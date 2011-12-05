@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/t41/!svn/ver/918/trunk/lib/t41/Backend
+END
+Uri.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/t41/!svn/ver/880/trunk/lib/t41/Backend/Uri.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/t41/!svn/ver/832/trunk/lib/t41/Backend/Exception.php
+END
+Key.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/t41/!svn/ver/907/trunk/lib/t41/Backend/Key.php
+END
+Mapper.php
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/t41/!svn/ver/907/trunk/lib/t41/Backend/Mapper.php
+END

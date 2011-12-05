@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/t41/!svn/ver/876/trunk/lib/t41/Object
+END
+Model.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/t41/!svn/ver/862/trunk/lib/t41/Object/Model.php
+END
+Relation.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/t41/!svn/ver/623/trunk/lib/t41/Object/Relation.php
+END
+Uri.php
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/t41/!svn/ver/876/trunk/lib/t41/Object/Uri.php
+END
+Rule.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/t41/!svn/ver/832/trunk/lib/t41/Object/Rule.php
+END
+Collection.php
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/t41/!svn/ver/870/trunk/lib/t41/Object/Collection.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/t41/!svn/ver/832/trunk/lib/t41/Object/Exception.php
+END
+Geo.php
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/t41/!svn/ver/832/trunk/lib/t41/Object/Geo.php
+END
+Abstract.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/t41/!svn/ver/865/trunk/lib/t41/Object/Abstract.php
+END

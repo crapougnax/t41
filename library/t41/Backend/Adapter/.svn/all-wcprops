@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/t41/!svn/ver/918/trunk/lib/t41/Backend/Adapter
+END
+Csv.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/t41/!svn/ver/905/trunk/lib/t41/Backend/Adapter/Csv.php
+END
+Ldap.php
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/t41/!svn/ver/832/trunk/lib/t41/Backend/Adapter/Ldap.php
+END
+Xml.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/t41/!svn/ver/832/trunk/lib/t41/Backend/Adapter/Xml.php
+END
+Interface.php
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/t41/!svn/ver/832/trunk/lib/t41/Backend/Adapter/Interface.php
+END
+Pdo.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/t41/!svn/ver/915/trunk/lib/t41/Backend/Adapter/Pdo.php
+END
+Filesystem.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/t41/!svn/ver/880/trunk/lib/t41/Backend/Adapter/Filesystem.php
+END
+Abstract.php
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/t41/!svn/ver/918/trunk/lib/t41/Backend/Adapter/Abstract.php
+END
+MongoDB.php
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/t41/!svn/ver/856/trunk/lib/t41/Backend/Adapter/MongoDB.php
+END
+Db2.php
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/t41/!svn/ver/917/trunk/lib/t41/Backend/Adapter/Db2.php
+END

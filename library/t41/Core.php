@@ -447,7 +447,7 @@ class Core {
     	
     	if (is_null($envKey)) {
     		
-    		throw new t41_Config_Exception("No matching environment found");
+    		throw new Config\Exception("No matching environment found");
     	}
     	
     	self::$_env += self::$_config['environments'][$envKey];
