@@ -19,9 +19,13 @@
  * @version    $Revision: 856 $
  */
 
+namespace t41\Backend\Adapter;
+use t41\Backend;
+use t41\Config;
+use t41\ObjectModel;
 
 /** Required files */
-require_once 't41/Backend/Adapter/Abstract.php';
+require_once 't41/Backend/Adapter/AdapterAbstract.php';
 
 /**
  * class providing all methods to use with MongoDB
@@ -31,7 +35,7 @@ require_once 't41/Backend/Adapter/Abstract.php';
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
+class MongoDbAdapter extends AdapterAbstract {
 
 
 	/**
@@ -41,10 +45,10 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 */
 	protected $_db;
 	
-	protected $_operators = array(t41_Condition::OPERATOR_GTHAN => '$gt'
-								, t41_Condition::OPERATOR_LTHAN => '$lt'
-								, t41_Condition::OPERATOR_EQUAL => '$in'
-								, t41_Condition::OPERATOR_DIFF => '$nin'
+	protected $_operators = array(Condition::OPERATOR_GTHAN => '$gt'
+								, Condition::OPERATOR_LTHAN => '$lt'
+								, Condition::OPERATOR_EQUAL => '$in'
+								, Condition::OPERATOR_DIFF => '$nin'
 								 );
 								 	
 	/**
@@ -71,11 +75,11 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 * @param string $alias
 	 * @throws t41_Backend_Exception
 	 */
-	public function __construct(t41_Backend_Uri $uri, $alias = null)
+	public function __construct(Uri $uri, $alias = null)
 	{
 		if (! extension_loaded('mongo')) {
 			
-			throw new t41_Backend_Exception(array("BACKEND_REQUIRED_EXT", 'mongo'));
+			throw new Exception(array("BACKEND_REQUIRED_EXT", 'mongo'));
 		}
 
 		parent::__construct($uri, $alias);
@@ -90,7 +94,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		} else {
 			
 			require_once 't41/Backend/Exception.php';			
-			throw new t41_Backend_Exception('BACKEND_MISSING_DBNAME_PARAM');
+			throw new Exception('BACKEND_MISSING_DBNAME_PARAM');
 		}
 		
 		if (! empty($url[1])) {
@@ -100,17 +104,17 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		
 		try {
 
-			$this->_ressource = new Mongo($this->_uri->getHost());
+			$this->_ressource = new \Mongo($this->_uri->getHost());
 			
-		} catch (MongoException $e) {
-			
-			require_once 't41/Backend/Exception.php';
-			throw new t41_Backend_Exception($e->getMessage());
-			
-		} catch (InvalidArgumentException $e) {
+		} catch (\MongoException $e) {
 			
 			require_once 't41/Backend/Exception.php';
-			throw new t41_Backend_Exception($e->getMessage());			
+			throw new Exception($e->getMessage());
+			
+		} catch (\InvalidArgumentException $e) {
+			
+			require_once 't41/Backend/Exception.php';
+			throw new Exception($e->getMessage());			
 		}
 	}
 	
@@ -122,13 +126,13 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 * @return boolean
 	 * @throws t41_Backend_Exception
 	 */
-	public function create(t41_Data_Object $do)
+	public function create(ObjectModel\DataObject $do)
 	{
 		// set database to use
 		$this->_selectDatabase($do->getUri());
 		
 		// get collection to use, from mapper if available, else from data object
-		$collection = ($this->_mapper instanceof t41_Backend_Mapper) ? $this->_mapper->getDatastore($do->getClass()) : $do->getClass();
+		$collection = ($this->_mapper instanceof Mapper) ? $this->_mapper->getDatastore($do->getClass()) : $do->getClass();
 
 		$collec = $this->_db->selectCollection($collection);
 		
@@ -147,7 +151,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 
 			$collec->insert($recordSet);
 			
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			
 			// @todo decide whether to throw an exception or just save last message in a property
 			die($e->getMessage());
@@ -155,10 +159,10 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		}
 		
 		// inject new t41_Object_Uri object in data object
-		$uri = t41_Backend::PREFIX . $this->_uri->getAlias() . '/' . $this->_database 
+		$uri = Backend::PREFIX . $this->_uri->getAlias() . '/' . $this->_database 
 		     . '/' . $collection . '/' . $recordSet['_id']->__toString();
 		
-		$uri = new t41_Object_Uri($uri, $this->_uri);
+		$uri = new ObjectModel\Uri($uri, $this->_uri);
 		$do->setUri($uri);
 		
 		return true;
@@ -172,7 +176,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 * @param t41_Data_Object $do Data object to populate
 	 * @return t41_Data_Object populated data object
 	 */
-	public function read(t41_Data_Object $do) 
+	public function read(ObjectModel\DataObject $do) 
 	{
 		$uri = $do->getUri();
 		
@@ -180,13 +184,13 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		$this->_selectDatabase($uri->getBackendUri());
 		
 		// get table to use, from mapper if available, else from data object
-		$collection = ($this->_mapper instanceof t41_Backend_Mapper) ? $this->_mapper->getDatastore($uri->getClass()) : $uri->getClass();
+		$collection = ($this->_mapper instanceof Mapper) ? $this->_mapper->getDatastore($uri->getClass()) : $uri->getClass();
 
 
 		$collec = $this->_db->selectCollection($collection);
 		
 		// get data from backend
-		$data = array('_id' => new MongoId($uri->getIdentifier()));
+		$data = array('_id' => new \MongoId($uri->getIdentifier()));
 		$this->_setLastQuery('findOne', $data);
 		$data = $collec->findOne($data);
 		
@@ -210,12 +214,12 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 * @param t41_Data_Object $do
 	 * @return mixed
 	 */
-	public function update(t41_Data_Object $do)
+	public function update(ObjectModel\DataObject $do)
 	{
 		$uri = $do->getUri();
 		
 		// get table to use, from mapper if available, else from data object
-		$table = ($this->_mapper instanceof t41_Backend_Mapper) ? $this->_mapper->getDatastore($uri->getClass()) : $do->getClass();
+		$table = ($this->_mapper instanceof Mapper) ? $this->_mapper->getDatastore($uri->getClass()) : $do->getClass();
 		
 		// prepare data
 		$data = $do->toArray();
@@ -235,7 +239,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	 * @param t41_Data_Object $do
 	 * @return mixed
 	 */
-	public function delete(t41_Data_Object $do)
+	public function delete(ObjectModel\DataObject $do)
 	{		
 		// on découpe l'url de l'URI afin d'obtenir les parties qui nous interesse.
 		$uri = $do->getUri();
@@ -250,7 +254,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	}
 	
 	
-	public function find(t41_Object_Collection $collection)
+	public function find(ObjectModel\Collection $collection)
 	{
 		$class = $collection->getDataObject()->getClass();
 		$mode  = $collection->getParameter('memberType');
@@ -259,15 +263,13 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		$this->_selectDatabase($collection->getDataObject()->getUri());
 		
 		// get collection to use, from mapper if available, else from data object
-		$collec = ($this->_mapper instanceof t41_Backend_Mapper) ? $this->_mapper->getDatastore($class) : $class;
+		$collec = ($this->_mapper instanceof Mapper) ? $this->_mapper->getDatastore($class) : $class;
 
 		$collec = $this->_db->selectCollection($collec);
 
 		// primary key is either part of the mapper configuration or 'id'
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : 'id';
 		
-		/* @var $select Zend_Db_Select */
-
 		$conditions = array();
 		
 		/* @var $condition t41_Condition */
@@ -322,7 +324,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		$ids = $collec->find($conditions, array('_id'));
 		
 		/* prepare base of object uri */
-		$uri = new t41_Object_Uri();
+		$uri = new ObjectModel\Uri();
 		$uri->setBackendUri($this->_uri);
 		$uri->setClass($collection->getDataObject()->getClass());
 		$uri->setUrl($this->_database . '/');
@@ -331,7 +333,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	}
 	
 	
-	public function returnsDistinct(t41_Object_Collection $collection, t41_Property_Abstract $property)
+	public function returnsDistinct(ObjectModel\Collection $collection, ObjectModel\Property\PropertyAbstract $property)
 	{
 		$class = $collection->getDataObject()->getClass();
 		$mode  = $collection->getParameter('memberType');
@@ -407,7 +409,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 		} else {
 			
 			require_once 't41/Backend/Exception.php';
-			throw new t41_Backend_Exception("Aucune base de donnée sélectionnée pour la requète");
+			throw new Exception("Aucune base de donnée sélectionnée pour la requète");
 		}
 	}
 	
@@ -471,7 +473,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 				if (isset($_operators[$op])) {
 				
 					$cval = is_numeric($value) ? (float) $value : $value;
-					$cval = in_array($_operators[$op], array($this->_operators[t41_Condition::OPERATOR_EQUAL], $this->_operators[t41_Condition::OPERATOR_DIFF])) ? (array) $cval : $cval;
+					$cval = in_array($_operators[$op], array($this->_operators[Condition::OPERATOR_EQUAL], $this->_operators[Condition::OPERATOR_DIFF])) ? (array) $cval : $cval;
 					$conditions[$field][$_operators[$op]] = $cval;
 					
 				}
@@ -483,7 +485,7 @@ class t41_Backend_Adapter_MongoDB extends t41_Backend_Adapter_Abstract {
 	}
 	
 	
-	protected function _populateCollection(array $ids, t41_Object_Collection $collection, t41_Object_Uri $uriBase)
+	protected function _populateCollection(array $ids, ObjectModel\Collection $collection, ObjectModel\Uri $uriBase)
 	{
 		foreach ($ids as $key => $val) {
 			
