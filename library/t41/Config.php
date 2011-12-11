@@ -1,7 +1,4 @@
 <?php
-
-namespace t41;
-
 /**
  * t41 Toolkit
  *
@@ -22,6 +19,11 @@ namespace t41;
  * @version    $Revision: 913 $
  */
 
+namespace t41;
+
+use t41\Config;
+
+
 /** Required files */
 require_once 't41/Config/Adapter/AdapterInterface.php';
 
@@ -37,71 +39,23 @@ require_once 't41/Config/Adapter/AdapterInterface.php';
 class Config {
 	
 	
-	const STORE_KEYS = 'keys';
+	const STORE_KEYS 		= 'keys';
 	
 	
-	const POSITION_TOP = 'top';
+	const POSITION_TOP		= 'top';
 	
 	
-	const POSITION_BOTTOM = 'bottom';
+	const POSITION_BOTTOM	= 'bottom';
 	
 	
-	const REALM_CONFIGS	= 1;
+	const REALM_CONFIGS		= 1;
 	
 	
-	const REALM_OBJECTS = 2;
+	const REALM_OBJECTS 	= 2;
 	
 	
-	const REALM_TEMPLATES = 4;
-	
-	
-	static $_paths = array(self::REALM_CONFIGS => array()
-						,  self::REALM_OBJECTS => array()
-						, self::REALM_TEMPLATES => array()
-						  );
-	
-	
-	/**
-	 * Load a file into a Configuration Array
-	 * 
-	 * @param string $file
-	 * @param array $params
-	 * 
-	 * @return array|false Configuration Array or false if the file don't exists
-	 */
-	public static function loadConfig($file, array $params = null)
-	{
-		if (($filePath = self::_findFile($file)) === false) {
+	const REALM_TEMPLATES	= 4;
 		
-			/* no matching file name in paths */
-			return false;
-		}
-		
-		$type = substr( $file, strrpos($file, '.') + 1 );
-		
-		$className = 'Config\Adapter\\' . ucfirst(strtolower($type));
-		
-		try {
-
-			require_once 't41/Config/Adapter/' . ucfirst(strtolower($type)) . '.php';
-			
-			$config = new $className($filePath, $params);
-			
-			if (! $config instanceof Config\Adapter\AdapterAbstract) {
-				
-				require_once 't41/Config/Exception.php';
-				throw new Config\Exception("$className is not implementing AdapterAbstract.");
-			}
-			
-			return $config->load();
-
-		} catch (Exception $e) {
-			
-			require_once 't41/Config/Exception.php';
-			throw new Config\Exception($e->getMessage());
-			
-		}
-	}
 	
 	/**
 	 * 
@@ -114,7 +68,7 @@ class Config {
 	{
 		if (is_null($realms)) {
 			
-			require_once 't41/Config/Exception.php';
+			//require_once 't41/Config/Exception.php';
 			throw new Config\Exception("Realms must be indicated");
 		}
 		
@@ -140,25 +94,14 @@ class Config {
 		}
 	}
 
-	
+
+	/**
+	 * Returns an array containing all declared search paths for the given realm of config files
+	 * @param string $realm
+	 * @return array
+	 */
 	static public function getPaths($realm = self::REALM_CONFIGS)
 	{
 		return self::$_paths[$realm];
-	}
-	
-	
-	static protected function _findFile($file)
-	{
-		foreach (self::$_paths[self::REALM_CONFIGS] as $path) {
-			
-			$filePath = (substr($file, 0, 1) == DIRECTORY_SEPARATOR) ? $file : $path . $file;
-			
-			if (file_exists($filePath)) {
-				
-				return $filePath;
-			}
-		}
-		
-		return false;
 	}
 }

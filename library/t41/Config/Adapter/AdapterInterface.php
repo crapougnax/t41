@@ -53,8 +53,5 @@ interface AdapterInterface {
 	 * @param array $config	Configuration Array
 	 * @param bool $add Add data on true, overwrite on false
 	 */
-	public function save(array $config, $add = true);
-	
-	
-	
+	public function save(array $config, $add = true);	
 }

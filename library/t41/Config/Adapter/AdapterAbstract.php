@@ -46,7 +46,7 @@ abstract class AdapterAbstract implements AdapterInterface {
 	
 	
 	/**
-	 * Array of configuration keys to preserve
+	 * Array of configuration keys to consider
 	 * 
 	 * @var $_identifiers array
 	 */
@@ -65,7 +65,10 @@ abstract class AdapterAbstract implements AdapterInterface {
 	}
 	
 	
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\Config\Adapter.AdapterInterface::validate()
+	 */
 	public function validate()
 	{
 		return true;

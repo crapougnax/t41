@@ -1,7 +1,4 @@
 <?php
-
-namespace t41\Config\Adapter;
-
 /**
  * t41 Toolkit
  *
@@ -22,6 +19,10 @@ namespace t41\Config\Adapter;
  * @version    $Revision: 876 $
  */
 
+namespace t41\Config\Adapter;
+
+use t41\Config;
+
 /** Required files */
 require_once 't41/Config/Adapter/AdapterAbstract.php';
 
@@ -34,20 +35,7 @@ require_once 't41/Config/Adapter/AdapterAbstract.php';
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 
-class Adapter_Xml extends AdapterAbstract {
-
-
-	/**
-	 * Constructor, set the configuration file path.
-	 * 
-	 * @param string $file Configuration file path
-	 * @param array $params
-	 */
-	public function __construct ($file, array $params = null)
-	{
-		parent::__construct($file);
-	}
-	
+class XmlAdapter extends AdapterAbstract {
 
 	
 	public function validate()
@@ -58,30 +46,23 @@ class Adapter_Xml extends AdapterAbstract {
 		
 		libxml_use_internal_errors(true);
 		
-		$xsdFileName = substr( $this->_filePath, strrpos($this->_filePath, DIRECTORY_SEPARATOR) + 1 );
-		
+		$xsdFileName = substr( $this->_filePath, strrpos($this->_filePath, DIRECTORY_SEPARATOR) + 1 );	
 		$xsdFileName = substr( $xsdFileName, 0, strpos($xsdFileName, '.') );
+		$xsdFileName = Loader::findFile('xsd/' . $xsdFileName . '.xsd');
 		
-		$xsdFileName = t41_Core::getBasePath() . 'application/configs/xsd/'.$xsdFileName.'.xsd';
-		
-		if (! file_exists($xsdFileName)) {
+		if (is_null($xsdFileName)) {
 
 			return true;
 		
 		} else {
 		
-			$doc = new DOMDocument();
-			
+			$doc = new \DOMDocument();
 			$doc->load($this->filePath);
-			
 			$validate = $doc->schemaValidate( $xsdFileName );
-			
 			libxml_use_internal_errors($luie);
-			
+
 			return $validate;
-		
 		}
-		
 	}
 	
 	
@@ -99,9 +80,9 @@ class Adapter_Xml extends AdapterAbstract {
 		
 		$xml = simplexml_load_file($this->_filePath);
 		
-		if (! $xml instanceof SimpleXMLElement) {
+		if (! $xml instanceof \SimpleXMLElement) {
 			
-			throw new t41_Config_Exception("Error parsing $this->_filePath");
+			throw new Exception("Error parsing $this->_filePath");
 		}
 		
 		$array = $this->_loadElement($xml);
@@ -117,7 +98,7 @@ class Adapter_Xml extends AdapterAbstract {
 	 * @param SimpleXMLElement $xml 
 	 * @return array
 	 */
-	protected function _loadElement(SimpleXMLElement $xml)
+	protected function _loadElement(\SimpleXMLElement $xml)
 	{
 		$array = array();
 		
@@ -158,9 +139,9 @@ class Adapter_Xml extends AdapterAbstract {
 			}	
 		}
 		
-		return $array;
-		
+		return $array;	
 	}
+
 	
 	/**
 	 * Save a Configuration array in a file
@@ -171,6 +152,6 @@ class Adapter_Xml extends AdapterAbstract {
 	 */
 	public function save(array $config, $add = true)
 	{
-		throw new t41_Config_Exception("NOT YET IMPLEMENTED");
+		throw new Exception("NOT YET IMPLEMENTED");
 	}
 }
