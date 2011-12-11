@@ -61,7 +61,7 @@ class Loader {
 	 */
 	public static function loadConfig($file, array $params = null)
 	{
-		if (($filePath = self::findFile($file)) === false) {
+		if (($filePath = self::findFile($file)) == null) {
 		
 			/* no matching file name in paths */
 			return false;

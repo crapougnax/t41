@@ -46,9 +46,11 @@ class XmlAdapter extends AdapterAbstract {
 		
 		libxml_use_internal_errors(true);
 		
+		/* XSD validation file -if exists- is based on file name */
 		$xsdFileName = substr( $this->_filePath, strrpos($this->_filePath, DIRECTORY_SEPARATOR) + 1 );	
 		$xsdFileName = substr( $xsdFileName, 0, strpos($xsdFileName, '.') );
-		$xsdFileName = Loader::findFile('xsd/' . $xsdFileName . '.xsd');
+		
+		$xsdFileName = \t41\Config\Loader::findFile('xsd/' . $xsdFileName . '.xsd');
 		
 		if (is_null($xsdFileName)) {
 

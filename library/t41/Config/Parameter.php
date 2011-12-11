@@ -254,8 +254,8 @@ class Parameter {
 	 */
 	static public function loadConfig($file, $add = true)
 	{
-		require_once 't41/Config.php';
-		$config = Config::loadConfig($file);
+		require_once 't41/Config/Loader.php';
+		$config = Loader::loadConfig($file);
 
 		if ($config === false) {
 			
@@ -289,12 +289,12 @@ class Parameter {
 			return self::getPropertyParameters($class);
 		}
 		
-		if ($object instanceof t41_View_Object_Abstract) {
+		if ($object instanceof View\ObjectAbstract) {
 			
 			return self::getViewObjectParameters($class);
 		}
 		
-		if ($object instanceof t41_View_Decorator_Abstract) {
+		if ($object instanceof View\DecoratorAbstract) {
 
 			return self::getDecoratorParameters($class);
 		}
