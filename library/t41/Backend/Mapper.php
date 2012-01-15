@@ -1,4 +1,7 @@
 <?php
+
+namespace t41\Backend;
+
 /**
  * t41 Toolkit
  *
@@ -27,7 +30,7 @@
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class t41_Backend_Mapper
+class Mapper
 {
 	/**
 	 * Matching array
@@ -98,10 +101,10 @@ class t41_Backend_Mapper
 				
 				/* datastore name may contain multiple values when foreign objects/rows are 
 				 * referenced with more than one key (DB2 has such cases) */
-				if (strpos($value['datastorename'], t41_Mapper::ARGS_SEPARATOR) !== false) {
+				if (strpos($value['datastorename'], \t41\Mapper::ARGS_SEPARATOR) !== false) {
 					
 					$val = array();
-					$pkeys = explode(t41_Mapper::ARGS_SEPARATOR, $value['datatorename']);
+					$pkeys = explode(\t41\Mapper::ARGS_SEPARATOR, $value['datatorename']);
 					foreach ($pkeys as $pkey) {
 						
 						$val[$pkey] = $array[$pkey];
@@ -275,7 +278,7 @@ class t41_Backend_Mapper
 	{
 		if (! isset($this->_mapping[$objectName]) || ! isset($this->_mapping[$objectName]['pkey'])) {
 			
-			return t41_Backend::DEFAULT_PKEY;
+			return \t41\Backend::DEFAULT_PKEY;
 		}
 		
 		if (isset($this->_mapping[$objectName]['pkey_parsed'])) {
@@ -283,14 +286,14 @@ class t41_Backend_Mapper
 			return $this->_mapping[$objectName]['pkey_parsed'];
 		}
 		
-		$keys  = explode(t41_Mapper::VALUES_SEPARATOR, $this->_mapping[$objectName]['pkey']);
+		$keys  = explode(\t41\Mapper::VALUES_SEPARATOR, $this->_mapping[$objectName]['pkey']);
 		
 		$array = array();
 		
 		foreach ($keys as $key) {
 			
-			$elements = explode(t41_Mapper::ARGS_SEPARATOR, $key);
-			$array[] = new t41_Backend_Key($elements[0], isset($elements[1]) ? $elements[1] : null);
+			$elements = explode(\t41\Mapper::ARGS_SEPARATOR, $key);
+			$array[] = new Key($elements[0], isset($elements[1]) ? $elements[1] : null);
 		}
 		
 		// save parsed value
@@ -340,8 +343,6 @@ class t41_Backend_Mapper
 			}
  		}
 		
-// 		Zend_Debug::dump($arrayDest); die;
- 		
 		return $arrayDest;
 	}
 	

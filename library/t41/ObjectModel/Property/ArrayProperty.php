@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\ObjectModel\Property;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,31 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
+ * @version    $Revision: 856 $
  */
 
 
 /**
- * Object Exception Class
+ * Class for an Array Property
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Exception extends \t41\Exception {
+class ArrayProperty extends PropertyAbstract {
 
+	
+	public function setValue($value)
+	{
+		if (! is_array($value)) {
+			
+			throw new Exception("This property accepts only arrays");
+		}
+		parent::setValue($value);
+	}
+	
 }

@@ -185,7 +185,7 @@ class Backend {
 	 */
 	static public function getInstance($id)
 	{
-		if ($id instanceof Backend\Uri) {
+		if ($id instanceof Backend\BackendUri) {
 			
 			if ($id->getAlias()) {
 
@@ -220,7 +220,7 @@ class Backend {
 					$config['uri']['adapter'] = $config['type'];
 				}
 				
-				$uri = new Backend\Uri($config['uri']);
+				$uri = new Backend\BackendUri($config['uri']);
 				
 				$backend = self::factory($uri, $id);
 				
@@ -242,7 +242,7 @@ class Backend {
 						$mapper = $config['mapper'];
 					}
 						
-					$mapper = Mapper::getInstance($mapper);
+					$mapper = \t41\Mapper::getInstance($mapper);
 					$backend->setMapper($mapper);
 				}
 				
@@ -331,7 +331,7 @@ class Backend {
 			} else {
 				
 				/* get object definition default backend */
-				$backend = Object\Core::getObjectBackend($do->getClass());
+				$backend = ObjectModel::getObjectBackend($do->getClass());
 			}
 				
 			if (is_null($backend)) {
@@ -378,7 +378,7 @@ class Backend {
 			} else {
 				
 				/* get object definition default backend */
-				$backend = Object\Core::getObjectBackend($do->getClass());
+				$backend = ObjectModel::getObjectBackend($do->getClass());
 			}
 				
 			if (is_null($backend)) {
@@ -421,13 +421,13 @@ class Backend {
 	 */
 	public static function delete($data)
 	{
-		if ($data instanceof Object\Uri) {				// data est une Uri
+		if ($data instanceof ObjectModel\ObjectUri) {				// data est une Uri
 			$backend = self::getInstance($data);			
 			$backend->delete($data);
-		} else if ($data instanceof Data\DataObject ) {	// Data est un Data Object
+		} else if ($data instanceof ObjectModel\DataObject ) {	// Data est un Data Object
 			self::delete($data->getUri());
 			$data->clearUri();
-		} else if ($data instanceof Model\ObjectModel ) { 	// data est un Objet
+		} else if ($data instanceof ObjectModel\ObjectModel ) { 	// data est un Objet
 			self::delete($data->getDataObject());
 		}
 	}
@@ -454,7 +454,7 @@ class Backend {
 		
 		if (is_null($backend)) {
 			
-			$backend = ObjectModel\Core::getObjectBackend($co->getDataObject()->getClass());
+			$backend = ObjectModel::getObjectBackend($co->getDataObject()->getClass());
 			
 			if (is_null($backend)) {
 			
@@ -465,7 +465,6 @@ class Backend {
 			
 		if (! $backend) {
 
-			require_once 't41/Backend/Exception.php';
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 
@@ -477,7 +476,7 @@ class Backend {
 	{
 		if (is_null($backend)) {
 			
-			$backend = ObjectModel\Core::getObjectBackend($co->getDataObject()->getClass());
+			$backend = ObjectModel::getObjectBackend($co->getDataObject()->getClass());
 			
 			if (is_null($backend)) {
 			

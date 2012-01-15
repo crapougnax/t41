@@ -1,4 +1,7 @@
 <?php
+
+namespace t41;
+
 /**
  * t41 Toolkit
  *
@@ -16,16 +19,12 @@
  * @package    t41_Core
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 876 $
+ * @version    $Revision: 937 $
  */
 
-namespace t41\Config;
-
-use t41;
-use t41\View;
 use t41\ObjectModel;
 use t41\ObjectModel\Property;
-
+use t41\View;
 
 /**
  * Class providing objects parameters wrapper ensuring basic logic control.
@@ -37,46 +36,18 @@ use t41\ObjectModel\Property;
  */
 class Parameter {
 
-	/**
-	 * Boolean parameter type identifier
-	 * @var string
-	 */
 	const BOOLEAN	= 'boolean';
 	
-	/**
-	 * Integer parameter type identifier
-	 * @var string
-	 */
 	const INTEGER	= 'integer';
 	
-	/**
-	 * Float parameter type identifier
-	 * @var string
-	 */
 	const FLOAT		= 'float';
 	
-	/**
-	 * String parameter type identifier
-	 * @var string
-	 */
 	const STRING	= 'string';
 	
-	/**
-	 * Array parameter type identifier
-	 * @var string
-	 */
 	const MULTIPLE	= 'array';
 	
-	/**
-	 * Default parameter loose type identifier
-	 * @var string
-	 */
 	const ANY		= 'any';
 	
-	/**
-	 * Object parameter type identifier
-	 * @var string
-	 */
 	const OBJECT	= 'object';
 	
 	
@@ -142,6 +113,7 @@ class Parameter {
 		}
 		
 		$this->setValue($value);
+		
 	}
 	
 	
@@ -153,7 +125,7 @@ class Parameter {
 			
 		} else {
 			
-			throw new Exception("Type '$type' is not one of the valid types.");
+			throw new Exception("Le type '$type' n'est pas un type acceptable");
 		}		
 	}
 	
@@ -187,7 +159,8 @@ class Parameter {
 	
 	public function setValue($value = null)
 	{
-		if ($this->_protected && ! is_null($this->_value)) {
+//		return $this->_setValue($value);
+		if ($this->_protected && $this->_value != null) {
 			
 			throw new Exception("VALUE_PROTECTED_FROM_CHANGE");
 		}
@@ -200,27 +173,28 @@ class Parameter {
 			
 			if ($this->_type == self::BOOLEAN && !is_bool($value)) {
 			
-				throw new Exception("Passed value '$value' is not a boolean");
+				throw new Exception("La valeur doit être de type booléen");
 			}
 
 			else if ($this->_type == self::INTEGER && (! is_integer($value) || ! is_numeric($value))) {
 			
-				throw new Exception("Passed value '$value' is not an integer nor a numeric value");
+//				var_dump($value); die;
+				throw new Exception("La valeur doit être de type entier");
 			}
 		
 			else if ($this->_type == self::FLOAT && !is_float($value)) {
 			
-				throw new Exception("Passed value '$value' is not a float");
+				throw new Exception("La valeur doit être de type float");
 			}
 		
 			else if ($this->_type == self::STRING && strlen($value) > 0 && !is_string($value)) {
 			
-				throw new Exception("Pass value '$value' is not a string");
+				throw new Exception("La valeur doit être de type string, valeur donnée est '$value'");
 			}
 			
 			else if ($this->_type == self::OBJECT && !is_object($value)) {
 
-				throw new Exception("Passed value '$value' is not an object");
+				throw new Exception("La valeur doit être de type objet, valeur donnée est '$value'");
 			}
 		}
 		
@@ -255,8 +229,8 @@ class Parameter {
 	 */
 	static public function loadConfig($file, $add = true)
 	{
-		require_once 't41/Config/Loader.php';
-		$config = Loader::loadConfig($file);
+		require_once 't41/Config.php';
+		$config = Config\Loader::loadConfig($file);
 
 		if ($config === false) {
 			
@@ -272,6 +246,7 @@ class Parameter {
 	        self::$_config = array_merge(self::$_config, $config);
 		}
 
+		//Zend_Debug::dump(self::$_config);
 		return true;
 	}
 	
@@ -280,7 +255,7 @@ class Parameter {
 	{
 		$class = get_class($object);
 		
-		if ($object instanceof ObjectModel) {
+		if ($object instanceof ObjectModel\ObjectModel) {
 			
 			return self::getObjectParameters($class);
 		}
@@ -312,10 +287,13 @@ class Parameter {
 	{
 		if (! isset(self::$_config['core'])) {
 			
+			//die(t41_Core::getBasePath() . 't41/configs/parameters/core.xml');
 			/* @todo get config from t41_Object */
 			self::loadConfig('parameters/core.xml');
 		}
 
+		//Zend_Debug::dump(self::$_config);
+		
 		$array = self::_compileFragments($objectClass, 'core');
 
 		// transform each array value into t41_Parameter
@@ -333,7 +311,7 @@ class Parameter {
 
 		$array = self::_compileFragments($objectClass);
 
-		// transform each array value into \t41\Parameter
+		// transform each array value into t41_Parameter
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
 	
@@ -361,6 +339,7 @@ class Parameter {
 		
 		$array = self::_compileFragments($objectClass, 'view_objects');
 		
+		//Zend_Debug::dump($array); die;
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
 	
@@ -436,11 +415,6 @@ class Parameter {
 	}
 	
 	
-	/**
-	 * Convert an array of parameters descriptions into into an array of t41\Parameter objects 
-	 * @param array $array
-	 * @return array
-	 */
 	static protected function _arrayToParameters(array $array)
 	{
 		foreach ($array as $key => $value) {

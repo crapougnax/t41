@@ -155,7 +155,7 @@ abstract class ObjectModelAbstract {
 	 * @param array $objects	if parameter is null, parameters are acquired from xml configuration files
 	 * @param boolean $replace
 	 */
-	final protected function _setParameterObjects(array $objects = null, $replace = false)
+	final protected function _setParameterObjects(array $objects = array(), $replace = false)
 	{
 		if (is_null($objects)) {
 			

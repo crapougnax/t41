@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\Backend\Adapter;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,22 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
 
-
 /**
- * Object Exception Class
+ * Class used to throw exceptions from backend.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class Exception extends \t41\Exception {
 
+	
+	protected $_store = 'backend/adapter';
 }

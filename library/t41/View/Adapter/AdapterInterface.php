@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\View\Adapter;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,27 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
 
-
 /**
- * Object Exception Class
+ * Interface class providing basic method names to context adapters.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Exception extends \t41\Exception {
+interface AdapterInterface {
 
+    public function __construct();
+
+    public function display();
+
+    public function componentAdd($file, $type);
+
+    public function eventAdd($event, $type, $isFile = false);
 }

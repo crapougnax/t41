@@ -22,6 +22,10 @@ namespace t41\ObjectModel;
  * @version    $Revision: 870 $
  */
 
+use t41\Backend;
+use t41\ObjectModel\Property\PropertyAbstract;
+use t41\ObjectModel\Property\IdentifierProperty;
+
 /**
  * Class for a collection of Objects
  *
@@ -30,12 +34,6 @@ namespace t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-use t41\ObjectModel\Property\PropertyAbstract;
-
-use t41\ObjectModel\Property\IdentifierProperty;
-
-use t41\ObjectModel;
-
 class Collection extends ObjectModelAbstract {
 
 	
@@ -124,9 +122,9 @@ class Collection extends ObjectModelAbstract {
 	
 	public function setCondition(PropertyInterface $property, $value = null, $operator = null, $mode = 'AND')
 	{
-		$condition = new \t41\Condition($property
+		$condition = new Backend\Condition($property
 									,  isset($value) ? $value : null
-									,  isset($operator) ? $operator : \t41\Condition::OPERATOR_EQUAL
+									,  isset($operator) ? $operator : Backend\Condition::OPERATOR_EQUAL
 									  );
 		
 		$this->_conditions[] = array($condition, $mode);
@@ -137,7 +135,7 @@ class Collection extends ObjectModelAbstract {
 	
 	public function setSorting($property, $order = 'ASC')
 	{
-		if (! $property instanceof PropertyInterface) {
+		if (! $property instanceof Property\PropertyInterface) {
 			
 			if (! is_array($property)) {
 				
@@ -148,7 +146,7 @@ class Collection extends ObjectModelAbstract {
 			
 			$property = $this->_do->getProperty($property[0]);
 			
-			if (! $property instanceof PropertyInterface) {
+			if (! $property instanceof Property\PropertyInterface) {
 				
 				throw new Exception("PARAM_DOESNT_MATCH_PROPERTY");
 			}
@@ -269,7 +267,7 @@ class Collection extends ObjectModelAbstract {
 	{
 		if (! is_array($this->_members)) {
 			
-			t41_Backend::find($this);
+			Backend::find($this);
 		}
 		
 		return $this->_members;
@@ -305,7 +303,7 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function having($propertyName)
 	{
-		if ($propertyName == Uri::IDENTIFIER) {
+		if ($propertyName == ObjectUri::IDENTIFIER) {
 			
 			return $this->setCondition(new Property\IdentifierProperty('id'));
 			

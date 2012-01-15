@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\Backend\Adapter;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,34 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
+ * @version    $Revision: 880 $
  */
 
 
 /**
- * Object Exception Class
+ * Class used to identify a backend
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
+ * @todo Actuellement, la classe n'accepte pas d'être utilisée sans préciser de nom de base
+ * 		il faudrai donc réfléchir à comment implementer ça au niveau de Zend_DB mais aussi au niveau des URI
+ * 		de façon à permettre à utiliser un backend MySQL sur plusieurs base d'un même serveur.
+ * 
  */
-class Exception extends \t41\Exception {
+class MysqlAdapter extends PdoAdapter {
 
+	
+	protected $_adapter = 'pdo_mysql';
+	
+	
+	protected function _connect()
+	{
+		parent::_connect();
+		$this->_ressource->query("SET NAMES 'utf8'");
+	}
 }

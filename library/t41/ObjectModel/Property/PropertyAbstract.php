@@ -22,9 +22,6 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 865 $
  */
 
-/** Required files */
-require_once 't41/Object/Abstract.php';
-require_once 't41/Property/Interface.php';
 
 /**
  * Abstract class providing basic t41_Property_* objects methods

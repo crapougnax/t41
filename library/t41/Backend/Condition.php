@@ -22,6 +22,9 @@ namespace t41\Backend;
  * @version    $Revision: 839 $
  */
 
+use t41\ObjectModel;
+use t41\ObjectModel\Property;
+
 /**
  * Simple class to handle query conditions on objects collections
  * 
@@ -36,6 +39,8 @@ namespace t41\Backend;
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
+use t41\DataObject;
+
 class Condition {
 	
 	
@@ -274,12 +279,12 @@ class Condition {
 	 */
 	public function having($name)
 	{
-		if (! $this->_property instanceof t41_Property_Object && ! $this->_property instanceof t41_Property_Collection) {
+		if (! $this->_property instanceof Property\ObjectProperty && ! $this->_property instanceof Property\CollectionProperty) {
 
-			throw new t41_Exception("CONDITION_INCORRECT_PROPERTY");
+			throw new Exception("CONDITION_INCORRECT_PROPERTY");
 		}
 		
-		$do = t41_Data::factory($this->_property->getParameter('instanceof'));
+		$do = DataObject::factory($this->_property->getParameter('instanceof'));
 		
 		if (($property = $do->getProperty($name)) !== false) {
 
@@ -287,7 +292,7 @@ class Condition {
 			return $this->_condition;
 		}
 		
-		throw new t41_Exception(array("CONDITION_UNKNOWN_PROPERTY", $name));
+		throw new Exception(array("CONDITION_UNKNOWN_PROPERTY", $name));
 	}
 	
 	

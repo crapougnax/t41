@@ -31,8 +31,6 @@ namespace t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-use t41\ObjectModel;
-
 class DataObject {
 	
 	/**
@@ -167,18 +165,17 @@ class DataObject {
     {  	
     	$this->_data = array();
     	
-    	if (ObjectModel::getObjectExtends($var)) {
+    	if (\t41\ObjectModel::getObjectExtends($var)) {
 
-    		$properties = ObjectModel::getObjectProperties(ObjectModel::getObjectExtends($var));
+    		$properties = \t41\ObjectModel::getObjectProperties(ObjectModel::getObjectExtends($var));
     		
     	} else {
     		
     		$properties = array();
     	}
     	
-    	$properties += (array) ObjectModel::getObjectProperties($var);
+    	$properties += (array) \t41\ObjectModel::getObjectProperties($var);
     	
-    	//Zend_Debug::dump($properties);
     	if ($properties !== false) {
     		
     		foreach ($properties as $propertyId => $propertyParams) {
@@ -210,16 +207,16 @@ class DataObject {
 	 * @todo remove parameter whicch value is already available in object uri
 	 * @return array
 	 */
-    public function toArray(t41_Backend_Adapter_Abstract $backend = null)
+    public function toArray(\t41\Backend\Adapter\AdapterAbstract $backend = null)
     {
-    	if (is_null($backend)) $backend = t41_Object::getObjectBackend($this->_class);
+    	if (is_null($backend)) $backend = \t41\ObjectModel::getObjectBackend($this->_class);
     	
     	$result = array('data' => array(), 'collections' => array());
     	
     	/* @var $value t41_Property_Abstract */
     	foreach ($this->_data as $key => $value) {
     		
-    		if ($value instanceof t41_Property_Collection) {
+    		if ($value instanceof Property\Collection) {
     			
     			if ($value->getParameter('embedded') == true) {
     				

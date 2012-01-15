@@ -22,6 +22,7 @@ namespace t41\ObjectModel;
  * @version    $Revision: 865 $
  */
 
+use t41\ObjectModel\Property;
 
 /**
  * Class for Property.
@@ -128,14 +129,11 @@ class Property {
 	{
 		if (empty($type)) $type = 'string';
 		
-		$className = 'Property\\' . ucfirst(strtolower($type));
+		$className = sprintf('\t41\ObjectModel\Property\%sProperty', ucfirst(strtolower($type)));
 		
 		try {
 			
-			/* @todo fix this pb of autoloader/require_once */
-			require_once str_replace('_', '/', $className) . '.php';
-				
-			/* @var $property t41_Property_Abstract */
+			/* @var $property \t41\ObjectModel\Property\PropertyAbstract */
 			$property = new $className($id, $params, \t41\Parameter::getPropertyParameters($className));
 			
 			if (! $property instanceof Property\PropertyAbstract) {

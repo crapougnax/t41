@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\ObjectModel\Property;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,30 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
 
-
 /**
- * Object Exception Class
+ * Class for an Currency Property
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Exception extends \t41\Exception {
+class CurrencyProperty extends PropertyAbstract {
 
+	
+	public function setValue($value)
+	{
+		if (! is_numeric($value)) {
+			
+			throw new Exception(array("VALUE_NOT_INTEGER_OR_FLOAT", $value));
+		}
+		
+		parent::setValue((float) $value);
+	}
 }

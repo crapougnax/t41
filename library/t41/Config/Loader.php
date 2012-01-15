@@ -1,4 +1,7 @@
 <?php
+
+namespace t41\Config;
+
 /**
  * t41 Toolkit
  *
@@ -19,7 +22,7 @@
  * @version    $Revision: 913 $
  */
 
-namespace t41\Config;
+use \t41\Config\Adapter;
 
 /**
  * Class providing basic functions needed to manage Configuration files
@@ -48,7 +51,7 @@ class Loader {
 	 * 
 	 * @var array
 	 */
-	protected $_adapters = array();
+	static protected $_adapters = array();
 	
 	
 	/**
@@ -70,17 +73,15 @@ class Loader {
 		$type = substr( $file, strrpos($file, '.') + 1 );
 		
 		/* use existing adapter instance or create it */
-		if (! isset($this->_adapters[$type])) {
+		if (! isset(self::$_adapters[$type])) {
 		
-			$className = 'Adapter\\' . ucfirst(strtolower($type));
+			$className = sprintf('\t41\Config\Adapter\%sAdapter', ucfirst(strtolower($type)));
 		
 			try {
 
-				//require_once 't41/Config/Adapter/' . ucfirst(strtolower($type)) . '.php';
+				self::$_adapters[$type] = new $className($filePath, $params);
 			
-				$this->_adapters[$type] = new $className($filePath, $params);
-			
-				if (! $this->_adapters[$type] instanceof Adapter\AdapterAbstract) {
+				if (! self::$_adapters[$type] instanceof Adapter\AdapterAbstract) {
 				
 					//require_once 't41/Config/Exception.php';
 					throw new Exception("$className is not implementing AdapterAbstract.");
@@ -92,7 +93,7 @@ class Loader {
 			}
 		}
 
-		return $this->_adapters[$type]->load();
+		return self::$_adapters[$type]->load();
 	}
 	
 	
@@ -115,7 +116,6 @@ class Loader {
 		foreach (\t41\Config::getPaths($realm) as $path) {
 			
 			$filePath = (substr($file, 0, 1) == DIRECTORY_SEPARATOR) ? $file : $path . $file;
-			
 			if (file_exists($filePath)) {
 				
 				return $filePath;

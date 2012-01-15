@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\ObjectModel\Rule;
+namespace t41\ObjectModel\Property;
 
 /**
  * t41 Toolkit
@@ -16,21 +16,33 @@ namespace t41\ObjectModel\Rule;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
 
-
 /**
- * Object Exception Class
+ * Class for a Date Property
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_Property
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Exception extends \t41\Exception {
+class DateProperty extends PropertyAbstract {
 
+/*	
+	public function setValue($value)
+	{
+		Zend_Loader::loadClass('Zend_Date');
+		
+		if (! Zend_Date::isDate($value, $this->getParameter('format'))) {
+			
+			throw new t41_Property_Exception(array("VALUE_NOT_A_DATE", array($this->_id, $value)));
+		}
+		
+		parent::setValue(new Zend_Date($value));
+	}
+	*/
 }

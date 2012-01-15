@@ -22,6 +22,8 @@ namespace t41;
  * @version    $Revision: 886 $
  */
 
+use t41\ObjectModel;
+
 /**
  * Class providing basic functions needed to handle model objects
  *
@@ -36,6 +38,10 @@ class ObjectModel {
 	const ID	= 'id';
 	
 	const URI	= 'uri';
+	
+	const MODEL = 'model';
+	
+	const DATA	= 'data';
 	
 	/**
 	 * Array of objects definitions
@@ -54,8 +60,7 @@ class ObjectModel {
 	 */
 	static public function loadConfig($file = 'objects.xml', $add = true)
 	{
-		require_once 't41/Config.php';
-		$config = Config::loadConfig($file);
+		$config = Config\Loader::loadConfig($file);
 		
 		if ($config === false) {
 			
@@ -120,23 +125,23 @@ class ObjectModel {
 	 */
 	static public function factory($param)
 	{
-		$class = ($param instanceof ObjectModel\Uri) ? $param->getClass() : $param;
+		$class = ($param instanceof ObjectModel\ObjectUri) ? $param->getClass() : $param;
 
 		if (! array_key_exists($class, self::$_config)) {
 			
-			require_once 't41/ObjectModel/Exception.php';
 			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
 		}
 		
 		try {
 			
-			$obj = new $class($param instanceof ObjectModel\Uri ? $param : null);
+			require_once 't41/ObjectModel/ObjectModel.php';
+			$obj = new $class($param instanceof ObjectModel\ObjectUri ? $param : null);
 			
 		} catch (ObjectModel\Exception $e) {
 			
 			die($e->getMessage());
 			
-		} catch (Data\Exception $e) {
+		} catch (ObjectModel\DataObject\Exception $e) {
 			
 			die($e->getMessage());
 		}
@@ -223,7 +228,6 @@ class ObjectModel {
 	{
 		if (! self::definitionExists($class)) {
 			
-			require_once 't41/Object/Exception.php';
 			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
 		}
 		

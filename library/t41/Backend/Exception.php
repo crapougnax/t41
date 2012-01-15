@@ -22,8 +22,6 @@ namespace t41\Backend;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Exception.php';
 
 /**
  * Class used to throw exceptions from backend.

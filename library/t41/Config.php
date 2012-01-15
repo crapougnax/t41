@@ -57,6 +57,9 @@ class Config {
 	const REALM_TEMPLATES	= 4;
 		
 	
+	static protected $_paths = array();
+	
+	
 	/**
 	 * 
 	 * Add a path where to look for *.xml config files, classes and templates

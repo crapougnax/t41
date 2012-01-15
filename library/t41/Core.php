@@ -214,19 +214,16 @@ class Core {
 		
 		require_once 'Zend/Version.php';
 		
-		if (Zend_Version::compareVersion('1.8.0') == true) {
+		if (\Zend_Version::compareVersion('1.8.0') == true) {
 	
 			require_once 'Zend/Loader/Autoloader.php';
-			self::$_autoloaderInstance = Zend_Loader_Autoloader::getInstance();
-		   	foreach (self::$autoloaderPrefixes as $prefix) {
-    			
-    			self::$_autoloaderInstance->registerNamespace($prefix);
-    		}
+			self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
+   			self::$_autoloaderInstance->registerNamespace(self::$autoloaderPrefixes);
     		
 		} else {
 	
 			require_once 'Zend/Loader.php';
-			Zend_Loader::registerAutoload();
+			\Zend_Loader::registerAutoload();
 		}
     		
     	self::$autoloaded = true;
@@ -243,7 +240,7 @@ class Core {
     {
     	if (! is_null($env) && ! in_array($env, array(self::ENV_DEV, self::ENV_STAGE, self::ENV_PROD))) {
     		
-    		throw new t41_Exception("'$env' is not a recognized environment");
+    		throw new Exception("'$env' is not a recognized environment");
     	}
     	
     	self::$_urls[$env] = $url;
@@ -254,7 +251,7 @@ class Core {
     {
         if (! is_null($env) && ! in_array($env, array(self::ENV_DEV, self::ENV_STAGE, self::ENV_PROD))) {
     		
-    		throw new t41_Exception("'$env' is not a recognized environment");
+    		throw new Exception("'$env' is not a recognized environment");
     	}
     	
     	return isset(self::$_urls[$env]) ? self::$_urls[$env] : null;
@@ -288,7 +285,7 @@ class Core {
      */
     public static function exceptionHandler(Exception $e)
     {
-        switch (t41_View::getDisplayContext()) {
+        switch (\t41\View::getDisplayContext()) {
             
             case 'ajax':
                 require_once 't41/Ajax.php';
@@ -297,7 +294,7 @@ class Core {
                 break;
                 
             default:
-            	t41_View::resetObjects('default'); // to avoid infinite loop and fatal error, reset view content
+            	\t41\View::resetObjects('default'); // to avoid infinite loop and fatal error, reset view content
             	require_once 't41/View/Error.php';
 				$error = new t41_View_Error();
 				$error->setTitle('ERREUR FATALE : ' . html_entity_decode($e->getMessage()));
@@ -308,7 +305,7 @@ class Core {
                 }
                 $error->register();
                 
-	            exit(t41_View::display());
+	            exit(\t41\View::display());
                 break;
         }        
     }
@@ -325,7 +322,7 @@ class Core {
                 break;
         }
         
-        if (t41_View::getDisplayContext() == 'ajax') {
+        if (\t41\View::getDisplayContext() == 'ajax') {
             
             require_once 't41/Ajax.php';
             $ajax = new t41_Ajax();
@@ -336,7 +333,7 @@ class Core {
 
         } else {
         	
-        	t41_View::addError($errStr, $errFile, $errNo);
+        	\t41\View::addError($errStr, $errFile, $errNo);
         }
         
         if ($fatale == true) {
@@ -359,15 +356,13 @@ class Core {
     	self::$_env['appPath'] = $path;
     	self::$_env['t41Path'] = $t41path ? $t41path : $path . 't41/';
 
-    	require_once 't41/Config.php';
-    	
     	/* add application config files path (in first position if none was declared before) */
-    	t41_Config::addPath($path . 'application/configs/', t41_Config::REALM_CONFIGS);
+    	\t41\Config::addPath($path . 'application/configs/', \t41\Config::REALM_CONFIGS);
     	
     	/* add templates folder path (in first position if none was declared before) */
-    	t41_Config::addPath($path . 'application/views/', t41_Config::REALM_TEMPLATES);
+    	\t41\Config::addPath($path . 'application/views/', \t41\Config::REALM_TEMPLATES);
     	
-    	$config = t41_Config::loadConfig('application.xml');
+    	$config = \t41\Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
     	
     	/* CLI Mode */
@@ -375,7 +370,7 @@ class Core {
     		
     		self::$_config['environments']['mode'] = 'cli';
 			
-			$opts = new Zend_Console_Getopt(array('env=s'			=> 'Environment value'
+			$opts = new \Zend_Console_Getopt(array('env=s'			=> 'Environment value'
 												, 'controller=s'	=> "Controller"
 												, 'action=s'		=> "Action"
 												, 'simulate'		=> "Simulate execution"
@@ -385,7 +380,7 @@ class Core {
 			try {
 				$opts->parse();
 				
-			} catch (Zend_Console_Getopt_Exception $e) {
+			} catch (\Zend_Console_Getopt_Exception $e) {
 				
 				die($e->getUsageMessage());
 			}
@@ -399,7 +394,7 @@ class Core {
 			
 		} else {
     	
-			t41_View::setDisplay('Web');
+			\t41\View::setDisplay('Web');
 			
 	    	/* array of mode / $_SERVER data key value */
     		$envMapper = array('hostname' => 'SERVER_NAME');
@@ -410,7 +405,7 @@ class Core {
     	/* define which environment matches current mode value */
     	if (is_null($match)) {
     		
-    		throw new t41_Config_Exception("environment value not detected");
+    		throw new \t41\Config\Exception("environment value not detected");
     	}
     	
     	$envKey = null;
@@ -478,15 +473,15 @@ class Core {
 
 			// get backends configuration
     		require_once 't41/Backend.php';
-    		t41_Backend::loadConfig();
+    		\t41\Backend::loadConfig();
 
     		// get mappers configuration
     		require 't41/Mapper.php';
-    		t41_Mapper::loadConfig();
+    		\t41\Mapper::loadConfig();
     	
     		// get object model configuration
     		require 't41/Object.php';
-    		t41_Object::loadConfig();
+    		\t41\ObjectModel::loadConfig();
 		}
 		
         if (get_magic_quotes_runtime()) {
@@ -495,9 +490,6 @@ class Core {
         
         // protection contre les inclusions distantes
         ini_set('allow_url_fopen', 0);
-        
-        // protection contre les envois de fichiers au cas ou
-        //ini_set('file_uploads', 0);
         
         if (! isset(self::$_env['webEnv'])) {
 	        self::getEnv();
@@ -514,44 +506,17 @@ class Core {
             error_reporting(-1) ;//E_ALL | E_STRICT);
             ini_set('display_errors', 1);
         }
-        // load configuration - old fashion mode
-        // @todo have both configuration files mixed in one
-        if (file_exists(self::getBasePath() . 'conf/config.ini')) { // && empty(self::$_config)) {
-        	
-        	if (! class_exists('Zend_Config')) {
-        		
-        		die("You must use a ZF-based autoloader to load old-fashioned config file");
-        	}
-        	
-	        Zend_Loader::loadClass('Zend_Config');
-    	    Zend_Loader::loadClass('Zend_Config_Ini');
 
-        	self::$_config = new Zend_Config_Ini(self::getBasePath() . 'conf/config.ini', array(self::$_env['webEnv'], 'all'));
-
-        	// base path
-        	self::$basePath = $path ? $path : self::$_config->app->basepath;
-        	
-        	// @todo APP_PATH deprecated - à supprimer à terme
-        	define('APP_PATH', $path ? $path : self::$_config->app->basepath);
-			self::$_env['appPath'] = $path ? $path : self::$_config->app->basepath;
-
-			
-			// define some basic view data
-			t41_View::setEnvData('t41.version', self::VERSION);
-			t41_View::setEnvData('zf.version', Zend_Version::VERSION);
-			t41_View::setEnvData('app.name', self::$_config['name']);
-			t41_View::setEnvData('app.version', t41_Core::getVersion());
-			
-        	// app name
-        	define('APP_NAME', self::$_config->gen->name); // @todo deprecated
-        	self::$_env['appName'] = self::$_config->gen->name;
-        }
+		// define some basic view data
+		\t41\View::setEnvData('t41.version', self::VERSION);
+		\t41\View::setEnvData('zf.version', \Zend_Version::VERSION);
+		\t41\View::setEnvData('app.name', self::$_config['name']);
+		\t41\View::setEnvData('app.version', self::getVersion());
         
 	    // set a cache adapter
         if (! isset(self::$_adapters['registry'])) {
         	
-        	Zend_Loader::loadClass('Zend_Registry');
-    		self::$_adapters['registry'] = new Zend_Registry();
+    		self::$_adapters['registry'] = new \Zend_Registry();
     	}
     	        
         // (re-)init session 
@@ -685,129 +650,6 @@ class Core {
         return nl2br(isset($str2) ? $str2 : $str);
     }
 
-    
-    /**
-     * Renvoie le nom de la première clé primaire de la table
-     * dont le nom est passé en paramètres
-     *
-     * @param string $tbl
-     * @return string
-     * @todo probablement à déplacer dans une classe t41_Db
-     * @deprecated 
-     */
-    public static function getPrimaryKey($tbl)
-    {
-        $res = self::dbGetHook()->describeTable($tbl);
-        foreach ($res as $colName => $colArray) {
-            if ($colArray['PRIMARY'] === true) {
-                return $colName;
-            }
-        }
-
-        reset($res);
-        $v0 = current($res);
-        return $v0['COLUMN_NAME'];
-    }
-
-
-
-    
-    /**
-     * Etablissement d'une connexion à la base de données et sauvegarde
-     * de la ressource dans le registre
-     * @todo à déplacer dans une classe t41_Db
-     *
-     */
-    protected static function _dbConnect()
-    {
-        Zend_Loader::loadClass('Zend_Db');
-        
-        if (! self::$_config instanceof Zend_Config_Ini) {
-        	
-        	throw new t41_Exception("No old-format config available");
-        }
-        
-        try {
-            $db = Zend_Db::factory(self::$_config->database->type, self::$_config->database->toArray());
-            } catch (Exception $e) { 
-            	throw new t41_Exception("Echec de la connexion au serveur de bases de données : " . $e->getMessage()); 
-            }
-
-        if (self::$_env['webEnv'] == t41_Core::ENV_DEV) {
-            // le profiler est toujours disponible en developpement
-        	$db->getProfiler()->setEnabled(true);
-        }
-
-        self::registrySet('db', $db);
-    }
-
-    
-    /**
-     * Returns the same single instance of Zend_Db and create it if necessary
-     *
-     * @param boolean $returnSelect if true, an instance of Zend_Db_Select is returned
-     * @return Zend_Db_Adapter_Pdo_Abstract|Zend_Db_Select
-     * 
-     */
-    public static function dbGetHook($returnSelect = false)
-    {
-        if (! self::registryHasObject('db')) {
-            self::_dbConnect();
-        }
-
-        return $returnSelect ? self::registryGet('db')->select() : self::registryGet('db');
-    }
-    
-
-    /**
-     * Convertit une date en timestamp
-     *
-     * @param string $date
-     * @return integer
-     */
-    public static function date2Timestamp($date)
-    {
-        $el = explode('-', $date);
-
-        return mktime(0, 0, 0, $el[1], $el[2], $el[0]);
-    }
-
-    public static function monetaire($val, $html = true)
-    {
-        $suffix = $html ? '&nbsp;&euro;' : ' EUR';
-        return number_format($val, '2', ',', '') . $suffix;
-    }
-
-    
-     /**
-     * convert a SQL formatted date to
-     * its french formatted version. Returns the original
-     * string in case of failure
-     *
-     * @param string $str
-     * @return string
-     */
-    public static function dateFormat($str)
-    {
-        $elem = sscanf($str, '%d-%d-%d');
-        return (count($elem) == 3) ?  $elem[2] . '/' . str_pad($elem[1], 2, '0', STR_PAD_LEFT) . '/' . $elem[0] : $str;
-    }
-
-
-    /**
-     * convert a french formatted date to
-     * its SQL version. Returns the original
-     * string in case of failure
-     *
-     * @param string $str
-     * @return string
-     */
-    public static function date2Sql($str)
-    {
-        $elem = sscanf($str, '%d/%d/%d');
-        return (count($elem) == 3) ?  $elem[2] . '-' . $elem[1] . '-' . $elem[0] : $str;
-    }
-
 
     /**
      * Add a value to the current session with 
@@ -820,7 +662,7 @@ class Core {
     {
 		if (! self::$_adapters['session'] instanceof t41_Session_Abstract) {
 			
-			throw new t41_Exception("No session adapter declared");
+			throw new Exception("No session adapter declared");
 		}
 		/*
 		
@@ -843,7 +685,7 @@ class Core {
     {
 		if (! self::$_adapters['session'] instanceof t41_Session_Abstract) {
 			
-			throw new t41_Exception("No session adapter declared");
+			throw new Exception("No session adapter declared");
 		}
 		
 		return self::$_adapters['session']->get($key);
@@ -872,7 +714,7 @@ class Core {
     {
     	if (! isset(self::$_adapters['cache'])) {
     		
-    		self::setAdapter('cache', Zend_Cache::factory('Core'
+    		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, 'File'
     													, array('automatic_serialization' => true))
     													 );
@@ -890,7 +732,7 @@ class Core {
     {
         if (! isset(self::$_adapters['cache'])) {
     		
-    		self::setAdapter('cache', Zend_Cache::factory('Core'
+    		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, 'File'
     													, array('automatic_serialization' => true))
     													 );
@@ -902,7 +744,7 @@ class Core {
         	
         	if (isset($cached['_class'])) {
         		try {
-                       Zend_Loader::loadClass($cached['_class']);
+                       \Zend_Loader::loadClass($cached['_class']);
                     } catch (Exception $e) {
                         return null;
                     }
@@ -930,7 +772,7 @@ class Core {
     {
     	if (! isset(self::$_adapters['registry'])) {
     		
-    		self::setAdapter('registry', Zend_Registry::getInstance());
+    		self::setAdapter('registry', \Zend_Registry::getInstance());
     	}
     	
     	return self::$_adapters['registry']->set($key, $val);
@@ -941,7 +783,7 @@ class Core {
     {
         if (! isset(self::$_adapters['registry'])) {
     		
-    		self::setAdapter('registry', Zend_Registry::getInstance());
+    		self::setAdapter('registry', \Zend_Registry::getInstance());
     	}
     	
     	return self::$_adapters['registry']->get($key);
@@ -952,7 +794,7 @@ class Core {
     {
         if (! isset(self::$_adapters['registry'])) {
     		
-    		self::setAdapter('registry', Zend_Registry::getInstance());
+    		self::setAdapter('registry', \Zend_Registry::getInstance());
     	}
     	    
     	return self::$_adapters['registry']->isRegistered($key);
@@ -981,9 +823,9 @@ class Core {
     	// first have a look at the file loaded status
     	if (! isset(self::$_messages[$store]) || ! isset(self::$_loaded[$store . '_' . $lang])) {
     		
-    		if (($config = t41_Config::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.' . $lang . '.xml')) === false) {
+    		if (($config = Config\Loader::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.' . $lang . '.xml')) === false) {
 
-    			if (($config = t41_Config::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.xml')) === false) {
+    			if (($config = Config\Loader::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.xml')) === false) {
     			
     				return $key;
     			}
