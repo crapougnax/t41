@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<objects>
+		<object id="Tests\Person">
+			<parameters>
+				<parameter id="test" type="boolean"/>
+			</parameters>
+			<properties>
+				<property id="lastname" type="string">
+					<label>Last Name</label>
+				</property>
+				<property id="firstname" type="string">
+					<label>First Name</label>
+				</property>
+				<property id="birthdate" type="date">
+					<label>Birthdate</label>
+				</property>
+				<property id="gender" type="enum">
+					<label>Gender</label>
+					<values>
+						<value id="M">Male</value>
+						<value id="F">Female</value>
+					</values>
+				</property>
+			</properties>
+		</object>
+	</objects>
+</config>
