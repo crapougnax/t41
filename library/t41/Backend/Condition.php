@@ -17,7 +17,7 @@ namespace t41\Backend;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 839 $
  */
@@ -36,7 +36,7 @@ use t41\ObjectModel\Property;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 use t41\DataObject;

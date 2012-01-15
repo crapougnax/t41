@@ -17,7 +17,7 @@ namespace t41\Backend\Adapter;
  *
  * @category   t41
  * @package    t41_Backend
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 880 $
  */
@@ -28,7 +28,7 @@ namespace t41\Backend\Adapter;
  *
  * @category   t41
  * @package    t41_Backend
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @todo Actuellement, la classe n'accepte pas d'être utilisée sans préciser de nom de base
  * 		il faudrai donc réfléchir à comment implementer ça au niveau de Zend_DB mais aussi au niveau des URI

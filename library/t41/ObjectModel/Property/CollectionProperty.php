@@ -17,7 +17,7 @@ namespace t41\ObjectModel\Property;
  *
  * @category   t41
  * @package    t41_Property
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
@@ -29,7 +29,7 @@ use t41\ObjectModel;
  *
  * @category   t41
  * @package    t41_Property
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class CollectionProperty extends PropertyAbstract {
@@ -93,7 +93,7 @@ class CollectionProperty extends PropertyAbstract {
 		if (is_null($this->_value)) {
 
 			/* set a new Collection based on instanceof parameter value */
-			$this->_value = new ObjectModel\Collection(\t41\DataObject::factory($this->getParameter('instanceof')));
+			$this->_value = new ObjectModel\Collection(ObjectModel\DataObject::factory($this->getParameter('instanceof')));
 			
 			/* inject the condition that allows to find collection members */
 			$this->_value->having($this->getParameter('keyprop'))->equals($this->_parent);

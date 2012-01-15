@@ -16,8 +16,8 @@ namespace t41\ObjectModel;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @package    t41_ObjectModel
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 865 $
  */
@@ -26,8 +26,8 @@ namespace t41\ObjectModel;
  * Class providing basic functions needed to handle environment building.
  *
  * @category   t41
- * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @package    t41_ObjectModel
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 abstract class ObjectModelAbstract {
@@ -159,7 +159,6 @@ abstract class ObjectModelAbstract {
 	{
 		if (is_null($objects)) {
 			
-			require_once 't41/Parameter.php';
 			$objects = \t41\Parameter::getParameters($this);
 		}
 		

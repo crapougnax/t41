@@ -17,18 +17,20 @@ namespace t41\ObjectModel;
  *
  * @category   t41
  * @package    t41_Data
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 876 $
  */
 
+use t41\Backend;
+use t41\ObjectModel\Property;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
  *
  * @category   t41
  * @package    t41_Data
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class DataObject {
@@ -216,7 +218,7 @@ class DataObject {
     	/* @var $value t41_Property_Abstract */
     	foreach ($this->_data as $key => $value) {
     		
-    		if ($value instanceof Property\Collection) {
+    		if ($value instanceof Property\CollectionProperty) {
     			
     			if ($value->getParameter('embedded') == true) {
     				
@@ -237,12 +239,12 @@ class DataObject {
     			}
     		}
     		
-    		if ($value instanceof t41_Property_Object) {
+    		if ($value instanceof Property\ObjectProperty) {
     			
     			$value = $value->getValue();
-    			$doBackend = ($this->_uri instanceof t41_Object_Uri) ? $this->_uri->getBackendUri()->getAlias() : null;
+    			$doBackend = ($this->_uri instanceof ObjectUri) ? $this->_uri->getBackendUri()->getAlias() : null;
     			
-    			if ($value instanceof t41_Object_Model) {
+    			if ($value instanceof ObjectModel) {
     				
     				$value = $value->getUri();
     				
@@ -251,7 +253,7 @@ class DataObject {
     					
     					$value = $value->getIdentifier();
     				}
-    			} else if ($value instanceof t41_Object_Uri) {
+    			} else if ($value instanceof ObjectUri) {
     				
     				 /* check backends if they're identical, just keep identifier value*/
     				if ($value->getBackendUri()->getAlias() == $doBackend) { //$backend->getUri()->getAlias()) {
@@ -262,10 +264,10 @@ class DataObject {
     			
     			$result['data'][$key] = $value;
     			
-    		} else if ($value instanceof t41_Property_Abstract){
+    		} else if ($value instanceof Property\PropertyAbstract){
 
     			$value = $value->getValue();
-    			$result['data'][$key] = ($value instanceof t41_Object_Model) ? $value->getUri() : $value;
+    			$result['data'][$key] = ($value instanceof ObjectModel) ? $value->getUri() : $value;
     			
     		} else {
 
@@ -281,13 +283,13 @@ class DataObject {
     /**
      * Returns the Property object associated with the given key
      * @param string $name
-     * @return t41_Property_Abstract
+     * @return Property\AbstractProperty
      */
     public function getProperty($name)
     {
     	if (strpos($name, '.') === false) {
     		
-    		return (isset($this->_data[$name])) ? /*clone*/ $this->_data[$name] : false; 
+    		return (isset($this->_data[$name])) ? $this->_data[$name] : false; 
     	}
     }
     
@@ -306,38 +308,13 @@ class DataObject {
     
 
     /**
-     * Returns an array of t41_Form_Elements_* based on properties
-     * 
-     * @todo lots of improvements!
-     * 
-     * @return array
-     */
-    public function getPropertiesAsElements()
-    {
-    	$array = array();
-    	
-    	foreach ($this->_data as $key => $val) {
-    		
-    		$element = new t41_Form_Element_Generic();
-			$element->setId($key);
-			$element->setLabel($val->getLabel() ? $val->getLabel() : $key);
-			$element->setValue($val->getValue());    	
-    		
-    		$array[$key] = $element;
-    	}
-    	
-    	return $array;
-    }
-    
-    
-    /**
      * Populates a data object
      *
      * @param array $data
-     * @param t41_Backend_Mapper $mapper
-     * @return t41_Data_Object
+     * @param \t41\Backend\Mapper $mapper
+     * @return \t41\ObjectModel\DataObject
      */
-    public function populate(array $data, t41_Backend_Mapper $mapper = null)
+    public function populate(array $data, Backend\Mapper $mapper = null)
     {
     	if ($mapper) {
     		
@@ -352,15 +329,15 @@ class DataObject {
     			/* @var $property t41_Property_Abstract */
     			$property = $this->_data[$key];
     			
-    			if ($property instanceof t41_Property_Object) {
+    			if ($property instanceof Property\ObjectProperty) {
 
-    				if (substr($value, 0, 1) == t41_Backend::PREFIX) {
+    				if (substr($value, 0, 1) == Backend::PREFIX) {
     					
-		    			$property->setValue(new t41_Object_Uri($value));
+		    			$property->setValue(new ObjectUri($value));
     					continue;
     				}
     				
-    				$backend = t41_Object::getObjectBackend($property->getParameter('instanceof'));
+    				$backend = \t41\ObjectModel::getObjectBackend($property->getParameter('instanceof'));
     			/*	
     				if ($backend != t41_Backend::getDefaultBackend()) {
 
@@ -405,5 +382,20 @@ class DataObject {
     	
     	if(is_object($this->_uri))
     		$this->_uri = clone $this->_uri;
+    }
+    
+    
+    static public function factory($class)
+    {
+    	try {
+    			
+    		$do = new self($class);
+    
+    	} catch (Exception $e) {
+    			
+    		throw new DataObject\Exception(array("PROPERTY_ERROR", $e->getMessage()));
+    	}
+    		
+    	return $do;
     }
 }

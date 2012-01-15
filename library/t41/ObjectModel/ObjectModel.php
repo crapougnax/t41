@@ -17,7 +17,7 @@ namespace t41\ObjectModel;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 862 $
  */
@@ -29,7 +29,7 @@ use t41\Backend;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 abstract class ObjectModel extends ObjectModelAbstract {
@@ -80,7 +80,7 @@ abstract class ObjectModel extends ObjectModelAbstract {
 						
 		} else {
 			
-			$this->_dataObject = \t41\DataObject::factory(get_class($this));
+			$this->_dataObject = DataObject::factory(get_class($this));
 			
 			/* get object rules from config */
 			$this->setRules();

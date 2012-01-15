@@ -17,7 +17,7 @@ namespace t41\View\Adapter;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
@@ -27,7 +27,7 @@ namespace t41\View\Adapter;
  *
  * @category   t41
  * @package    t41_View_Adapter
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 

@@ -17,7 +17,7 @@ namespace t41\Config;
  *
  * @category   t41
  * @package    t41_Config
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 913 $
  */
@@ -29,7 +29,7 @@ use \t41\Config\Adapter;
  *
  * @category   t41
  * @package    t41_Config
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 

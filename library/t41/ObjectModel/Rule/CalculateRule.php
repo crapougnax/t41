@@ -17,16 +17,19 @@ namespace t41\ObjectModel\Rule;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 832 $
  */
+
+use t41\ObjectModel;
+use t41\ObjectModel\Property;
 
 /**
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class CalculateRule extends RuleAbstract {
@@ -76,17 +79,17 @@ class CalculateRule extends RuleAbstract {
 								
 								$value = $value->getProperty($prop)->getValue();
 
-							} else if ($value instanceof t41\ObjectModel\ObjectModel) {
+							} else if ($value instanceof ObjectModel\ObjectModel) {
 								
 								$value = $value->getProperty($prop);
 							
-							} else if ($value instanceof t41\ObjectModel\Property\PropertyAbstract) {
+							} else if ($value instanceof Property\PropertyAbstract) {
 								
 								$value = $value->getValue();
 							}
 						}
 						
-						$prep[] = ($value instanceof t41\ObjectModel\Property\PropertyAbstract) ? $value->getValue() : $value;
+						$prep[] = ($value instanceof Property\PropertyAbstract) ? $value->getValue() : $value;
 			
 					} else {
 			
