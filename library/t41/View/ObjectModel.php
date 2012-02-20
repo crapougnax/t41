@@ -22,10 +22,12 @@ namespace t41\View;
  * @version    $Revision: 865 $
  */
 
+use t41\Parameter;
+use t41\View;
 use t41\ObjectModel;
 
 /**
- * Deprecated class providing basic methods to every view-related object.
+ * class providing basic methods to every view-related object.
  *
  * @category   t41
  * @package    t41_View
@@ -56,8 +58,8 @@ abstract class ObjectModel extends ObjectModel\ObjectModelAbstract {
 	 */
 	public function __construct($id = null, array $params = null)
 	{
-		$this->_setParameterObjects(array('pos_x'	=> new \t41\Parameter(\t41\Parameter::INTEGER)
-										, 'pos_y'	=> new \t41\Parameter(\t41\Parameter::INTEGER)
+		$this->_setParameterObjects(array('pos_x'	=> new Parameter(Parameter::INTEGER)
+										, 'pos_y'	=> new Parameter(Parameter::INTEGER)
 									));
 
 		parent::__construct($id, $params);
@@ -105,11 +107,11 @@ abstract class ObjectModel extends ObjectModel\ObjectModelAbstract {
 	 * @param boolean $clone
 	 * @return boolean
 	 */
-	public function register($placeHolder = \t41\View::PH_DEFAULT, array $params = null, $clone = false)
+	public function register($placeHolder = View::PH_DEFAULT, array $params = null, $clone = false)
 	{
 		$obj = $clone ? clone $this : $this;
 		
-		return \t41\View::addObject($obj, $placeHolder, $params);
+		return View::addObject($obj, $placeHolder, $params);
 	}
 	
 	

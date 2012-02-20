@@ -22,6 +22,9 @@ namespace t41;
  * @version    $Revision: 914 $
  */
 
+use t41\Core;
+use t41\Config;
+
 /**
  * Class providing basic functions needed to handle environment building.
  *
@@ -112,9 +115,8 @@ class Core {
 	 * App base path
 	 *
 	 * @var string
-	 * @deprecated 
 	 */
-    static protected $basePath;
+    static public $basePath;
 
     
     /**
@@ -172,6 +174,12 @@ class Core {
     static protected $_adaptersList = array('session', 'registry', 'cache', 'backend');
     
     
+    /**
+     * Set given adapter for given key
+     * @param string $key
+     * @param string $adapter
+     * @throws Exception
+     */
     public static function setAdapter($key, $adapter)
     {
     	if (! in_array($key, self::$_adaptersList)) {
@@ -347,23 +355,27 @@ class Core {
      * environment builder
      *
      * @var string $path base path
+     * @var string $mpath modules path
      */
-    public static function init($path = null, $t41path = null)
+    public static function init($path = null, $mpath = null)
     {
     	// enable t41 error handler (notices are not catched until we get a proper logger)
     	set_error_handler(array('t41_Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
-    	self::$_env['appPath'] = $path;
-    	self::$_env['t41Path'] = $t41path ? $t41path : $path . 't41/';
+    	// define path but only if it's empty
+    	if (empty(self::$basePath)) self::$basePath = $path;
 
     	/* add application config files path (in first position if none was declared before) */
-    	\t41\Config::addPath($path . 'application/configs/', \t41\Config::REALM_CONFIGS);
+    	Config::addPath($path . 'application/configs/', Config::REALM_CONFIGS);
     	
     	/* add templates folder path (in first position if none was declared before) */
-    	\t41\Config::addPath($path . 'application/views/', \t41\Config::REALM_TEMPLATES);
+    	Config::addPath($path . 'application/views/', Config::REALM_TEMPLATES);
     	
-    	$config = \t41\Config\Loader::loadConfig('application.xml');
+    	$config = Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
+    	
+    	// load modules
+    	Core\Module::init($mpath ? $mpath : $path);
     	
     	/* CLI Mode */
     	if (isset(self::$_config['cli']) && PHP_SAPI == 'cli') {
