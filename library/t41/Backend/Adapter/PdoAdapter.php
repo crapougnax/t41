@@ -202,10 +202,10 @@ abstract class PdoAdapter extends AdapterAbstract {
 	/**
 	 * Populate the given data object
 	 *  
-	 * @param t41_Data_Object $do data object instance
+	 * @param t41\ObjectModel\DataObject $do data object instance
 	 * @return boolean
 	 */
-	public function read(t41_Data_Object $do) 
+	public function read(ObjectModel\DataObject $do) 
 	{	
 		// get table to use
 		$table = $this->_getTableFromUri($do->getUri());

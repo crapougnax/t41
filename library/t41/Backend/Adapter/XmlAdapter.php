@@ -22,7 +22,7 @@ namespace t41\Backend\Adapter;
  * @version    $Revision: 832 $
  */
 
-
+use t41;
 use t41\Backend;
 use t41\ObjectModel;
 
@@ -81,6 +81,8 @@ class XmlAdapter extends AdapterAbstract {
 		if ($this->_uri->getUrl()) {
 			
 			$this->_path = $this->_uri->getUrl();
+			
+			$this->_path = str_replace('{basepath}', t41\Core::$basePath, $this->_path);
 			if (substr($this->_path, -1) != DIRECTORY_SEPARATOR) {
 				
 				$this->_path .= DIRECTORY_SEPARATOR;
@@ -180,9 +182,9 @@ class XmlAdapter extends AdapterAbstract {
 	 * @param t41_Data_Object $do DataObject formaté pour son Objet
 	 * @return t41_Data_Object DataObject formaté et rempli
 	 */
-	public function read(ObjectModel\ObjectUri $uri) 
+	public function read(ObjectModel\DataObject $do) 
 	{	
-		if (! $this->_setRessource($uri->getClass())) {
+		if (! $this->_setRessource($do->getUri()->getClass())) {
 
 			die('BACKEND_RESSOURCE_ERROR');
 		}
@@ -190,7 +192,7 @@ class XmlAdapter extends AdapterAbstract {
 		try {
 
 			$xpath = new \DOMXPath($this->_ressource);
-			$expr = sprintf("//%s[@%s='%s']", $this->_itemName, $this->_pkey, $uri->getIdentifier());
+			$expr = sprintf("//%s[@%s='%s']", $this->_itemName, $this->_pkey, $do->getUri()->getIdentifier());
 			$node = $xpath->query($expr)->item(0);
 
 			$data = array();
@@ -265,10 +267,10 @@ class XmlAdapter extends AdapterAbstract {
 	/**
 	 * Efface la ligne la base identifié par l'Uri en paramètre
 	 *
-	 * @param t41_Uri $uri
+	 * @param t41\ObjectModel\DataObject $do
 	 * @return mixed
 	 */
-	public function delete(ObjectModel\ObjectUri $uri)
+	public function delete(ObjectModel\DataObject $do)
 	{		
 	}
 	

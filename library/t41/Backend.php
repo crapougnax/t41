@@ -22,6 +22,9 @@ namespace t41;
  * @version    $Revision: 916 $
  */
 
+use t41\Backend;
+use t41\Backend\Adapter;
+
 /**
  * Class providing exchange interface with data sources
  *
@@ -57,7 +60,7 @@ class Backend {
 	 * 
 	 * @var array
 	 */
-	static protected $_config = array();
+	static protected $_config;
 	
 	
 	/**
@@ -101,13 +104,19 @@ class Backend {
 	static public function loadConfig($file = 'backends.xml', $add = true)
 	{
 		// load config file (file extension defines which adapter will be used)
-		$config = Config::loadConfig($file);
-		
+		$config = Config\Loader::loadConfig($file);
+
 		if ($config === false) {
 			
 			return false;
 		}
 
+		if (! isset($config['backends'])) {
+			
+			\Zend_Debug::dump($config);
+			throw new Exception("NO CONFIG IN GIVEN SOURCE");
+		}
+		
 		// if the key 'default' exists, it defines the default backend key value
 		if (isset($config['backends']['default'])) {
 			
@@ -121,7 +130,7 @@ class Backend {
 		
 		} else {
 			
-	        self::$_config = array_merge(self::$_config, $config['backends']);
+	        self::$_config = array_merge((array) self::$_config, $config['backends']);
 		}
 		
 		return true;
@@ -181,10 +190,15 @@ class Backend {
 	 * Recupérer une instance de Backend à partir de son Uri, alias ou encore id dans la liste.
 	 *
 	 * @param string|t41_Backend_Uri alias or uri of desired backend
-	 * @return t41_Backend_Adapter_Interface Backend Adapter
+	 * @return t41\Backend\Adapter\AdapterAbstract Backend Adapter
 	 */
 	static public function getInstance($id)
 	{
+		if (! is_array(self::$_config)) {
+
+			self::loadConfig();
+		}
+		
 		if ($id instanceof Backend\BackendUri) {
 			
 			if ($id->getAlias()) {
@@ -250,7 +264,6 @@ class Backend {
 			}
 		}
 		
-		require_once 't41/Backend/Exception.php';
 		throw new Backend\Exception('Unknown backend alias: ' . $id . '.');
 	}
 	
@@ -264,30 +277,26 @@ class Backend {
 	 * @return t41_Backend_Adapter_Abstract
 	 * @throws t41_Exception
 	 */
-	static public function factory(Backend\Uri $uri, $alias = null, $mapper = null)
+	static public function factory(Backend\BackendUri $uri, $alias = null, $mapper = null)
 	{
 		if (! is_null($alias)) $uri->setAlias($alias);
 		
-		$class = str_replace('_', ' ', $uri->getType());
-		$class = str_replace(' ', '_', ucwords($class));
+		$backendClass = sprintf('\t41\Backend\Adapter\%sAdapter', ucfirst(strtolower($uri->getType())));
 		
-		$backendClass = 'Backend\Adapter\\' . $class;
-		\Zend_Loader::loadClass($backendClass);
-		
-		if (class_exists($backendClass)) {
+		try {
 			
 			$backend = new $backendClass($uri);
 			$alias = self::addBackend($backend, $alias);
 			if ($mapper) {
 				
-				$backend->setMapper(Mapper::getInstance($mapper));
+				$backend->setMapper(Backend\Mapper::getInstance($mapper));
 			}
 			
 			return $backend;
 			
-		} else {
+		} catch(\Exception $e) {
 			
-			throw new Backend\Exception('BACKEND_UNKNOWN_CLASS');
+			throw new Backend\Exception($e->getMessage() . 'BACKEND_UNKNOWN_CLASS');
 		}
 	}
 

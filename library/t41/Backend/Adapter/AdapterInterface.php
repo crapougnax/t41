@@ -22,6 +22,9 @@ namespace t41\Backend\Adapter;
  * @version    $Revision: 832 $
  */
 
+use t41\Backend;
+use t41\ObjectModel;
+
 /**
  * Interface for backend adapters
  *
@@ -36,23 +39,23 @@ namespace t41\Backend\Adapter;
 interface AdapterInterface {
 
 	
-	public function __construct(t41_Backend_Uri $uri);
+	public function __construct(Backend\BackendUri $uri);
 	
 	
-	public function setMapper(t41_Backend_Mapper $mapper);
+	public function setMapper(Backend\Mapper $mapper);
 	
 	
-	public function create(t41_Data_Object $do);
+	public function create(ObjectModel\DataObject $do);
 	
 	
-	public function read(t41_Data_Object $do);
+	public function read(ObjectModel\DataObject $do);
 	
 	
-	public function update(t41_Data_Object $do);
+	public function update(ObjectModel\DataObject $do);
 	
 	
-	public function delete(t41_Data_Object $do);
+	public function delete(ObjectModel\DataObject $do);
 
 	
-	public function find(t41_Object_Collection $collection);
+	public function find(ObjectModel\Collection $collection);
 }

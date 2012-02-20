@@ -167,9 +167,9 @@ abstract class AdapterAbstract implements AdapterInterface {
 	}
 	
 	/**
-	 * Returns backend's t41_Backend_Uri instance
+	 * Returns backend's BackendUri instance
 	 * 
-	 * @return t41_Backend_Uri
+	 * @return t41\Backend\BackendUri
 	 */
 	public function getUri()
 	{
