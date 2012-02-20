@@ -22,6 +22,7 @@ namespace t41\ObjectModel;
  * @version    $Revision: 870 $
  */
 
+use t41\ObjectModel;
 use t41\Backend;
 use t41\ObjectModel\Property\PropertyAbstract;
 use t41\ObjectModel\Property\IdentifierProperty;
@@ -94,7 +95,7 @@ class Collection extends ObjectModelAbstract {
 	 * @param t41_Data_Object $do
 	 * @param array $params
 	 */
-	public function __construct(t41_Data_Object $do, array $params = null)
+	public function __construct(ObjectModel\DataObject $do, array $params = null)
 	{
 		/* deal with class parameters first */
 		$this->_setParameterObjects();

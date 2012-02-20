@@ -255,4 +255,23 @@ class ObjectModel {
 		
 		return $rules;
 	}
+	
+	
+	/**
+	 * Objects collection factory
+	 * @param string $class
+	 * @return t41\ObjectModel\Collection
+	 * @throws t41\ObjectModel\Exception
+	 */
+	static public function collectionFactory($class)
+	{
+		try {
+			$do = ObjectModel\DataObject::factory($class);
+			$collection = new ObjectModel\Collection($do);
+			return $collection;
+		} catch (\Exception $e) {
+			
+			throw new Exception($e->getMessage());
+		}
+	}
 }
