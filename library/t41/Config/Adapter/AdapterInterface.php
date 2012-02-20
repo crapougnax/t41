@@ -35,16 +35,19 @@ interface AdapterInterface {
 	
 	/**
 	 * Validate the loaded file
+	 * @param string $filePath The complete path to the file to validate 
 	 * 
 	 */
-	public function validate();
+	public function validate($filePath);
 
 	
 	/**
-	 * Load the Configuration file into an array
+	 * Load the Configuration files into an array
+	 * 
+	 * @param array $filePath Array containing the complete paths to the files to load and parse 
 	 * @return array
 	 */
-	public function load();
+	public function load($filePath);
 
 	
 	/**

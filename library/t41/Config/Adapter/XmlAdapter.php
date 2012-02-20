@@ -40,12 +40,13 @@ class XmlAdapter extends AdapterAbstract {
 	{
 		return true;
 		
+		// @todo create XSD models
 		$luie = libxml_use_internal_errors();
 		
 		libxml_use_internal_errors(true);
 		
 		/* XSD validation file -if exists- is based on file name */
-		$xsdFileName = substr( $this->_filePath, strrpos($this->_filePath, DIRECTORY_SEPARATOR) + 1 );	
+		$xsdFileName = substr( $filePath, strrpos($filePath, DIRECTORY_SEPARATOR) + 1 );	
 		$xsdFileName = substr( $xsdFileName, 0, strpos($xsdFileName, '.') );
 		
 		$xsdFileName = Config\Loader::findFile('xsd/' . $xsdFileName . '.xsd');
@@ -69,23 +70,32 @@ class XmlAdapter extends AdapterAbstract {
 	/**
 	 * Method to load the Configuration file
 	 * 
+	 * @param string $filePath Full path to the xml config file
 	 * @return array
 	 */
-	public function load()
-	{		
-		if (is_null($this->_filePath) || ! $this->validate()) {
-			
+	public function load($filePath)
+	{
+		if (is_null($this->_filePath)) {
+				
 			throw new Exception ('The config file ' . $this->_filePath . ' is not valid.');
 		}
 		
-		$xml = simplexml_load_file($this->_filePath);
+		$array = array();
 		
-		if (! $xml instanceof \SimpleXMLElement) {
-			
-			throw new Exception("Error parsing $this->_filePath");
+		/* load all files */
+		foreach ($this->_filePath as $file) {
+		
+			/* @todo validate XML compliance of file */
+				
+			$xml = simplexml_load_file($file);
+		
+			if (! $xml instanceof \SimpleXMLElement) {
+					
+				throw new Exception("Error parsing $file");
+			}
+		
+			$array = array_merge_recursive($array, $this->_loadElement($xml));
 		}
-		
-		$array = $this->_loadElement($xml);
 		
 		return $array;
 	}	

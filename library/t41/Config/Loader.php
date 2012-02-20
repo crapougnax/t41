@@ -22,7 +22,8 @@ namespace t41\Config;
  * @version    $Revision: 913 $
  */
 
-use \t41\Config\Adapter;
+use t41\Config;
+use t41\Config\Adapter;
 
 /**
  * Class providing basic functions needed to manage Configuration files
@@ -40,9 +41,10 @@ class Loader {
 	 * Realms paths store
 	 * @var array
 	 */
-	static $_paths = array(\t41\Config::REALM_CONFIGS	=> array()
-						,  \t41\Config::REALM_OBJECTS	=> array()
-						,  \t41\Config::REALM_TEMPLATES => array()
+	static $_paths = array(Config::REALM_CONFIGS	=> array()
+						,  Config::REALM_OBJECTS	=> array()
+						,  Config::REALM_TEMPLATES	=> array()
+						,  Config::REALM_MODULES	=> array()
 						  );
 	
 	
@@ -79,21 +81,19 @@ class Loader {
 		
 			try {
 
-				self::$_adapters[$type] = new $className($filePath, $params);
+				self::$_adapters[$type] = new $className($params);
 			
 				if (! self::$_adapters[$type] instanceof Adapter\AdapterAbstract) {
 				
-					//require_once 't41/Config/Exception.php';
 					throw new Exception("$className is not implementing AdapterAbstract.");
 				}			
 			} catch (Exception $e) {
 			
-				//require_once 't41/Config/Exception.php';
 				throw new Exception($e->getMessage());
 			}
 		}
 
-		return self::$_adapters[$type]->load();
+		return self::$_adapters[$type]->load($filePath);
 	}
 	
 	

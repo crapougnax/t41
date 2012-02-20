@@ -55,6 +55,9 @@ class Config {
 	
 	
 	const REALM_TEMPLATES	= 4;
+	
+	
+	const REALM_MODULES		= 8;
 		
 	
 	static protected $_paths = array();
@@ -75,7 +78,7 @@ class Config {
 			throw new Config\Exception("Realms must be indicated");
 		}
 		
-		$constants = array(self::REALM_CONFIGS, self::REALM_OBJECTS, self::REALM_TEMPLATES);
+		$constants = array(self::REALM_CONFIGS, self::REALM_OBJECTS, self::REALM_TEMPLATES, self::REALM_MODULES);
 
 		foreach ($constants as $constant) {
 			

@@ -22,9 +22,6 @@ namespace t41\Config\Adapter;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Config/Adapter/AdapterInterface.php';
-
 /**
  * Abstract class for Config Adapters
  * 
@@ -34,13 +31,13 @@ require_once 't41/Config/Adapter/AdapterInterface.php';
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-
 abstract class AdapterAbstract implements AdapterInterface {
+
 
 	/**
 	 *  Configuration file path
-	 * 
-	 * @var string
+	 *
+	 * @var array
 	 */
 	protected $_filePath;
 	
@@ -50,37 +47,28 @@ abstract class AdapterAbstract implements AdapterInterface {
 	 * 
 	 * @var $_identifiers array
 	 */
-	protected $_identifiers = array('id', 'lang', 'alias', 'env', 'type', 'datastore', 'dataclass', 'pkey', 'default', 'backend', 'extends', 'mode');
+	protected $_identifiers = array('id', 'lang', 'alias', 'env', 'type', 'datastore', 'dataclass', 'pkey', 'default', 'backend', 'extends', 'mode', 'vendor');
 
 	/**
 	 * Constructor
 	 * 
-	 * @param string $file Configuration file path
 	 * @param array $params
 	 */
-	public function __construct($file, array $params = null)
+	public function __construct(array $params = null)
 	{   
-		
-		$this->_filePath = $file;
+
+		/**
+		 * @todo implement $params parsing
+		 */
 	}
 	
 	
 	/**
-	 * (non-PHPdoc)
 	 * @see t41\Config\Adapter.AdapterInterface::validate()
 	 */
 	public function validate()
 	{
 		return true;
-	}
-	
-	
-	/**
-	 * Load the Configuration file
-	 * @return array
-	 */
-	public function load() {
-		
 	}
 	
 	
