@@ -1,6 +1,1 @@
-This is the git repository of the t41 project.
-
-TODO:
-
-- convert class names to PHP 5.3 namespaces,
-- reimport only validated classes from subversion.
+t41 Toolkit
