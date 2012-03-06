@@ -22,6 +22,7 @@ namespace t41\ObjectModel;
  * @version    $Revision: 832 $
  */
 
+use t41\ObjectModel;
 
 /**
  * Class for Property.
@@ -45,27 +46,23 @@ class Rule {
 	 */
 	static public function factory($type = 'string', array $params = null)
 	{
-		$className = 'Rule\\' . ucfirst(strtolower($type));
+		$className = sprintf('\t41\ObjectModelRule\\%sRule', ucfirst(strtolower($type)));
 		
 		try {
 			
-			/* @todo fix this pb of autoloader/require_once */
-			require_once str_replace('_', '/', $className) . '.php';
-				
 			/* @var $property t41_Object_Rule_Abstract */
 			$rule = new $className($params);
 			
 			if (! $rule instanceof Rule\RuleInterface) {
 				
-				throw new Property\Exception("$className doesn't implement t41_Object_Rule_Interface");
+				throw new ObjectModel\Exception("$className doesn't implement t41_Object_Rule_Interface");
 			}
 			
 			return $rule;
 
 		} catch (Exception $e) {
 			
-			require_once 't41/Object/Exception.php';
-			throw new Exception("RULE_INSTANCIATION_ERROR", $e->getCode(), $e);
+			throw new ObjectModel\Exception("RULE_INSTANCIATION_ERROR", $e->getCode(), $e);
 		}
 	}
 }

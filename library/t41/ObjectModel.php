@@ -23,6 +23,7 @@ namespace t41;
  */
 
 use t41\ObjectModel;
+use t41\ObjectModel\Rule;
 
 /**
  * Class providing basic functions needed to handle model objects
@@ -227,6 +228,47 @@ class ObjectModel {
 	static public function getRules($class)
 	{
 		if (! self::definitionExists($class)) {
+				
+			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
+		}
+	
+		if (! isset(self::$_config[$class]['rules'])) {
+				
+			return null;
+		}
+	
+		$rules = array();
+	
+		foreach (self::$_config[$class]['rules'] as $key => $val) {
+	
+			$rule = Rule::factory($val['type']);
+			$rule->setId($key);
+	
+			if (isset($val['source'])) 			$rule->setSource($val['source']);
+			if (isset($val['destination']))		$rule->setDestination($val['destination']);
+				
+			$trigger = $val['trigger'];
+			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
+			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
+	
+			$rules[$ruleKey][$key] = $rule;
+		}
+	
+		ksort($rules);
+	
+		return $rules;
+	}
+	
+	
+	/**
+	 * Convert rules configuration array into rules objects array 
+	 * @param string $class
+	 * @throws ObjectModel\Exception
+	 * @return array
+	 */
+	static public function getRules($class)
+	{
+		if (! self::definitionExists($class)) {
 			
 			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
 		}
@@ -240,15 +282,17 @@ class ObjectModel {
 		
 		foreach (self::$_config[$class]['rules'] as $key => $val) {
 
-			$rule = ObjectModel\Rule::factory($val['type']);
+			$rule = Rule::factory($val['type']);
+			$rule->setId($key);
+
 			if (isset($val['source'])) 			$rule->setSource($val['source']);
 			if (isset($val['destination']))		$rule->setDestination($val['destination']);
 			
 			$trigger = $val['trigger'];
+			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
+			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
 
-			$ruleKey = $trigger['when'] . '/' . $trigger['event'] . '/' . $trigger['property'];
-
-			$rules[$ruleKey][] = $rule;
+			$rules[$ruleKey][$key] = $rule;
 		}
 		
 		ksort($rules);

@@ -31,6 +31,6 @@ namespace t41\ObjectModel\Rule;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Exception extends \t41\Exception {
+class RuleException extends \t41\Exception {
 
 }

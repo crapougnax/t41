@@ -22,9 +22,7 @@ namespace t41\ObjectModel\Rule;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Object/Abstract.php';
-require_once 't41/Object/Rule/Interface.php';
+use t41\ObjectModel;
 
 /**
  * Abstract abstract class
@@ -34,15 +32,27 @@ require_once 't41/Object/Rule/Interface.php';
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class RuleAbstract extends \t41\ObjectModel\ObjectModelAbstract implements RuleInterface {
+class RuleAbstract extends ObjectModel\ObjectModelAbstract implements RuleInterface {
 
 
+	/**
+	 * Id of source property 
+	 * @var string
+	 */
 	protected $_source;
 	
 	
+	/**
+	 * Id of destination property
+	 * @var string
+	 */
 	protected $_destination;
 
 	
+	/**
+	 * Rule constructor
+	 * @param array $params
+	 */
 	public function __construct(array $params = null)
 	{
 		/* deal with class parameters first */
@@ -58,12 +68,6 @@ class RuleAbstract extends \t41\ObjectModel\ObjectModelAbstract implements RuleI
 	public function setSource($str)
 	{
 		$this->_source = $str;
-		
-		if (strpos($this->_source, '.') !== false) {
-			
-			$this->_source = explode('.', $this->_source);
-		}
-		
 		return $this;
 	}
 	
@@ -71,17 +75,11 @@ class RuleAbstract extends \t41\ObjectModel\ObjectModelAbstract implements RuleI
 	public function setDestination($str)
 	{
 		$this->_destination = $str;
-		
-		if (strpos($this->_destination, '.') !== false) {
-			
-			$this->_destination = explode('.', $this->_destination);
-		}
-		
 		return $this;
 	}
 	
 	
-	public function execute(\t41\ObjectModel\DataObject $do)
+	public function execute(ObjectModel\DataObject $do)
 	{
 		return true;
 	}
