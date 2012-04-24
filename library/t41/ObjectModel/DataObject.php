@@ -22,8 +22,10 @@ namespace t41\ObjectModel;
  * @version    $Revision: 876 $
  */
 
-use t41\Backend;
-use t41\ObjectModel\Property;
+use t41\Core,
+	t41\Backend,
+	t41\ObjectModel,
+	t41\ObjectModel\Property;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -33,12 +35,12 @@ use t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class DataObject {
+class DataObject extends ObjectModelAbstract {
 	
 	/**
 	 * Object URI where data can be found
 	 *
-	 * @var t41_Object_Uri
+	 * @var t41\ObjectModel\ObjectUri
 	 */
 	protected $_uri;
 	
@@ -50,7 +52,7 @@ class DataObject {
 	protected $_class;
 	
 	/**
-	 * Array of t41_Property_Abstract objects
+	 * Array of t41\ObjectModel\Property\AbstractProperty objects
 	 *
 	 * @var array
 	 */
@@ -64,6 +66,8 @@ class DataObject {
 	 */
 	protected $_key;
 	
+	
+	protected $_rules;
 	
 	/**
 	 * Class constructor
@@ -128,12 +132,18 @@ class DataObject {
      * @param t41_Object_Uri $uri
      * @return t41_Data_Object 
      */
-    public function setUri(Uri $uri)
+    public function setUri(ObjectModel\ObjectUri $uri)
     {
     	$this->_uri = $uri;
     	return $this;
     }
 
+    
+    public function resetUri()
+    {
+    	$this->_uri = null;
+    	return $this;
+    } 
     
 	/**
 	 * @return t41_Object_Uri
@@ -167,23 +177,28 @@ class DataObject {
     {  	
     	$this->_data = array();
     	
-    	if (\t41\ObjectModel::getObjectExtends($var)) {
+    	if (ObjectModel::getObjectExtends($var)) {
 
-    		$properties = \t41\ObjectModel::getObjectProperties(ObjectModel::getObjectExtends($var));
+    		$properties = ObjectModel::getObjectProperties(ObjectModel::getObjectExtends($var));
     		
     	} else {
     		
     		$properties = array();
     	}
     	
-    	$properties += (array) \t41\ObjectModel::getObjectProperties($var);
+    	$properties += (array) ObjectModel::getObjectProperties($var);
     	
+//    	\Zend_Debug::dump($properties); die;
     	if ($properties !== false) {
     		
     		foreach ($properties as $propertyId => $propertyParams) {
     			
-    			$this->_data[$propertyId] = Property::factory($propertyId, $propertyParams['type'], $propertyParams);
+    			$type = isset($propertyParams['type']) ? $propertyParams['type'] : null;
+    			
+    			$this->_data[$propertyId] = Property::factory($propertyId, $type, $propertyParams);
+    			$this->_data[$propertyId]->setParent($this);
     		}
+    		
     	} else {
     		
     		throw new DataObject\Exception(array("MISSING_DEFINITION", $var));
@@ -203,28 +218,33 @@ class DataObject {
     
     
 	/**
-	 * Retourne un tableau contenant les données du Data Object
+	 * Return an array with all properties
 	 * 
-	 * @param t41_Backend_Adapter_Abstract $backend
-	 * @todo remove parameter whicch value is already available in object uri
+	 * @param t41\Backend\Adapter\AbstractAdapter $backend
+	 * @param boolean $changed
 	 * @return array
 	 */
-    public function toArray(\t41\Backend\Adapter\AdapterAbstract $backend = null)
+    public function toArray(Backend\Adapter\AbstractAdapter $backend = null, $changed = false)
     {
-    	if (is_null($backend)) $backend = \t41\ObjectModel::getObjectBackend($this->_class);
+    	if (is_null($backend)) {
+    		
+    		$backend = ObjectModel::getObjectBackend($this->_class);
+    	}
     	
     	$result = array('data' => array(), 'collections' => array());
     	
-    	/* @var $value t41_Property_Abstract */
+    	/* @var $value t41\ObjectModel\Property\AbstractProperty */
     	foreach ($this->_data as $key => $value) {
     		
+    		// consider only changed properties?
+    		if ($changed === true && $value->hasChanged() === false) continue;
     		if ($value instanceof Property\CollectionProperty) {
     			
     			if ($value->getParameter('embedded') == true) {
     				
     				$array = array();
     				
-    				/* @var $member t41_Object_Model */
+    				/* @var $member t41\ObjectModel\BaseObject */
     				foreach ($value->getValue()->getMembers() as $member) {
     					
     					$array[] = $member->getDataObject()->toArray();
@@ -234,37 +254,52 @@ class DataObject {
     			} else {
     			
     				// this property is not part of the saved data set
-    				$result['collection'][$key] = $value;
+    				$result['collections'][$key] = $value;
     				continue;
     			}
-    		}
-    		
-    		if ($value instanceof Property\ObjectProperty) {
+    			
+    		} else if ($value instanceof Property\ObjectProperty) {
     			
     			$value = $value->getValue();
-    			$doBackend = ($this->_uri instanceof ObjectUri) ? $this->_uri->getBackendUri()->getAlias() : null;
+    			$doBackend = ($this->_uri instanceof ObjectUri) ? $this->_uri->getBackendUri() : ObjectModel::getObjectBackend($this->_class);
+				$doBackend = $doBackend->getAlias();
     			
-    			if ($value instanceof ObjectModel) {
+    			if ($value instanceof BaseObject) {
     				
-    				$value = $value->getUri();
+    				// object has not been saved yet
+    				if (! $value->getUri()) {
+
+    					$value = $value->getDataObject()->toArray();
+
+    				} else {
     				
-	    			/* check backends if they're identical, just keep identifier value*/
-    				if ($value->getBackendUri()->getAlias() == $doBackend) { //$backend->getUri()->getAlias()) {
+	    				$value = $value->getUri();
+    				
+		    			/* check backends if they're identical, just keep identifier value*/
+    					if ($value->getBackendUri()->getAlias() == $doBackend) {
     					
-    					$value = $value->getIdentifier();
+    						$value = $value->getIdentifier();
+    					} else {
+    						
+    						$value = $value->__toString();
+    					}
     				}
+
     			} else if ($value instanceof ObjectUri) {
     				
-    				 /* check backends if they're identical, just keep identifier value*/
-    				if ($value->getBackendUri()->getAlias() == $doBackend) { //$backend->getUri()->getAlias()) {
+    				/* check backends if they're identical, just keep identifier value*/
+    				if ($value->getBackendUri()->getAlias() == $doBackend) {
     					
     					$value = $value->getIdentifier();
-    				}
+    				} else {
+    						
+    						$value = $value->__toString();
+    					}
     			}
     			
     			$result['data'][$key] = $value;
     			
-    		} else if ($value instanceof Property\PropertyAbstract){
+    		} else if ($value instanceof Property\AbstractProperty){
 
     			$value = $value->getValue();
     			$result['data'][$key] = ($value instanceof ObjectModel) ? $value->getUri() : $value;
@@ -281,16 +316,38 @@ class DataObject {
     
 
     /**
-     * Returns the Property object associated with the given key
+     * Returns the Property object associated with the given key or key chain
      * @param string $name
      * @return Property\AbstractProperty
      */
     public function getProperty($name)
     {
+    	return (isset($this->_data[$name])) ? $this->_data[$name] : false; 
+    }
+    
+    
+    public function getRecursiveProperty($name)
+    {
     	if (strpos($name, '.') === false) {
     		
-    		return (isset($this->_data[$name])) ? $this->_data[$name] : false; 
+    		return $this->getProperty($name);
     	}
+    	
+    	$parts = explode('.', $name);
+
+    	$data = $this->_data;
+    	foreach ($parts as $part) {
+
+	    	$property = $data[$part];
+    			 
+    		if ($property instanceof Property\ObjectProperty) {
+    	
+   				$data = DataObject::factory($property->getParameter('instanceof'));
+   				$data = $data->getProperties();
+    		}
+    	}
+    	 
+    	return (isset($data[$part])) ? $data[$part] : false;    	
     }
     
     
@@ -331,13 +388,19 @@ class DataObject {
     			
     			if ($property instanceof Property\ObjectProperty) {
 
+    				if ($property->getParameter('instanceof') == null) {
+    					
+    					//\Zend_Debug::dump($property); die;
+    					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
+    				}
+    				
     				if (substr($value, 0, 1) == Backend::PREFIX) {
     					
 		    			$property->setValue(new ObjectUri($value));
     					continue;
     				}
     				
-    				$backend = \t41\ObjectModel::getObjectBackend($property->getParameter('instanceof'));
+    				$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
     			/*	
     				if ($backend != t41_Backend::getDefaultBackend()) {
 
@@ -354,6 +417,7 @@ class DataObject {
     		}
     	}
     	
+    	$this->resetChangedState();
     	return $this;
     }
     
@@ -361,8 +425,8 @@ class DataObject {
     /**
      * Map properties against mapper to obtain a backend-compatible array
      * 
-     * @param t41_Backend_Mapper $mapper
-     * @param t41_Backend_Adapter_Abstract $backend
+     * @param t41\Backend\Mapper $mapper
+     * @param t41\Backend\Adapter\AbstractAdapter $backend
      * @return array
      */
     public function map(t41_Backend_Mapper $mapper, $backend)
@@ -385,6 +449,90 @@ class DataObject {
     }
     
     
+    public function delegateRules(array $rules = array())
+    {
+    	$this->_rules = $rules;
+    	return $this;
+    }
+    
+    
+    /**
+     * Execute defined rules for given trigger
+     *
+     * @param string $trigger
+     * @return boolean
+     */
+    public function triggerRules($trigger)
+    {
+    	if (! isset($this->_rules[$trigger])) {
+    		 
+    		/* return true if no defined rule for trigger */
+    		return true;
+    	}
+    
+    	$result = true;
+    
+    	foreach ($this->_rules[$trigger] as $rule) {
+    		 
+    		$result = $result && $rule->execute($this);
+    	}
+    
+    	return $result;
+    }
+    
+    
+    /**
+     * Reset changed state of property matching $name or all properties
+     * @param string $name
+     * @return boolean
+     */
+    public function resetChangedState($name = null)
+    {
+    	if (! is_null($name)) {
+    		
+    		if (isset($this->_data[$name])) {
+    		
+	    		$this->_data[$name]->resetChangedState();
+    			return true;
+    		} else {
+    			return false;
+    		}
+    		
+    	} else {
+    		
+    		foreach ($this->_data as $property) {
+    			
+    			$property->resetChangedState();
+    		}
+    		
+    		return true;
+    	}
+    }
+    
+    
+    public function reduce(array $params = array())
+    {
+    	$uuid = ($this->_uri instanceof ObjectUri) ? $this->_uri->reduce($params) : null;
+    	$props = array();
+    	foreach ($this->_data as $key => $property) {
+    		
+    		if (isset($params['props']) && ! in_array($key, $params['props'])) {
+    			
+    			continue;
+    		}
+    		
+    		$constraints = $property->getParameter('constraints');
+    		
+    		// ignore stricly server-side properties
+    		if (isset($constraints['serverside'])) continue;
+    		
+    		$props[$key] = $property->reduce($params);
+    	}
+    	
+    	return array_merge(parent::reduce($params), array('uuid' => $uuid, 'props' => $props));
+    }
+    
+    
     static public function factory($class)
     {
     	try {
@@ -393,7 +541,7 @@ class DataObject {
     
     	} catch (Exception $e) {
     			
-    		throw new DataObject\Exception(array("PROPERTY_ERROR", $e->getMessage()));
+    		throw new DataObject\Exception("PROPERTY_ERROR " . $e->getMessage());
     	}
     		
     	return $do;

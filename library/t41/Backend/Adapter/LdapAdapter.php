@@ -471,7 +471,7 @@ class LdapAdapter extends AdapterAbstract {
 			 *
 			 * @var $value t41_Object_Model
 			 */
-			if ($value instanceof ObjectModel\ObjectModel) {
+			if ($value instanceof ObjectModel\BaseObject) {
 
 					throw new Exception("LDAP Adapter doesn't support conditions which value is an object: " . $field);
 			}

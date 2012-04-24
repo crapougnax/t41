@@ -22,7 +22,6 @@ namespace t41\ObjectModel;
  * @version    $Revision: 832 $
  */
 
-use t41\ObjectModel;
 
 /**
  * Class for Property.
@@ -36,17 +35,17 @@ class Rule {
 
 	
 	/**
-	 * Returns a t41_Object_Rule_* instance build from parameters
+	 * Returns a t41\ObjectModel\Rule\*Rule instance build from parameters
 	 *
 	 * @param string $id
 	 * @param string $type
 	 * @param array  $params
-	 * @return t41_Property_Abstract
-	 * @throws t41_Property_Exception
+	 * @return t41\ObjectModel\Rule\RuleAbstract
+	 * @throws t41\ObjectModel\Rule\Exception
 	 */
 	static public function factory($type = 'string', array $params = null)
 	{
-		$className = sprintf('\t41\ObjectModelRule\\%sRule', ucfirst(strtolower($type)));
+		$className = sprintf('\t41\ObjectModel\Rule\%sRule', ucfirst(strtolower($type)));
 		
 		try {
 			
@@ -55,14 +54,14 @@ class Rule {
 			
 			if (! $rule instanceof Rule\RuleInterface) {
 				
-				throw new ObjectModel\Exception("$className doesn't implement t41_Object_Rule_Interface");
+				throw new Rule\Exception("$className doesn't implement t41\ObjectModel\Rule\RuleInterface");
 			}
 			
 			return $rule;
 
 		} catch (Exception $e) {
 			
-			throw new ObjectModel\Exception("RULE_INSTANCIATION_ERROR", $e->getCode(), $e);
+			throw new Exception("RULE_INSTANCIATION_ERROR", $e->getCode(), $e);
 		}
 	}
 }

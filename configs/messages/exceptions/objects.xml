@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages>
+	<exceptions>
+		<exception id="NO_CLASS_DECLARATION">
+			<labels>
+				<label lang="en">No class declaration available for '%0'</label>
+				<label lang="fr">Aucune déclaration de classe disponible pour '%0'.</label>
+			</labels>
+		</exception>
+		<exception id="NOT_INSTANCEOF">
+			<labels>
+				<label lang="en">%0 is not an instanceof %1</label>
+				<label lang="fr">'%0' n'est pas une instance de '%1'</label>
+			</labels>
+		</exception>
+		<exception id="CANNOT_CHANGE_VALUE">
+			<labels>
+				<label lang="en">%0 value has already been defined</label>
+				<label lang="fr">La valeur '%0' a déjà été définie</label>
+			</labels>
+		</exception>
+		<exception id="INCORRECT_PROPERTY_DESCRIPTOR">
+			<labels>
+				<label lang="en">No available property for the '%0' descriptor</label>
+				<label lang="fr">Aucune propriété ne correspond au descripteur '%0'</label>
+			</labels>
+		</exception>
+	</exceptions>
+</messages>

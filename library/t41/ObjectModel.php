@@ -22,9 +22,6 @@ namespace t41;
  * @version    $Revision: 886 $
  */
 
-use t41\ObjectModel;
-use t41\ObjectModel\Rule;
-
 /**
  * Class providing basic functions needed to handle model objects
  *
@@ -43,6 +40,16 @@ class ObjectModel {
 	const MODEL = 'model';
 	
 	const DATA	= 'data';
+	
+	
+	/**
+	 * calculation flags
+	 * @var integer
+	 */
+	const CALC_SUM	= 'sum';
+	
+	const CALC_AVG	= 'avg';
+	
 	
 	/**
 	 * Array of objects definitions
@@ -77,7 +84,7 @@ class ObjectModel {
 	        self::$_config = array_merge(self::$_config, $config['objects']);
 		}
 
-		//Zend_Debug::dump(self::$_config); die;
+//		\Zend_Debug::dump(self::$_config); die;
 		return true;
 	}
 	
@@ -130,12 +137,11 @@ class ObjectModel {
 
 		if (! array_key_exists($class, self::$_config)) {
 			
-			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
+			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
 		}
 		
 		try {
 			
-			require_once 't41/ObjectModel/ObjectModel.php';
 			$obj = new $class($param instanceof ObjectModel\ObjectUri ? $param : null);
 			
 		} catch (ObjectModel\Exception $e) {
@@ -176,8 +182,7 @@ class ObjectModel {
 		
 		if (! $class || ! $property) {
 			
-			require_once 't41/Object/Exception.php';
-			throw new ObjectModel\Exception("OBJECT_INCORRECT_PROPERTY_DESCRIPTOR");
+			throw new ObjectModel\Exception(array("INCORRECT_PROPERTY_DESCRIPTOR", $str));
 		}
 		
 		$props = self::getObjectProperties($class);
@@ -190,7 +195,7 @@ class ObjectModel {
 		} else {
 			
 			require_once 't41/Object/Exception.php';
-			throw new ObjectModel\Exception("OBJECT_NO_SUCH_PROPERTY");
+			throw new ObjectModel\Exception("NO_SUCH_PROPERTY");
 		}
 	}
 	
@@ -207,16 +212,14 @@ class ObjectModel {
 	{
 		if (! self::definitionExists($id)) {
 			
-			require_once 't41/Object/Exception.php';
-			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $id));
+			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $id));
 		}
 		
 //		Zend_Debug::dump(self::$_config[$id]);
 
 		if (isset(self::$_config[$id]['backend'])) {
 			
-			require_once 't41/Backend.php';
-			return Backend::getInstance(\t41\Backend::PREFIX . self::$_config[$id]['backend']);
+			return Backend::getInstance(Backend::PREFIX . self::$_config[$id]['backend']);
 		
 		} else {
 
@@ -225,11 +228,13 @@ class ObjectModel {
 	}
 	
 	
-	static public function getRules($class)
+	static public function getRules($object)
 	{
+		$class = get_class($object);
+		
 		if (! self::definitionExists($class)) {
 				
-			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
+			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
 		}
 	
 		if (! isset(self::$_config[$class]['rules'])) {
@@ -241,8 +246,9 @@ class ObjectModel {
 	
 		foreach (self::$_config[$class]['rules'] as $key => $val) {
 	
-			$rule = Rule::factory($val['type']);
+			$rule = ObjectModel\Rule::factory($val['type']);
 			$rule->setId($key);
+			$rule->setObject($object);
 	
 			if (isset($val['source'])) 			$rule->setSource($val['source']);
 			if (isset($val['destination']))		$rule->setDestination($val['destination']);
@@ -256,47 +262,6 @@ class ObjectModel {
 	
 		ksort($rules);
 	
-		return $rules;
-	}
-	
-	
-	/**
-	 * Convert rules configuration array into rules objects array 
-	 * @param string $class
-	 * @throws ObjectModel\Exception
-	 * @return array
-	 */
-	static public function getRules($class)
-	{
-		if (! self::definitionExists($class)) {
-			
-			throw new ObjectModel\Exception(array('OBJECT_NO_CLASS_DECLARATION', $class));
-		}
-		
-		if (! isset(self::$_config[$class]['rules'])) {
-			
-			return null;
-		}
-		
-		$rules = array();
-		
-		foreach (self::$_config[$class]['rules'] as $key => $val) {
-
-			$rule = Rule::factory($val['type']);
-			$rule->setId($key);
-
-			if (isset($val['source'])) 			$rule->setSource($val['source']);
-			if (isset($val['destination']))		$rule->setDestination($val['destination']);
-			
-			$trigger = $val['trigger'];
-			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
-			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
-
-			$rules[$ruleKey][$key] = $rule;
-		}
-		
-		ksort($rules);
-		
 		return $rules;
 	}
 	

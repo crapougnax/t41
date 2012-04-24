@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<properties>
+		<property id="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="label">
+					<type>any</type>
+				</parameter>
+				<parameter id="defaultvalue">
+					<type>any</type>
+				</parameter>
+				<parameter id="constraints">
+					<type>any</type>
+				</parameter>
+				<parameter id="validators">
+					<type>array</type>
+				</parameter>
+			</parameters>
+		</property>
+		<property id="\t41\ObjectModel\Property\StringProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameters id="minlength">
+					<type>integer</type>
+				</parameters>
+				<parameter id="maxlength">
+					<type>integer</type>
+				</parameter>
+			</parameters>
+		</property>
+		<property id="\t41\ObjectModel\Property\ObjectProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+					<parameter id="instanceof">
+						<type>string</type>
+						<protected>true</protected>
+					</parameter>
+					<parameter id="display">
+						<type>string</type>
+						<protected>false</protected>
+					</parameter>
+			</parameters>
+		</property>
+		<property id="\t41\ObjectModel\Property\CollectionProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+					<parameter id="instanceof">
+						<type>string</type>
+						<protected>true</protected>
+					</parameter>
+					<parameter id="keyprop">
+						<type>string</type>
+						<protected>true</protected>
+					</parameter>
+					<parameter id="morekeyprop">
+						<type>array</type>
+					</parameter>
+					<parameter id="sorting">
+						<type>string</type>
+					</parameter>
+					<parameter id="max">
+						<type>integer</type>
+						<value>0</value>
+					</parameter>
+					<parameter id="relation">
+						<type>string</type>
+					</parameter>
+					<parameter id="unique">
+						<type>string</type>
+					</parameter>
+			</parameters>
+		</property>
+		<property id="\t41\ObjectModel\Property\DateProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="format">
+					<type>string</type>
+					<value>yyyy-mm-dd</value>
+				</parameter>
+			</parameters>
+		</property>
+		<property id="\t41\ObjectModel\Property\EnumProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="values">
+					<type>array</type>
+				</parameter>
+			</parameters>
+		</property>
+
+		<property id="\t41\ObjectModel\Property\IntegerProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="unsigned">
+					<type>boolean</type>
+					<defaultvalue>false</defaultvalue>
+				</parameter>
+			</parameters>
+		</property>
+				
+		<property id="\t41\ObjectModel\Property\CurrencyProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="currency">
+					<type>string</type>
+				</parameter>
+			</parameters>
+		</property>
+
+		<property id="\t41\ObjectModel\Property\ArrayProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+			</parameters>
+		</property>
+
+		<property id="\t41\ObjectModel\Property\FloatProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="unsigned">
+					<type>boolean</type>
+					<defaultvalue>false</defaultvalue>
+				</parameter>
+			</parameters>
+		</property>
+		
+	</properties>
+</config>

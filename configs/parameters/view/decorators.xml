@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<decorators>
+		<object id="\t41\View\SimpleComponent">
+			<decorator id="WebDefault">
+				<parameters>
+					<parameter id="theme">
+						<type>string</type>
+					</parameter>
+					<parameter id="color">
+						<type>string</type>
+					</parameter>
+					<parameter id="open_default">
+						<type>boolean</type>
+						<defaultvalue>true</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
+			<decorator id="PdfDefault">
+			</decorator>
+		</object>
+		<object id="\t41\View\FormComponent">
+			<decorator id="WebDefault" extends="\t41\View\SimpleComponent">
+				<bogus/>
+		</decorator>
+		</object>
+		
+		<object id="\t41\View\FormComponent\Element\ButtonElement">
+			<decorator id="WebDefault" extends="\t41\View\SimpleComponent">
+				<parameters>
+					<parameter id="size">
+						<type>string</type>
+						<defaultvalue>medium</defaultvalue>
+					</parameter>
+					<parameter id="icon">
+						<type>string</type>
+					</parameter>
+					<parameter id="nolabel">
+						<type>boolean</type>
+						<defaultvalue>false</defaultvalue>
+					</parameter>
+				</parameters>
+		</decorator>
+		</object>
+		
+	</decorators>
+</config>

@@ -22,8 +22,8 @@ namespace t41;
  * @version    $Revision: 914 $
  */
 
-use t41\Core;
-use t41\Config;
+use t41\Core,
+	t41\Config;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -66,7 +66,7 @@ class Core {
 	 * 
 	 * @var array
 	 */
-	static public $autoloaderPrefixes = array('t41_');
+	static public $autoloaderPrefixes = array();
 	
 	
 	static protected $_autoloaderInstance;
@@ -95,6 +95,9 @@ class Core {
 	static public $lazy = false;
 	
 	
+	static public $cache = 'Apc';
+	
+	
 	/**
 	 * Debug mode
 	 * 
@@ -108,7 +111,7 @@ class Core {
 	 *
 	 * @var array
 	 */
-	static protected $_env;
+	static protected $_env = array();
 
 	
 	/**
@@ -119,10 +122,11 @@ class Core {
     static public $basePath;
 
     
+    static public $env;
+    
+    
     /**
      * Configuration Data
-     *
-     * @var Zend_Config
      */
     static protected $_config;
 
@@ -147,14 +151,6 @@ class Core {
      * @var boolean
      */
     static protected $_fancyExceptions = true;
-    
-    
-    /**
-     * Array of different environment related urls of the application 
-     *
-     * @var array
-     */
-    static protected $_urls = array();
     
     
     /**
@@ -190,27 +186,66 @@ class Core {
     	self::$_adapters[$key] = $adapter;
     }
     
+    
+    public static function setIncludePaths($path)
+    {
+    	if (substr($path, -1) != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
+    	
+    	self::$basePath = $path;
 
+    	set_include_path(
+    			get_include_path() . PATH_SEPARATOR
+    			. $path . PATH_SEPARATOR
+    			. $path . 'application/' . PATH_SEPARATOR
+    			. $path . 'vendor/' . PATH_SEPARATOR
+    			. $path . 'vendor/quatrain/t41/library' . PATH_SEPARATOR
+    			. $path . 'vendor/zend/zf1/library' . PATH_SEPARATOR
+    	);
+    }
+
+    
     /**
      * Add a prefix to be searched by the autoloader
      * @param string|array $prefix
      */
-	public static function addAutoloaderPrefix($prefix)
+	public static function addAutoloaderPrefix($prefix, $path = null)
 	{
+		set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+		
 		if (is_array($prefix)) {
 
-			foreach ($prefix as $var) {
+			foreach ($prefix as $key => $val) {
 			
-				self::$autoloaderPrefixes[] = $var;	
-				if (is_object(self::$_autoloaderInstance)) { self::$_autoloaderInstance->registerNamespace($var); }
+				self::$autoloaderPrefixes[$key] = $val;	
+				if (is_object(self::$_autoloaderInstance)) {
+
+					if (substr($key, -1) == '_') {
+						
+						self::$_autoloaderInstance->registerPrefix($key, $val);
+					} else {
+						self::$_autoloaderInstance->registerNamespace($key, $val);
+					}
+				}
 			}
+			
 		} else {
 			
-			self::$autoloaderPrefixes[] = $prefix;	
-			if (is_object(self::$_autoloaderInstance)) {self::$_autoloaderInstance->registerNamespace($prefix); }
+			self::$autoloaderPrefixes[$prefix] = $path;	
+			if (is_object(self::$_autoloaderInstance)) {
+				if (substr($prefix, -1) == '_') {
+				
+					self::$_autoloaderInstance->registerPrefix($prefix, $path);
+				} else {
+					self::$_autoloaderInstance->registerNamespace($prefix, $path);
+				}
+			}
 		}
+		
+/*		if (self::$_autoloaderInstance) {
+			\Zend_Debug::dump(self::$_autoloaderInstance->getRegisteredNamespaces());
+		}
+*/
 	}
-	
 	
 	
 	public static function enableAutoloader($prefix = null)
@@ -220,52 +255,32 @@ class Core {
 			self::addAutoloaderPrefix($prefix);
 		}
 		
-		require_once 'Zend/Version.php';
+		//self::$_autoloaderInstance = new \Zend\Loader\StandardAutoloader();
+		require_once 'Zend/Loader/Autoloader.php';
+		self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
 		
-		if (\Zend_Version::compareVersion('1.8.0') == true) {
-	
-			require_once 'Zend/Loader/Autoloader.php';
-			self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
-   			self::$_autoloaderInstance->registerNamespace(self::$autoloaderPrefixes);
-    		
-		} else {
-	
-			require_once 'Zend/Loader.php';
-			\Zend_Loader::registerAutoload();
+		self::$autoloaderPrefixes['t41'] = self::$basePath . 'vendor/quatrain/t41/library/t41';
+		
+		foreach (self::$autoloaderPrefixes as $prefix => $path) {
+		
+			if (substr($prefix, -1) == '_') {
+				
+				self::$_autoloaderInstance->registerNamespace($prefix, $path);
+//				self::$_autoloaderInstance->registerPrefix($prefix, $path);
+				
+			} else {
+				
+				self::$_autoloaderInstance->registerNamespace($prefix, $path);
+			}
+
+//			self::$_autoloaderInstance->register();
 		}
-    		
+		
+   		//\Zend\Debug::dump(self::$_autoloaderInstance);
     	self::$autoloaded = true;
 	}
 	
 	
-    /**
-     * Allow declaration of possible url matched with one of the possible environment
-     *
-     * @param string $url
-     * @param string $env
-     */
-    public static function setUrl($url, $env = self::ENV_PROD)
-    {
-    	if (! is_null($env) && ! in_array($env, array(self::ENV_DEV, self::ENV_STAGE, self::ENV_PROD))) {
-    		
-    		throw new Exception("'$env' is not a recognized environment");
-    	}
-    	
-    	self::$_urls[$env] = $url;
-    }
-    
-    
-    public static function getUrl($env = self::ENV_PROD)
-    {
-        if (! is_null($env) && ! in_array($env, array(self::ENV_DEV, self::ENV_STAGE, self::ENV_PROD))) {
-    		
-    		throw new Exception("'$env' is not a recognized environment");
-    	}
-    	
-    	return isset(self::$_urls[$env]) ? self::$_urls[$env] : null;
-    }
-
-    
     /**
      * Enable or disable the t41 custom exceptions handler
      *
@@ -275,7 +290,7 @@ class Core {
     {
     	self::$_fancyExceptions = $bool;
     	if ($bool === true) {
-    		set_exception_handler(array('t41_Core', 'exceptionHandler'));
+    		set_exception_handler(array('\t41\Core', 'exceptionHandler'));
     		
     	} else {
     		
@@ -293,23 +308,21 @@ class Core {
      */
     public static function exceptionHandler(Exception $e)
     {
-        switch (\t41\View::getDisplayContext()) {
+        switch (View::getDisplayContext()) {
             
             case 'ajax':
-                require_once 't41/Ajax.php';
                 $ajax = new t41_Ajax();
                 $ajax->setSendMessage($e->getMessage(), t41_Ajax::ERR);
                 break;
                 
             default:
-            	\t41\View::resetObjects('default'); // to avoid infinite loop and fatal error, reset view content
-            	require_once 't41/View/Error.php';
+            	View::resetObjects('default'); // to avoid infinite loop and fatal error, reset view content
 				$error = new t41_View_Error();
 				$error->setTitle('ERREUR FATALE : ' . html_entity_decode($e->getMessage()));
-                if (self::getEnvData('webEnv') == self::ENV_DEV) {
+                if (self::$env == self::ENV_DEV) {
                 	
                 	// in dev mode, also print out execution trace
-                    $error->setContent('<pre>' . $e->getTraceAsString() . '</pre>');
+                    $error->setContent('<br/><pre>' . $e->getTraceAsString() . '</pre>');
                 }
                 $error->register();
                 
@@ -360,22 +373,36 @@ class Core {
     public static function init($path = null, $mpath = null)
     {
     	// enable t41 error handler (notices are not catched until we get a proper logger)
-    	set_error_handler(array('t41_Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
+    	//set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
     	// define path but only if it's empty
     	if (empty(self::$basePath)) self::$basePath = $path;
 
-    	/* add application config files path (in first position if none was declared before) */
-    	Config::addPath($path . 'application/configs/', Config::REALM_CONFIGS);
-    	
+    	/* add application & t41 config files path (in first position if none was declared before) */
+    	Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
+    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/configs/', Config::REALM_CONFIGS);
+    	 
     	/* add templates folder path (in first position if none was declared before) */
-    	Config::addPath($path . 'application/views/', Config::REALM_TEMPLATES);
+    	Config::addPath(self::$basePath . 'application/views/', Config::REALM_TEMPLATES);
+
+    	/* add t41 & application controllers paths (in first position if none was declared before) */
+    	Config::addPath(self::$basePath . 'application/controllers/', Config::REALM_CONTROLLERS, null, 'default');
+    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
+    	
+    	/* register default REST controllers path */
+    	/* @todo allow override in config file or even later */
+    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
+    	 
     	
     	$config = Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
     	
     	// load modules
-    	Core\Module::init($mpath ? $mpath : $path);
+    	Core\Module::init($mpath ? $mpath : self::$basePath);
+    	
+    	// load ACL
+    	Core\Acl::init($mpath ? $mpath : self::$basePath);
+    	
     	
     	/* CLI Mode */
     	if (isset(self::$_config['cli']) && PHP_SAPI == 'cli') {
@@ -392,7 +419,7 @@ class Core {
 			try {
 				$opts->parse();
 				
-			} catch (\Zend_Console_Getopt_Exception $e) {
+			} catch (\Zend_Console_GetOpt_Exception $e) {
 				
 				die($e->getUsageMessage());
 			}
@@ -406,7 +433,7 @@ class Core {
 			
 		} else {
     	
-			\t41\View::setDisplay('Web');
+			View::setDisplay(View\Adapter\WebAdapter::ID);
 			
 	    	/* array of mode / $_SERVER data key value */
     		$envMapper = array('hostname' => 'SERVER_NAME');
@@ -417,7 +444,7 @@ class Core {
     	/* define which environment matches current mode value */
     	if (is_null($match)) {
     		
-    		throw new \t41\Config\Exception("environment value not detected");
+    		throw new Config\Exception("environment value not detected");
     	}
     	
     	$envKey = null;
@@ -431,7 +458,7 @@ class Core {
     				
     				if ($key == $match) {
     					
-    					$envKey = $key;
+    					$envKey = self::$env = $key;
     					break;
     				}
     			}
@@ -445,7 +472,7 @@ class Core {
     				
     				if (isset($value['hostname']) && $value['hostname'] == $match) {
     					
-    					$envKey = $key;
+    					$envKey = self::$env = $key;
     					break;
     				}
     			}
@@ -484,47 +511,34 @@ class Core {
 		if (self::$lazy !== true) {
 
 			// get backends configuration
-    		require_once 't41/Backend.php';
-    		\t41\Backend::loadConfig();
+    		Backend::loadConfig();
 
     		// get mappers configuration
-    		require 't41/Mapper.php';
-    		\t41\Mapper::loadConfig();
+    		Mapper::loadConfig();
     	
     		// get object model configuration
-    		require 't41/Object.php';
-    		\t41\ObjectModel::loadConfig();
+    		ObjectModel::loadConfig();
+    		
 		}
 		
-        if (get_magic_quotes_runtime()) {
-            ini_set('magic_quotes_runtime', 0);
-        }
-        
-        // protection contre les inclusions distantes
-        ini_set('allow_url_fopen', 0);
-        
-        if (! isset(self::$_env['webEnv'])) {
-	        self::getEnv();
-        }
-        
         // configure error reporting according to env
-        if (in_array(self::$_env['webEnv'], array(self::ENV_STAGE, self::ENV_PROD))) {
+        if (in_array(self::$env, array(self::ENV_STAGE, self::ENV_PROD))) {
         	
-        	error_reporting((E_ALL | E_STRICT) ^ E_NOTICE);
-        	ini_set('display_errors', 0);
+        	error_reporting(E_ERROR); //(E_ALL | E_STRICT) ^ E_NOTICE);
+        	ini_set('display_errors', 1);
         	
         } else {
 
-            error_reporting(-1) ;//E_ALL | E_STRICT);
+            error_reporting(E_ALL & ~E_DEPRECATED);
             ini_set('display_errors', 1);
         }
 
 		// define some basic view data
-		\t41\View::setEnvData('t41.version', self::VERSION);
-		\t41\View::setEnvData('zf.version', \Zend_Version::VERSION);
-		\t41\View::setEnvData('app.name', self::$_config['name']);
-		\t41\View::setEnvData('app.version', self::getVersion());
-        
+		View::setEnvData('t41.version', self::VERSION);
+//		if (class_exists('Zend_Version')) View::setEnvData('zf.version', \Zend_Version::VERSION);
+		View::setEnvData('app.name', self::$_config['name']);
+		View::setEnvData('app.version', self::getVersion());
+		
 	    // set a cache adapter
         if (! isset(self::$_adapters['registry'])) {
         	
@@ -534,63 +548,19 @@ class Core {
         // (re-)init session 
         if (! isset(self::$_adapters['session'])) {
     		
-    		self::$_adapters['session'] = new t41_Session_Default();
+    		self::$_adapters['session'] = '';//new t41_Session_Default();
     	}
 
         // to be done at the very end to avoid empty stack on exception
         if (self::$_fancyExceptions === true) {
-	        set_exception_handler(array('t41_Core', 'exceptionHandler'));
+	        //set_exception_handler(array('t41\Core', 'exceptionHandler'));
         } 
     }
     
     
     /**
-     * Returns the base path of the application folder
-     *
-     * @return string
-     */
-    public static function getBasePath()
-    {
-        return isset(self::$_env['appPath']) ? self::$_env['appPath'] : null;
-    }
-    
-
-    /**
-     * Returns the base path of the application folder
-     *
-     * @return string
-     */
-    public static function gett41Path()
-    {
-        return isset(self::$_env['t41Path']) ? self::$_env['t41Path'] : null;
-    }
-    
-    
-    /**
-     * Loads a XML config file and returns a SimpleXmlElement object or false in case of failure
-     *
-     * @param string $fileName
-     * @return SimpleXMLElement
-     * @deprecated will be removed soon
-     * 
-     */
-    public static function loadXmlConfig($fileName)
-    {
-    	$filePath = self::getBasePath() . 'application/configs/' . $fileName;
-    	
-    	if (file_exists($filePath)) {
-    		
-	        return simplexml_load_file($filePath);
-
-    	} else {
-    		
-    		return false;
-    	}
-    }
-    
-    
-    /**
      * Try to detect environment based on URL structure
+     * @deprecated
      *
      */
     protected static function getEnv()
@@ -722,21 +692,24 @@ class Core {
      * CACHE GLOBAL ACCESS METHODS
      */
     
-    public static function cacheSet($key, $val = null)
+    public static function cacheSet($val, $key = null)
     {
     	if (! isset(self::$_adapters['cache'])) {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
-    													, 'File'
+    													, self::$cache
     													, array('automatic_serialization' => true))
     													 );
     	}
-    	
+
+    	if (is_null($key)) $key = md5(microtime() . $_SERVER['REMOTE_ADDR']);
+    	 
         if (is_object($val)) {
-            $val = array('_class' => get_class($val), 'content' => gzcompress(serialize($val)));
+
+        	$val = array('_class' => get_class($val), 'content' => gzcompress(serialize($val)));
         }
         
-    	return self::$_adapters['cache']->save($val, $key);
+    	return self::$_adapters['cache']->save($val, $key) ? $key : false;
     }
     
     
@@ -745,7 +718,7 @@ class Core {
         if (! isset(self::$_adapters['cache'])) {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
-    													, 'File'
+    													, self::$cache
     													, array('automatic_serialization' => true))
     													 );
     	}
@@ -835,9 +808,9 @@ class Core {
     	// first have a look at the file loaded status
     	if (! isset(self::$_messages[$store]) || ! isset(self::$_loaded[$store . '_' . $lang])) {
     		
-    		if (($config = Config\Loader::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.' . $lang . '.xml')) === false) {
+    		if (($config = Config\Loader::loadConfig(self::$basePath . 'configs/messages/' . $store . '.' . $lang . '.xml')) === false) {
 
-    			if (($config = Config\Loader::loadConfig(self::gett41Path() . 'configs/messages/' . $store . '.xml')) === false) {
+    			if (($config = Config\Loader::loadConfig(self::$basePath . 'configs/messages/' . $store . '.xml')) === false) {
     			
     				return $key;
     			}

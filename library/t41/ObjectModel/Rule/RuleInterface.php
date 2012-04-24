@@ -22,6 +22,9 @@ namespace t41\ObjectModel\Rule;
  * @version    $Revision: 832 $
  */
 
+use t41\ObjectModel,
+	t41\ObjectModel\Property;
+
 /**
  * Interface for objects rules
  *
@@ -38,5 +41,5 @@ interface RuleInterface {
 	
 	public function setDestination($str);
 	
-	public function execute(t41\ObjectModel\DataObject $do);
+	public function execute(Property\AbstractProperty $property);
 }

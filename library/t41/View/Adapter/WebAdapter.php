@@ -22,7 +22,8 @@ namespace t41\View\Adapter;
  * @version    $Revision: 865 $
  */
 
-use t41\View;
+use t41\View,
+	t41\Core;
 
 /**
  * Class providing the view engine with a Web context adapter.
@@ -92,7 +93,7 @@ class WebAdapter extends AdapterAbstract {
 	           $this->_component[$type][] = $filePath;
         	}
            
-        } else if (file_exists(\t41\Core::getBasePath() . $this->_componentsBasePath . $filePath)) {
+        } else if (file_exists(Core::$basePath . $this->_componentsBasePath . $filePath)) {
 
             if ($priority == -1) {
         		array_unshift($this->_component[$type], $filePath);
@@ -274,32 +275,20 @@ class WebAdapter extends AdapterAbstract {
 
     
     public function display($content = null, $error = false)
-    {
-    	if ($this->_subContext == 'ajax') exit;
-    	
-    	if ($this->_subContext == 'popup') {
-
-    		$this->componentAdd('page_popup', 'css');
-            $this->componentAdd('donut/popup', 'js');
-            $this->eventAdd("document.getElementById('bandeau').innerHTML = '" . $this->_title . "';", 'js');
-    		
-    		$this->setTemplate('popup.tpl');
-    	}
-    	
+    {    	
     	if ($this->_template) {
 
-    		if (\t41\View::getTheme('web')) {
+    		if (View::getTheme('web')) {
     			
-    			$this->componentAdd(\t41\View::getTheme('web'), 'css', 't41');
+    			$this->componentAdd(View::getTheme('web'), 'css', 't41');
     		}
     		
-    	    if (\t41\View::getColor('web')) {
+    	    if (View::getColor('web')) {
     			
-    			$this->componentAdd(\t41\View::getColor('web'), 'css', 't41');
+    			$this->componentAdd(View::getColor('web'), 'css', 't41');
     		}
     		    		
-    		echo $this->_render();
-    		exit();
+    		return $this->_render();
     	}
     }
 
@@ -322,13 +311,13 @@ class WebAdapter extends AdapterAbstract {
     				
     			case 'helper':
     				$tmp = explode('.', $tag[2]);
-    				$class = $tmp[0] . '\View\Web\\' . ucfirst($tmp[1]);
+    				$class = sprintf('%s\View\Web\%s', $tmp[0], ucfirst($tmp[1]));
     				try {
     					$helper = new $class;
     					$content = $helper->render();
     				} catch (Exception $e) {
     					
-    					if (\t41\Core::getEnvData('Env') == \t41\Core::ENV_DEV) {
+    					if (Core::getEnvData('Env') == Core::ENV_DEV) {
     						$content = $e->getMessage();
     					}
     				}
@@ -336,7 +325,7 @@ class WebAdapter extends AdapterAbstract {
     				
     			case 'container':
     				
-    				$elems = \t41\View::getObjects($tag[2]);
+    				$elems = View::getObjects($tag[2]);
     				
     				if (is_array($elems)) {
     					
@@ -351,9 +340,8 @@ class WebAdapter extends AdapterAbstract {
     						if (method_exists($object, 'getDecorator')) {
     							
     							try {
-    								$decorator = \t41\View\Decorator::factory($object, $params);
+    								$decorator = View\Decorator::factory($object, $params);
         							$content .= $decorator->render();
-        							
     							} catch (Exception $e) {
     								
     								$content .= 'ERREUR : ' . $e->getMessage() . $e->getTraceAsString() . "<br/>";
@@ -387,7 +375,7 @@ class WebAdapter extends AdapterAbstract {
     				    				
     			case 'env':
     				
-    				$content = \t41\Core::htmlEncode(View::getEnvData($tag[2]));
+    				$content = Core::htmlEncode(View::getEnvData($tag[2]));
     				break;
     		}
     		
@@ -398,11 +386,10 @@ class WebAdapter extends AdapterAbstract {
         $template = str_replace('</body>', $this->eventAttach() . '</body>', $template);
         
         // PHASE 4: display logged errors in dev mode
-        if (\t41\Core::getEnvData('webEnv') == \t41\Core::ENV_DEV) {
+        if (Core::getEnvData('webEnv') == Core::ENV_DEV) {
         	
-	        $errors = \t41\View::getErrors();
+	        $errors = View::getErrors();
         
-	//        Zend_Debug::dump($errors);
     	    if (count($errors) > 0) {
         	
         		$str = "\n";
@@ -420,7 +407,7 @@ class WebAdapter extends AdapterAbstract {
         		$template = str_replace('</body>', '</body><!--' . $str . ' -->' , $template);
         	}
         }
-
+        
         return $template;
     }
 }

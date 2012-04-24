@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<mappers>
+		<mapper id="mysql" type="backend">
+			<object id="Customer" datastore="customer" pkey="customer_id">
+				<map>
+					<property id="dob">
+						<datastorename>ddn</datastorename>
+						<conversions>
+							<conversion source="object">t41_Core::date2Sql</conversion>
+							<conversion source="backend">Sql2date</conversion>
+						</conversions>
+					</property>
+					<property id="lastname">
+						<datastorename>nom</datastorename>
+					</property>
+					<property id="firstname">
+						<datastorename>prenom</datastorename>
+					</property>
+				</map>
+			</object>
+		</mapper>
+	</mappers>
+</config>

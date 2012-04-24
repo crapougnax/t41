@@ -30,6 +30,6 @@ namespace t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class StringProperty extends PropertyAbstract {
+class StringProperty extends AbstractProperty {
 
 }

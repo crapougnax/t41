@@ -22,8 +22,8 @@ namespace t41;
  * @version    $Revision: 916 $
  */
 
-use t41\Backend;
-use t41\Backend\Adapter;
+use t41\Backend,
+	t41\Backend\Adapter;
 
 /**
  * Class providing exchange interface with data sources
@@ -113,8 +113,8 @@ class Backend {
 
 		if (! isset($config['backends'])) {
 			
-			\Zend_Debug::dump($config);
-			throw new Exception("NO CONFIG IN GIVEN SOURCE");
+		//	\Zend_Debug::dump($config);
+			throw new Config\Exception("NO_CONFIG_IN_GIVEN_SOURCE");
 		}
 		
 		// if the key 'default' exists, it defines the default backend key value
@@ -227,14 +227,29 @@ class Backend {
 			if (isset(self::$_config[$id])) {
 
 				$config = self::$_config[$id];
+				$uri = array();
 				
 				/* temp fix - some backends require adapters (PDO), most don't */
 				if (! isset($config['uri']['adapter'])) {
 					
-					$config['uri']['adapter'] = $config['type'];
+					$uri['adapter'] = $config['type'];
 				}
 				
-				$uri = new Backend\BackendUri($config['uri']);
+				/* reduce possible arrays into proper env-based value */
+				/* @todo use parent value if backend extends some other backend */ 
+				foreach ($config['uri'] as $key => $val) {
+
+					if (is_array($val)) {
+						
+						$uri[$key] = isset($val[Core::$env]) ? $val[Core::$env] : null;
+						
+					} else {
+						
+						$uri[$key] = $val;
+					}
+				}
+				
+				$uri = new Backend\BackendUri($uri);
 				
 				$backend = self::factory($uri, $id);
 				
@@ -249,14 +264,14 @@ class Backend {
 								 
 						} else {
 								
-							throw new Backend\Exception("BACKEND_NO_MAPPER_VALUE");
+							throw new Backend\Exception("NO_MAPPER_VALUE");
 						}
 					} else {
 						
 						$mapper = $config['mapper'];
 					}
 						
-					$mapper = \t41\Mapper::getInstance($mapper);
+					$mapper = Mapper::getInstance($mapper);
 					$backend->setMapper($mapper);
 				}
 				
@@ -269,19 +284,25 @@ class Backend {
 	
 	
 	/**
-	 * Construire un Backend à partir de son Uri et le stocker dans la liste des Backends instanciés
+	 * Instanciate a backend from its uri
 	 *
 	 * @param t41_Uri $uri
 	 * @param string $alias		alias name
-	 * @param string mapper name
-	 * @return t41_Backend_Adapter_Abstract
-	 * @throws t41_Exception
+	 * @param string $mapper mapper name
+	 * @return t41\Backend\Adapter\AbstractAdapter
+	 * @throws t41\Backend\Exception
 	 */
 	static public function factory(Backend\BackendUri $uri, $alias = null, $mapper = null)
 	{
 		if (! is_null($alias)) $uri->setAlias($alias);
 		
-		$backendClass = sprintf('\t41\Backend\Adapter\%sAdapter', ucfirst(strtolower($uri->getType())));
+		$parts = explode('_', $uri->getType());
+		foreach ($parts as $key => $part) {
+			
+			$parts[$key] = ucfirst(strtolower($part));
+		}
+		
+		$backendClass = sprintf('\t41\Backend\Adapter\%sAdapter', implode('\\', $parts));
 		
 		try {
 			
@@ -296,7 +317,7 @@ class Backend {
 			
 		} catch(\Exception $e) {
 			
-			throw new Backend\Exception($e->getMessage() . 'BACKEND_UNKNOWN_CLASS');
+			throw new Backend\Exception('UNKNOWN_CLASS');
 		}
 	}
 
@@ -308,7 +329,7 @@ class Backend {
 	 * @param string $alias
 	 * @return int
 	 */
-	static public function addBackend(Backend\Adapter\AdapterAbstract $backend, $alias = null)
+	static public function addBackend(Backend\Adapter\AbstractAdapter $backend, $alias = null)
 	{
 		if (empty($alias)) {
 			
@@ -328,7 +349,7 @@ class Backend {
 	 * @param t41_Backend_Adapter_Abstract $backend
 	 * @return boolean
 	 */
-	static public function read(Data\Object $do, Backend\Adapter\AdapterAbstract $backend = null)
+	static public function read(ObjectModel\DataObject $do, Backend\Adapter\AdapterAbstract $backend = null)
 	{
 		if (is_null($backend)) {
 
@@ -352,8 +373,7 @@ class Backend {
 			
 		if (! $backend) {
 
-			require_once 't41/Backend/Exception.php';
-			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
+			throw new Exception("NO_AVAILABLE_BACKEND");
 		}
 			
 		if ($do->getUri()) {
@@ -372,10 +392,10 @@ class Backend {
 	/**
 	 * Enregistre les données du DataObject dans son backend ou dans le backen précisé en paramètre.
 	 *
-	 * @param t41_Data_Object $do
+	 * @param t41\ObjectModel\DataObject $do
 	 * @param t41_Backend_Adapter_Abstract $backend
 	 */
-	static public function save(Data\Object $do, Backend\Adapter\AdapterAbstract $backend = null)
+	static public function save(ObjectModel\DataObject $do, Backend\Adapter\AdapterAbstract $backend = null)
 	{
 		if (is_null($backend)) {
 
@@ -399,7 +419,6 @@ class Backend {
 			
 		if (! $backend) {
 
-			require_once 't41/Backend/Exception.php';
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 			
@@ -409,11 +428,11 @@ class Backend {
 			return $backend->update($do);
 			
 		} else {
-				
+			
 			// Insertion de l'objet dans le backend
 			return $backend->create($do);
 		}
-	}	
+	}
 	
 
 	static public function populate(t41_Data_Object $do)
@@ -422,36 +441,54 @@ class Backend {
 		return $do;
 	}
 	
-	
 	/**
-	 * Efface une entrée du backend à partir d'un Objet, d'un Data Object, ou d'une Uri.
-	 *
-	 * @param mixed $data
+	 * Delete the given dataobject in its backend
+	 * 
+	 * @param ObjectModel\DataObject $do
+	 * @param Backend\Adapter\AbstractAdapter $backend
+	 * @throws Backend\Exception
 	 */
-	public static function delete($data)
+	public static function delete(ObjectModel\DataObject $do, Backend\Adapter\AbstractAdapter $backend = null)
 	{
-		if ($data instanceof ObjectModel\ObjectUri) {				// data est une Uri
-			$backend = self::getInstance($data);			
-			$backend->delete($data);
-		} else if ($data instanceof ObjectModel\DataObject ) {	// Data est un Data Object
-			self::delete($data->getUri());
-			$data->clearUri();
-		} else if ($data instanceof ObjectModel\ObjectModel ) { 	// data est un Objet
-			self::delete($data->getDataObject());
+		if (is_null($backend)) {
+
+			if ($do->getUri()) {
+			
+				/* uri n'est pas vide, on peu alors essayer d'y trouver le backend */
+				$backend = self::getInstance($do->getUri()->getBackendUri());
+
+			} else {
+				
+				/* get object definition default backend */
+				$backend = ObjectModel::getObjectBackend($do->getClass());
+			}
+				
+			if (is_null($backend)) {
+
+				/* get object default backend if exists */
+				$backend = self::getDefaultBackend();
+			}
 		}
-	}
+			
+		if (! $backend) {
+
+			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
+		}
+			
+		return $backend->delete($do);
+	}	
 	
 	
 	/**
 	 * Execute a search on given backend with given t41_Object_Collection parameters
 	 * and returns an array of results (either t41_Object_Uri, t41_Object_Data or t41_Object_Model instances)
 	 * 
-	 * @param t41_Object_Collection $co
-	 * @param t41_Backend_Adapter_Abstract $backend
-	 * @throws t41_Backend_Exception
+	 * @param t41\ObjectModel\Collection $co
+	 * @param t41\Backend\Adapter\AbstractAdapter $backend
+	 * @throws t41\Backend\Exception
 	 * @return array
 	 */
-	static public function find(ObjectModel\Collection $co, Backend\Adapter\AdapterAbstract $backend = null, $returnCount = false)
+	static public function find(ObjectModel\Collection $co, Backend\Adapter\AbstractAdapter $backend = null, $returnCount = false)
 	{
 		/*
 		 * Backend to use in order of preferences
@@ -496,7 +533,6 @@ class Backend {
 			
 		if (! $backend) {
 
-			require_once 't41/Backend/Exception.php';
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 
@@ -535,7 +571,7 @@ class Backend {
 	}
 	
 	
-	public function setDebug($bool)
+	static public function setDebug($bool)
 	{
 		self::$_debug = (bool) $bool;
 	}

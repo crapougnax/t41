@@ -1,4 +1,7 @@
 <?php
+
+namespace t41;
+
 /**
  * t41 Toolkit
  *
@@ -19,13 +22,7 @@
  * @version    $Revision: 913 $
  */
 
-namespace t41;
-
 use t41\Config;
-
-
-/** Required files */
-require_once 't41/Config/Adapter/AdapterInterface.php';
 
 /**
  * Class providing basic functions needed to manage Configuration files
@@ -37,6 +34,11 @@ require_once 't41/Config/Adapter/AdapterInterface.php';
  */
 
 class Config {
+	
+	const PREFIX_SEPARATOR	= '|';
+	
+	
+	const DEFAULT_PREFIX	= '_';
 	
 	
 	const STORE_KEYS 		= 'keys';
@@ -60,8 +62,21 @@ class Config {
 	const REALM_MODULES		= 8;
 		
 	
-	static protected $_paths = array();
+	const REALM_CONTROLLERS	= 16;
 	
+	
+	/**
+	 * Realms paths store
+	 * @var array
+	 */
+	static protected $_paths = array(Config::REALM_CONFIGS		=> array()
+								  ,  Config::REALM_OBJECTS		=> array()
+								  ,  Config::REALM_TEMPLATES	=> array()
+								  ,  Config::REALM_MODULES		=> array()
+								  ,  Config::REALM_CONTROLLERS	=> array()
+									);
+	
+		
 	
 	/**
 	 * 
@@ -70,17 +85,18 @@ class Config {
 	 * @param integer $realms
 	 * @param string $position
 	 */
-	static public function addPath($path, $realms = null, $position = self::POSITION_BOTTOM)
+	static public function addPath($path, $realms = null, $position = self::POSITION_BOTTOM, $prefix = null)
 	{
 		if (is_null($realms)) {
 			
-			//require_once 't41/Config/Exception.php';
 			throw new Config\Exception("Realms must be indicated");
 		}
 		
-		$constants = array(self::REALM_CONFIGS, self::REALM_OBJECTS, self::REALM_TEMPLATES, self::REALM_MODULES);
+		if (substr($path, -1) != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
 
-		foreach ($constants as $constant) {
+		if (! is_null($prefix) && is_string($prefix)) $path .= self::PREFIX_SEPARATOR . $prefix;
+		
+		foreach (array_keys(self::$_paths) as $constant) {
 			
 			if (($constant & $realms) != 0) {
 				
@@ -108,6 +124,11 @@ class Config {
 	 */
 	static public function getPaths($realm = self::REALM_CONFIGS)
 	{
-		return self::$_paths[$realm];
+		if (! is_int($realm)) {
+			
+			throw new Exception("INTEGER_EXPECTED");
+		}
+		
+		return isset(self::$_paths[$realm]) ? self::$_paths[$realm] : false;
 	}
 }

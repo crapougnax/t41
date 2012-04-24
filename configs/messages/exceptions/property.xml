@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages>
+	<exceptions>
+		<exception id="INSTANCIATION_ERROR">
+			<labels>
+				<label lang="en">Error instanciating %0 property object: %1</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_MUST_BE_INSTANCEOF">
+			<labels>
+				<label lang="en">Value must be an instance of class '%0', 't41\ObjectModel\DataObject' or 't41\ObjectModel\ObjectUri'. Given value was of type '%1'.</label>
+				<label lang="fr">La valeur passée doit être une instance des classes '%0', 't41\ObjectModel\DataObject' ou 't41\ObjectModel\ObjectUri'. Valeur transmise '%1' de type '%2'.</label>
+				</labels>
+		</exception>
+		<exception id="VALUE_NOT_IN_ENUMERATION">
+			<labels>
+				<label lang="en">Value '%0' is not part of the acceptable values set (%1)</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_NOT_A_DATE">
+			<labels>
+				<label lang="en">Given value '%1' for '%0' is not a valid date</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_NO_ARRAY">
+			<labels>
+				<label lang="en">Given value '%1' for '%0' is not a valid date</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_NOT_INTEGER_OR_FLOAT">
+			<labels>
+				<label lang="en">Given value '%0' is not an integer or a float</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_IS_PROTECTED">
+			<labels>
+				<label lang="en">Value is protected and cannot be modified</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_VALIDATOR_DATE_FAILED">
+			<labels>
+				<label lang="en">Invalid Date: '%0'</label>
+			</labels>
+		</exception>
+		<exception id="VALUE_VALIDATOR_EMAILADDRESS_FAILED">
+			<labels>
+				<label lang="en">Invalid Email Address Syntax: '%0'</label>
+			</labels>
+		</exception>
+	</exceptions>
+</messages>

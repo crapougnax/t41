@@ -35,4 +35,6 @@ require_once 't41/Exception.php';
  */
 class Exception extends \t41\Exception {
 
+	
+	protected $_store = 'objects';
 }

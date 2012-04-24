@@ -22,7 +22,8 @@ namespace t41\Core;
  * @version    $Revision: 961 $
  */
 
-use t41\Config;
+use t41\Core,
+	t41\Config;
 
 /**
  * Class managing modules
@@ -45,9 +46,12 @@ class Module {
 	 * Array of detected modules
 	 * @var array
 	 */
-	static protected $_modules = array();
+	static protected $_modules;
 	
-
+	
+	static protected $_config;
+	
+	
 	/**
 	 * Detect all modules directories and try to get config for them
 	 * @param string $path
@@ -56,8 +60,12 @@ class Module {
 	{
 		// @todo implement cache mechanism here
 		
-		self::$_path = $path . 'modules' . DIRECTORY_SEPARATOR;
+		self::$_path = $path . 'application/modules' . DIRECTORY_SEPARATOR;
+
 		if (! is_dir(self::$_path)) return false;
+		
+		self::$_config = array();
+		self::$_modules = array('enabled' => array(), 'disabled' => array());
 		
 		foreach (scandir(self::$_path) as $vendor) {
 			
@@ -70,16 +78,84 @@ class Module {
 						
 						if (is_dir($fpath . 'configs')) {
 							
-							Config::addPath($fpath . 'configs', Config::REALM_MODULES);
+							// register path with $vendor as prefix
+							Config::addPath($fpath . 'configs', Config::REALM_MODULES, null, $vendor);
 						}
 					}
 				}
 			}
 		}
-		
+
 		// load all detected modules configuration file
-		self::$_modules = Config::loadConfig('module.xml', Config::REALM_MODULES);
+		$config = Config\Loader::loadConfig('module.xml', Config::REALM_MODULES);
 		
-//		Zend_Debug::dump(self::$_modules); die;
+		// remove useless "modules" key
+		foreach ($config as $key => $val) {
+			
+			self::$_config[$key] = $val['modules'];
+		}
+
+		//\Zend_Debug::dump($config); die;
+		
+		// build menu
+		$menu = new Layout\Menu('main');
+		$menu->setLabel('Main Menu');
+		
+		foreach (self::$_config as $prefix => $modules) {
+			
+			foreach ($modules as $key => $module) {
+				
+				$path = Core::$basePath . 'application/modules' . DIRECTORY_SEPARATOR . $prefix . DIRECTORY_SEPARATOR . $key;
+				self::bind($module, $path);
+				
+				// if module has controllers, declare them to front controller
+				// then add them to main menu
+				if (isset($module['controller']) || isset($module['controllers_extends'])) {
+						
+					Config::addPath($path . '/controllers/', Config::REALM_CONTROLLERS, null, $module['controller']['base']);
+				}
+				
+				if (isset($module['controller'])) {				
+					$menu->addItem($key, $module['controller']);
+				}
+				
+				// if module extends existing controllers, declare them for inclusion at the end of the process
+				if (isset($module['controllers_extends']) && ! empty($module['controllers_extends'])) {
+				
+					$menu->registerExtends($key, $module['controllers_extends']);
+				}
+			}
+		}
+		
+		// process extends declaration when menu is complete
+		$menu->proceedExtends();
+		
+		Layout::addMenu('main', $menu);
+	}
+	
+	
+	public static function bind(array $config, $path, Layout\Menu $menu = null)
+	{
+		$store = ($config['enabled'] == true) ? 'enabled' : 'disabled';
+		
+		if ($store == 'disabled') {
+			
+			return;
+		}
+		
+		Config::addPath($path . '/configs/', Config::REALM_CONFIGS);
+		
+		// if modules has model, declare path to the autoloader
+		if (is_dir($path . '/models') && isset($config['namespace'])) {
+			
+			Core::addAutoloaderPrefix($config['namespace'], $path . '/models/');
+			Config::addPath($path . '/models', Config::REALM_OBJECTS, null, $config['namespace']);
+		}
+	}
+	
+	
+	public static function getConfig()
+	{
+		return self::$_config;
 	}
 }

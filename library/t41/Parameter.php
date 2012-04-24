@@ -22,9 +22,9 @@ namespace t41;
  * @version    $Revision: 937 $
  */
 
-use t41\ObjectModel;
-use t41\ObjectModel\Property;
-use t41\View;
+use t41\ObjectModel,
+	t41\ObjectModel\Property,
+	t41\View;
 
 /**
  * Class providing objects parameters wrapper ensuring basic logic control.
@@ -34,8 +34,9 @@ use t41\View;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Parameter {
+class Parameter implements Core\ClientSideInterface {
 
+	
 	const BOOLEAN	= 'boolean';
 	
 	const INTEGER	= 'integer';
@@ -154,47 +155,51 @@ class Parameter {
 		}
 		
 		$this->_value = $value;
+		
+		return $this;
 	}
 	
-	
+
+	/**
+	 * Set parameter value
+	 * @param mixed $value
+	 * @throws \t41\Exception
+	 */
 	public function setValue($value = null)
 	{
-//		return $this->_setValue($value);
 		if ($this->_protected && $this->_value != null) {
 			
 			throw new Exception("VALUE_PROTECTED_FROM_CHANGE");
 		}
 		
-		if (is_null($value) || $this->_type == self::ANY) {
-			
-			return $this->_setValue($value);
-			
-		} else {
-			
-			if ($this->_type == self::BOOLEAN && !is_bool($value)) {
-			
-				throw new Exception("La valeur doit être de type booléen");
-			}
-
-			else if ($this->_type == self::INTEGER && (! is_integer($value) || ! is_numeric($value))) {
-			
-//				var_dump($value); die;
-				throw new Exception("La valeur doit être de type entier");
-			}
+		if (! is_null($value)) {
 		
-			else if ($this->_type == self::FLOAT && !is_float($value)) {
+			switch ($this->_type) {
 			
-				throw new Exception("La valeur doit être de type float");
-			}
-		
-			else if ($this->_type == self::STRING && strlen($value) > 0 && !is_string($value)) {
-			
-				throw new Exception("La valeur doit être de type string, valeur donnée est '$value'");
-			}
-			
-			else if ($this->_type == self::OBJECT && !is_object($value)) {
-
-				throw new Exception("La valeur doit être de type objet, valeur donnée est '$value'");
+				case self::BOOLEAN:
+					if (! is_null($value) && ! is_bool($value)) throw new Exception("VALUE_NO_BOOLEAN");
+					break;
+				
+				case self::INTEGER:
+					if (! is_integer($value) || ! is_numeric($value)) throw new Exception("VALUE_NO_INTEGER");
+					break;
+				
+				case self::FLOAT:
+					if (! is_float($value)) throw new Exception("VALUE_NO_FLOAT");
+					break;
+				
+				case self::OBJECT:
+					if (! is_object($value)) throw new Exception(array("VALUE_MUST_BE_INSTANCEOF",$value));
+					break;
+				
+				case self::STRING:
+						if (strlen($value) > 0 && ! is_string($value)) throw new Exception(array("VALUE_NO_STRING", $value));
+					break;
+				
+				case self::MULTIPLE:
+					if (! is_null($value) && ! is_array($value)) throw new Exception(array("VALUE_NO_ARRAY", $value));
+					$value = (array) $value;
+					break;
 			}
 		}
 		
@@ -202,9 +207,15 @@ class Parameter {
 	}
 	
 	
-	public function getValue()
+	/**
+	 * Return the current parameter value or the value of a given member 
+	 * if key is provided and parameter type is array
+	 * @param string $key
+	 * @return mixed
+	 */
+	public function getValue($key = null)
 	{
-		return $this->_value;
+		return ($key && $this->_type == self::MULTIPLE) ? $this->_value[$key] : $this->_value;
 	}
 	
 	
@@ -229,7 +240,6 @@ class Parameter {
 	 */
 	static public function loadConfig($file, $add = true)
 	{
-		require_once 't41/Config.php';
 		$config = Config\Loader::loadConfig($file);
 
 		if ($config === false) {
@@ -246,7 +256,7 @@ class Parameter {
 	        self::$_config = array_merge(self::$_config, $config);
 		}
 
-		//Zend_Debug::dump(self::$_config);
+//		\Zend_Debug::dump(self::$_config);
 		return true;
 	}
 	
@@ -255,7 +265,10 @@ class Parameter {
 	{
 		$class = get_class($object);
 		
-		if ($object instanceof ObjectModel\ObjectModel) {
+		// Sometimes, namespaced-class comes without its initial ns separator
+		if (substr($class, 0, 1) != '\\') $class = '\\' . $class;
+		
+		if ($object instanceof ObjectModel\BaseObject) {
 			
 			return self::getObjectParameters($class);
 		}
@@ -265,12 +278,12 @@ class Parameter {
 			return self::getPropertyParameters($class);
 		}
 		
-		if ($object instanceof View\ObjectModel) {
+		if ($object instanceof View\ViewObject || $object instanceof View\Action\AbstractAction) {
 			
 			return self::getViewObjectParameters($class);
 		}
 		
-		if ($object instanceof View\DecoratorAbstract) {
+		if ($object instanceof View\Decorator\AbstractDecorator) {
 
 			return self::getDecoratorParameters($class);
 		}
@@ -287,7 +300,6 @@ class Parameter {
 	{
 		if (! isset(self::$_config['core'])) {
 			
-			//die(t41_Core::getBasePath() . 't41/configs/parameters/core.xml');
 			/* @todo get config from t41_Object */
 			self::loadConfig('parameters/core.xml');
 		}
@@ -337,24 +349,20 @@ class Parameter {
 			self::loadConfig('parameters/view/objects.xml');
 		}
 		
-		$array = self::_compileFragments($objectClass, 'view_objects');
+		$array = self::_compileFragments($objectClass, 'view');
 		
-		//Zend_Debug::dump($array); die;
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
 	
 	
 	static public function getDecoratorParameters($objectClass)
 	{
-		$elems = explode('_', $objectClass);
+		$elems = explode('\\', $objectClass);
 		
-		$decoratorId = $elems[count($elems)-1];
-		$view = $elems[count($elems)-2];
-		unset($elems[count($elems)-1]);
+		$sublevel = $elems[count($elems)-1];
 		unset($elems[count($elems)-1]);
 		
-		$class = implode('_', $elems);
-		$sublevel = strtolower($view . '/' . $decoratorId);
+		$class = implode('\\', $elems);
 		
 		if (! isset(self::$_config['decorators'])) {
 			
@@ -430,5 +438,12 @@ class Parameter {
 		}
 		
 		return $array;
+	}
+	
+	
+	public function reduce(array $params = array())
+	{
+		return $this->_value; //
+		return array('id' => $this->_id, 'type' => $this->_type, 'value' => $this->_value);
 	}
 }

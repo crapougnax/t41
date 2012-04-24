@@ -22,6 +22,7 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 876 $
  */
 
+use t41\Core;
 
 /**
  * Property class to use for enumeration of values
@@ -31,7 +32,7 @@ namespace t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class EnumProperty extends PropertyAbstract {
+class EnumProperty extends AbstractProperty {
 
 	
 	protected $_values = array();
@@ -39,7 +40,7 @@ class EnumProperty extends PropertyAbstract {
 	
 	public function getValues()
 	{
-		$lang = 'fr';
+		$lang = Core::$lang;
 		
 		if (! isset($this->_values[$lang])) {
 			
@@ -64,11 +65,11 @@ class EnumProperty extends PropertyAbstract {
 		return $this->_values[$lang];
 	}
 	
-/*	
-	public function getValue()
+	
+	public function getDisplayValue($key = null)
 	{
 		$values = $this->getValues();
-		
-		return isset($values[$this->_value]) ? $values[$this->_value] : null;
-	} */
+		if (! $key) $key = $this->_value;
+		return isset($values[$key]) ? $values[$key] : $key;
+	}
 }

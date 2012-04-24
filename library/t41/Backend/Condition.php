@@ -158,7 +158,7 @@ class Condition {
 	 * @param mixed $value
 	 * @param integer|string $operator
 	 */
-	public function __construct(ObjectModel\Property\PropertyInterface $property = null, $value = null, $operator = self::OPERATOR_EQUAL)
+	public function __construct(ObjectModel\Property\AbstractProperty $property = null, $value = null, $operator = self::OPERATOR_EQUAL)
 	{
 		if (! is_null($property)) {
 
@@ -185,7 +185,7 @@ class Condition {
 	 * @param t41_Property_Interface $property
 	 * @return t41_Condition
 	 */
-	public function setProperty(\t41\ObjectModel\Property\PropertyAbstract $property)
+	public function setProperty(\t41\ObjectModel\Property\AbstractProperty $property)
 	{
 		$this->_property = $property;
 		return $this;
@@ -196,7 +196,7 @@ class Condition {
 	 * Sets the value to compare to property
 	 * 
 	 * @param mixed $value
-	 * @return t41_Condition
+	 * @return t41\Backend\Condition
 	 */
 	public function setValue($value, $increment = false)
 	{
@@ -213,7 +213,7 @@ class Condition {
 	 * from this class or a literal operator 
 	 * 
 	 * @param integer|string $operator
-	 * @return t41_Condition
+	 * @return t41\Backend\Condition
 	 */
 	public function setOperator($operator, $increment = false)
 	{
@@ -228,7 +228,7 @@ class Condition {
 	/**
 	 * Returns the property instance
 	 * 
-	 * @return t41_Property_Abstract
+	 * @return t41\ObjectModel\Property\AbstractProperty
 	 */
 	public function getProperty()
 	{
@@ -240,7 +240,7 @@ class Condition {
 	 * Returns the current nested t41_Condition child instance
 	 * or null
 	 * 
-	 * @return t41_Condition
+	 * @return t41\Backend\Condition
 	 */
 	public function getCondition()
 	{
@@ -284,7 +284,7 @@ class Condition {
 			throw new Exception("CONDITION_INCORRECT_PROPERTY");
 		}
 		
-		$do = DataObject::factory($this->_property->getParameter('instanceof'));
+		$do = ObjectModel\DataObject::factory($this->_property->getParameter('instanceof'));
 		
 		if (($property = $do->getProperty($name)) !== false) {
 
@@ -303,10 +303,12 @@ class Condition {
 	 * @param mixed $operator
 	 * @return t41_Condition
 	 */
-	public function where($value, $operator)
+	public function where($value, $operator, $mode = self::MODE_AND)
 	{
 		// clause is added and counter is incremented
-		return $this->setValue($value)->setOperator($operator, true);
+		return $this->setValue($value)
+					->setMode($mode)
+					->setOperator($operator, true);
 	}
 	
 	
@@ -316,9 +318,9 @@ class Condition {
 	 * @param mixed $value
 	 * @return t41_Condition
 	 */
-	public function equals($value)
+	public function equals($value, $mode = self::MODE_AND)
 	{
-		return $this->where($value, self::OPERATOR_EQUAL);
+		return $this->where($value, self::OPERATOR_EQUAL, $mode);
 	}
 	
 	
@@ -449,6 +451,13 @@ class Condition {
 	public function andMode()
 	{
 		$this->_clauses[$this->_current]['mode'] = self::MODE_AND;
+		return $this;
+	}
+	
+
+	public function setMode($mode)
+	{
+		$this->_clauses[$this->_current]['mode'] = $mode;
 		return $this;
 	}
 }

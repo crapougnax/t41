@@ -38,17 +38,6 @@ class Loader {
 	
 	
 	/**
-	 * Realms paths store
-	 * @var array
-	 */
-	static $_paths = array(Config::REALM_CONFIGS	=> array()
-						,  Config::REALM_OBJECTS	=> array()
-						,  Config::REALM_TEMPLATES	=> array()
-						,  Config::REALM_MODULES	=> array()
-						  );
-	
-	
-	/**
 	 * Array of config adapters instances
 	 * 
 	 * @var array
@@ -60,18 +49,19 @@ class Loader {
 	 * Load a file into a Configuration Array
 	 * 
 	 * @param string $file
+	 * @param integer $realm
 	 * @param array $params
 	 * 
 	 * @return array|false Configuration Array or false if the file don't exists
 	 */
-	public static function loadConfig($file, array $params = null)
+	public static function loadConfig($file, $realm = Config::REALM_CONFIGS, array $params = null)
 	{
-		if (($filePath = self::findFile($file)) == null) {
+		if (($filePath = self::findFile($file, $realm)) == null) {
 		
 			/* no matching file name in paths */
 			return false;
 		}
-		
+	//	\Zend_Debug::dump($filePath);
 		$type = substr( $file, strrpos($file, '.') + 1 );
 		
 		/* use existing adapter instance or create it */
@@ -81,47 +71,57 @@ class Loader {
 		
 			try {
 
-				self::$_adapters[$type] = new $className($params);
+				self::$_adapters[$type] = new $className($filePath, $params);
 			
-				if (! self::$_adapters[$type] instanceof Adapter\AdapterAbstract) {
+				if (! self::$_adapters[$type] instanceof Adapter\AbstractAdapter) {
 				
 					throw new Exception("$className is not implementing AdapterAbstract.");
 				}			
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 			
 				throw new Exception($e->getMessage());
 			}
+		} else {
+			
+			self::$_adapters[$type]->setPath($filePath);
 		}
 
-		return self::$_adapters[$type]->load($filePath);
+		return self::$_adapters[$type]->load();
 	}
 	
 	
 	/**
 	 * Looks for the given file name in all declared paths in ordered list for the given realm
-	 * Returns the full path of the first matching file or null.
+	 * Returns the full path of the matching files or null.
 	 * @param string $file
 	 * @param string $realm
 	 * @return string
-	 */
-	static public function findFile($file, $realm = \t41\Config::REALM_CONFIGS)
+	 */		
+	static public function findFile($file, $realm = Config::REALM_CONFIGS, $returnFirst = false)
 	{
-		if (! in_array($realm, array_keys(self::$_paths))) {
-			
-			throw new Exception("Unrecognized realm value");
-		}
-		
-		/* @todo implement persistent file path caching here */
-		
-		foreach (\t41\Config::getPaths($realm) as $path) {
+		$prefix = Config::DEFAULT_PREFIX;
+		$files = array($prefix => array());
+
+		foreach (Config::getPaths($realm) as $path) {
+							
+			if (strstr($path, Config::PREFIX_SEPARATOR) !== false) {
+
+				list($path, $prefix) = explode(Config::PREFIX_SEPARATOR, $path);
+				if (! isset($files[$prefix])) $files[$prefix] = array();
+				
+			} else {
+				
+				$prefix = '_';
+			}
 			
 			$filePath = (substr($file, 0, 1) == DIRECTORY_SEPARATOR) ? $file : $path . $file;
+		
 			if (file_exists($filePath)) {
 				
-				return $filePath;
+				if ($returnFirst) return $filePath;
+				$files[$prefix][] = $filePath;
 			}
 		}
-		
-		return null;
+		return count($files) > 0 ? $files : false;
 	}
 }

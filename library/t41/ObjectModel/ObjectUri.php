@@ -22,7 +22,8 @@ namespace t41\ObjectModel;
  * @version    $Revision: 876 $
  */
 
-use t41\Backend;
+use t41\Backend,
+	t41\Core;
 
 /**
  * Class providing exchange interface with data sources
@@ -32,7 +33,7 @@ use t41\Backend;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class ObjectUri {
+class ObjectUri implements Core\ClientSideInterface {
 	
 	
 	const IDENTIFIER = '#identifier';
@@ -76,7 +77,7 @@ class ObjectUri {
 	 * @param string $str
 	 * @param t41_Backend_Uri $backendUri
 	 */
-	public function __construct($str = null, BackendUri $backendUri = null)
+	public function __construct($str = null, Backend\BackendUri $backendUri = null)
 	{
 		if (! is_null($str)) {
 			
@@ -87,22 +88,20 @@ class ObjectUri {
 			// we only got one identifier, use default backend
 			if (count($parts) == 1) {
 				
-				$this->_backendUri = $backendUri ? $backendUri->getUri() : \t41\Backend::getDefaultBackend()->getUri();
+				$this->_backendUri = $backendUri ? $backendUri->getUri() : Backend::getDefaultBackend()->getUri();
 				$this->_identifier = $str;
 			
 			} else {
 				
-				if (substr($parts[0], 0, 1) == \t41\Backend::PREFIX) {
-					
-					$this->_backendUri = $backendUri ? $backendUri : \t41\Backend::getBackendUri($parts[0]);
+				if (substr($parts[0], 0, 1) == Backend::PREFIX) {
+
+					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);
 					$this->_identifier = $parts[count($parts) - 1];
-//					unset($parts[count($parts) - 1]);
-					unset($parts[0]);
 					$this->_url = implode('/', $parts);
 				
 				} else if ($backendUri) {
 
-					$this->_backendUri = $backendUri ? $backendUri : \t41\Backend::getBackendUri($parts[0]);
+					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);
 					$this->_url = $str;
 					
 				} else {
@@ -120,7 +119,7 @@ class ObjectUri {
 	}
 	
 	
-	public function setBackendUri(BackendUri $uri)
+	public function setBackendUri(Backend\BackendUri $uri)
 	{
 		$this->_backendUri = $uri;
 	}
@@ -189,7 +188,13 @@ class ObjectUri {
 	 */
 	public function __toString()
 	{
-		return $this->_backendUri->__toString() . $this->_url;
+		return $this->_backendUri ? $this->_backendUri->__toString() . $this->_url : '';
+	}
+	
+	
+	public function reduce(array $params = array())
+	{
+		return Core\Registry::set($this);
 	}
 	
 	

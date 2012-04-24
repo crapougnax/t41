@@ -22,6 +22,9 @@ namespace t41;
  * @version    $Revision: 832 $
  */
 
+use t41\Core,
+	t41\Config;
+
 /**
  * Class providing basic functions needed to handle environment building.
  *
@@ -38,7 +41,7 @@ class Exception extends \Exception {
 	 * 
 	 * @var string
 	 */
-	protected $_store = null;
+	protected $_store = 'core';
 
 	/**
 	 * 
@@ -49,42 +52,58 @@ class Exception extends \Exception {
 	public function __construct($message, $code = 0, Exception $previous = null)
 	{
 		if (is_array($message)) {
-			
-			if (count($message) != 2) {
 				
+			if (count($message) != 2) {
+	
 				throw new \Exception('Array argument should contain exactly two values');
 			}
-			
-			// key O is key to message, key 1 contains a string or an array of strings
-			$txtKey = $message[0];
-			
-		} else {
-			
-			$txtKey = $message;
-		}
-		
-		require_once 't41/Core.php';
-		
-		if (! empty($this->_store)) {
-			
-			$this->_store = '/' . $this->_store;
-		}
-		
-		$str = Core::getText($txtKey, 'exceptions' . $this->_store);
-		
-		if ($str !== false && is_array($message)) {
-			
-			foreach ( (array) $message[1] as $key => $val) {
 				
-				$str = str_replace('%' . $key, $val, $str);
-			}
+			// key O is key to message, key 1 contains a string or an array of strings
+			$key = $message[0];
+				
+		} else {
+				
+			$key = $message;
 		}
+	
+		$lang = Core::$lang;
+	
+		$res = Config\Loader::loadConfig('messages/exceptions/' . $this->_store . '.xml');
 		
-		// if a previously caught exception is passed as parameter, its message is postfixed to current message 
-		if ($previous instanceof Exception) {
+		$this->_messages = $res['exceptions'];
+		if (isset($this->_messages[$key])) {
+
+			$messages = isset($this->_messages[$key]['labels']) ? $this->_messages[$key]['labels'] : array();
 			
-			$str .= ': ' . $previous->getMessage();
+			if ($lang != 'en' && isset($messages[$lang])) {
+				
+				$str = $messages[$lang];
+	
+			} else {
+	
+				/* english version should always be available either under the 'en' key or in the parent-level 'label' key */ 
+				$str = isset($messages['en']) ? $messages['en'] : $this->_messages[$key]['label'];
+			}
+	
+			if ($str !== false && is_array($message)) {
+					
+				foreach ( (array) $message[1] as $key => $val) {
+	
+					$str = str_replace('%' . $key, $val, $str);
+				}
+			}
+				
+		} else {
+				
+			$str = $key;
 		}
+	
+		// if a previously caught exception is passed as parameter, its message is postfixed to current message
+		if ($previous instanceof Exception) {
+				
+			$str .= "\n" . $previous->getMessage();
+		}
+	
 		parent::__construct($str, (integer) $code); //, $previous);
 	}
 }

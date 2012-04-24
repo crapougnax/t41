@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<objects>
+		<object id="voiture">
+			<properties>
+				<property id="label">
+					<label lang="en">Name</label>
+					<label lang="es">Nombre</label>
+				</property>
+			</properties>
+		</object>
+	</objects>
+</config>

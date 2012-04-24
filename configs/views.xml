@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<views default="default">
+		<view type="web" name="default">
+			<params>
+				<param name="template" value="default.tpl" />
+				<param name="theme" value="t41_fluid" />
+				<param name="color" value="t41_blue" />
+			</params>
+		</view>
+		<view type="web" name="popup">
+			<params>
+				<param name="template" value="popup.tpl" />
+				<param name="theme" value="t41_fluid" />
+				<param name="color" value="t41_blue" />
+			</params>
+		</view>
+	</views>
+</config>

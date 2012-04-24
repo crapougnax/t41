@@ -22,7 +22,8 @@ namespace t41;
  * @version    $Revision: 854 $
  */
 
-use t41\View;
+use t41\Core,
+	t41\View;
 
 /**
  * Static class used for all interactions with the view
@@ -122,7 +123,7 @@ class View {
 	static public function setDisplay($adapter, array $parameters = null)
 	{
 		$adapter = ucfirst(strtolower($adapter));
-		$adapterClass = 't41_View_Adapter_' . $adapter;
+		$adapterClass = sprintf('t41\View\Adapter\%sAdapter', $adapter);
 		try {
 			self::$_display = new $adapterClass($parameters);
 			
@@ -289,11 +290,11 @@ class View {
 	
 	static public function display($content = null, $error = null)
 	{
-		\t41\Core::setFancyExceptions(false);
+		Core::setFancyExceptions(false);
 		
 		if (self::_isInstanciated()) {
 			
-			self::$_display->display($content, $error);
+			return self::$_display->display($content, $error);
 		}
 	}
 	

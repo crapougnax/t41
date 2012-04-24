@@ -22,6 +22,9 @@ namespace t41\ObjectModel;
  * @version    $Revision: 865 $
  */
 
+use t41\Core,
+	t41\Parameter;
+
 /**
  * Class providing basic functions needed to handle environment building.
  *
@@ -30,7 +33,7 @@ namespace t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-abstract class ObjectModelAbstract {
+abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 
 	
 	/**
@@ -98,17 +101,31 @@ abstract class ObjectModelAbstract {
 	
 	
 	/**
-	 * Permet de récupérer la valeur d'un paramètre
+	 * Return the current value of the parameter object matching the given key or key pattern
 	 *
-	 * @param string $key
-	 * @return mixed valeur du paramètre
+	 * @param string $key		parameter key. The simplest form is a string. 
+	 * 							The dot is used to directly get an array-type property value (ex: propname.arraykey)
+	 * @param boolean $strict	Strict mode. Set to true to thrown an exception if parameter does not exist
+	 * @return mixed parameter value
 	 */
-	final public function getParameter($key)
+	final public function getParameter($key, $strict = false)
 	{
-		if (isset($this->_params[$key]) && $this->_params[$key] instanceof \t41\Parameter) {
-			return $this->_params[$key]->getValue();
+		if (strstr($key, '.')) list($key, $arraykey) = explode('.', $key);
+		
+		if (isset($this->_params[$key]) && $this->_params[$key] instanceof Parameter) {
+			
+			return $this->_params[$key]->getValue(@$arraykey);
+		
 		} else {
-			return null;
+			
+			if ($strict === false) {
+				
+				return null;
+			
+			} else {
+			
+				throw new Exception(array("NO_SUCH_PARAMETER", $key));
+			}
 		}
 	}
 	
@@ -135,6 +152,12 @@ abstract class ObjectModelAbstract {
 	}
 	
 	
+	public function getParameters()
+	{
+		return $this->_params;
+	}
+	
+	
 	/**
 	 * Allow definition of multiple parameters from an array
 	 *
@@ -157,9 +180,9 @@ abstract class ObjectModelAbstract {
 	 */
 	final protected function _setParameterObjects(array $objects = array(), $replace = false)
 	{
-		if (is_null($objects)) {
+		if (count($objects) == 0) {
 			
-			$objects = \t41\Parameter::getParameters($this);
+			$objects = (array) Parameter::getParameters($this);
 		}
 		
 		if ($replace === true) {
@@ -168,7 +191,7 @@ abstract class ObjectModelAbstract {
 		
 		foreach ($objects as $key => $object) {
 			
-			if (! $object instanceof \t41\Parameter ) {
+			if (! $object instanceof Parameter ) {
 				continue;
 			}
 			
@@ -183,5 +206,42 @@ abstract class ObjectModelAbstract {
 			
 			$this->_params[$key] = clone $param;
 		}
+	}
+	
+	
+	public function register()
+	{
+		$res = Core::cacheSet($this);
+		if ($res !== false) {
+			
+			$this->_id = $res;
+		}
+		
+		return $this->_id;
+	}
+	
+	
+	/**
+	 * Reduce parameters to a simple array
+	 * @see t41\Core.ClientSideInterface::reduce()
+	 * @return array
+	 */
+	public function reduce(array $params = array())
+	{
+		if (isset($params['params']) && count($params['params']) == 0) return array();
+		
+		$parameters = array();
+		foreach ($this->_params as $key => $parameter) {
+			
+			if (isset($params['params']) && is_array($params['params']) && ! array_key_exists($key, $params['params'])) {
+				
+				continue;
+			}
+			
+			if (is_null($parameter->getValue())) continue;
+			$parameters[$key] = $parameter->reduce();
+		}
+		
+		return count($parameters) > 0 ? array('params' => $parameters) : array();
 	}
 }

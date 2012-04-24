@@ -33,5 +33,5 @@ namespace t41\Backend\Adapter;
 class Exception extends \t41\Exception {
 
 	
-	protected $_store = 'backend/adapter';
+	protected $_store = 'backend';
 }

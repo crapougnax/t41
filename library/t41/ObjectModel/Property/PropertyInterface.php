@@ -43,4 +43,7 @@ interface PropertyInterface {
 	
 	
 	public function getLabel($lang = null);
+	
+	
+	public function getDisplayValue();
 }

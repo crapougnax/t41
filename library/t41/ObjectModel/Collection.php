@@ -22,25 +22,28 @@ namespace t41\ObjectModel;
  * @version    $Revision: 870 $
  */
 
-use t41\ObjectModel;
-use t41\Backend;
-use t41\ObjectModel\Property\PropertyAbstract;
-use t41\ObjectModel\Property\IdentifierProperty;
+use t41\ObjectModel,
+	t41\Backend,
+	t41\Backend\Condition,
+	t41\ObjectModel\Property\PropertyAbstract,
+	t41\ObjectModel\Property\IdentifierProperty;
 
 /**
  * Class for a collection of Objects
  *
  * @category   t41
- * @package    t41_Core
+ * @package    t41_ObjectModel
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class Collection extends ObjectModelAbstract {
 
 	
-	const CALC_SUM	= 1;
+	const MEMBER_APPEND 	= 'append';
 	
-	const CALC_AVG	= 2;
+	const MEMBER_PREPEND	= 'prepend';
+	
+	const MEMBER_REMOVE		= 'remove';
 	
 	
 	const POS_FIRST	= 1;
@@ -57,6 +60,13 @@ class Collection extends ObjectModelAbstract {
 	protected $_members = array();
 	
 	
+	/**
+	 * Array of members awaiting saving or deletion
+	 * @var array
+	 */
+	protected $_spool = array('save' => array(), 'delete' => array());
+	
+	
 	protected $_offset = 0;
 	
 	
@@ -64,6 +74,9 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	protected $_max;
+	
+	
+	protected $_lastSubFind;
 	
 	
 	/**
@@ -92,11 +105,25 @@ class Collection extends ObjectModelAbstract {
 	 *   model: returns populated t41_Object_Model-based instances
 	 *   default value is data
 	 * 
-	 * @param t41_Data_Object $do
+	 * @param \t41\ObjectModel\DataObject|string $do
 	 * @param array $params
 	 */
-	public function __construct(ObjectModel\DataObject $do, array $params = null)
+	public function __construct($do, array $params = null)
 	{
+		if ($do instanceof ObjectModel\DataObject) {
+			
+			$this->_do = $do;
+			
+		} else if (is_string ($do)) {
+			
+			$this->_do = ObjectModel\DataObject::factory($do);
+				
+		} else {
+			
+			throw new Exception("Collection must be instanced from dataobject or class name");
+		}
+		
+		
 		/* deal with class parameters first */
 		$this->_setParameterObjects();
 		
@@ -104,33 +131,99 @@ class Collection extends ObjectModelAbstract {
 			
 			$this->_setParameters($params);
 		}
-		
-		$this->_do = $do;
 	}
 	
 	
-	
-	public function addMember($object)
+	/**
+	 * Add a member to the collection, passed object must be instance of class defined in dataobject
+	 * 
+	 * @param ObjectModel\BaseObject $object
+	 * @param string $position
+	 * @throws Exception
+	 * @return \t41\ObjectModel\Collection
+	 */
+	public function addMember(ObjectModel\BaseObject $object, $position = null)
 	{
-		if (get_class($object) != $this->_do->getClass()) {
+		$class = $this->getClass();
+		if (! $object instanceof $class) {
 			
-			throw new Exception(array('VALUE_MUST_BE_INSTANCEOF', $this->_do->getClass()));
+			throw new Exception(array('VALUE_MUST_BE_INSTANCEOF', $class));
+		}
+
+		if ($position == self::MEMBER_PREPEND) {
+			
+			array_unshift($this->_members, $object);
+			
+		} else {
+			
+			// @todo add instant saving of unsaved members before any find()
+			$this->_members[] = $this->_spool['save'][] = $object;
 		}
 		
-		$this->_members[] = $object;
+		return $this;
 	}
 	
 	
-	public function setCondition(PropertyInterface $property, $value = null, $operator = null, $mode = 'AND')
+	/**
+	 * Remove the given member from the collection
+	 * Returns true if success, false otherwise
+	 * 
+	 * @param ObjectModel\BaseObject $object
+	 * @return boolean
+	 */
+	public function removeMember(ObjectModel\BaseObject $object)
+	{
+		$uri = $object->getUri()->__toString();
+		
+		foreach ($this->_members as $key => $member) {
+			
+			if ($member == $object || $member->getUri()->__toString() == $uri) {
+				
+				$this->_spool['delete'][] = $this->_members[$key];
+				unset($this->_members[$key]);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	public function newMember()
+	{
+		return ObjectModel::factory($this->_do->getClass());
+	}
+	
+	
+	public function setCondition(Property\AbstractProperty $property, $value = null, $operator = null, $mode = 'AND')
 	{
 		$condition = new Backend\Condition($property
-									,  isset($value) ? $value : null
-									,  isset($operator) ? $operator : Backend\Condition::OPERATOR_EQUAL
-									  );
+										,  isset($value) ? $value : null
+										,  isset($operator) ? $operator : Condition::OPERATOR_EQUAL
+									  	  );
 		
 		$this->_conditions[] = array($condition, $mode);
 		
 		return $condition;
+	}
+	
+	
+	public function resetConditions($property)
+	{
+		// temp fix - @todo recursion
+		if (strstr($property, '.') !== false) {
+			
+			$parts = explode('.', $property);
+			$property = $parts[0];
+		}
+		
+		foreach ($this->_conditions as $key => $condition) {
+			
+			if ($condition[0]->getProperty()->getId() == $property) {
+				
+				unset($this->_conditions[$key]);
+			}
+		}
 	}
 	
 	
@@ -233,10 +326,81 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
-	public function find(\t41\Backend\Adapter\AdapterInterface $backend = null)
+	/**
+	 * Execute a query on given, object's or default backend with the current conditions
+	 * 
+	 * @param string $memberType Dynamically change members type
+	 * @param Adapter\AbstractAdapter $backend specific backend to use
+	 */
+	public function find($memberType = null, Adapter\AbstractAdapter $backend = null)
 	{
+		if ($memberType) {
+			$prevMemberType = $this->getParameter('memberType');
+			$this->setParameter('memberType', $memberType);
+		}
+		
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
-		$this->_members = (array) \t41\Backend::find($this, $backend);
+		$res = Backend::find($this, $backend);
+		
+		if ($memberType) {
+			$this->setParameter('memberType', $prevMemberType);
+		}
+		
+		if ($res === false) {
+			
+			return false;
+		}
+		
+		$this->_members = $res;
+		return true;
+	}
+	
+	
+	/**
+	 * Execute a query on the current members list and return the matching ones or their quantity
+	 * @param array $conditions
+	 * @param boolean $returnCount
+	 * @return array|integer
+	 */
+	public function subFind(array $conditions = array(), $returnCount = false)
+	{
+		$this->_lastSubFind = null;
+		
+		if (! is_array($this->_members)) {
+			
+			return $returnCount ? 0 : array();
+		}
+		
+		$subArray = $this->_members;
+		
+		foreach ($conditions as $propertyName => $propertyVal) {
+			
+			if ($propertyVal instanceof ObjectModel\BaseObject) {
+				
+				$propertyVal = $propertyVal->getUri();
+			}
+			
+			foreach ($subArray as $key => $val) {
+				
+			//	\Zend_Debug::dump($val->getProperty($propertyName)->getValue());
+			//	\Zend_Debug::dump($propertyVal);
+				if ($val->getProperty($propertyName)->getValue() != $propertyVal) {
+					
+					unset($subArray[$key]);
+				}
+			}
+		}
+		
+		sort($subArray);
+		$this->_lastSubFind = $subArray;
+		
+		return $returnCount ? count($subArray) : $subArray;
+	}
+	
+	
+	public function getLastSubFind($index = null)
+	{
+		return (array) ($index !== null) ? $this->_lastSubFind[$index] : $this->_lastSubFind;
 	}
 	
 	
@@ -284,14 +448,13 @@ class Collection extends ObjectModelAbstract {
 	public function getProperties()
 	{
 		return $this->_do->getProperties();
-//		return $this->_do->getPropertiesAsElements();
 	}
 	
 
-	protected function _count($backend = null)
+	protected function _count(Backend\Adapter\AbstractAdapter $backend = null)
 	{
-		if (is_null($backend)) $backend = \t41\Backend::getDefaultBackend();
-		$this->_max = (integer) \t41\Backend::find($this, $backend, true);
+		if (is_null($backend)) $backend = Backend::getDefaultBackend();
+		$this->_max = (integer) Backend::find($this, $backend, true);
 	}
 	
 	
@@ -299,21 +462,34 @@ class Collection extends ObjectModelAbstract {
 	 * Set a new condition on property given id or throws an exception if property doesn't exist
 	 *  
 	 * @param string $propertyName
-	 * @param return t41_Condition
-	 * @throws t41_Exception
+	 * @param return t41\Backend\Condition
+	 * @throws t41\Backend\Exception
 	 */
-	public function having($propertyName)
+	public function having($propertyName, $mode = Condition::MODE_AND)
 	{
 		if ($propertyName == ObjectUri::IDENTIFIER) {
 			
-			return $this->setCondition(new Property\IdentifierProperty('id'));
+			return $this->setCondition(new Property\IdentifierProperty(ObjectUri::IDENTIFIER, null, null, $mode));
 			
 		} else if (($property = $this->_do->getProperty($propertyName)) !== false) {
 
-			return $this->setCondition($property);
+			return $this->setCondition($property, null, null, $mode);
+		
+		} else if (strstr($propertyName, '.') !== false) {
+			
+			// deal with recursive properties
+			$parts = explode('.', $propertyName);
+			$condition = $this->setCondition($this->_do->getProperty($parts[0]));
+				
+			foreach (array_slice($parts,1) as $property) {
+				
+				$condition = $condition->having($property);
+			}
+			
+			return $condition;
 		}
 		
-		throw new Exception(array("CONDITION_UNKNOWN_PROPERTY", $propertyName));
+		throw new Backend\Exception(array("CONDITION_UNKNOWN_PROPERTY", $propertyName));
 	}
 	
 	
@@ -321,13 +497,13 @@ class Collection extends ObjectModelAbstract {
 	public function returnsDistinct($string, $backend = null)
 	{
 		$prop = $this->_do->getProperty($string);
-		if (! $prop instanceof Property\PropertyAbstract) {
+		if (! $prop instanceof Property\AbstractProperty) {
 			
-			throw new Exception("unknown property: " . $string);
+			throw new Backend\Exception(array("CONDITION_UNKNOWN_PROPERTY", $string));
 		}
 		
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
-		return (array) \t41\Backend::returnsDistinct($this, $prop, $backend);
+		return (array) Backend::returnsDistinct($this, $prop, $backend);
 	}
 	
 	/*
@@ -344,16 +520,22 @@ class Collection extends ObjectModelAbstract {
 	public function __call($m, $a)
 	{
 		if (substr($m, 0, 6) == 'having') {
-
+		
 			/* set a new condition with a call to having<<PropertyId>>() */
 			$prop = strtolower(substr($m, 6));
-
+		
 			return $this->having( empty($a) ? $prop : $prop . '.' . $a);
-				
-		} else if (substr($m, 0, 3) == 'get') {
+		
+		} else if (substr($m, 0, 4) == 'calc') {
 			
-			$prop = strtolower(substr($m, 3));
+			$prop = strtolower(substr($m, 4));
 			$calc = 0;
+			
+			// populate or refresh collection, only if there is no member to save or delete
+			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
+				
+				$this->find();
+			}
 
 			if (isset($a[0])) {
 				
@@ -361,19 +543,28 @@ class Collection extends ObjectModelAbstract {
 				switch ($a[0]) {
 				
 					/* sum up the values of all members $prop property */
-					case self::CALC_SUM:
+					case ObjectModel::CALC_SUM:
 						foreach ($this->_members as $member) {
 							
-							$calc += (float) $member->getProperty($prop);
+							$property = $member->getProperty($prop);
+							if (! $property instanceof Property\AbstractProperty) {
+
+								continue;
+							}
+							
+							$calc += (float) $property->getValue();
 						}
 						break;
 					
 					/* sum up the values of all members $prop property and average the result */
-					case self::CALC_AVG:
+					case ObjectModel::CALC_AVG:
 						$calc = $this->__call($m, array(self::CALC_SUM));
 						$calc = ($calc / count($this->_members));
 						break;
 				}
+			} else {
+				
+				throw new Exception("Missing mandatory argument for '$m' magic call");
 			}
 			
 			return $calc;
@@ -382,5 +573,43 @@ class Collection extends ObjectModelAbstract {
 
 			throw new Exception(array("OBJECT_UNKNOWN METHOD", $m));
 		}
+	}
+	
+	
+	/**
+	 * Save all members marked as unsaved in backend
+	 * @param Backend\Adapter\AbstractAdapter $backend
+	 * @return boolean
+	 */
+	public function save(Backend\Adapter\AbstractAdapter $backend = null)
+	{
+		$res = true;
+		
+		foreach ($this->_spool['save'] as $key => $member) {
+			
+			$res2 = $member->save($backend);
+			if ($res2 === true) {
+				
+				unset($this->_spool['save'][$key]);
+				
+			} else {
+				
+				$res = false;
+			}
+		}
+		
+		return $res;
+	}
+	
+	
+	public function reduce(array $params = array())
+	{
+		$data = array();
+		foreach ($this->getMembers() as $member) {
+			
+			$data[] = $member->reduce($params);
+		}
+		
+		return array_merge(parent::reduce($params), array('collection' => $data));
 	}
 }

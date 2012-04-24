@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages>
+	<exceptions>
+		<exception id="NO_CLASS_DECLARATION">
+			<label lang="en">No class declaration available for '%0'</label>
+			<label lang="fr">Aucune déclaration de classe disponible pour '%0'</label>
+		</exception>
+		<exception id="NOT_INSTANCEOF">
+			<label lang="en">%0 is not an instanceof %1</label>
+		</exception>
+		<exception id="CANNOT_CHANGE_VALUE">
+			<label lang="en">%0 value has already been defined</label>
+		</exception>
+	</exceptions>
+</messages>

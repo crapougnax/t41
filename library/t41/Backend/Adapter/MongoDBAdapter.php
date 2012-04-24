@@ -34,7 +34,7 @@ use t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class MongoDbAdapter extends AdapterAbstract {
+class MongoDbAdapter extends AbstractAdapter {
 
 
 	/**
@@ -433,7 +433,7 @@ class MongoDbAdapter extends AdapterAbstract {
 			 *
 			 * @var $value t41_Object_Model
 			 */
-			if ($value instanceof ObjectModel\ObjectModel) {
+			if ($value instanceof ObjectModel\BaseObject) {
 
 				if ($value->getUri()->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
 					

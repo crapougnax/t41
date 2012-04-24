@@ -37,7 +37,7 @@ use t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class Db2Adapter extends AdapterAbstract {
+class Db2Adapter extends AbstractAdapter {
 
 
 	/**
@@ -512,7 +512,7 @@ class Db2Adapter extends AdapterAbstract {
 			 *
 			 * @var $value t41_Object_Model
 			 */
-			if ($value instanceof ObjectModel\ObjectModel || $value instanceof ObjectModel\DataObject) {
+			if ($value instanceof ObjectModel\BaseObject || $value instanceof ObjectModel\DataObject) {
 
 				if ($value->getUri()->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
 					

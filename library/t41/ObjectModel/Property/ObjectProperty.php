@@ -22,7 +22,8 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel;
+use t41\ObjectModel,
+	t41\Core;
 
 /**
  * Property class to use for object values
@@ -32,7 +33,7 @@ use t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class ObjectProperty extends PropertyAbstract {
+class ObjectProperty extends AbstractProperty {
 
 	
 	const UNDEFINED_LABEL	= "Undefined Label";
@@ -53,26 +54,39 @@ class ObjectProperty extends PropertyAbstract {
 	 */
 	public function setValue($value)
 	{
+		if (is_string($value) && substr($value, 0,1) == \t41\Backend::PREFIX) {
+			
+			$value = new ObjectModel\ObjectUri($value);
+		}
+		
 		if (! is_object($value) 
 		   || (get_class($value) != $this->getParameter('instanceof')
 		   && ! $value instanceof ObjectModel\DataObject
 		   && ! $value instanceof ObjectModel\ObjectUri)) {
 			
 		   	$type = is_object($value) ? get_class($value) : gettype($value);
-		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF", array($this->getParameter('instanceof'), $type)));
+		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF", array($this->getParameter('instanceof'), $value, $type)));
 		}
 		
 		parent::setValue($value);
 	}
 	
 	
+	/**
+	 * Return the current value in the $param form
+	 * @see t41\ObjectModel\Property.AbstractProperty::getValue()
+	 * @param string $param define which format to use
+	 */
 	public function getValue($param = null)
 	{
 		if (is_null($this->_value)) return null;
+
+		/* if param is null, return the value in its current format */
+		if (is_null($param)) return $this->_value;
 		
 		switch ($param) {
 			
-			case ObjectModel\Property::OBJECT:
+			case ObjectModel::MODEL:
 				if ($this->_value instanceof ObjectModel\DataObject) {
 					
 					$this->_value = \t41\ObjectModel::factory($this->_value);
@@ -83,9 +97,9 @@ class ObjectProperty extends PropertyAbstract {
 					$this->_value = \t41\ObjectModel::factory($this->_value);
 				}
 				return $this->_value;
-			break;
+				break;
 				
-			case ObjectModel\Property::DATA:
+			case ObjectModel::DATA:
 				if ($this->_value instanceof ObjectModel\ObjectUri) {
 					
 					$this->_value = \t41\ObjectModel::factory($this->_value);
@@ -101,7 +115,7 @@ class ObjectProperty extends PropertyAbstract {
 				}
 				break;
 
-			case ObjectModel\Property::URI:
+			case ObjectModel::URI:
 			default:
 				if ($this->_value instanceof ObjectModel\ObjectUri) {
 					
@@ -124,7 +138,7 @@ class ObjectProperty extends PropertyAbstract {
 	{
 		if (empty($this->_displayValue) && $this->_value) {
 			
-			if (! $this->_value instanceof ObjectModel\ObjectModel) {
+			if (! $this->_value instanceof ObjectModel\BaseObject) {
 				
 				$this->getValue(ObjectModel\Property::OBJECT);
 			}
@@ -139,7 +153,7 @@ class ObjectProperty extends PropertyAbstract {
 				$this->_displayValue = array();
         		foreach ($displayProps as $disProp) {
 
-            		$this->_displayValue[] = $this->_value->getProperty($disProp);
+            		$this->_displayValue[] = $this->_value->getProperty($disProp)->getValue();
             	}
             
             	$this->_displayValue = implode(' ', $this->_displayValue);
@@ -147,5 +161,31 @@ class ObjectProperty extends PropertyAbstract {
 		}
 		
 		return $this->_displayValue;
+	}
+	
+	
+	public function reduce(array $params = array())
+	{
+		if (! $this->_value) {
+			
+			return parent::reduce($params);
+			
+		} else {
+
+			// @todo improve performances !!
+			
+			$uuid  = Core\Registry::set($this);
+			
+			if (isset($params['extprops']) && ($params['extprops'] === true || array_key_exists($this->_id, $params['extprops']))) {
+
+				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id]));
+				
+			} else {
+				
+				$value = $this->getDisplayValue();
+			}				
+				
+			return array_merge(parent::reduce($params), array('value' => $value, 'uuid' => $uuid));
+		}
 	}
 }

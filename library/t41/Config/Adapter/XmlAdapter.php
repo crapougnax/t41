@@ -22,7 +22,6 @@ namespace t41\Config\Adapter;
  * @version    $Revision: 876 $
  */
 
-
 use t41\Config;
 
 /**
@@ -33,7 +32,7 @@ use t41\Config;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class XmlAdapter extends AdapterAbstract {
+class XmlAdapter extends AbstractAdapter {
 
 	
 	public function validate()
@@ -46,7 +45,7 @@ class XmlAdapter extends AdapterAbstract {
 		libxml_use_internal_errors(true);
 		
 		/* XSD validation file -if exists- is based on file name */
-		$xsdFileName = substr( $filePath, strrpos($filePath, DIRECTORY_SEPARATOR) + 1 );	
+		$xsdFileName = substr( $this->_filePath, strrpos($this->_filePath, DIRECTORY_SEPARATOR) + 1 );	
 		$xsdFileName = substr( $xsdFileName, 0, strpos($xsdFileName, '.') );
 		
 		$xsdFileName = Config\Loader::findFile('xsd/' . $xsdFileName . '.xsd');
@@ -70,31 +69,46 @@ class XmlAdapter extends AdapterAbstract {
 	/**
 	 * Method to load the Configuration file
 	 * 
-	 * @param string $filePath Full path to the xml config file
+	 * @param array $filePath Full path to the xml config file
 	 * @return array
 	 */
-	public function load($filePath)
+	public function load(array $filePath = array())
 	{
-		if (is_null($this->_filePath)) {
+		if (count($filePath) == 0) {
+
+			if (is_null($this->_filePath)) {
 				
-			throw new Exception ('The config file ' . $this->_filePath . ' is not valid.');
+				throw new Exception('The config file ' . $this->_filePath . ' is not valid.');
+			}
+			
+			$filePath = $this->_filePath;
 		}
 		
 		$array = array();
 		
 		/* load all files */
-		foreach ($this->_filePath as $file) {
+		foreach ($filePath as $key => $files) {
 		
-			/* @todo validate XML compliance of file */
+			if ($key != Config::DEFAULT_PREFIX) $array[$key] = array();
+			if (count($files) == 0) continue;
+			
+			foreach ($files as $file) {
+
+				/* @todo validate XML compliance of file */
 				
-			$xml = simplexml_load_file($file);
+				$xml = simplexml_load_file($file);
 		
-			if (! $xml instanceof \SimpleXMLElement) {
+				if (! $xml instanceof \SimpleXMLElement) {
 					
-				throw new Exception("Error parsing $file");
-			}
+					throw new Exception("Error parsing $file");
+				}
 		
-			$array = array_merge_recursive($array, $this->_loadElement($xml));
+				if ($key != Config::DEFAULT_PREFIX) {
+					$array[$key] = array_merge_recursive($array[$key], $this->_loadElement($xml));
+				} else {
+					$array = array_merge_recursive($array, $this->_loadElement($xml));
+				}
+			}
 		}
 		
 		return $array;

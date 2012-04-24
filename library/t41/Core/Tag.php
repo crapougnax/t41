@@ -60,10 +60,10 @@ class Tag {
 	 * List of declared stores and their optional namespace
 	 * @var array
 	 */
-	static protected $_stores = array('env' => 't41');
+	static protected $_stores = array('env' => 't41', 'object' => 't41');
 	
 	
-	static protected $_interface = 't41\Core\Tag\Interface';
+	static protected $_interface = 't41\Core\Tag\TagInterface';
 	
 
 	/**
@@ -127,6 +127,23 @@ class Tag {
 			
 			return false;
 		}
+	}
+	
+
+	static public function parse($str)
+	{
+		$tagPattern = "/%([a-z0-9]+)\\:([a-z0-9.]*)\\{*([a-zA-Z0-9:,\\\"']*)\\}*%/";
+		 
+		$tags = array();
+		 
+		preg_match_all($tagPattern, $str, $tags, PREG_SET_ORDER);
+
+		foreach ($tags as $tag) {
+			
+			$str = str_replace($tag, self::get($tag[0]), $str);
+		}
+		
+		return $str;
 	}
 	
 	

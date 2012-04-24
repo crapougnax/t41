@@ -22,6 +22,8 @@ namespace t41\View;
  * @version    $Revision: 832 $
  */
 
+use t41\View;
+
 /**
  * Basic class providing a decorator factory.
  *
@@ -64,7 +66,8 @@ class Decorator {
 	    	$decoratorClass = get_class($object);
     	}
 
-    	if (\t41\View::getViewType() != Adapter\WebAdapter::ID) {
+    	if (View::getViewType() != Adapter\WebAdapter::ID) {
+    		
     		$decoratorData['name'] = 'Default';
     	}
     	
@@ -73,7 +76,7 @@ class Decorator {
     		$decoratorData['name'] = 'Default';
     	}
     	
-    	$decoratorClass .= '_' . \t41\View::getContext() . '_' . ucfirst($decoratorData['name']);
+    	$decoratorClass .= '\\' . View::getContext() . ucfirst($decoratorData['name']);
 								
     	if (! class_exists($decoratorClass)) {
 

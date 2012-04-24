@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<view_objects>
+		<object id="t41_View_Object_Abstract">
+			<parameters>
+				<parameter id="open_default" type="boolean">
+					<defaultvalue>true</defaultvalue>
+				</parameter>
+				<parameter id="pos_x" type="integer"/>
+				<parameter id="pos_y" type="integer"/>
+			</parameters>
+		</object>
+		<object id="t41_View_List" extends="t41_View_Object_Abstract">
+			<parameters>
+				<parameter id="selectable" type="boolean">
+					<defaultvalue>false</defaultvalue>
+				</parameter>
+				<parameter id="offset" type="integer">
+					<defaultvalue>0</defaultvalue>
+				</parameter>
+				<parameter id="batch" type="integer">
+					<defaultvalue>10</defaultvalue>
+				</parameter>
+				<parameter id="max" type="integer">
+					<defaultvalue>0</defaultvalue>
+				</parameter>
+				<parameter id="columns" type="array">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="decorators" type="array">
+				<needed_empty_tag/>
+				</parameter>
+			</parameters>
+		</object>
+		<object id="t41_View_Form" extends="t41_View_Object_Abstract">
+			<parameters>
+				<parameter id="columns" type="array">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="decorators" type="array">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="redirect_on_success" type="string">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="redirect_on_failure" type="string">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="redirect_on_condition" type="array">
+				<needed_empty_tag/>
+				</parameter>
+				<parameter id="callback_action" type="array">
+				<needed_empty_tag/>
+				</parameter>
+			</parameters>
+		</object>
+		<object id="t41_View_Button" extends="t41_View_Object_Abstract">
+			<parameters>
+				<parameter id="data" type="object">
+					<needed_empty_tag></needed_empty_tag>
+				</parameter>
+			</parameters>
+		</object>
+	</view_objects>
+</config>

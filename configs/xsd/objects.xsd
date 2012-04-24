@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:simpleType name="langStringType">
+		<xs:restriction base="xs:string">
+			<xs:length value="2" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="labelsCollectionType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element minOccurs="0" name="label">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="lang" type="langStringType" use="required" />
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="enumValueType">
+		<xs:complexContent>
+			<xs:extension base="labelsCollectionType">
+				<xs:attribute name="id" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="propertyType" abstract="true">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="labels" type="labelsCollectionType" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="t41_String">
+		<xs:complexContent>
+			<xs:extension base="propertyType">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="minlength" type="xs:int" />
+					<xs:element minOccurs="0" name="maxlength" type="xs:int" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Float">
+		<xs:complexContent>
+			<xs:extension base="propertyType" />
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Integer">
+		<xs:complexContent>
+			<xs:extension base="propertyType" />
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Date">
+		<xs:complexContent>
+			<xs:extension base="propertyType" />
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Enum">
+		<xs:complexContent>
+			<xs:extension base="propertyType">
+				<xs:sequence>
+					<xs:element name="values">
+						<xs:complexType>
+							<xs:sequence maxOccurs="unbounded">
+								<xs:element maxOccurs="unbounded" name="value" type="enumValueType" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Object">
+		<xs:complexContent>
+			<xs:extension base="propertyType">
+				<xs:attribute name="instanceof" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="t41_Collection">
+		<xs:complexContent>
+			<xs:extension base="t41_Object">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="minMembers" type="xs:int" />
+					<xs:element minOccurs="0" name="maxMembers" type="xs:int" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="propertiesType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="property" type="propertyType" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="parametersType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="parameter" type="propertyType" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="Object">
+		<xs:all minOccurs="0">
+			<xs:element name="parameters" type="parametersType" />
+			<xs:element name="properties" type="propertiesType" />
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="extends" type="xs:string" use="required" />
+		<xs:attribute name="backend" type="xs:string" use="required" />
+	</xs:complexType>
+	
+	<xs:element name="config">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="objects">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="object" type="Object" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

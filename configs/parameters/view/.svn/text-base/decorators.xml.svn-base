@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<decorators>
+		<object id="t41_View_Component">
+			<view id="web">
+				<decorator id="default">
+					<parameters>
+						<parameter id="theme">
+							<type>string</type>
+						</parameter>
+						<parameter id="color">
+							<type>string</type>
+						</parameter>
+						<parameter id="open_default">
+							<type>boolean</type>
+							<defaultvalue>true</defaultvalue>
+						</parameter>
+					</parameters>
+				</decorator>
+			</view>
+			<view id="pdf">
+				<decorator id="default">
+				</decorator>
+			</view>
+		</object>
+		<object id="t41_View_Form">
+			<view id="web">
+				<decorator id="default" extends="t41_View_Component">
+				<bogus/>
+				</decorator>
+			</view>
+		</object>		
+	</decorators>
+</config>

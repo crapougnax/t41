@@ -22,8 +22,6 @@ namespace t41\Config;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Exception.php';
 
 /**
  * Config Exception Class 

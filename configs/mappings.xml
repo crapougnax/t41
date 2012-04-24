@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappers>
+	<mapper id="mysql" type="backend">
+		<map source="voiture" object="Voiture"/>
+		<map source="facture" object="Facture">
+			<entity source="client_id" property="client" references="client.client_id" />
+		</map>
+		<map source="client" object="Client"/>
+	</mapper>
+</mappers>

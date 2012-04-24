@@ -33,12 +33,19 @@ namespace t41\Config\Adapter;
 
 interface AdapterInterface {
 	
+	
+	/**
+	 * Set path(s) to search into
+	 * @param mixed $path
+	 */
+	public function setPath($path);
+	
+	
 	/**
 	 * Validate the loaded file
-	 * @param string $filePath The complete path to the file to validate 
 	 * 
 	 */
-	public function validate($filePath);
+	public function validate();
 
 	
 	/**
@@ -47,7 +54,7 @@ interface AdapterInterface {
 	 * @param array $filePath Array containing the complete paths to the files to load and parse 
 	 * @return array
 	 */
-	public function load($filePath);
+	public function load(array $filePath = array());
 
 	
 	/**

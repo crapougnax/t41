@@ -22,7 +22,8 @@ namespace t41\View\Adapter;
  * @version    $Revision: 911 $
  */
 
-use t41\ObjectModel;
+use t41\ObjectModel\ObjectModelAbstract,
+	t41\Config;
 
 /**
  * Abstract class providing the view engine with basic methods and
@@ -33,7 +34,7 @@ use t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-abstract class AdapterAbstract extends ObjectModel\ObjectModelAbstract implements AdapterInterface {
+abstract class AdapterAbstract extends ObjectModelAbstract implements AdapterInterface {
 
 		
     /**
@@ -156,13 +157,14 @@ abstract class AdapterAbstract extends ObjectModel\ObjectModelAbstract implement
     	/* reset template */
     	$this->_template = null;
     	
-    	foreach (\t41\Config::getPaths(\t41\Config::REALM_TEMPLATES) as $path) {
-			
-			$filePath = (substr($tpl, 0, 1) == DIRECTORY_SEPARATOR) ? $tpl : $path . $tpl;
-			
-			if (file_exists($filePath)) {
+    	$files = Config\Loader::findFile($tpl, Config::REALM_TEMPLATES);
+    	
+    	foreach ($files[Config::DEFAULT_PREFIX] as $file) {
+
+    		if (file_exists($file)) {
 				
-	    		$this->_template = $filePath;
+	    		$this->_template = $file;
+	    		break;
 			}
 		}
 		
@@ -170,18 +172,6 @@ abstract class AdapterAbstract extends ObjectModel\ObjectModelAbstract implement
 			
 			throw new Exception("Unable to find '$tpl' template file in paths");
 		}
-		return;
-		
-		$basepath = (substr($tpl, 0, 1) != '/') ? 'application/views/' : null;
-    	
-    	if (file_exists($basepath . $tpl)) {
-    		
-    		$this->_template = $basepath . $tpl;
-    		
-    	} else if (\t41\Core::getEnvData('webEnv') == \t41\Core::ENV_DEV) {
-    		
-			throw new Exception("Unable to find $tpl template in '$basepath");
-    	}
     }
     
     

@@ -22,6 +22,11 @@ namespace t41\ObjectModel\Rule;
  * @version    $Revision: 832 $
  */
 
+use t41\View\Action\ObjectAction;
+
+use t41\ObjectModel,
+	t41\ObjectModel\Property;
+
 /**
  *
  * @category   t41
@@ -29,42 +34,86 @@ namespace t41\ObjectModel\Rule;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class CopyRule extends RuleAbstract {
+class CopyRule extends AbstractRule {
 	
 	
 	/**
 	 * Copy value or method return of source property to destination property
 	 * 
-	 *  @param t41_Data_Object $do
+	 *  @param t41\ObjectModel\Property\AbstractProperty $obj
 	 *  @return boolean
 	 */
-	public function execute(\t41\ObjectModel\DataObject $do)
+	public function execute(Property\AbstractProperty $property)
 	{
+		$do = $this->_object->getDataObject();
+		
 		try {
+			
+			$source = $this->_source->getValue();
+			
 			/* get source value */
-			if (is_array($this->_source)) {
+			if ($this->_source->isProperty()) {
 	
 				$value = $do->getProperty($this->_source[0])->{$this->_source[1]}();
 			
-			} else {
-			
-				$value = $do->getProperty($this->_source)->getValue();
+			} elseif ($this->_source->isMethod()) {
+
+				// recursion
+				if (strstr($source, '.') !== false) {
+
+					$parts = explode('.', $source);
+					foreach ($parts as $part) {
+						
+						$property = $do->getProperty($part);
+						
+						if ($property instanceof Property\AbstractProperty) {
+							
+							if ($property->getValue() instanceof ObjectModel\ObjectModelAbstract){
+								
+								$obj = $property->getValue();
+							}
+							
+						} else {
+								
+							$source = $part;
+						}
+					}
+				} else {
+					
+					$obj = $this->_object;
+				}
+
+				/**
+				 * IMPORTANT: if $obj is a collection from an unsaved object
+				 * 			  don't execute rule because there is no uri yet to bind members to object
+				 * @todo improve this kind of detection (a switch on the collection or the property itself ?)
+				 */
+				
+				if ($obj instanceof ObjectModel\Collection && $this->_object->getUri() == null) {
+					
+					return;
+				}
+				
+				$value = $obj->$source($this->_source->getArgument());
 			}
 			
-			var_dump($this->_source);
-		
+			$destination = $this->_destination->getValue();
+				
 			/* set destination value with source value */
-			if (is_array($this->_destination)) {
+			if ($this->_destination->isProperty()) {
 			
-				$do->getProperty($this->_destination[0])->getProperty($this->_destination[1])->setValue($value);
+				$do->getProperty($destination)->setValue($value);
 			
-			} else {
+			} else if ($this->_destination->isMethod()) {
 			
-				$do->getProperty($this->_destination)->setValue($value);
-			}		
+				$obj->$destination($value);
+			}
+			
 		} catch (Exception $e) {
 			
 			/* @todo log exception */
+			$this->_object->setStatus('Exception executing rule: ' . $e->getMessage(), 0, array('rule' => __CLASS____));
+			
 			return false;
 		}
 		

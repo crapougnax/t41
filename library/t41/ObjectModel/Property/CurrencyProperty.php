@@ -30,16 +30,23 @@ namespace t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class CurrencyProperty extends PropertyAbstract {
+class CurrencyProperty extends AbstractProperty {
 
 	
 	public function setValue($value)
 	{
-		if (! is_numeric($value)) {
+		if (! is_numeric($value) && ! is_float($value) && ! is_integer($value)) {
 			
 			throw new Exception(array("VALUE_NOT_INTEGER_OR_FLOAT", $value));
 		}
 		
 		parent::setValue((float) $value);
+	}
+	
+	
+	public function getDisplayValue()
+	{
+		setlocale(LC_ALL, 'fr_FR.UTF-8');
+		return money_format('%n', $this->_value);
 	}
 }

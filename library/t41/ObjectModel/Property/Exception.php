@@ -22,8 +22,6 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Exception.php';
 
 /**
  * Exception class for Property components

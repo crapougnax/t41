@@ -22,8 +22,7 @@ namespace t41\Config\Adapter;
  * @version    $Revision: 832 $
  */
 
-/** Required files */
-require_once 't41/Config/Exception.php';
+use t41\Config;
 
 /**
  * Config Exception Class 
@@ -34,6 +33,7 @@ require_once 't41/Config/Exception.php';
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 
-class Exception extends \t41\Config\Exception {
+class Exception extends Config\Exception {
 	
+	protected $_store = 'config/adapter';
 }

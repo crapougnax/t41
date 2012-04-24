@@ -30,7 +30,7 @@ namespace t41\ObjectModel\Property;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class DateProperty extends PropertyAbstract {
+class DateProperty extends AbstractProperty {
 
 /*	
 	public function setValue($value)
@@ -45,4 +45,11 @@ class DateProperty extends PropertyAbstract {
 		parent::setValue(new Zend_Date($value));
 	}
 	*/
+	
+	public function getDisplayValue()
+	{
+		$parts = explode('-', $this->_value);
+		$parts = array_reverse($parts);
+		return implode('/', $parts);
+	}
 }

@@ -22,7 +22,8 @@ namespace t41\ObjectModel;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel\Property;
+use t41\ObjectModel\Property,
+	t41\Parameter;
 
 /**
  * Class for Property.
@@ -117,7 +118,7 @@ class Property {
 	
 	
 	/**
-	 * Returns a t41_Property_* instance build from parameters
+	 * Returns a t41\ObjectModel\PropertyAbstract-derived instance build from parameters
 	 *
 	 * @param string $id
 	 * @param string $type
@@ -127,26 +128,24 @@ class Property {
 	 */
 	static public function factory($id, $type = null, array $params = null)
 	{
-		if (empty($type)) $type = 'string';
+		if (is_null($type) || ! is_string($type)) $type = 'string';
 		
 		$className = sprintf('\t41\ObjectModel\Property\%sProperty', ucfirst(strtolower($type)));
 		
 		try {
-			
 			/* @var $property \t41\ObjectModel\Property\PropertyAbstract */
-			$property = new $className($id, $params, \t41\Parameter::getPropertyParameters($className));
-			
-			if (! $property instanceof Property\PropertyAbstract) {
+			$property = new $className($id, $params, Parameter::getPropertyParameters($className));
+
+			if (! $property instanceof Property\AbstractProperty) {
 				
-				throw new Exception("$className is not extending t41_Property_Abstract");
+				throw new Exception("$className is not extending t41\ObjectModel\Property\AbstractProperty");
 			}
 			
 			return $property;
 
 		} catch (\Exception $e) {
 			
-			require_once 't41/Property/Exception.php';
-			throw new Exception("PROPERTY_INSTANCIATION_ERROR", $e->getCode(), $e);
+			throw new Property\Exception(array("INSTANCIATION_ERROR",array($type, $e->getMessage())));
 		}
 	}
 }

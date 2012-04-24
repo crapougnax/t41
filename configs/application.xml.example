@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config>
+	<application>
+		<name>myapp</name>
+		<versions default="fr">
+			<version id="fr">
+				<language>fr</language>
+				<locale>fr_FR</locale>
+				<currency>EUR</currency>
+				<timezone>Europe/Paris</timezone>
+			</version>
+			<version id="en">
+				<language>en</language>
+				<locale>en_US</locale>
+				<currency>USD</currency>
+			</version>
+		</versions>
+	</application>
+</config>

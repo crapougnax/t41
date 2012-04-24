@@ -79,7 +79,7 @@ class CalculateRule extends RuleAbstract {
 								
 								$value = $value->getProperty($prop)->getValue();
 
-							} else if ($value instanceof ObjectModel\ObjectModel) {
+							} else if ($value instanceof ObjectModel\BaseObject) {
 								
 								$value = $value->getProperty($prop);
 							

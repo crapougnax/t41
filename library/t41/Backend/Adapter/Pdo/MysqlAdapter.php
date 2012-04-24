@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\Backend\Adapter;
+namespace t41\Backend\Adapter\Pdo;
 
 /**
  * t41 Toolkit
@@ -22,6 +22,7 @@ namespace t41\Backend\Adapter;
  * @version    $Revision: 880 $
  */
 
+use t41\Backend\Adapter\AbstractPdoAdapter;
 
 /**
  * Class used to identify a backend
@@ -30,12 +31,8 @@ namespace t41\Backend\Adapter;
  * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @todo Actuellement, la classe n'accepte pas d'être utilisée sans préciser de nom de base
- * 		il faudrai donc réfléchir à comment implementer ça au niveau de Zend_DB mais aussi au niveau des URI
- * 		de façon à permettre à utiliser un backend MySQL sur plusieurs base d'un même serveur.
- * 
  */
-class MysqlAdapter extends PdoAdapter {
+class MysqlAdapter extends AbstractPdoAdapter {
 
 	
 	protected $_adapter = 'pdo_mysql';
