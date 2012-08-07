@@ -15,10 +15,16 @@
 				<parameter id="validators">
 					<type>array</type>
 				</parameter>
+				<parameter id="help">
+					<type>string</type>
+				</parameter>
 			</parameters>
 		</property>
 		<property id="\t41\ObjectModel\Property\StringProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
+				<parameter id="multilines">
+					<type>boolean</type>
+				</parameter>
 				<parameters id="minlength">
 					<type>integer</type>
 				</parameters>
@@ -37,6 +43,16 @@
 						<type>string</type>
 						<protected>false</protected>
 					</parameter>
+					<parameter id="keyprop">
+						<type>string</type>
+						<protected>true</protected>
+					</parameter>
+					<parameter id="morekeyprop">
+						<type>array</type>
+					</parameter>
+					<parameter id="sorting">
+						<type>any</type>
+					</parameter>
 			</parameters>
 		</property>
 		<property id="\t41\ObjectModel\Property\CollectionProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
@@ -53,7 +69,7 @@
 						<type>array</type>
 					</parameter>
 					<parameter id="sorting">
-						<type>string</type>
+						<type>any</type>
 					</parameter>
 					<parameter id="max">
 						<type>integer</type>
@@ -110,6 +126,20 @@
 				<parameter id="unsigned">
 					<type>boolean</type>
 					<defaultvalue>false</defaultvalue>
+				</parameter>
+			</parameters>
+		</property>
+		
+		<property id="\t41\ObjectModel\Property\MetaProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="property">
+					<type>string</type>
+				</parameter>
+				<parameter id="action">
+					<type>string</type>
+				</parameter>
+				<parameter id="type">
+					<type>string</type>
 				</parameter>
 			</parameters>
 		</property>

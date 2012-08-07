@@ -34,22 +34,6 @@ class Mapper {
 	
 	
 	/**
-	 * Character used as a separator between values in a same string
-	 * 
-	 * @var string
-	 */
-	const VALUES_SEPARATOR = ',';
-	
-	
-	/**
-	 * Character used as a separator between arguments in a value
-	 * 
-	 * @var string
-	 */
-	const ARGS_SEPARATOR = ':';
-	
-	
-	/**
 	 * Array of mappers definitions
 	 * 
 	 * @var array
@@ -103,11 +87,11 @@ class Mapper {
 			throw new ObjectModel\Exception(array('MAPPER_NO_DECLARATION', $id));
 		}
 		
-		$class = 't41_' . ucfirst(strtolower(self::$_config[$id]['type'])) . '_Mapper';
+//		$class = 't41_' . ucfirst(strtolower(self::$_config[$id]['type'])) . '_Mapper';
 		
 		try {
 			
-			$obj = new $class(self::$_config[$id]);
+			$obj = new Backend\Mapper(self::$_config[$id]);
 			
 		} catch (ObjectModel\Exception $e) {
 			

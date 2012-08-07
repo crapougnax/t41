@@ -190,7 +190,7 @@ class Backend {
 	 * Recupérer une instance de Backend à partir de son Uri, alias ou encore id dans la liste.
 	 *
 	 * @param string|t41_Backend_Uri alias or uri of desired backend
-	 * @return t41\Backend\Adapter\AdapterAbstract Backend Adapter
+	 * @return t41\Backend\Adapter\AbstractAdapter Backend Adapter
 	 */
 	static public function getInstance($id)
 	{
@@ -349,7 +349,7 @@ class Backend {
 	 * @param t41_Backend_Adapter_Abstract $backend
 	 * @return boolean
 	 */
-	static public function read(ObjectModel\DataObject $do, Backend\Adapter\AdapterAbstract $backend = null)
+	static public function read(ObjectModel\DataObject $do, Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		if (is_null($backend)) {
 
@@ -390,12 +390,12 @@ class Backend {
 	
 	
 	/**
-	 * Enregistre les données du DataObject dans son backend ou dans le backen précisé en paramètre.
+	 * Save object in given backend, class default backend or global default backend.
 	 *
 	 * @param t41\ObjectModel\DataObject $do
-	 * @param t41_Backend_Adapter_Abstract $backend
+	 * @param t41\Backend\Adapter\AbstractAdapter $backend
 	 */
-	static public function save(ObjectModel\DataObject $do, Backend\Adapter\AdapterAbstract $backend = null)
+	static public function save(ObjectModel\DataObject $do, Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		if (is_null($backend)) {
 
@@ -442,7 +442,7 @@ class Backend {
 	}
 	
 	/**
-	 * Delete the given dataobject in its backend
+	 * Delete the given data object in its backend
 	 * 
 	 * @param ObjectModel\DataObject $do
 	 * @param Backend\Adapter\AbstractAdapter $backend
@@ -485,6 +485,7 @@ class Backend {
 	 * 
 	 * @param t41\ObjectModel\Collection $co
 	 * @param t41\Backend\Adapter\AbstractAdapter $backend
+	 * @param array|boolean $returnCount 
 	 * @throws t41\Backend\Exception
 	 * @return array
 	 */
@@ -518,7 +519,29 @@ class Backend {
 	}
 	
 	
-	static public function returnsDistinct(ObjectModel\Collection $co, Property\PropertyAbstract $property, Backend\Adapter\AdapterAbstract $backend)
+	static public function stats(ObjectModel\Collection $co, Backend\Adapter\AbstractAdapter $backend = null, array $properties)
+	{
+		if (is_null($backend)) {
+				
+			$backend = ObjectModel::getObjectBackend($co->getDataObject()->getClass());
+				
+			if (is_null($backend)) {
+					
+				// get default backend
+				$backend = self::getDefaultBackend();
+			}
+		}
+			
+		if (! $backend) {
+		
+			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
+		}
+		
+		return $backend->find($co, $properties);
+	}
+	
+	
+	static public function returnsDistinct(ObjectModel\Collection $co, Property\PropertyAbstract $property, Backend\Adapter\AbstractAdapter $backend)
 	{
 		if (is_null($backend)) {
 			

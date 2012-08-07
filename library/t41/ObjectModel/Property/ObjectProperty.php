@@ -36,9 +36,6 @@ use t41\ObjectModel,
 class ObjectProperty extends AbstractProperty {
 
 	
-	const UNDEFINED_LABEL	= "Undefined Label";
-	
-	
 	protected $_displayValue;
 	
 	
@@ -61,11 +58,12 @@ class ObjectProperty extends AbstractProperty {
 		
 		if (! is_object($value) 
 		   || (get_class($value) != $this->getParameter('instanceof')
-		   && ! $value instanceof ObjectModel\DataObject
-		   && ! $value instanceof ObjectModel\ObjectUri)) {
+		   		&& ! $value instanceof ObjectModel\DataObject
+		   		&& ! $value instanceof ObjectModel\ObjectUri)) {
 			
 		   	$type = is_object($value) ? get_class($value) : gettype($value);
-		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF", array($this->getParameter('instanceof'), $value, $type)));
+		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF"
+		   					  , array($this->getParameter('instanceof'), $value, $type)));
 		}
 		
 		parent::setValue($value);
@@ -143,49 +141,35 @@ class ObjectProperty extends AbstractProperty {
 				$this->getValue(ObjectModel\Property::OBJECT);
 			}
 			
-			$displayProps = explode(',', $this->getParameter('display'));
-			if (count($displayProps) == 1 && $displayProps[0] == '') {
-				
-				$this->_displayValue = self::UNDEFINED_LABEL;
-				
-			} else {
-
-				$this->_displayValue = array();
-        		foreach ($displayProps as $disProp) {
-
-            		$this->_displayValue[] = $this->_value->getProperty($disProp)->getValue();
-            	}
-            
-            	$this->_displayValue = implode(' ', $this->_displayValue);
-			}
+			$this->_parseDisplayProperty();
 		}
 		
 		return $this->_displayValue;
 	}
 	
 	
-	public function reduce(array $params = array())
+	public function reduce(array $params = array(), $cache = true)
 	{
 		if (! $this->_value) {
 			
-			return parent::reduce($params);
+			return parent::reduce($params, $cache);
 			
 		} else {
 
 			// @todo improve performances !!
 			
-			$uuid  = Core\Registry::set($this);
+			$uuid = Core\Registry::set($this->getValue(ObjectModel::DATA));
 			
 			if (isset($params['extprops']) && ($params['extprops'] === true || array_key_exists($this->_id, $params['extprops']))) {
 
-				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id]));
+				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id]), $cache);
 				
 			} else {
 				
 				$value = $this->getDisplayValue();
 			}				
 				
-			return array_merge(parent::reduce($params), array('value' => $value, 'uuid' => $uuid));
+			return array_merge(parent::reduce($params, $cache), array('value' => $value, 'uuid' => $uuid));
 		}
 	}
 }

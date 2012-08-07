@@ -150,7 +150,7 @@ class Parameter implements Core\ClientSideInterface {
 			throw new Exception(array("OBJECT_NOT_INSTANCEOF", array((string) $value, implode(',', $this->_values))));
 
 		} else if (count($this->_values) > 0 && !in_array($value, $this->_values)) {
-			
+				
 			throw new Exception(array("VALUE_NOT_IN_ENUMERATION", array($value, implode(',', $this->_values))));
 		}
 		
@@ -260,36 +260,62 @@ class Parameter implements Core\ClientSideInterface {
 		return true;
 	}
 	
+	
+	static protected function _cloneParametersArray($array)
+	{
+		foreach ($array as $key => $parameter) {
+			
+			$array[$key] = clone $parameter;
+		}
+		
+		return $array;
+	}
 
+	
 	static public function getParameters($object)
 	{
 		$class = get_class($object);
 		
 		// Sometimes, namespaced-class comes without its initial ns separator
 		if (substr($class, 0, 1) != '\\') $class = '\\' . $class;
+
+		//$cacheKey = 'params_' . md5($class);
+		
+		// send cache content if available
+		//if (($cached = Core::cacheGet($cacheKey)) !== false) {
+		
+		//	return count($cached) > 0 ? self::_cloneParametersArray($cached) : $cached;
+		//}
+		
 		
 		if ($object instanceof ObjectModel\BaseObject) {
 			
-			return self::getObjectParameters($class);
-		}
-		
-		if ($object instanceof Property\PropertyInterface) {
+			$params = self::getObjectParameters($class);
 			
-			return self::getPropertyParameters($class);
-		}
-		
-		if ($object instanceof View\ViewObject || $object instanceof View\Action\AbstractAction) {
+		} else if ($object instanceof Property\AbstractProperty) {
 			
-			return self::getViewObjectParameters($class);
-		}
+			$params = self::getPropertyParameters($class);
 		
-		if ($object instanceof View\Decorator\AbstractDecorator) {
+		} else if ($object instanceof View\ViewObject || $object instanceof View\Action\AbstractAction) {
+			
+			$params = self::getViewObjectParameters($class);
+		
+		} else if ($object instanceof View\Decorator\AbstractDecorator) {
 
-			return self::getDecoratorParameters($class);
+			$params =  self::getDecoratorParameters($class);
 		}
 		
-		// lowest level of inheritance
-		if ($object instanceof ObjectModel\ObjectModelAbstract) {
+		//if (isset($params)) {
+			
+			//Core::cacheSet($params, $cacheKey);
+			//return $params;
+		//}
+		
+		if (isset($params)) {
+			
+			return $params;
+			
+		} else if ($object instanceof ObjectModel\ObjectModelAbstract) {
 
 			return self::getCoreParameters($class);
 		}
@@ -386,7 +412,7 @@ class Parameter implements Core\ClientSideInterface {
 	static protected function _compileFragments($objectClass, $objectType = 'objects', $subLevel = null)
 	{
 		$array = array();
-
+		
 		if (isset(self::$_config[$objectType][$objectClass])) {
 			
 			$sub = self::$_config[$objectType][$objectClass];
@@ -441,7 +467,7 @@ class Parameter implements Core\ClientSideInterface {
 	}
 	
 	
-	public function reduce(array $params = array())
+	public function reduce(array $params = array(), $cache = true)
 	{
 		return $this->_value; //
 		return array('id' => $this->_id, 'type' => $this->_type, 'value' => $this->_value);

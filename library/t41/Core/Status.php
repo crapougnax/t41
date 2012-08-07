@@ -22,6 +22,12 @@ class Status {
 	protected $_context = array();
 	
 	
+	/**
+	 * Defines a new status
+	 * @param string $message
+	 * @param integer $code
+	 * @param mixed $context
+	 */
 	public function __construct($message, $code = null, $context = null) {
 		
 		$this->_message = $message;

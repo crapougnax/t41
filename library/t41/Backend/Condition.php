@@ -22,8 +22,9 @@ namespace t41\Backend;
  * @version    $Revision: 839 $
  */
 
-use t41\ObjectModel;
-use t41\ObjectModel\Property;
+use t41\ObjectModel,
+	t41\ObjectModel\ObjectUri,
+	t41\ObjectModel\Property;
 
 /**
  * Simple class to handle query conditions on objects collections
@@ -43,6 +44,12 @@ use t41\DataObject;
 
 class Condition {
 	
+	
+	/**
+	 * Empty Value descriptor
+	 * @var string
+	 */
+	const NO_VALUE	= 'IS NULL';
 	
 	/**
 	 * OR mode descriptor
@@ -279,7 +286,13 @@ class Condition {
 	 */
 	public function having($name)
 	{
-		if (! $this->_property instanceof Property\ObjectProperty && ! $this->_property instanceof Property\CollectionProperty) {
+		// condition on the identifier part of the uri
+		if ($name == ObjectUri::IDENTIFIER) {
+			
+			$this->_condition = new self(new Property\IdentifierProperty(ObjectUri::IDENTIFIER));
+			return $this->_condition;
+			
+		} else if (! $this->_property instanceof Property\ObjectProperty && ! $this->_property instanceof Property\CollectionProperty) {
 
 			throw new Exception("CONDITION_INCORRECT_PROPERTY");
 		}

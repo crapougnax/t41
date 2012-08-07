@@ -22,6 +22,8 @@ namespace t41;
  * @version    $Revision: 914 $
  */
 
+use t41\View\SimpleComponent;
+
 use t41\Core,
 	t41\Config;
 
@@ -95,7 +97,7 @@ class Core {
 	static public $lazy = false;
 	
 	
-	static public $cache = 'Apc';
+	static public $cache = 'File';
 	
 	
 	/**
@@ -125,6 +127,9 @@ class Core {
     static public $env;
     
     
+    static public $mode;
+    
+    
     /**
      * Configuration Data
      */
@@ -143,6 +148,13 @@ class Core {
 	 */
 	static protected $_loaded = array();
 
+	
+	/**
+	 * An array of memory usage info
+	 * @var array
+	 */
+	static public $memusage = array();
+	
 
     /**
      * Faut-il utiliser les gestionnaires d'exception t41 ?
@@ -311,13 +323,13 @@ class Core {
         switch (View::getDisplayContext()) {
             
             case 'ajax':
-                $ajax = new t41_Ajax();
-                $ajax->setSendMessage($e->getMessage(), t41_Ajax::ERR);
+              //  $ajax = new t41_Ajax();
+              //  $ajax->setSendMessage($e->getMessage(), t41_Ajax::ERR);
                 break;
                 
             default:
             	View::resetObjects('default'); // to avoid infinite loop and fatal error, reset view content
-				$error = new t41_View_Error();
+				$error = new SimpleComponent();
 				$error->setTitle('ERREUR FATALE : ' . html_entity_decode($e->getMessage()));
                 if (self::$env == self::ENV_DEV) {
                 	
@@ -326,7 +338,7 @@ class Core {
                 }
                 $error->register();
                 
-	            exit(\t41\View::display());
+	            exit(View::display());
                 break;
         }        
     }
@@ -343,23 +355,21 @@ class Core {
                 break;
         }
         
-        if (\t41\View::getDisplayContext() == 'ajax') {
-            
-            require_once 't41/Ajax.php';
-            $ajax = new t41_Ajax();
-            $ajax->addData('file', $errFile);
-            $ajax->addData('line', $errLine);
-            
-            $ajax->setSendMessage($errStr, t41_Ajax::ERR);
+        $headers = headers_list(); //  getallheaders();
+        
+        if (isset($headers['X-Requested-With']) && $headers['X-Requested-With'] == 'XMLHttpRequest') {
+        	
+        	//header($_SERVER['SERVER_PROTOCOL'] . ' ' . $errStr, true, 500);
+			exit(sprintf('{status:"ERR", message:"%s", context:{line:%d,file:%s}', $errStr, $errLine, $errFile));
 
         } else {
         	
-        	\t41\View::addError($errStr, $errFile, $errNo);
+        	View::addError($errStr, $errFile, $errNo);
         }
         
         if ($fatale == true) {
         	
-        	die ($errStr);
+        	exit($errStr);
         }
     }
     
@@ -372,8 +382,11 @@ class Core {
      */
     public static function init($path = null, $mpath = null)
     {
+    	// enable garbage collection
+    	gc_enable();
+    	
     	// enable t41 error handler (notices are not catched until we get a proper logger)
-    	//set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
+    	set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
     	// define path but only if it's empty
     	if (empty(self::$basePath)) self::$basePath = $path;
@@ -393,31 +406,28 @@ class Core {
     	/* @todo allow override in config file or even later */
     	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
     	 
-    	
+    	// never cached, shall it be ?
     	$config = Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
     	
-    	// load modules
-    	Core\Module::init($mpath ? $mpath : self::$basePath);
-    	
-    	// load ACL
-    	Core\Acl::init($mpath ? $mpath : self::$basePath);
-    	
-    	
     	/* CLI Mode */
-    	if (isset(self::$_config['cli']) && PHP_SAPI == 'cli') {
+    	if (php_sapi_name() == 'cli') {
     		
-    		self::$_config['environments']['mode'] = 'cli';
+    		self::$mode = self::$_config['environments']['mode'] = 'cli';
 			
 			$opts = new \Zend_Console_Getopt(array('env=s'			=> 'Environment value'
 												, 'controller=s'	=> "Controller"
+												, 'module=s'		=> "Module"
 												, 'action=s'		=> "Action"
+												, 'params=s'		=> "Action parameters"
 												, 'simulate'		=> "Simulate execution"
 									)
 							   );
 
 			try {
 				$opts->parse();
+				
+				//var_dump($opts->params); die;
 				
 			} catch (\Zend_Console_GetOpt_Exception $e) {
 				
@@ -428,7 +438,9 @@ class Core {
 			
 			/* temporary */
 			define('CLI_CONTROLLER', trim($opts->controller));
+			define('CLI_MODULE', trim($opts->module));
 			define('CLI_ACTION', trim($opts->action));
+			define('CLI_PARAMS', $opts->params);
 			define('CLI_SIMULATE', (bool) $opts->simulate);
 			
 		} else {
@@ -486,6 +498,12 @@ class Core {
     	
     	self::$_env += self::$_config['environments'][$envKey];
     	
+    	if (self::getEnvData('cache_backend')) {
+    	
+    		self::$cache = self::getEnvData('cache_backend');
+    	}
+    	 
+    	
     	self::$_env['version'] = self::$_config['versions'][self::$_config['versions']['default']];
     	
     	/* define app name */
@@ -506,6 +524,13 @@ class Core {
 		
 		/* define lang - can be overwritten anywhere */
 		self::$lang = self::$_config['versions']['default'];
+		
+		// load modules
+		Core\Module::init($mpath ? $mpath : self::$basePath);
+		
+		// load ACL
+		Core\Acl::init($mpath ? $mpath : self::$basePath);
+		
 		
 		/* load configuration files if lazy mode is off */
 		if (self::$lazy !== true) {
@@ -529,7 +554,7 @@ class Core {
         	
         } else {
 
-            error_reporting(E_ALL & ~E_DEPRECATED);
+            error_reporting(E_ALL & ~E_STRICT);
             ini_set('display_errors', 1);
         }
 
@@ -692,13 +717,16 @@ class Core {
      * CACHE GLOBAL ACCESS METHODS
      */
     
-    public static function cacheSet($val, $key = null)
+    public static function cacheSet($val, $key = null, $force = false)
     {
     	if (! isset(self::$_adapters['cache'])) {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, self::$cache
-    													, array('automatic_serialization' => true))
+    													, array('automatic_serialization' => true)
+    													, array(
+    															'hashed_directory_level'	=> 2,
+    															'cache_dir' => '/dev/shm'))
     													 );
     	}
 
@@ -706,7 +734,13 @@ class Core {
     	 
         if (is_object($val)) {
 
-        	$val = array('_class' => get_class($val), 'content' => gzcompress(serialize($val)));
+        	$val = array('_class' => get_class($val), 'content' => serialize($val));
+        }
+        
+        // don't re-cache already cached-content, except if force is set to true
+        if (self::$_adapters['cache']->load($key) !== false && $force == false) {
+        	
+        	return $key;
         }
         
     	return self::$_adapters['cache']->save($val, $key) ? $key : false;
@@ -719,8 +753,14 @@ class Core {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, self::$cache
-    													, array('automatic_serialization' => true))
-    													 );
+    													, array('automatic_serialization' 	=> true)
+    													, array( 
+    															'hashed_directory_level'	=> 2,
+    															'lifetime'					=> 600,
+    															'cache_dir' => '/dev/shm'
+    															)
+    													  )
+    						);
     	}
     	
     	$cached = self::$_adapters['cache']->load($key);
@@ -734,7 +774,7 @@ class Core {
                         return null;
                     }
                     
-                return unserialize(gzuncompress($cached['content']));
+                return unserialize($cached['content']);
                 
             } else {
             	
@@ -883,4 +923,25 @@ class Core {
 		
 		return $data;
     }
+    
+    
+    static public function memUsage($group = 'default', $id = null)
+	{
+		list(, $caller) = debug_backtrace(false);
+	//	\Zend_Debug::dump($caller); die;
+		if (! isset(self::$memusage[$group])) {
+			self::$memusage[$group] = array();
+		}
+
+		$index = substr(microtime(), 0,9);
+		self::$memusage['default'][$index] = memory_get_usage();
+		$func = $caller['class'] . '::' . $caller['function'];
+		self::$memusage[$func][] = $index;
+	}
+	
+	
+	static public function processMemUsage()
+	{
+		
+	}
 }

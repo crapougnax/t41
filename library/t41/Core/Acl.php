@@ -64,10 +64,18 @@ class Acl {
 	 */
 	public static function init($path)
 	{
+		if (Core::getEnvData('cache_configs') !== false) {
+
+			$ckey = 'configs_acl';
+			if (($cached = Core::cacheGet($ckey)) !== false) {
+				self::$_config = $cached;
+				return;
+			}
+		}
+		
 		// load application acl configuration file
 		$config = Config\Loader::loadConfig('acl.xml', Config::REALM_CONFIGS);
 		
-//		\Zend_Debug::dump($config['acl']['roles']); die;
 		$resources = array();
 		
 		// add all fragments coming from modules
@@ -92,11 +100,14 @@ class Acl {
 				}
 			}
 		}
+		
 		$config['acl']['resources'] += $resources;
 
-//		\Zend_Debug::dump($resources); die;
 
 		self::$_config = $config['acl'];
+		if (isset($ckey)) {
+			Core::cacheSet($config['acl'], $ckey);
+		}
 	}
 	
 	
@@ -158,9 +169,9 @@ class Acl {
 		
 		foreach (self::$_config['roles'] as $key => $data) {
 			
-			if ($data['type'] != 'group') continue;
+			if (isset($data['type']) && $data['type'] != 'group') continue;
 			
-			if (array_key_exists($role, $data['members'])) {
+			if (@array_key_exists($role, $data['members'])) {
 				
 				$groups[] = $key;
 			}

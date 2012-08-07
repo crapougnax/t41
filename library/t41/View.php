@@ -185,19 +185,6 @@ class View {
 		}
 	}
 	
-	/**
-	 * Ajout d'une feuille de style CSS à la vue
-	 *
-	 * @param unknown_type $sheet
-	 * @return unknown
-	 * @deprecated use t41_View::addRequiredLib() instead
-	 */
-	static public function addRequiredCssSheet($sheet) {
-		if (self::_isInstanciated ()) {
-			return self::$_display->componentAdd ( $sheet, 'css' );
-		}
-	}
-	
 
 	static public function addRequiredLib($file, $type, $lib = null, $priority = 0)
 	{
@@ -308,7 +295,7 @@ class View {
 	}
 	
 	
-	static public function addObject($object, $container = 'default', array $params = null)
+	static public function addObject($object, $container = self::PH_DEFAULT, array $params = null)
 	{
 		if (is_null($container)) $container = self::PH_DEFAULT;
 		self::$_objects [$container] [] = array($object, $params);

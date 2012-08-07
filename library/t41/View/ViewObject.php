@@ -40,6 +40,9 @@ abstract class ViewObject extends ObjectModelAbstract {
 	protected $_title;
 	
 	
+	protected $_help;
+	
+	
 	protected $_content = array();
 	
 	
@@ -90,6 +93,26 @@ abstract class ViewObject extends ObjectModelAbstract {
 		return $this->_content;
 	}
 	
+
+	/**
+	 * Sets a help text message
+	 * @param string $str
+	 */
+	public function setHelp($str)
+	{
+		$this->_help = $str;
+		return $this;
+	}
+	
+	
+	/**
+	 * Get help text
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return $this->_help;
+	}
 	
 	/**
 	 * 
@@ -132,6 +155,27 @@ abstract class ViewObject extends ObjectModelAbstract {
 		}
 		
 		return $this;
+	}
+	
+	
+	/**
+	 * Shortcut to define decorator parameters
+	 * @param array $array
+	 */
+	public function setDecoratorParams(array $array)
+	{
+		$this->_decorator['params'] = $array;
+		return $this;
+	}
+	
+	
+	/**
+	 * Retrieve parameters that the selected decorator will receive upon instanciation
+	 * @return array
+	 */
+	public function getDecoratorParams()
+	{
+		return isset($this->_decorator['params']) ? $this->_decorator['params'] : array();
 	}
 	
 	

@@ -2,7 +2,11 @@
 
 namespace t41\View\FormComponent\Element\ListElement;
 
-use t41\View,
+use t41\ObjectModel,
+	t41\View,
+	t41\View\ViewUri,
+	t41\View\FormComponent,
+	t41\View\Action\AutocompleteAction,
 	t41\View\Decorator\AbstractWebDecorator;
 
 class WebDefault extends AbstractWebDecorator {
@@ -10,33 +14,54 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
+		$value = null;
+		
+		if ($this->_obj->getValue()) {
+		
+			$value = $this->_obj->getValue();
+			if (($value instanceof ObjectModel\BaseObject || $value instanceof ObjectModel\DataObject) && $value->getUri()) {
+					
+				$value = $value->getUri()->getIdentifier();
+				
+			} else if ($value instanceof ObjectModel\ObjectUri) {
+				
+				$value = $value->getIdentifier();
+			} else {
+				
+				$value = null;
+			}
+		}
+		
 		// set correct name for field name value depending on 'mode' parameter value
 		$name = $this->_obj->getId();
 		
-//		if ($this->getParameter('mode') == t41_Form::SEARCH) {
-//			
-//			$name = t41_View_Uri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
-//		}
+		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
+			
+			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
+		}
 		
 		// display autocompleter field
-		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('select_max_values')) {
+		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('select_max_values') 
+				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
+
+			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
+			//$acfield->setValue($this->_obj->getValue()->getDisplayValue());
 			
-			//t41_Externals::enablejQueryUI();
-			//t41_View::addRequiredLib('base', 'js', 't41');
-			//t41_View::addRequiredLib('autocompleter', 'js', 't41');
+			$action = new AutocompleteAction($this->_obj->getCollection());
+			$action->setParameter('search', array('label'));
+			$action->setParameter('display', array('type','label'));
+			$action->setParameter('event', 'keyup');
+			$action->setContextData('onclick', 't41.view.element.autocomplete.close');
+			$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());
+			$action->bind($acfield);
 			
-			$key = $this->_obj->sessionize();
-			//View::addEvent("new t41_autocompleter('$key')", 'js');
+			$deco = View\Decorator::factory($acfield);
+			$html = $deco->render();
 			
-			$html  = sprintf('<input type="text" size="30" id="%s_input" value="%s"/>'
-							, $key
-							, $this->_obj->formatValue($this->_obj->getValue())
-							);
-			$html .= sprintf('<input type="hidden" name="%s" id="%s_hidden" value="%s"/>', $name, $key, $this->_obj->getValue());
-							
-			$html .= sprintf('<a id="%s_placeholder" style="display: none;" title="Cliquez pour &eacute;diter" class="input_placeholder"> </a>', $key);
-			$html .= sprintf('<div class="suggestionsBox" id="%s_suggestions" style="display: none;">', $key);
-			$html .= sprintf('<div class="suggestionList" id="%s_autoSuggestionsList"></div></div>', $key);
+			$deco = View\Decorator::factory($action);
+			$deco->render();
+			
+			$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s"/>', $name, $this->_nametoDomId($name), $value);
 			
 			return $html . "\n";
 			
@@ -46,7 +71,7 @@ class WebDefault extends AbstractWebDecorator {
 			$zv = new \Zend_View();
 			$options = array(null => '') + (array) $this->_obj->getEnumValues();
 
-			return $zv->formSelect($name, $this->_obj->getValue(), null, $options);
+			return $zv->formSelect($name, $value, null, $options);
 		}
 	}
 }

@@ -54,7 +54,7 @@ class CopyRule extends AbstractRule {
 			/* get source value */
 			if ($this->_source->isProperty()) {
 	
-				$value = $do->getProperty($this->_source[0])->{$this->_source[1]}();
+				$value = $do->getProperty($this->_source->getValue())->getValue(); //->{$this->_source[1]}();
 			
 			} elseif ($this->_source->isMethod()) {
 

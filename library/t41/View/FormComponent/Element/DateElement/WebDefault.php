@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\View\Form\Element\DateElement;
+namespace t41\View\FormComponent\Element\DateElement;
 
 
 use t41\View,
@@ -16,7 +16,7 @@ class WebDefault extends AbstractWebDecorator {
 
 		switch ($this->getParameter('mode')) {
 
-			case t41_Form::SEARCH:
+			case 'rttr': //t41_Form::SEARCH:
 				
 				$so = t41_View_Uri::getUriAdapter()->getIdentifier('search');
 				

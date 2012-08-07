@@ -34,7 +34,7 @@ use t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class XmlAdapter extends AdapterAbstract {
+class XmlAdapter extends AbstractAdapter {
 
 
 	/**

@@ -22,9 +22,11 @@ namespace t41\View\TableComponent;
  * @version    $Revision: 903 $
  */
 
-use t41\ObjectModel;
+use t41\View\FormComponent\Element\CurrencyElement;
 
-use t41\View\Decorator\AbstractWebDecorator,
+use t41\ObjectModel,
+	t41\View\Decorator\AbstractWebDecorator,
+	t41\View\Decorator,
 	t41\View\TableComponent,
 	t41\View;
 
@@ -101,6 +103,8 @@ class WebDefault extends AbstractWebDecorator {
 			
 			foreach($this->_obj->getRows() as $key => $row) {
 				
+			//	\Zend_Debug::dump($row); die;
+				
 				if ($row instanceof ObjectModel\DataObject) {
 					
 					$colRow[$field->getId()] .= sprintf('&nbsp;<span class="value">%s</span>'
@@ -108,8 +112,9 @@ class WebDefault extends AbstractWebDecorator {
 					);
 										
 				} else {
+					
 					$colRow[$field->getId()] .= sprintf('&nbsp;<span class="value">%s</span>'
-									 , $this->_formatValue($field, $row[$field->getAltId()])
+									 , $field->formatValue($row[$field->getId()])
 									);
 				}
 			}
@@ -118,7 +123,7 @@ class WebDefault extends AbstractWebDecorator {
 			$i++;
 		}
 		
-		if ($this->_obj->getParameter('columns')) $colRow[$colId] .= '</div><div style="clear: both;"></div>';
+		//if ($this->_obj->getParameter('columns')) $colRow[$colId] .= '</div><div style="clear: both;"></div>';
 		
 		$html = $html . implode("\n", $colRow)/* . '</div>'*/;
 		
@@ -136,14 +141,14 @@ class WebDefault extends AbstractWebDecorator {
 			
 			if ($field->getParameter('preserveLabel') == false) {
 				
-				$label = htmlentities($label);
+				$label = $this->_escape($label);
 			}
 			$head .= '<th>' . $label . '</th>';
 		}
 		
 		if (count($this->_obj->getButtons()) > 0) $head .= '<th>&nbsp;</th>';
 		
-		$head = sprintf('<tr class="%s_head">%s</tr>', $this->_cssStyle, $head);
+		$head = sprintf('<tr class="">%s</tr>', $head);
 		$i=0;
 		
 		foreach($this->_obj->getRows() as $key => $row) {
@@ -164,7 +169,7 @@ class WebDefault extends AbstractWebDecorator {
 			
 			if (count($this->_obj->getButtons()) > 0) $line .= $this->_buttonsRendering($row);
 			
-			$css = $i%2 == 0 ? 'list_row' : 'list_row bis';
+			$css = $i%2 == 0 ? 'odd' : 'even';
 			$body .= '<tr id="' . $this->_obj->getId() . '_' . $key . '" class="' . $css . '">' . $line . '</tr>';
 			$i++;
 		}
@@ -179,7 +184,7 @@ class WebDefault extends AbstractWebDecorator {
 			$info = '<div class="info">Vous pouvez trier les valeurs d\'une colonne en cliquant sur son ent&ecirc;te, et sur plusieurs colonnes avec shift+clic (maj+clic).</div>';
 		}
 		
-		return @$info.'<table'.@$class.'>' . $thead . $tbody . '</table>';
+		return @$info.'<table class="t41 component table">' . $thead . $tbody . '</table>';
 	}
 
 	
@@ -188,7 +193,7 @@ class WebDefault extends AbstractWebDecorator {
 		$title = $this->_obj->getTitle() ? $this->_obj->getTitle() : 'Table';
 		$status = $this->_obj->getParameter('open_default') ? 'open' : 'close';
 		$html = <<<HTML
-<div class="t41 component table" id="{$this->_obj->getId()}">
+<div class="t41 component" id="{$this->_obj->getId()}">
 <h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 <div class="content">
 HTML;
@@ -208,7 +213,7 @@ HTML;
 		
 		foreach ($this->_obj->getButtons() as $button) {
 			
-			$deco = t41_View_Decorator::factory($button);
+			$deco = Decorator::factory($button);
 			$deco->setParameter('data', $data);
 			
 			$line .= $deco->render();

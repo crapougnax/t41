@@ -59,10 +59,10 @@ class ObjectAction extends AbstractAction {
 	 *
 	 * @return array
 	 */
-	public function execute(array $data = array())
+	public function execute($data = array())
 	{
 		$res = false;
-		
+
 		switch ($this->_action) {
 			
 			case 'create':

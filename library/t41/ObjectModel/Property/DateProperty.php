@@ -48,7 +48,13 @@ class DateProperty extends AbstractProperty {
 	
 	public function getDisplayValue()
 	{
-		$parts = explode('-', $this->_value);
+		return self::format($this->_value);
+	}
+	
+	
+	static public function format($str)
+	{
+		$parts = explode('-', $str);
 		$parts = array_reverse($parts);
 		return implode('/', $parts);
 	}

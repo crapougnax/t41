@@ -22,6 +22,8 @@ namespace t41\View;
  * @version    $Revision: 865 $
  */
 
+use t41\View\FormComponent\Element\FieldElement;
+
 use t41\View,
 	t41\ObjectModel,
 	t41\View\FormComponent;
@@ -36,6 +38,10 @@ use t41\View,
  */
 class FormComponent extends View\ViewObject {
 
+	
+	const SEARCH_MODE = 'search';
+	
+	
 	/**
 	 * Form Adapter object
 	 * 
@@ -54,37 +60,25 @@ class FormComponent extends View\ViewObject {
 	
 	public function __construct($source = null, array $params = null, FormComponent\Adapter\AbstractAdapter $adapter = null)
 	{
-/*    	$this->_setParameterObjects(
-    								array(
-    									  'redirect_on_success' 	=> new t41_Parameter(t41_Parameter::STRING)
-    									, 'redirect_on_failure' 	=> new t41_Parameter(t41_Parameter::STRING)
-    									, 'redirect_on_condition'	=> new t41_Parameter(t41_Parameter::MULTIPLE) // array of field, value, comparison operator
-    									  // a callback action is defined in an array with a class, a method and optionals object id and params
-    									  // action will be delegated treatement on submit, it must return a status
-    									, 'callback_action'			=> new t41_Parameter(t41_Parameter::MULTIPLE) // 0 = class, 1 = method, 2 = id, 3 = params
-    									, 'columns'					=> new t41_Parameter(t41_Parameter::MULTIPLE)
-    									 )
-    						  	   );
-*/
 		parent::__construct('toto', $params);
-//    	if (is_array($params)) $this->_setParameters($params);
     						  	   
 		$this->_adapter = $adapter ? $adapter : new FormComponent\Adapter\DefaultAdapter();
 		
 		if ($source instanceof ObjectModel\BaseObject) {
 			
 			$this->_source = $source;
-			$this->_adapter->build($this->_source->getDataObject());
+			$this->_adapter->build($this->_source->getDataObject(), $this->getParameter('display'));
+			
 			
 		} else if ($source instanceof ObjectModel\DataObject) {
 			
 			$this->_source = $source->getDataObject();
-			$this->_adapter->build($this->_source);
+			$this->_adapter->build($this->_source, $this->getParameter('display'));
 			
 		} else if (is_string($source)) {
 			
 			$this->_source = ObjectModel\DataObject::factory($source);
-			$this->_adapter->build($this->_source);
+			$this->_adapter->build($this->_source, $this->getParameter('display'));
 				
 		}
 	}
@@ -102,6 +96,11 @@ class FormComponent extends View\ViewObject {
 	}
 	
 	
+	/**
+	 * Returns the form element matching the given key
+	 * @param string $key
+	 * @return t41\View\FormComponent\Element\AbstractElement
+	 */
 	public function getElement($key)
 	{
 		return $this->_adapter->getElement($key);
@@ -160,7 +159,7 @@ class FormComponent extends View\ViewObject {
     				
     			} else {
     				
-    				$this->_columns[] = new t41_View_Form_Element_Generic($column);
+    				$this->_columns[] = new FieldElement($column);
     			}
     		}
     	}
@@ -224,7 +223,6 @@ class FormComponent extends View\ViewObject {
     	
     	if (! is_object($class)) {
 
-    		@Zend_Loader::loadClass($class);
     		$class = new $class($id == self::USE_ID ? $this->getParameter('rowid') : $id);
     	}
     		
@@ -234,6 +232,7 @@ class FormComponent extends View\ViewObject {
     		
     	} catch (Exception $e) {
     		
+    		var_dump($e);
     		die($e->getMessage());
     	}
     	
@@ -291,33 +290,4 @@ class FormComponent extends View\ViewObject {
     		$this->_executeAction($action['class'], $action['method'], $action['id'], $paData);
     	}
     }
-    
-    
-	/**
-	 * Form Factory pattern
-	 *
-	 * @param string $type
-	 * @param mixed $id
-	 * @param array $params
-	 * @return t41_Form_Abstract
-	 */
-	public static function factory($source = null, $adapter = 'Default', array $params = null) {
-		
-		$class = 't41_View_Form_Adapter_' . ucfirst(strtolower($adapter));
-		
-		try {
-			
-			Zend_Loader::loadClass($class);
-			$adapter = new $class();
-			return new self($source, $adapter, $params);
-			
-		} catch (t41_View_Exception $e) {
-			
-			die($e->getMessage());
-			
-		} catch (Exception $e) {
-			
-			throw new t41_View_Exception($e->getMessage() . "\n" . $e->getTraceAsString());
-		}
-	}
 }

@@ -57,7 +57,7 @@ class ListElement extends AbstractElement {
 	{
 		$this->_setParameterObjects(array('select_max_values'	=> new Parameter(Parameter::INTEGER, 100)
 										, 'display'				=> new Parameter(Parameter::STRING)
-										, 'sorting'				=> new Parameter(Parameter::MULTIPLE)	
+										, 'sorting'				=> new Parameter(Parameter::ANY)	
 										
 										 )
 								   );
@@ -75,13 +75,30 @@ class ListElement extends AbstractElement {
 	public function setCollection(ObjectModel\Collection $collection)
 	{
 		$this->_collection = $collection;
+		$this->_collection->setBoundaryBatch($this->getParameter('select_max_values')+1);
+		if ($this->getParameter('sorting')) {
+		
+			if (! is_array($this->getParameter('sorting'))) {
+					
+				$sortings = explode(',', $this->getParameter('sorting'));
+				$array = array();
+				foreach ($sortings as $sorting) {
+					$array[] = explode(' ', $sorting);
+				}
+				$this->_collection->setSortings($array);
+				
+			} else {
+		
+				$this->_collection->setSortings($this->getParameter('sorting'));
+			}
+		}
 		return $this;
 	}
 	
 	
 	/**
 	 * Returns objects collection
-	 * @return t41_Object_Collection
+	 * @return t41\ObjectModel\Collection
 	 */
 	public function getCollection()
 	{
@@ -148,9 +165,10 @@ class ListElement extends AbstractElement {
             $select->limit(($this->getParameter('select_max_values') > 1) ? $this->getParameter('select_max_values') + 1 : 20);
 */            
         $this->_collection->find();
+//        \Zend_Debug::dump(Backend::getLastQuery());
         
         foreach ($this->_collection->getMembers() as $member) {
-                    
+/*                    
         	$this->_displayProps = explode(',', $this->getParameter('display'));
         	$str = array();
         	foreach ($this->_displayProps as $disProp) {
@@ -161,13 +179,13 @@ class ListElement extends AbstractElement {
         		if (! $prop instanceof Property\AbstractProperty) {
         			
         			\Zend_Debug::dump($this->_displayProps);
-        			die($disProp);
+        			//die($disProp);
         		}
         		
             	$str[] = $prop->getValue();
             }
-                
-            $this->_enumValues[$member->getUri()->getIdentifier()] = implode(' ', $str);
+*/                
+            $this->_enumValues[$member->getUri()->getIdentifier()] = Property::parseDisplayProperty($member, $this->getParameter('display'));
         }
             
        return $this->_enumValues;
@@ -186,13 +204,18 @@ class ListElement extends AbstractElement {
 
         // value no more available to select, though we need to display it !
 
-        $uri = new ObjectModel\ObjectUri($key);
-        $uri->setClass($this->getCollection()->getClass());
+        if (is_string($key)) {
+	        $uri = new ObjectModel\ObjectUri($key);
+    	    $uri->setClass($this->getCollection()->getClass());
         
-        $_do = clone $this->_collection->getDataObject();
-        $_do->setUri($uri);
+        	$_do = clone $this->_collection->getDataObject();
+     		$_do->setUri($uri);
         
-        Backend::read($_do);
+        	Backend::read($_do);
+        } else {
+        	
+        	$_do = $key->getDataObject();
+        }
 
         $this->_displayProps = explode(',', $this->getParameter('display'));
         
@@ -205,7 +228,7 @@ class ListElement extends AbstractElement {
         }
                 
         $str = implode(' ', $str);
-        $this->_enumValues[$key] = $str;
+        if (is_string($key)) $this->_enumValues[$key] = $str;
 
         return $str;
     }
@@ -265,10 +288,11 @@ class ListElement extends AbstractElement {
 	{
 		if (! $val instanceof ObjectModel\ObjectUri) {
 			
-			$val = new ObjectModel\ObjectUri($val);
-			$val->setClass($this->getCollection()->getClass());
+			$class = $this->getCollection()->getClass();
+			$val = new $class($val);
 		}
 		
 		parent::setValue($val);
 	}
 }
+

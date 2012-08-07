@@ -51,11 +51,11 @@ class WebDefault extends SimpleComponent\WebDefault {
     	$this->_id = 't41_' . md5(time());
     	
     	
-		View::addEvent(sprintf("%s = new t41.view.form('%s',%s)"
+		View::addEvent(sprintf("%s = new t41.view.form('%s',%s,%s)"
 									, $this->_id
 									, $this->_id
 									, \Zend_Json::encode($reduced)
-//									, \Zend_Json::encode($this->getJsArgs())
+									, \Zend_Json::encode($this->_obj->reduce())
 								  ), 'js');
     	
         return $this->_headerRendering() . $this->_contentRendering() . $this->_footerRendering();
@@ -67,8 +67,6 @@ class WebDefault extends SimpleComponent\WebDefault {
 		$p = '<fieldset>';
 		$p .= '<legend></legend>';
 		
-
-		$focus = null;
 		$altDecorators = (array) $this->_obj->getParameter('decorators');
 		
 		/* @var $val t41_View_Element_Abstract */
@@ -88,27 +86,27 @@ class WebDefault extends SimpleComponent\WebDefault {
         		continue;
         	}
         	
-        	if (! $focus) {
-
-        		if ($element instanceof t41_View_Form_Element_Generic) {
+        	if (! isset($focus) && $element instanceof Element\FieldElement) {
         			
-	        		View::addEvent(sprintf("jQuery('%s').focus()", $field->getAltId()), 'js');
-	        		$focus = $key;
-        		}
+	        	View::addEvent(sprintf("jQuery('#%s').focus()", $field->getAltId()), 'js');
+	        	$focus = $field;
         	}
         	
         	$label = '&nbsp;';
 	        $label = $this->_escape($element->getTitle());
     	    if ($field->getConstraint('mandatory') == 'Y') {
     	    
-    	    	$label = '<strong>' . $label . '</strong>';
+    	    	$class=' mandatory';
     	        $mandatory = ' mandatory';
     	    } else {
+    	    	$class ='';
     	        $mandatory = '';
     	    }
 
-    	    $line = sprintf('<div class="clear"></div><div class="label"><label for="%s">%s</label></div>'
-            				, $field->getAltId()
+    	    $line = sprintf('<div class="clear"></div><div class="label%s"><label for="%s" data-help="%s">%s</label></div>'
+            				, $class
+    	    				, $field->getAltId()
+    	    				, $field->getHelp()
             				, $label
             			 );
             			 
@@ -117,10 +115,10 @@ class WebDefault extends SimpleComponent\WebDefault {
             	$p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
             	
             	// if field is defined and not editable BUT data is not in backend, we need to provide field value
-            	if ($this->_obj->getParameter('rowid') == null) {
+  //          	if ($this->_obj->getParameter('rowid') == null) {
             		
-            		$p .= sprintf('<input type="hidden" name="%s" value="%s" />' . "\n", $field->getAltId(), $field->getValue()); 
-            	}
+            	//	$p .= sprintf('<input type="hidden" name="%s" value="%s" />' . "\n", $field->getAltId(), $field->getValue()); 
+            //	}
             	continue;
             }
             

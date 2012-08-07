@@ -22,8 +22,12 @@ namespace t41\Backend\Adapter;
  * @version    $Revision: 905 $
  */
 
-use t41\Backend;
-use t41\ObjectModel;
+use t41\ObjectModel\DataObject;
+
+use t41\Core,
+	t41\Backend,
+	t41\ObjectModel,
+	t41\ObjectModel\Collection;
 
 /**
  * Class providing CSV methods to backend
@@ -34,7 +38,7 @@ use t41\ObjectModel;
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * 
  */
-class CsvAdapter extends FilesystemAdapter {
+class CsvAdapter extends AbstractAdapter {
 
 
 	protected $_basePath;	
@@ -77,15 +81,15 @@ class CsvAdapter extends FilesystemAdapter {
 	}
 	
 	
-	public function find(ObjectModel\Collection $collection)
+	public function find(Collection $collection, $returnCount = false)
 	{
-		$url = str_replace('{basepath}', \t41\Core::getBasePath(), $this->_uri->getUrl());
+		$url = str_replace('{basepath}', Core::$basePath, $this->_uri->getUrl());
 		$class = $collection->getDataObject()->getClass();
 		
 		if ($this->_mapper) {
 			
 			$file = $this->_mapper->getDatastore($class);
-			
+				
 		} else {
 			
 			throw new Exception("Csv backends need a mapper where datastores are defined");
@@ -93,7 +97,7 @@ class CsvAdapter extends FilesystemAdapter {
 
 
 		if (substr($file, 0, 1) != DIRECTORY_SEPARATOR) $file = $url . $file;
-
+		
 		try { 
 				$file = fopen($file, 'r');
 				
@@ -123,49 +127,55 @@ class CsvAdapter extends FilesystemAdapter {
 		
 		$array = array();
 		
-		$key = 0; // csv file current line key
+		$key = -1; // csv file current line key
+		$selected = 0; // selected members counter
+		$offset = $collection->getBoundaryOffset();
+		$limit = $collection->getBoundaryBatch();
 		
 		while (($data = fgetcsv($file, 1000, $separator)) !== false) {	
 			
-			if ($this->_mapper->getExtraArg('firstlineisheader', $class) !== false && $key == 0) {
+			if ($this->_mapper->getExtraArg('firstlineisheader', $class) !== false && $key == -1) {
 				
 				/* ignore first line if it is declared as header */
-				$key = 1;
+				$key += 1;
+				$offset += 1;
 				continue;
 			}
 
 			/* test data array against defined conditions */
 			if ($this->_testAgainstConditionBlock($data) === false) {
-				
+			
 				continue;
 			}
 			
-			$uri->setUrl($url . '/' . $key++);
-			switch ($collection->getParameter('memberType')) {
-
-				case 'uri':
-					$obj = clone $uri;
-					break;
-					
-				case 'data':
-					$obj = clone $do;
-					$obj->setUri(clone $uri);
-					$obj->populate($data, $this->_mapper);
-					break;
-					
-				case 'model':
-					$obj = clone $do;
-					$obj->setUri(clone $uri);
-					$obj->populate($data, $this->_mapper);
-					/* @var $obj t41_Object_Model */
-					$obj = new $class(null, null, $obj);
-					break;
+			$key++;
+			
+			// ignore everything before offset value
+			if ($key < $offset && $returnCount != true) continue;
+			
+			// break after limit value is reached except if we count lines
+			if ($selected == $limit && $returnCount !== true) {
+				return $array;
 			}
 			
-			$array[] = $obj;
+			// increment selected counter
+			$selected++;
+			
+			if ($returnCount !== true) {
+
+				$uri = new ObjectModel\ObjectUri();
+				$uri->setBackendUri($this->_uri);
+				$uri->setClass($collection->getDataObject()->getClass());
+				$uri->setUrl($url . '/' . $key);
+						
+				$do = DataObject::factory($class);
+				$do->setUri($uri);
+				$do->populate($data, $this->_mapper);
+				$array[] = new $class($do);
+			}
 		}
 		
-		return $array;
+		return $returnCount ? $key : $array;
 	}
 	
 	
@@ -177,7 +187,7 @@ class CsvAdapter extends FilesystemAdapter {
 	 * @todo implement AND mode between conditions
 	 * @param t41_Object_Collection $collection
 	 */
-	protected function _prepareConditionBlock(t41_Object_Collection $collection)
+	protected function _prepareConditionBlock(Collection $collection)
 	{
 		$array = array();
 		

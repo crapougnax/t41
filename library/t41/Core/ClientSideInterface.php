@@ -29,6 +29,7 @@ interface ClientSideInterface {
 	 * 
 	 * 
 	 * @param array $params
+	 * @param boolean $cache
 	 * @return array
 	 */
 	public function reduce(array $params = array());

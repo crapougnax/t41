@@ -49,12 +49,15 @@ abstract class AbstractAdapter implements AdapterInterface {
 	protected $_errors = array();
 	
 
-	public function build(ObjectModel\DataObject $do) {
+	public function build(ObjectModel\DataObject $do, array $display = null) {
 		
 		foreach ($do->getProperties() as $property) {
 			
-			/* convert property to form element */
-			$this->addElementFromProperty($property, (count($this->_elements)+1) * 100);
+			if (is_null($display) || in_array($property->getId(), $display)) {
+
+				/* convert property to form element */
+				$this->addElementFromProperty($property, (count($this->_elements)+1) * 100);
+			}
 		}
 	}
 		

@@ -138,9 +138,10 @@ class Tag {
 		 
 		preg_match_all($tagPattern, $str, $tags, PREG_SET_ORDER);
 
+		//\Zend_Debug::dump($tags); die;
 		foreach ($tags as $tag) {
 			
-			$str = str_replace($tag, self::get($tag[0]), $str);
+			$str = str_replace($tag[0], self::get($tag[0]), $str);
 		}
 		
 		return $str;

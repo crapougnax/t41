@@ -23,6 +23,7 @@ namespace t41\View\Decorator;
  */
 
 use t41\View,
+	t41\View\Decorator,
 	t41\ObjectModel\ObjectModelAbstract;
 
 /**
@@ -68,6 +69,54 @@ abstract class AbstractDecorator extends ObjectModelAbstract {
 	public function render()
 	{
 		return '';
+	}
+	
+	
+	protected function _contentRendering()
+	{
+		$content = '';
+	
+		foreach ($this->_obj->getContent() as $elem) {
+	
+			if ($elem instanceof View\ViewObject) {
+	
+				try {
+						
+					$deco = Decorator::factory($elem);
+						
+				} catch (View\Exception $e) {
+						
+					$decoratorClassBase = get_class($elem) . '\\' . View::getContext();
+						
+					try {
+	
+						// get decorator data from object
+						$objDecorator = $this->_obj->getDecorator();
+	
+						// Current class object decorator
+						$decoratorClass = $decoratorClassBase .  ucfirst($objDecorator['name']);
+						$deco = new $decoratorClass($elem);
+							
+					} catch (View\Exception $e) {
+							
+						// Default decorator
+						$decoratorClass = $decoratorClassBase . 'Default';
+						$deco = new $decoratorClass($elem);
+					}
+				}
+	
+				if ($deco instanceof self) {
+						
+					$content .= $deco->render();
+				}
+	
+			} else {
+	
+				$content .= $elem;
+			}
+		}
+	
+		return $content;
 	}
 	
 	

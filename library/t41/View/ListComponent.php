@@ -22,6 +22,14 @@ namespace t41\View;
  * @version    $Revision: 879 $
  */
 
+use t41\ObjectModel\Property\CurrencyProperty;
+
+use t41\View\ListComponent\Element\MetaElement;
+
+use t41\View\ListComponent\Element\ColumnElement;
+
+use t41\View\FormComponent\Element\ListElement;
+
 use t41\View,
 	t41\ObjectModel,
 	t41\ObjectModel\Property,
@@ -38,6 +46,9 @@ use t41\View,
  */
 class ListComponent extends ViewObject {
 
+	
+	const METACOL = '*';
+	
 	
 	protected $_collection;
 	
@@ -67,14 +78,13 @@ class ListComponent extends ViewObject {
     public function __construct(ObjectModel\Collection $collection, array $params = null)
     {
     	$this->_collection = $collection;
-    	
     	parent::__construct(null, $params);
     }
     
 
     /**
-     *
-     * @return t41_Object_Collection
+     * Returns the collection handled by the object
+     * @return t41\ObjectModel\Collection
      */
     public function getCollection()
     {
@@ -90,18 +100,36 @@ class ListComponent extends ViewObject {
     {
     	if (! is_array($this->_columns)) {
     		
+    		$alt = $this->getParameter('altlabels');
+    		
     		$do = $this->_collection->getDataObject();
     		$columns = $this->getParameter('columns') ? $this->getParameter('columns') : array_keys($do->getProperties());
     		
     		$this->_columns = array();
     		
     		foreach ($columns as $column) {
+    			
+    			// meta columns are useful to display calculated (not stored) values
+    			if (substr($column, 0, 1) == self::METACOL) {
+    				
+    				$parts = explode(':', substr($column, 1));
+    				$obj = new Element\MetaElement($parts[0]);
+    				$obj->setParameter('property', $parts[0]);
+    				if (isset($parts[1])) $obj->setParameter('action', $parts[1]);
+    				$this->_columns[] = $obj;
+    				continue;
+    				
+    			} else if ($column instanceof MetaElement) {
+    				$this->_columns[] = $column;
+    				continue;
+    			}
 
     			// $column may contain recursive property reference
     			$parts = explode('.', $column);
     			 
     			// find matching property
     			$property = $do->getProperty($parts[0]);
+    			//\Zend_Debug::dump($property);
     			 
     			if (! $property instanceof Property\AbstractProperty) {
     				
@@ -131,12 +159,13 @@ class ListComponent extends ViewObject {
     			}
     			
     			$obj->setParameter('property', $parts[0]);
-    			$obj->setTitle($property->getLabel());
+    			$obj->setTitle(isset($alt[$column]) ? $alt[$column] : $property->getLabel());
+    			$obj->setParameter('align', $property instanceof CurrencyProperty ? 'R' : 'L');
     			 
     			$this->_columns[] = $obj;
     		}
     	}
-//    	\Zend_Debug::dump($this->_columns); die;
+    //	\Zend_Debug::dump($this->_columns); die;
     	return $this->_columns;
     }
     
@@ -149,19 +178,21 @@ class ListComponent extends ViewObject {
     
     public function query()
     {
-    	$this->_collection->setParameter('memberType', ObjectModel::DATA);
-    	$this->_collection->find();
-    	$this->setParameter('max', $this->_collection->getMax());
+    	if ($this->_collection->getParameter('populated') !== true) {
+    		$this->_collection->find(ObjectModel::DATA);
+    		$this->setParameter('max', $this->_collection->getMax());
+    	}
     }
     
     
     /**
      * 
-     * @param unknown_type $type
+     * @param string $type
      * @param Element\ButtonElement|string $button
+     * @param array $params Decorator parameters
      * @throws Exception
      */
-    public function addRowAction($link, $button = null)
+    public function addRowAction($link, $button = null, array $params = null)
     {
     	
     	if (! $button instanceof ButtonElement) {
@@ -172,7 +203,10 @@ class ListComponent extends ViewObject {
     	}
     	
     	$button->setLink($link);
-    	$button->setDecorator(null, array('size' => 'small'));
+    	if (is_array($params)) {
+    		
+    		$button->setDecoratorParams($params);
+    	}
     	    	
     	return $this->_addEvent('row', $button);
     }
@@ -192,5 +226,11 @@ class ListComponent extends ViewObject {
     public function getEvents($scope)
     {
     	return isset($this->_events[$scope]) ? $this->_events[$scope] : array();
+    }
+    
+    
+    public function reduce(array $params = array(), $cache = true)
+    {
+    	return array_merge(parent::reduce($params), array('obj' => $this->_collection->reduce($params, $cache)));
     }
 }

@@ -65,7 +65,7 @@ class TestAction extends AbstractAction {
 				'data'		=> $this->getContext(),
 		);
 	
-		if ($this->_callback) $array['callback'] = $this->_callback;
+		if ($this->_callbacks) $array['callbacks'] = $this->_callbacks;
 	
 		// add or replace data with optional $params['data'] content
 		if (isset($params['extra'])) {

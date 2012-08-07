@@ -4,40 +4,69 @@ namespace t41\Core;
 
 use t41\ObjectModel,
 	t41\Core\UUID,
-	t41\Core;
+	t41\Core,
+	t41\Exception;
 
 
 class Registry {
 
+	/**
+	 * Cached-data store
+	 * @var array
+	 */
+	static protected $_store = null;
 	
-	static protected $_store = array();
+	
+	/**
+	 * Datastore identifier
+	 * @var string
+	 */
+	static public $storeId = 'registry_store';
 	
 	
-	static public function set($obj)
+	static public function set($obj, $id = null, $force = false)
 	{
-		self::$_store = Core::cacheGet('registry_store');
-		
+		//self::loadStore();
 		if (! $obj instanceof ObjectModel\ObjectModelAbstract  && ! $obj instanceof ObjectModel\ObjectUri) {
 			
-			throw new \t41\Exception("no object or of unrecognized heritance");
+			throw new Exception("no object or of unrecognized heritance");
 		}
 		
-		$id = UUID::v4();
+		if (is_null($id)) {
+			
+			if (($obj instanceof ObjectModel\BaseObject || $obj instanceof ObjectModel\DataObject) && $obj->getUri()) {
+				
+				$prefix = ($obj instanceof ObjectModel\BaseObject) ? 'obj_' : 'do_';
+				
+				$id = $prefix . md5($obj->getUri()->asString());
+				
+			} else {
+
+				$id = UUID::v4();
+			}
+		}
 		
-		self::$_store[$id] = self::serialize($obj);
-		Core::cacheSet(self::$_store, 'registry_store');
-		
+		Core::cacheSet($obj, $id, $force);
 		return $id;
 	}
 	
 	
 	static public function get($uuid)
 	{
-		self::$_store = Core::cacheGet('registry_store');
+		return Core::cacheGet($uuid);
 		
+		//self::loadStore();
 		if (isset(self::$_store[$uuid])) {
 			
 			return self::unserialize(self::$_store[$uuid]);
+		}
+	}
+	
+	
+	static public function loadStore()
+	{
+		if (is_null(self::$_store)) {
+			self::$_store = Core::cacheGet(self::$storeId);
 		}
 	}
 	
@@ -46,6 +75,7 @@ class Registry {
 	{
 		return array('_class' => get_class($obj), 'content' => gzcompress(serialize($obj)));
 	}
+	
 	
 	static public function unserialize($cached)
 	{

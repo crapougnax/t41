@@ -24,7 +24,9 @@ namespace t41\View\Action;
 
 use t41\ObjectModel\ObjectModelAbstract,
 	t41\Parameter,
-	t41\Core;
+	t41\Core,
+	t41\View,
+	t41\View\ViewObject;
 
 /**
  * Abstract class providing basic methods to remote-triggered actions handling
@@ -34,7 +36,7 @@ use t41\ObjectModel\ObjectModelAbstract,
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-abstract class AbstractAction extends ObjectModelAbstract {
+abstract class AbstractAction extends ViewObject {
 
 	
 	protected $_obj;
@@ -46,6 +48,15 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	protected $_context = array();
 	
 	
+	protected $_bound;
+	
+	
+	protected $_cachePrefix;
+	
+	
+	public $status;
+	
+	
 	/**
 	 * Optional sub-action identifier
 	 * @var string
@@ -53,7 +64,7 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	protected $_action;
 	
 
-	protected $_callback;
+	protected $_callbacks;
 	
 
 	public function __construct($obj = null, array $params = null)
@@ -63,6 +74,7 @@ abstract class AbstractAction extends ObjectModelAbstract {
 		if (! is_null($obj)) {
 			
 			$this->setObject($obj);
+			$this->_cachePrefix = method_exists($obj, 'getCachePrefix') ? $obj->getCachePrefix() : 'prefix';
 		}
 		
 		if (is_array($params)) {
@@ -75,9 +87,10 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	/**
 	 * Execute the action and returns a result
 	 *
+	 * @param array $data
 	 * @return mixed
 	 */
-	public function execute()
+	public function execute($data)
 	{
 		return true;
 	}
@@ -107,15 +120,15 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	}
 	
 	
-	public function getCallback()
+	public function getCallback($key)
 	{
-		return $this->_callback;
+		return $this->_callbacks[$key];
 	}
 	
 	
-	public function setCallback($str)
+	public function setCallback($key, $str)
 	{
-		$this->_callback = $str;
+		$this->_callbacks[$key] = $str;
 		return $this;
 	}
 	
@@ -161,9 +174,9 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	}
 	
 	
-	public function register()
+	public function register($placeHolder = View::PH_DEFAULT, array $params = null, $clone = false)
 	{
-		$res = parent::register();
+		$res = parent::register($placeHolder, $params, $clone);
 		if ($res !== false) {
 			
 			$this->_context['rid'] = $res;
@@ -173,7 +186,31 @@ abstract class AbstractAction extends ObjectModelAbstract {
 	}
 	
 	
-	public function reduce(array $params = array())
+	public function bind(ViewObject $obj)
+	{
+		$this->_bound = $obj;
+		return $this;
+	}
+	
+	
+	public function unbind()
+	{
+		$this->_bound = null;
+		return $this;		
+	}
+	
+	
+	public function getBoundObject()
+	{
+		return $this->_bound;
+	}
+	
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
+	 */
+	public function reduce(array $params = array(), $cache = true)
 	{
 		/* keep object in registry */
 		$this->setContextData('uuid', Core\Registry::set($this));
@@ -185,9 +222,8 @@ abstract class AbstractAction extends ObjectModelAbstract {
 						'event'		=> $this->getParameter('event'),
 						'action'	=> $fullAction,
 						'data'		=> $this->getContext(),
+						'callbacks'	=> $this->_callbacks
 					  );
-		
-		if ($this->_callback) $array['callback'] = $this->_callback;
 		
 		// add or replace data with optional $params['data'] content 
 		if (isset($params['extra'])) {

@@ -64,7 +64,7 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 		if (! is_null($id)) $this->setId($id);
 
 		$this->_setParameterObjects();
-									
+		
 		if (is_array($params)) {
 			$this->_setParameters($params);
 		}
@@ -110,11 +110,12 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	 */
 	final public function getParameter($key, $strict = false)
 	{
-		if (strstr($key, '.')) list($key, $arraykey) = explode('.', $key);
+		$arraykey = null;
+		if (strstr($key, '.') !== false) list($key, $arraykey) = explode('.', $key);
 		
 		if (isset($this->_params[$key]) && $this->_params[$key] instanceof Parameter) {
 			
-			return $this->_params[$key]->getValue(@$arraykey);
+			return $this->_params[$key]->getValue($arraykey);
 		
 		} else {
 			
@@ -178,7 +179,7 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	 * @param array $objects	if parameter is null, parameters are acquired from xml configuration files
 	 * @param boolean $replace
 	 */
-	final protected function _setParameterObjects(array $objects = array(), $replace = false)
+	final protected function _setParameterObjects(array $objects = null, $replace = false)
 	{
 		if (count($objects) == 0) {
 			
@@ -226,7 +227,7 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	 * @see t41\Core.ClientSideInterface::reduce()
 	 * @return array
 	 */
-	public function reduce(array $params = array())
+	public function reduce(array $params = array(), $cache = true)
 	{
 		if (isset($params['params']) && count($params['params']) == 0) return array();
 		
@@ -239,7 +240,7 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 			}
 			
 			if (is_null($parameter->getValue())) continue;
-			$parameters[$key] = $parameter->reduce();
+			$parameters[$key] = $parameter->reduce($params, $cache);
 		}
 		
 		return count($parameters) > 0 ? array('params' => $parameters) : array();

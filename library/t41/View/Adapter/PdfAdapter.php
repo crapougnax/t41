@@ -22,6 +22,7 @@ namespace t41\View\Adapter;
  * @version    $Revision: 835 $
  */
 
+use t41\View;
 
 /**
  * Class providing the view engine with a PDF-context adapter.
@@ -66,6 +67,7 @@ class PdfAdapter extends AdapterAbstract {
 		
 		$params['format']	 	= new \t41\Parameter(\t41\Parameter::STRING, self::FORMAT_A4, false, array(self::FORMAT_A3, self::FORMAT_A4));
 		$params['orientation'] 	= new \t41\Parameter(\t41\Parameter::STRING, self::ORIENTATION_PORTRAIT, false, array(self::ORIENTATION_PORTRAIT, self::ORIENTATION_LANDSCAPE));
+		$params['destination']	= new \t41\Parameter(\t41\Parameter::STRING, 'D');
 		
 		$params['fontSize']		= new \t41\Parameter(\t41\Parameter::ANY, 9);
 		$params['fontName'] 	= new \t41\Parameter(\t41\Parameter::STRING, 'Helvetica');
@@ -106,18 +108,19 @@ class PdfAdapter extends AdapterAbstract {
 	
     public function display()
     {
+    	require_once 'vendor/tcpdf/tcpdf/tcpdf.php';
         $this->_document = new \TCPDF($this->getParameter('orientation'), 'mm', $this->getParameter('format'), true); 
         
         $this->_document->setPrintHeader($this->getParameter('addHeader'));
         $this->_document->setPrintFooter($this->getParameter('addFooter'));
         
         // set document information
-        $this->_document->SetCreator(utf8_encode('t41 with ' . get_class($this->_document)));
+        $this->_document->SetCreator('t41 using ' . get_class($this->_document));
         
-        $this->_document->SetAuthor(utf8_encode($this->getParameter('author')));
+        $this->_document->SetAuthor($this->getParameter('author'));
 
-        $this->_document->SetTitle(utf8_encode($this->getParameter('title')));
-        $this->_document->SetSubject(utf8_encode($this->getParameter('title')));
+        $this->_document->SetTitle($this->getParameter('title'));
+        $this->_document->SetSubject($this->getParameter('title'));
 
         //set margins
         $this->_document->SetMargins( $this->getParameter('marginLeft')
@@ -182,7 +185,7 @@ class PdfAdapter extends AdapterAbstract {
         
         
         $doc = $this->getParameter('title') ? str_replace('/', '-', $this->getParameter('title')) . '.pdf' : 'Export.pdf';
-        $this->_document->Output($doc, 'D');
+        return $this->_document->Output($doc, $this->getParameter('destination'));
     }
 
     
@@ -190,7 +193,7 @@ class PdfAdapter extends AdapterAbstract {
     {
 		$content = null;
 		$newpage = false;
-    	$elems = \t41\View::getObjects(t41_View::PH_DEFAULT);
+    	$elems = View::getObjects(View::PH_DEFAULT);
     	
     	if (is_array($elems)) {
     		

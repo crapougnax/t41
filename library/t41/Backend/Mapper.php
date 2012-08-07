@@ -22,6 +22,8 @@ namespace t41\Backend;
  * @version    $Revision: 907 $
  */
 
+use t41\Backend;
+
 /**
  * Class providing functionalities to define and use mappers between objects and backends
  *
@@ -32,6 +34,22 @@ namespace t41\Backend;
  */
 class Mapper
 {
+	/**
+	 * Character used as a separator between values in a same string
+	 *
+	 * @var string
+	 */
+	const VALUES_SEPARATOR = ',';
+	
+	
+	/**
+	 * Character used as a separator between arguments in a value
+	 *
+	 * @var string
+	 */
+	const ARGS_SEPARATOR = ':';
+	
+	
 	/**
 	 * Matching array
 	 * 
@@ -101,10 +119,10 @@ class Mapper
 				
 				/* datastore name may contain multiple values when foreign objects/rows are 
 				 * referenced with more than one key (DB2 has such cases) */
-				if (strpos($value['datastorename'], \t41\Mapper::ARGS_SEPARATOR) !== false) {
+				if (strpos($value['datastorename'], self::ARGS_SEPARATOR) !== false) {
 					
 					$val = array();
-					$pkeys = explode(\t41\Mapper::ARGS_SEPARATOR, $value['datatorename']);
+					$pkeys = explode(self::ARGS_SEPARATOR, $value['datatorename']);
 					foreach ($pkeys as $pkey) {
 						
 						$val[$pkey] = $array[$pkey];
@@ -278,7 +296,7 @@ class Mapper
 	{
 		if (! isset($this->_mapping[$objectName]) || ! isset($this->_mapping[$objectName]['pkey'])) {
 			
-			return \t41\Backend::DEFAULT_PKEY;
+			return Backend::DEFAULT_PKEY;
 		}
 		
 		if (isset($this->_mapping[$objectName]['pkey_parsed'])) {

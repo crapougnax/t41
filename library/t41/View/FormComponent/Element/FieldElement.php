@@ -25,7 +25,7 @@ namespace t41\View\FormComponent\Element;
 use t41\View\FormComponent\Element\AbstractElement;
 
 /**
- * t41 Data Object handling a set of properties tied to an object
+ * Simple form field element
  *
  * @category   t41
  * @package    t41_View

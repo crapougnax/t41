@@ -22,6 +22,8 @@ namespace t41\View\FormComponent\Element;
  * @version    $Revision: 876 $
  */
 
+use t41\ObjectModel\Property;
+
 use t41\Parameter,
 	t41\Backend,
 	t41\View,
@@ -64,13 +66,13 @@ abstract class AbstractElement extends View\ViewObject {
 	
 	protected $_enumValues;
 
-	protected $_helpText;
-	
 	protected $_altId;
 	
 	protected $_conditions = array();
 	
 	protected $_positions = array();
+	
+	protected $_action;
 	
 	
 	public function hide()
@@ -89,14 +91,14 @@ abstract class AbstractElement extends View\ViewObject {
 	
 	public function readOnly()
 	{
-		$this->_is[self::CONSTRAINT_PROTECTED] = true;
+		$this->_is[Property::CONSTRAINT_PROTECTED] = true;
 		return $this;
 	}
 	
 
 	public function readWrite()
 	{
-		$this->_is[self::CONSTRAINT_PROTECTED] = false;
+		$this->_is[Property::CONSTRAINT_PROTECTED] = false;
 		return $this;
 	}
 	
@@ -136,24 +138,14 @@ abstract class AbstractElement extends View\ViewObject {
 	public function setValue($val)
 	{
 		$this->_value = $val;
-	}
-	
-	
-	public function setHelpText($str)
-	{
-		$this->_helpText = $str;
-	}
-	
-	
-	public function getHelpText()
-	{
-		return $this->_helpText;
+		return $this;
 	}
 	
 	
 	public function setDefaultValue($val)
 	{
 		 $this->_defaultVal = $val;
+		 return $this;
 	}
 	
 	
@@ -166,7 +158,6 @@ abstract class AbstractElement extends View\ViewObject {
 	public function setConstraint($constraint, $val)
 	{
 		$this->_is[$constraint] = $val;
-		
 		return $this;
 	}
 	

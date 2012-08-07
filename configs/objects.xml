@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<objects>
+
+		<object id="t41\ObjectModel\Collection\StatsObject">
+			<properties>
+				<property id="total" type="integer">
+					<label>Total</label>
+				</property>
+				<property id="group" type="array">
+					<label>Group</label>
+				</property>
+			</properties>
+		</object>
+	</objects>
+</config>

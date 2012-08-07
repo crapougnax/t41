@@ -24,7 +24,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 	public function updateAction()
 	{
 		try {
-				// test object uri, if empty, object is new or faulty
+			// test object uri, if empty, object is new or faulty
 				
 				// walk through POST data
 				foreach ($this->_post as $key => $val) {
@@ -33,11 +33,13 @@ class Rest_ObjectController extends Rest_DefaultController {
 				
 						if ($property instanceof Property\ObjectProperty) {
 								
-							//$obj = Core\Registry::get($val);
 							if ($val) {
 									
 								$class = $property->getParameter('instanceof');
 								$property->setValue(new $class($val));
+							} else {
+								
+								$property->resetValue();
 							}
 							
 						} else if ($property instanceof Property\CollectionProperty) {
@@ -47,50 +49,89 @@ class Rest_ObjectController extends Rest_DefaultController {
 				
 							// val for a collection should come as an array of new/existing members
 							foreach ($val as $memberKey => $memberArray) {
+
+								if (! is_numeric($memberKey)) {
+									$this->_status = "NOK";
+									$this->_context['message'] = 'member-id is not a number';
+									return false;									
+								}
+								
+								// action exists to update or remove member
+								if (isset($memberArray['action'])) {
 									
-								$member = new $class();
-				
-								// set keyprop property value
-								$member->getProperty($member->getProperty($keyprop)->setValue($this->_obj));
-				
-								// walk through
-								foreach ($memberArray as $memberPropKey => $memberPropVal) {
+									// get target member
+									$object = $property->getValue()->getMember($memberKey);
 										
-									$mprop = $member->getProperty($memberPropKey);
+									switch ($memberArray['action']) {
 										
-									if ($mprop instanceof Property\ObjectProperty) {
+										case 'delete':
+											if ($property->setValue($object, Collection::MEMBER_REMOVE) !== true) {
+												$this->_status = "NOK";
+												$this->_context['message'] = 'error removing member from collection';
+												return false;
+											}
+											break;
 											
-										$memberPropVal = Core\Registry::get($memberPropVal);
-											
-										if ($memberPropVal instanceof Property\AbstractProperty) {
-				
-											$mprop->setValue($memberPropVal->getValue());
+										case 'update':
+											foreach ($memberArray['props'] as $mApropN => $mApropV) {
 												
+												if (($mAprop = $object->getProperty($mApropN)) !== false) {
+													$mAprop->setValue($mApropV);
+												}
+											}
+											// direct update of the member
+											$object->save();
+											break;
+									}
+									
+								} else {
+									
+									// no action, default is new member to add
+								
+									$member = new $class();
+				
+									// set keyprop property value
+									$member->getProperty($member->getProperty($keyprop)->setValue($this->_obj));
+				
+									// walk through
+									foreach ($memberArray as $memberPropKey => $memberPropVal) {
+										
+										$mprop = $member->getProperty($memberPropKey);
+										
+										if ($mprop instanceof Property\ObjectProperty) {
+											
+											$memberPropVal = Core\Registry::get($memberPropVal);
+											
+											if ($memberPropVal instanceof Property\AbstractProperty) {
+				
+												$mprop->setValue($memberPropVal->getValue());
+												
+											} else {
+												
+												$mprop->setValue($memberPropVal);
+											}
 										} else {
-												
+				
 											$mprop->setValue($memberPropVal);
 										}
-									} else {
+									}
 				
-										$mprop->setValue($memberPropVal);
+									// check if member was added successfully, break otherwise
+									if ($property->setValue($member) === false) {
+									
+										$this->_status = "NOK";
+										$this->_context['message'] = 'error adding member to collection';
+										break;
 									}
 								}
-				
-								// check if member was added successfully, break otherwise
-								if ($property->setValue($member) === false) {
-									
-									$this->_status = "NOK";
-									$this->_context['message'] = 'error adding member to collection';
-									break;
-								}
-							}
-								
+							}	
 						} else {
 								
 							$property->setValue($val);
 						}
 					}
 				}
+				
 				$result = $this->_obj->save();
 	
 				if ($result === false) {
@@ -100,12 +141,14 @@ class Rest_ObjectController extends Rest_DefaultController {
 	
 				} else {
 	
-					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true));
+					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true, 'collections' => 1));
+					$this->_executeActions('ok');
+					$this->_refreshCache = true;
 				}
 	
 			} catch (\Exception $e) {
 
-				$this->_context['err'] = $e->getMessage(); //Backend::getLastQuery();
+				$this->_context['err'] = $e->getMessage();
 				$this->_status = 'ERR';
 			}
 	}
@@ -172,12 +215,25 @@ class Rest_ObjectController extends Rest_DefaultController {
 	}
 	
 	
+	/**
+	 * Returns the value of the given property
+	 * 
+	 */
 	public function getAction()
 	{
 		try {
 			$res = $this->_obj->getProperty($this->_post['property']);
 			$res->getValue();
+			
+			// if the save flag is defined, force object saving
+			if (isset($this->_post['save'])) {
+				
+				Backend::save($res->getParent());
+				$this->_refreshCache = true;
+			}
+			
 			$this->_data = $res->reduce(array('params' => array()));
+			
 		} catch (\Exception $e) {
 	
 			$this->_context['message'] = $e->getMessage();
@@ -189,5 +245,44 @@ class Rest_ObjectController extends Rest_DefaultController {
 			$this->_context['context'] = $this->_obj->status->getContext();
 		}
 		$this->_status = $res ? 'OK' : 'NOK';
+	}
+	
+	
+	public function execAction()
+	{
+		try {
+			$res = $this->_obj->{$this->_post['method']}($this->_post);
+			$this->_data = $res->reduce(array('params' => array()));
+			
+		} catch (\Exception $e) {
+		
+			$this->_context['message'] = $e->getMessage();
+			$this->_status = 'ERR';
+		}
+		
+		if ($this->_obj->status instanceof Core\Status) {
+			$this->_context['message'] = $this->_obj->status->getMessage();
+			$this->_context['context'] = $this->_obj->status->getContext();
+		}
+		$this->_status = $res ? 'OK' : 'NOK';		
+	}
+	
+	
+	protected function _executeActions($which)
+	{
+		$res = true;
+		try {
+			foreach ($this->_actions[$which] as $action) {
+			
+				$res = $res && call_user_func($action, $this->_obj, $this->_post);
+			}
+		} catch (Exception $e) {
+			
+			$this->_status = 'ERR';
+			$this->_context['message'] = $e->getMessage();
+			return false;
+		}
+		
+		return $res;
 	}
 }

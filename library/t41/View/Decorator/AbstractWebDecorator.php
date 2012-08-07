@@ -57,54 +57,6 @@ abstract class AbstractWebDecorator extends AbstractDecorator {
 	}
 
 	
-	protected function _contentRendering()
-	{
-		$content = '';
-		
-		foreach ($this->_obj->getContent() as $elem) {
-
-			if ($elem instanceof View\ViewObject) {
-				
-				try {
-					
-					$deco = Decorator::factory($elem);
-					
-				} catch (View\Exception $e) {
-					
-					$decoratorClassBase = get_class($elem) . '\\' . View::getContext();
-					
-					try {
-						
-						// get decorator data from object
-						$objDecorator = $this->_obj->getDecorator();
-						
-						// Current class object decorator
-						$decoratorClass = $decoratorClassBase .  ucfirst($objDecorator['name']);
-						$deco = new $decoratorClass($elem);
-					
-					} catch (View\Exception $e) {
-					
-						// Default decorator
-						$decoratorClass = $decoratorClassBase . 'Default';
-						$deco = new $decoratorClass($elem);
-					}
-				}
-				
-				if ($deco instanceof self) {
-					
-					$content .= $deco->render();
-				}
-				
-			} else {
-
-				$content .= $elem;
-			}
-		}
-		
-		return $content;
-	}
-	
-	
 	/**
 	 * return an html-escaped version of the given string
 	 * 
@@ -118,6 +70,11 @@ abstract class AbstractWebDecorator extends AbstractDecorator {
 		return htmlentities($str, ENT_QUOTES, $charset);
 	}
 	
+	
+	protected function _nametoDomId($str)
+	{
+		return str_replace(array('[',']'), '_', $str);
+	}
 	
 	/**
 	 * Bind action to element in view

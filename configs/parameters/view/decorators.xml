@@ -20,13 +20,59 @@
 			</decorator>
 		</object>
 		<object id="\t41\View\FormComponent">
-			<decorator id="WebDefault" extends="\t41\View\SimpleComponent">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
 				<bogus/>
 		</decorator>
 		</object>
+
+		<object id="\t41\View\TableComponent">
+			<decorator id="PdfDefault" extends="\t41\View\Decorator\AbtractPdfDecorator">
+				<parameters>
+					<parameter id="newpage">
+						<type>string</type>
+						<defaultvalue>no</defaultvalue>
+						<values>
+							<value id="no">no</value>
+							<value id="before">before</value>
+							<value id="after">after</value>
+							<value id="both">both</value>
+						</values>
+					</parameter>
+				</parameters>
+			</decorator>
+		</object>
 		
+		<object id="\t41\View\ListComponent">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
+				<parameters>
+					<parameter id="paginator">
+						<type>boolean</type>
+						<defaultvalue>true</defaultvalue>
+					</parameter>
+					<parameter id="sortable">
+						<type>boolean</type>
+					<defaultvalue>true</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
+			<decorator id="PdfDefault" extends="\t41\View\Decorator\AbtractPdfDecorator">
+				<parameters>
+					<parameter id="newpage">
+						<type>string</type>
+						<defaultvalue>no</defaultvalue>
+						<values>
+							<value id="no">no</value>
+							<value id="before">before</value>
+							<value id="after">after</value>
+							<value id="both">both</value>
+						</values>
+					</parameter>
+				</parameters>
+			</decorator>
+		</object>
+				
 		<object id="\t41\View\FormComponent\Element\ButtonElement">
-			<decorator id="WebDefault" extends="\t41\View\SimpleComponent">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
 				<parameters>
 					<parameter id="size">
 						<type>string</type>
@@ -43,5 +89,29 @@
 		</decorator>
 		</object>
 		
+		<object id="\t41\View\FormComponent\Element\FieldElement">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
+				<parameters>
+					<parameter id="mode">
+						<type>string</type>
+					</parameter>
+					<parameter id="length">
+						<type>integer</type>
+						<defaultvalue>30</defaultvalue>
+					</parameter>
+				</parameters>
+		</decorator>
+		</object>
+
+		<object id="\t41\View\FormComponent\Element\ListElement">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
+				<parameters>
+					<parameter id="mode">
+						<type>string</type>
+					</parameter>
+				</parameters>
+		</decorator>
+		</object>
+				
 	</decorators>
 </config>

@@ -46,7 +46,13 @@ class CurrencyProperty extends AbstractProperty {
 	
 	public function getDisplayValue()
 	{
+		return self::format($this->_value);
+	}
+	
+	
+	static public function format($value)
+	{
 		setlocale(LC_ALL, 'fr_FR.UTF-8');
-		return money_format('%n', $this->_value);
+		return money_format('%n', $value);		
 	}
 }

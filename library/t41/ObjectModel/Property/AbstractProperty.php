@@ -22,8 +22,12 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel\ObjectModelAbstract,
-	t41\ObjectModel;
+use t41\ObjectModel,
+	t41\ObjectModel\Rule\AbstractRule,
+	t41\ObjectModel\DataObject,
+	t41\ObjectModel\ObjectModelAbstract,
+	t41\ObjectModel\Property,
+	t41\Core\Tag;
 
 /**
  * Abstract class providing basic t41\ObjectModel\Property\*Property objects methods
@@ -42,6 +46,15 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	 * @var $_value mixed
 	 */
 	protected $_value;
+	
+	protected $_initialValue;
+	
+	
+	/**
+	 * Help text
+	 * @var string
+	 */
+	protected $_helpText;
 	
 	
 	/**
@@ -70,11 +83,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	public function __construct($id, array $params = null, array $paramObjs = null)
 	{
 		$this->setId($id);
-		
-		if (is_array($paramObjs)) {
-			
-			$this->_setParameterObjects($paramObjs);
-		}
+		$this->_setParameterObjects($paramObjs);
 		
 		if (is_array($params)) {
 			try {
@@ -82,15 +91,23 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 			} catch (\Exception $e) {
 
 				// @todo throw nice exception
-				\Zend_Debug::dump($params); die;
+				throw new Exception($e->getMessage());
+				//\Zend_Debug::dump($params); die;
 			}
 		}
 	}
 	
 	
-	public function setParent($parent)
+	/**
+	 * Sets a reference to parent data object
+	 * 
+	 * @param DataObject $parent
+	 * @return \t41\ObjectModel\Property\AbstractProperty
+	 */
+	public function setParent(DataObject $parent)
 	{
 		$this->_parent = $parent;
+		return $this;
 	}
 	
 	
@@ -99,7 +116,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	 * @param ObjectModel\Rule\AbstractRule $rule
 	 * @param unknown_type $trigger
 	 */
-	public function attach(ObjectModel\Rule\AbstractRule $rule, $trigger)
+	public function attach(AbstractRule $rule, $trigger)
 	{
 		if (! isset($this->_rules[$trigger]) || ! is_array($this->_rules[$trigger])) {
 			
@@ -110,10 +127,15 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
+	public function getRules()
+	{
+		return $this->_rules;
+	}
+	
+	
 	public function setValue($value)
 	{
 		if ($this->getParameter('constraint.protected') == true && ! is_null($this->_value)) {
-			
 			throw new Exception(array("VALUE_IS_PROTECTED", $this->_id));
 		}
 		
@@ -134,6 +156,12 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		if ($value !== $this->_value) {
 			$this->_changed = true;
 			$this->_value = $value;
+			
+			/* defines first initialized value */
+			if (! $this->_initialValue && $value != $this->getParameter('defaultvalue')) {
+				
+				$this->_initialValue = $value;
+			}
 		}
 		
 		$this->_triggerRules('after/set');
@@ -142,6 +170,17 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
+	public function setHelpText($str)
+	{
+		$this->_helpText = $str;
+		return $this;
+	}
+	
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\ObjectModel\Property.PropertyInterface::getValue()
+	 */
 	public function getValue()
 	{		
 		$this->_triggerRules('before/get');
@@ -185,11 +224,16 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		}
 	}
 	
-
+	
+	public function getHelpText()
+	{
+		return $this->_helpText;
+	}
+	
 	/**
-	 * Returns the parent t41_Property_* instance of the current property
+	 * Returns the parent data object instance of the current property
 	 * 
-	 * @return t41_Property_Abstract
+	 * @return t41\ObjectModel\DataObject
 	 */
 	public function getParent()
 	{
@@ -203,9 +247,42 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
+	
+	/**
+	 * Reset the property value to the previous stored one or the default one, if any.
+	 * to set the value to NULL, use resetValue()
+	 */
+	public function reset()
+	{
+		if ($this->_initialValue) {
+			
+			$this->setValue($this->_initialValue);
+		
+		} else if ($this->getParameter('defaultvalue')) {
+			
+			$this->setValue($this->getParameter('defaultvalue'));
+			
+		} else {
+			
+			$this->resetValue();
+		}
+		
+		$this->resetChangedState();
+	}
+	
+	
 	public function resetChangedState()
 	{
 		$this->_changed = false;
+	}
+	
+	
+	public function resetValue()
+	{
+//		unset($this->_value);
+		$this->_value = null;
+		$this->_changed = true;
+		return $this;
 	}
 	
 	
@@ -218,14 +295,12 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	protected function _triggerRules($trigger)
 	{
 		if (! isset($this->_rules[$trigger])) {
-				
 			return true;
 		}
 	
 		$result = true;
-	
+
 		foreach ($this->_rules[$trigger] as $rule) {
-	
 			$result = $result && $rule->execute($this);
 		}
 	
@@ -233,18 +308,80 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
-	public function __clone()
+
+	protected function _parseDisplayProperty()
 	{
-		if (is_object($this->_value)) {
-			$this->_value = clone $this->_value;
+		$display = $this->getParameter('display');
+		if (! $display) return false;
+		
+		if (substr($display,0,1) == '[') {
+			
+			// mask
+			Tag\ObjectTag::$object = $this->getValue();
+			$this->_displayValue = Tag::parse(substr($display, 1, strlen($display)-2));
+			
+		} else {
+			
+			$displayProps = explode(',', $display);
+			if (count($displayProps) == 1 && $displayProps[0] == '') {
+			
+				$this->_displayValue = Property::UNDEFINED_LABEL;
+			
+			} else {
+			
+				$this->_displayValue = array();
+				foreach ($displayProps as $disProp) {
+			
+					if ($this->_value->getProperty($disProp)) {
+						$this->_displayValue[] = $this->_value->getProperty($disProp)->getValue();
+					} elseif ($disProp == '#identifier') {
+						//@todo refactor this
+						$this->_displayValue[] = $this->_value->getIdentifier();
+					}
+				}
+			
+				$this->_displayValue = implode(' ', $this->_displayValue);
+			}
 		}
 	}
 	
 	
-	public function reduce(array $params = array())
+	/**
+	 * Clone rules
+	 * @see t41\ObjectModel.ObjectModelAbstract::__clone()
+	 */
+	public function __clone()
+	{
+		foreach ($this->_rules as $key => $rule) {
+			
+			$this->_rules[$key] = clone $rule;
+		}
+	}
+	
+
+	/**
+	 * Function called from BaseObject::__clone() method in order to refresh object's reference in rules
+	 * @param ObjectModel\BaseObject $object
+	 */
+	public function changeRulesObjectReference(ObjectModel\BaseObject $object)
+	{
+		foreach ($this->_rules as $rule) {
+				
+			$rule->setObject($object);
+		}
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
+	 */
+	public function reduce(array $params = array(), $cache = true)
 	{
 		$class = get_class($this);
 		$type = str_replace('Property','', substr($class, strrpos($class, '\\')+1));
-		return array_merge(parent::reduce($params), array('value' => $this->_value, 'type' => $type));
+		return array_merge(parent::reduce($params, $cache), array('value' => $this->getValue(), 'type' => $type));
 	}
 }

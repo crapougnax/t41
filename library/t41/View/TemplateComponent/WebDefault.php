@@ -22,6 +22,10 @@ namespace t41\View\TemplateComponent;
  * @version    $Revision: 832 $
  */
 
+use t41\ObjectModel\BaseObject;
+
+use t41\ObjectModel\Property\AbstractProperty;
+
 use t41\Core,
 	t41\View,
 	t41\View\Decorator\AbstractWebDecorator;
@@ -104,6 +108,14 @@ class WebDefault extends AbstractWebDecorator {
     				
    				case 'env':
    					$value = View::getEnvData($tag[2]);
+   					break;
+   					
+   				default:
+   					$obj = $this->_obj->getVariable($tag[1]);
+   					if ($obj instanceof BaseObject) {
+	   					$value = $obj->getProperty($tag[2]);
+   						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : null;
+   					}
    					break;
    			}
     				

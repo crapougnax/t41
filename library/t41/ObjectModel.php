@@ -30,6 +30,10 @@ namespace t41;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
+use t41\ObjectModel\ObjectUri,
+	t41\ObjectModel\DataObject;
+
+
 class ObjectModel {
 	
 	
@@ -127,14 +131,20 @@ class ObjectModel {
 	/**
 	 * Returns an instance of an object based on definition matching the given id
 	 * 
-	 * @param string|ObjectModel\Uri $param class id or object uri
+	 * @param string|ObjectModel\ObjectUri $param class id or object uri
 	 * @throws ObjectModel\Exception
-	 * @return ObjectModel\Model
+	 * @return ObjectModel\BaseObject
 	 */
 	static public function factory($param)
 	{
+		if ($param instanceof DataObject) {
+			
+			$class = $param->getClass();
+			return new $class($param);
+		}
+		
 		$class = ($param instanceof ObjectModel\ObjectUri) ? $param->getClass() : $param;
-
+		
 		if (! array_key_exists($class, self::$_config)) {
 			
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
@@ -146,10 +156,12 @@ class ObjectModel {
 			
 		} catch (ObjectModel\Exception $e) {
 			
+			var_dump($e);
 			die($e->getMessage());
 			
 		} catch (ObjectModel\DataObject\Exception $e) {
 			
+			var_dump($e);
 			die($e->getMessage());
 		}
 		
@@ -282,5 +294,34 @@ class ObjectModel {
 			
 			throw new Exception($e->getMessage());
 		}
+	}
+	
+
+	
+	/**
+	 * Compare two instances and returns true if they represent the same object
+	 * @param t41\ObjectModel\ObjectModelAbstract $obj1
+	 * @param t41\ObjectModel\ObjectModelAbstract $obj2
+	 * @return boolean
+	 */
+	static public function compare($obj1, $obj2)
+	{
+		return (self::getObjectIdentifier($obj1) == self::getObjectIdentifier($obj2));
+	}
+	
+	
+	/**
+	 * Returns the object identifier
+	 * @param object $obj
+	 * @return string
+	 */
+	static public function getObjectIdentifier($obj)
+	{ 
+		if ($obj instanceof ObjectModel\BaseObject || $obj instanceof ObjectModel\DataObject) {
+
+			$obj = $obj->getUri();
+		}
+		
+		return ($obj instanceof ObjectUri) ? $obj->__toString() : microtime();
 	}
 }

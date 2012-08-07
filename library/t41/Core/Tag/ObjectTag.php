@@ -29,6 +29,12 @@ namespace t41\Core\Tag;
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
+use t41\ObjectModel;
+
+use t41\ObjectModel\BaseObject;
+
+use t41\ObjectModel\Property\AbstractProperty;
+
 class ObjectTag implements TagInterface {
 
 	
@@ -50,6 +56,12 @@ class ObjectTag implements TagInterface {
 				
 			case 'uri':
 				return self::getUriPart($sub);
+				break;
+				
+			default:
+				$object = (self::$object instanceof BaseObject) ? self::$object->getDataObject() : self::$object;
+				$prop = $object->getRecursiveProperty($tag);
+				return ($prop instanceof AbstractProperty) ? $prop->getDisplayValue(ObjectModel::DATA) : '';
 				break;
 		}
 	}

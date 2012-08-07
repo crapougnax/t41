@@ -22,6 +22,8 @@ namespace t41\ObjectModel;
  * @version    $Revision: 862 $
  */
 
+use t41\ObjectModel\Property\AbstractProperty;
+
 use t41\Core,
 	t41\Backend,
 	t41\ObjectModel;
@@ -88,6 +90,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 						
 		} else {
 			
+			// @todo cache here
 			$this->_dataObject = DataObject::factory(get_class($this));
 			
 			/* get object rules from config */
@@ -123,6 +126,12 @@ abstract class BaseObject extends ObjectModelAbstract {
 		}
 		
 		return $this->_dataObject->getUri();
+	}
+	
+	
+	public function getIdentifier()
+	{
+		return $this->_dataObject->getUri() ? $this->_dataObject->getUri()->getIdentifier() : false;
 	}
 	
 	
@@ -167,6 +176,17 @@ abstract class BaseObject extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Add a new dynamic property to the object
+	 * @param AbstractProperty $property
+	 */
+	public function addProperty(AbstractProperty $property)
+	{
+		$this->_dataObject->addProperty($property);
+		return $this;
+	}
+	
+	
 	public function __call($m, $a)
 	{
 		$method_begin = substr($m, 0, 3);
@@ -174,6 +194,11 @@ abstract class BaseObject extends ObjectModelAbstract {
 		
 		switch ($method_begin) {
 			
+			case 'has':
+				// returns true if property exists
+				return (bool) $this->_dataObject->getProperty($method_end);
+				break;
+				
 			case 'set':
 				$this->_triggerRules('before/set/' . $method_end);
 				$res = $this->_dataObject->$method_end = $a[0];
@@ -201,7 +226,21 @@ abstract class BaseObject extends ObjectModelAbstract {
 					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
 				}
 				break;
-			
+
+			/* get a property value without triggering rules */
+			// @todo untested
+			case 'got':
+				if (($property = $this->_dataObject->getProperty($method_end)) !== false) {
+							
+					$prop = $property->getValue(isset($a[0]) ? $a[0] : null);
+					return $prop;
+							
+				} else {
+							
+					throw new Exception(array('OBJECT_UNKNOWN_PROPERTY', $method_end));
+				}
+				break;	
+				
 			default:
 				throw new Exception(array("UNKNOWN_METHOD", $m)); 
 				break;
@@ -209,6 +248,31 @@ abstract class BaseObject extends ObjectModelAbstract {
 		
 		return $this;
 	}
+	
+	
+	/**
+	 * Clone object's data object and parameters but keeps values
+	 * use reset() to reset properties values to their initial state (first value setted or default value)
+	 * @see t41\ObjectModel.ObjectModelAbstract::__clone()
+	 */
+	public function __clone()
+	{
+		$this->_dataObject = clone $this->_dataObject;
+		
+		// change rules' bound object reference
+		foreach ($this->_dataObject->getProperties() as $property) {
+			
+			$property->changeRulesObjectReference($this);
+		}
+		
+		
+		// clone parameters
+		foreach ($this->_params as $key => $val) {
+			
+			$this->_params[$key] = clone $val;
+		}
+	}
+	
 	
 	/**
 	 * Set a new status message for the object
@@ -257,8 +321,6 @@ abstract class BaseObject extends ObjectModelAbstract {
 			$rules = (array) ObjectModel::getRules($this);
 		}
 		
-//		\Zend_Debug::dump($rules);
-		
 		// attach each rule to the relevant property
 		foreach ($rules as $trigger => $rulesArray) {
 			
@@ -271,6 +333,12 @@ abstract class BaseObject extends ObjectModelAbstract {
 				
 					// unset delegated rule @todo handle no-property-related rules
 					unset($rules[$trigger][$key]);
+					
+					/*
+					 * @todo find  a way to also pass rules to whatever property is concerned
+					 * ex: if the rules allows to compute data from a collection, any change to the collection
+					 * members should trigger the rule.
+					 */
 				}
 			}
 		}
@@ -289,7 +357,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 	 *   
 	 * @param t41_Backend_Adapter_Interface $backend
 	 */
-	public function read(Backend\Adapter\AdapterAbstract $backend = null)
+	public function read(Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		return Backend::read($this->_dataObject, $backend);
 	}
@@ -300,7 +368,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 	 * 
 	 * @return boolean
 	 */
-	public function save(Backend\Adapter\AdapterAbstract $backend = null)
+	public function save(Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		return Backend::save($this->_dataObject, $backend);
 	}
@@ -309,15 +377,19 @@ abstract class BaseObject extends ObjectModelAbstract {
 	/**
 	 * Delete object in backend
 	 * Object Uri is resetted. Object can then be saved in another backend
-	 * @param Backend\Adapter\AdapterAbstract $backend
+	 * @param Backend\Adapter\AbstractAdapter $backend
 	 * @return boolean
 	 */
-	public function delete(Backend\Adapter\AdapterAbstract $backend = null)
+	public function delete(Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		$res = Backend::delete($this->_dataObject, $backend);
 		if ($res === true) {
 			
 			$this->_dataObject->resetUri();
+			
+		} else {
+			
+			$this->status = new Core\Status('error',null,Backend::getLastQuery());
 		}
 		
 		return $res;
@@ -346,26 +418,31 @@ abstract class BaseObject extends ObjectModelAbstract {
 	}
 	
 	
-	public function reduce(array $params = array())
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
+	 */
+	public function reduce(array $params = array(), $cache = true)
 	{
 		/* keep object in registry */
-		$uuid = Core\Registry::set($this);
+		$uuid = $cache ? Core\Registry::set($this) : null;
 		
 		// build an array with remotely callable methods
 		$methods = array();
-		foreach (get_class_methods($this) as $method) {
+//		foreach (get_class_methods($this) as $method) {
 			
-			if (substr($method,0,1) == '_') continue;
+//			if (substr($method,0,1) == '_') continue;
 			//$methods[] = $method;
-		}
+//		}
 		
-		$array = array('uuid' => $uuid);
-		if (Core::$env == Core::ENV_DEV) {
-			
-			$array['class'] = get_class($this);
-			if ($this->getUri()) $array['uri'] = $this->getUri()->__toString();
-		}
-		return array_merge($this->_dataObject->reduce($params), $array);
-//		return array_merge_recursive($this->_dataObject->reduce($params), array('methods' => $methods));
+		$array = $uuid ? array('uuid' => $uuid) : array();
+
+		return array_merge($this->_dataObject->reduce($params, false), $array);
+	}
+	
+	
+	public function reclaimMemory()
+	{
+		$this->_dataObject->reclaimMemory();
 	}
 }

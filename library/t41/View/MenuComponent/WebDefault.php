@@ -37,71 +37,74 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
-		$html = '<div class="t41 component menu">' . "\n";
+		$html = '';
 		
 		foreach ($this->_obj->getMenu()->getItems() as $moduleKey => $module) {
-
-			// valid items counter
-			$items = 0;
-			
-			// top level menu
-			$p = sprintf('<ul><li class="head" data-help="%s"><a class="head">%s</a><div class="drop"><ul>'
-					, $this->_escape($module->getHelp())
-					, $this->_escape($module->getLabel())
-					);
-
-			
+	
+			$menu = '';
+	
 			foreach ($module->getItems() as $item) {
-				
-				$resource = $item->getId();
-				if (! $item->fullRes) $resource = $moduleKey . '/' . $resource;
-				if (! $item->noLink && (! $this->_obj->isGranted($resource) || $item->hidden)) {
-
-					continue;
-				}
-
-				if ($item->noLink != true) $items++;
-				
-				$p .= sprintf('<li data-help="%s" id="%s">%s</li>' . "\n"
-							 , $this->_escape($item->getHelp())
-							 , $this->_makeJsId($item, $moduleKey)
-							 , $this->_makeLink($item, $moduleKey)
-							 );
-				
-				if ($item->getItems()) {
-					
-					$p .= '<ul>';
-					foreach ($item->getItems() as $itemKey2 => $item2) {
-
-						$resource = $item2->getId();
-						if (! $item2->fullRes) $resource = $moduleKey . '/' . $resource;
-						if (! $item2->noLink && (! $this->_obj->isGranted($resource) || $item2->hidden)) {
-
-							continue;
-						}
-						
-						if ($item2->noLink != true) $items++;
-						
-						$p .= sprintf('<li data-help="%s" id="%s">%s</li>' . "\n"
-							 , $this->_escape($item2->getHelp())
-							 , $this->_makeJsId($item2, $moduleKey)
-							 , $this->_makeLink($item2, $moduleKey)
-							 );
-					}
-					$p .= '</ul>';
-				}
+	
+				$menu .= $this->_renderMenu($item, $moduleKey);
 			}
-			$p .= '</div></li></ul>';
 			
-			if ($items > 0) $html .= $p;
+			if ($menu) {
+				
+				// top level menu
+				$html .= sprintf('<ul><li class="head" data-help="%s"><a class="head">%s</a><div class="drop">%s</div></li></ul>'
+						, $this->_escape($module->getHelp())
+						, $this->_escape($module->getLabel())
+						, $menu
+				);
+			}
 		}
-		
-		$html .= "</div>\n";
-		
-		return $html;
+	
+		return '<div class="t41 component menu">' . "\n" . $html . "</div>\n";
 	}
 	
 
+	protected function _renderMenu($item, $moduleKey)
+	{
+		$html = ''; $sublevel = false;
+		
+		$resource = $item->getId();
+		if (! $item->fullRes) $resource = $moduleKey . '/' . $resource;
+		if (! $item->noLink && (! $this->_obj->isGranted($resource) || $item->hidden)) {
+		
+			return '';
+		}
+				
+		$prefix = sprintf('<li data-help="%s" id="%s">%s</li>' . "\n"
+				, $this->_escape($item->getHelp())
+				, $this->_makeJsId($item, $moduleKey)
+				, $this->_makeLink($item, $moduleKey)
+		);
+		
+		if ($item->getItems()) {
+			
+			$sublevel = true;
+				
+			foreach ($item->getItems() as $item2) {
+				
+				$html .= $this->_renderMenu($item2, $moduleKey);
+			}
+		}
+		
+		if ($item->noLink != true) {
+			
+			 $html = $prefix;
+		}
+
+		if ($sublevel && $html) {
+				
+			$html = $prefix . $html;
+				
+		}
+		
+		return $html ? '<ul>' . $html . '</ul>' : '';
+	}
+	
+	
 	/**
 	 * Return a Javascript id build from parameters
 	 * @param t41\Core\Layout\Menu\Item $item

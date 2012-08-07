@@ -23,7 +23,8 @@ namespace t41\ObjectModel\Property;
  */
 
 use t41\ObjectModel,
-	t41\ObjectModel\Collection;
+	t41\ObjectModel\Collection,
+	t41\Backend\Condition;
 
 /**
  * Property class to use for object values
@@ -56,6 +57,12 @@ class CollectionProperty extends AbstractProperty {
 	public function setValue($value, $action = Collection::MEMBER_APPEND)
 	{
 		$res = true;
+		
+		// instanciate collection jit
+		if (is_null($this->_value)) {
+			
+			$this->getValue();
+		}
 		
 		switch ($action) {
 
@@ -93,16 +100,18 @@ class CollectionProperty extends AbstractProperty {
 	
 	/**
 	 * Return current ObjecModel\Collection instance handled by current instance
-	 * instant instanciation is performed if $_value is null
+	 * instant instanciation is performed if $_value is null or $force is true
 	 * 
-	 *  @return \t41\ObjectModel\Collection
+	 *  @param boolean $force
+	 *  @return t41\ObjectModel\Collection
 	 */
-	public function getValue()
+	public function getValue($force = false)
 	{
-		if (is_null($this->_value)) {
+		if (is_null($this->_value) || $force === true) {
 
 			/* set a new Collection based on instanceof parameter value */
 			$this->_value = new ObjectModel\Collection($this->getParameter('instanceof'));
+			$this->_value->setBoundaryBatch(10000);
 				
 			/* inject the condition that allows to find collection members */
 			if ($this->getParameter('keyprop')) {
@@ -120,10 +129,12 @@ class CollectionProperty extends AbstractProperty {
 						$parts = explode(' ', $value);
 						if (count($parts) == 3) {
 							
+							if ($parts[2] == 'novalue') $parts[2] = Condition::NO_VALUE;
 							if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
 							$this->_value->having($parts[0])->$parts[1]($parts[2]);
 						
 						} else {
+							if ($parts[1] == 'novalue') $parts[1] = Condition::NO_VALUE;
 							if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
 							$this->_value->having($parts[0])->equals($parts[1]);
 						}
@@ -136,17 +147,38 @@ class CollectionProperty extends AbstractProperty {
 					}
 				}
 			}
+			
+			// set sorting
+			if ($this->getParameter('sorting')) {
+				
+				foreach ($this->getParameter('sorting') as $pair) {
+					
+					$this->_value->setSorting(array($pair['property'],$pair['mode']));
+				}
+			}
+			
+			// query now only if object exists in backend
+			if ($this->_parent->getUri()) $this->_value->find();
 		}
 		
 		return parent::getValue();
 	}
 	
-	
-	public function reduce(array $params = array())
+		
+	public function __clone()
 	{
-		$value = $this->getValue();
-		$value->find();
-		$value = $value->reduce($params);
-		return array_merge(parent::reduce($params), array('value' => $value['collection'], 'type' => 'Collection'));
+		$this->_value = null;
+	}
+	
+	
+	public function reduce(array $params = array(), $cache = true)
+	{
+		if (isset($params['collections']) && $params['collections'] == true) {
+			$value = $this->getValue();
+			$value = $value->reduce($params, $cache);
+		}
+		
+		return array_merge( parent::reduce($params), 
+							array('value' => isset($value) ? $value['collection'] : $this->_value, 'type' => 'Collection'));
 	}
 }

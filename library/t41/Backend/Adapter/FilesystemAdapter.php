@@ -37,7 +37,7 @@ use t41\ObjectModel;
 
 
 
-abstract class FilesystemAdapter extends AdapterAbstract {
+abstract class FilesystemAdapter extends AbstractAdapter {
 
 
 	protected $_basePath;	

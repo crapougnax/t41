@@ -22,8 +22,11 @@ namespace t41\Config;
  * @version    $Revision: 913 $
  */
 
-use t41\Config;
-use t41\Config\Adapter;
+use t41\Core\Registry;
+
+use t41\Core,
+	t41\Config,
+	t41\Config\Adapter;
 
 /**
  * Class providing basic functions needed to manage Configuration files
@@ -56,12 +59,22 @@ class Loader {
 	 */
 	public static function loadConfig($file, $realm = Config::REALM_CONFIGS, array $params = null)
 	{
+		// try to get cached version if configs caching is enabled
+		if (Core::getEnvData('cache_configs') === true) {
+
+			$ckey = self::getCacheKey($file, $realm);
+			if (($cached = Core::cacheGet($ckey)) !== false) {
+				
+				return $cached;
+			}
+		}
+		
 		if (($filePath = self::findFile($file, $realm)) == null) {
 		
 			/* no matching file name in paths */
 			return false;
 		}
-	//	\Zend_Debug::dump($filePath);
+
 		$type = substr( $file, strrpos($file, '.') + 1 );
 		
 		/* use existing adapter instance or create it */
@@ -75,7 +88,7 @@ class Loader {
 			
 				if (! self::$_adapters[$type] instanceof Adapter\AbstractAdapter) {
 				
-					throw new Exception("$className is not implementing AdapterAbstract.");
+					throw new Exception("$className is not implementing AbstractAdapter.");
 				}			
 			} catch (\Exception $e) {
 			
@@ -86,7 +99,15 @@ class Loader {
 			self::$_adapters[$type]->setPath($filePath);
 		}
 
-		return self::$_adapters[$type]->load();
+		$config = self::$_adapters[$type]->load();
+		
+		/* if ckey is set, cache is activated but empty */
+		if (isset($ckey)) {
+			
+			Core::cacheSet($config, $ckey);
+		}
+		
+		return $config;
 	}
 	
 	
@@ -123,5 +144,17 @@ class Loader {
 			}
 		}
 		return count($files) > 0 ? $files : false;
+	}
+	
+	
+	/**
+	 * Build and return a unique cache key for the given file and realm
+	 * @param string $file
+	 * @param integer $realm
+	 * @return string
+	 */
+	static public function getCacheKey($file, $realm)
+	{
+		return 'configs_' . str_replace(array('.','/'),'_', $file) . '_' . $realm;
 	}
 }

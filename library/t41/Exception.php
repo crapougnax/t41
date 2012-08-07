@@ -70,6 +70,7 @@ class Exception extends \Exception {
 	
 		$res = Config\Loader::loadConfig('messages/exceptions/' . $this->_store . '.xml');
 		
+		//\Zend_Debug::dump($res); die;
 		$this->_messages = $res['exceptions'];
 		if (isset($this->_messages[$key])) {
 
@@ -89,7 +90,7 @@ class Exception extends \Exception {
 					
 				foreach ( (array) $message[1] as $key => $val) {
 	
-					$str = str_replace('%' . $key, $val, $str);
+					$str = str_replace('%' . $key, is_object($val) ? get_class($val) : $val, $str);
 				}
 			}
 				

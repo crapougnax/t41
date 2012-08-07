@@ -7,6 +7,8 @@
  * @version 
  */
 
+use t41\Core\Registry;
+
 use t41\Core,
 	t41\ObjectModel,
 	t41\ObjectModel\Collection,
@@ -19,17 +21,26 @@ require_once 'Zend/Controller/Action.php';
 class Rest_DefaultController extends Zend_Controller_Action {
 
 	
+	protected $_uuid;
+	
+	
 	protected $_obj = null;
 	
 	
 	protected $_status = 'OK';
 	
 	
-	protected $_data;
+	protected $_refreshCache = false;
+	
+	
+	protected $_data = array();
 	
 	
 	protected $_context = array();
 
+	
+	protected $_actions = array('pre' => array(), 'ok' => array(), 'nok' => array());
+	
 	
 	protected $_redirects = array();
 	
@@ -39,18 +50,19 @@ class Rest_DefaultController extends Zend_Controller_Action {
 	
 	public function init()
 	{
-		/* surcharge wth ACL in your own controller */
+		/* redeclare with your ACL in your own controller */
 	}
+	
 	
 	public function preDispatch()
 	{
 		$this->_post = $this->getRequest()->getPost();
 
-		$uuid = $this->_getParam('uuid');
+		$this->_uuid = $this->_getParam('uuid');
 	
-		if ($uuid) {
+		if ($this->_uuid) {
 	
-			$this->_obj = Core\Registry::get($uuid);
+			$this->_obj = Core\Registry::get($this->_uuid);
 			$this->_defineRedirect(array('ok','nok','err'));
 	
 			if ($this->_obj instanceof ObjectModel\ObjectUri) {
@@ -65,6 +77,11 @@ class Rest_DefaultController extends Zend_Controller_Action {
 				$this->postDispatch();
 			}
 
+			// @todo post actions coming from js, unsecure, we should keep a reference of the handling form object
+			if ($this->_getParam('post_ok')) {
+
+				$this->_actions['ok'] = $this->_getParam('post_ok');
+			}
 			
 		} else {
 	
@@ -77,6 +94,19 @@ class Rest_DefaultController extends Zend_Controller_Action {
 	
 	public function postDispatch()
 	{
+		if ($this->_uuid && $this->_refreshCache === true) {
+
+			Registry::set($this->_obj, $this->_uuid, true);
+		}
+		
+		// reinject some data 
+		foreach ($this->_post as $key => $val) {
+
+			if (substr($key,0,1) == '_') {
+				$this->_data[$key] = $val;
+			}
+		}
+		
 		// if a redirect is available for the status, add it to the data
 		if (isset($this->_redirects[strtolower($this->_status)])) {
 			
@@ -93,9 +123,9 @@ class Rest_DefaultController extends Zend_Controller_Action {
 			$this->_context['redirect'] = Core\Tag::parse($this->_redirects[strtolower($this->_status)]);
 		}
 			
-		if (Core::$env == Core::ENV_DEV) $this->_context['debug'] = Backend::getLastQuery();
+		if (isset($this->_post['_debug'])) $this->_context['debug'] = Backend::getLastQuery();
 		
-		exit ($this->_setResponse($this->_status, $this->_data, $this->_context));
+		exit($this->_setResponse($this->_status, $this->_data, $this->_context));
 	}
 	
 	
@@ -107,7 +137,12 @@ class Rest_DefaultController extends Zend_Controller_Action {
  			
  			case 'json':
  			default:
- 				
+ 				header('Content-Type:application/json');
+ 				if (Core::getEnvData('cache_datasets') !== false) {
+	 				header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
+ 					header_remove('Cache-Control');
+ 					header_remove('Pragma');
+ 				}
  				return \Zend_Json::encode($response);
  				break;
  		}

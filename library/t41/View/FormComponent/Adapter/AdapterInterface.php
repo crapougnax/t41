@@ -39,7 +39,7 @@ use t41\ObjectModel\Property;
 interface AdapterInterface {
 
 	
-	public function build(ObjectModel\DataObject $do);
+	public function build(ObjectModel\DataObject $do, array $display = null);
 	
 	public function addElementFromProperty(Property\AbstractProperty $property, $position);
 	

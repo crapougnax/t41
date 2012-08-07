@@ -102,7 +102,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	 * Set mapper object instance to call on CRUD operations
 	 * 
 	 * @param \t41\Backend\Mapper $mapper
-	 * @return \t41\Backend\Adapter\AdapterAbstract
+	 * @return \t41\Backend\Adapter\AbstractAdapter
 	 */
 	public function setMapper(Backend\Mapper $mapper)
 	{
@@ -160,7 +160,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	protected function _getTableFromUri(ObjectModel\ObjectUri $uri)
 	{
-		if ($uri->getUrl()) {
+		if ($uri instanceof ObjectModel\ObjectUri && $uri->getUrl()) {
 			
 			$els = explode('/', $uri->getUrl());
 			
@@ -216,7 +216,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 		return $returnCount ? 0 : $collection;
 	}
 	
-
+	
 	public function returnsDistinct(ObjectModel\Collection $collection, PropertyAbstract $property)
 	{
 		return array();
@@ -238,7 +238,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 			
 			if ($const === false) {
 
-				var_dump($operator); die;
+//				var_dump($operator); die;
 				throw new Backend\Exception(array("CONDITION_UNDECLARED_OPERATOR", $operator));
 			}
 			
@@ -376,7 +376,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	
 	/**
-	 * Walk through given DataObject instance to detect & save new objects
+	 * Walk through given data object instance to detect & save potential new objects
 	 * 
 	 * @param ObjectModel\DataObject $do
 	 * @return boolean
@@ -391,7 +391,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 					&& $property->getValue() instanceof ObjectModel\BaseObject
 					&& ! $property->getValue()->getUri()) {
 		
-				$res = res && $property->getValue()->save();
+				$res = $res && $property->getValue()->save();
 			}
 		}
 		

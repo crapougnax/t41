@@ -22,13 +22,18 @@ namespace t41\View\ListComponent;
  * @version    $Revision: 963 $
  */
 
+
+use t41\ObjectModel\Property\MetaProperty;
+
 use t41\Core,
 	t41\ObjectModel,
 	t41\ObjectModel\Property,
 	t41\View\Decorator\AbstractWebDecorator,
 	t41\View,
 	t41\View\ViewUri,
-	t41\View\FormComponent\Element;
+	t41\View\Decorator,
+	t41\View\FormComponent,
+	t41\View\ListComponent\Element;
 
 /**
  * List view object default Web Decorator
@@ -43,7 +48,7 @@ class WebDefault extends AbstractWebDecorator {
 	/**
 	 * Uri adapter
 	 *
-	 * @var t41_View_Uri_Adapter_Abstract
+	 * @var t41\View\Uri\AbstractAdapter
 	 */
 	protected $_uriAdapter;
 	
@@ -64,9 +69,9 @@ class WebDefault extends AbstractWebDecorator {
 	
 	
 	/**
-	 * t41_View_List instance
+	 * t41\View\ListComponent instance
 	 *
-	 * @var t41_View_List
+	 * @var t41\View\ListComponent
 	 */
 	protected $_obj;
 
@@ -74,14 +79,14 @@ class WebDefault extends AbstractWebDecorator {
 	/**
 	 * t41_Object_Collection instance
 	 * 
-	 * @var t41_Object_Collection
+	 * @var t41\ObjectModel\Collection
 	 */
 	protected $_collection;
 	
 	
 	/**
 	 * Current data object
-	 * @var t41_Data_Object
+	 * @var t41\ObjectModel\DataObject
 	 */
 	protected $_do;
 	
@@ -113,9 +118,17 @@ class WebDefault extends AbstractWebDecorator {
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
     			
     			if (! empty($value)) { // @todo also test array values for empty values
+
+    				$property = $this->_collection->getDataObject()->getProperty($field);
     				
-		    		$this->_collection->having($field)->contains($value);
-    				
+    				if ($property instanceof MetaProperty) {
+    					
+    					$this->_collection->having($property->getParameter('property'))->contains($value);
+    				} else {
+
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->contains($value);
+    				}
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
     			}
     		}
@@ -136,23 +149,33 @@ class WebDefault extends AbstractWebDecorator {
     		$this->_collection->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
     	}
     	
-        $this->_obj->query();        
+        $this->_obj->query();
         
         $p = '';
         
-
-        $p = '<table class="t41 component list">';
+        $p = $this->_headerRendering();
+        $p .= sprintf('<table class="t41 list" id="%s">', $this->getId());
         $p .= $this->_headlineRendering();
+        
+        //if (true) $p .= $this->_quickSearchRendering();
 		$p .= $this->_contentRendering();
         $p .= '</table>';
 
-        return $this->_headerRendering() . $p . $this->_footerRendering();
+        if ($this->getParameter('paginator') !== false) {
+        	$p .= $this->_footerRendering();
+        } else {
+        	$p .= '</div></div>';
+        }
+        	 
+        return $p;
     }
 
 
     protected function _renderButton(Element\ButtonElement $button)
     {
-    	$deco = View\Decorator::factory($button, array('size' => 'small'));
+    	$params = $button->getDecoratorParams();
+    	$params['size'] = 'medium';
+    	$deco = View\Decorator::factory($button, $params);
     	return $deco->render();
     }
 
@@ -168,7 +191,7 @@ class WebDefault extends AbstractWebDecorator {
 
 		$status = ($this->_obj->getParameter('open_default') == true) ? 'open' : 'close';
     	$html_head = <<<HTML
-<div class="t41_wrapper" id="{$this->_instanceof}_{$this->_obj->getId()}">
+<div class="t41 component list" id="{$this->_instanceof}_{$this->_obj->getId()}">
 <h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 <div class="content">
 HTML;
@@ -182,35 +205,46 @@ HTML;
     	$sort = null;
     	
        // build header line
-       
         $line = '<tr>';
         
         $sortIdentifiers = (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) ? $this->_env[$this->_sortIdentifier] : array();
         
-        if ($this->_obj->getParameter('selectable') === true) {
+        if ($this->_obj->getParameter('selectable') !== false) {
         	
-        	$line .= '<th>&nbsp;</th>';
+        	$cbid = 'toggler_' . $this->_id;
+        	$line .= sprintf('<td><input type="checkbox" id="%s"/></td>', $cbid);
+        	
+        	View::addEvent(sprintf('t41.view.bindLocal(jQuery("#%s"), "change", function() { t=jQuery("#%s").attr("checked");jQuery("#%s").find(\':checkbox[id=""]\').each(function(i,o){o.checked=t});})'
+        					, $cbid
+        					, $cbid
+        					, $this->_id
+        					), 'js');
         }
         
         /* @var $val t41_View_Property_Abstract */
         foreach ($this->_obj->getColumns() as $val) {
-
-        	if (array_key_exists($val->getId(), $sortIdentifiers)) {
+        	
+        	$line .= '<th><strong>';
+        	 
+        	if ($this->getParameter('sortable') == false) {
         		
-        		$by = ($sortIdentifiers[$val->getAltId()] == 'ASC') ? 'DESC' : 'ASC';
+        		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
+        		continue;
+        	}
+        	
+        	if (is_object($val) && array_key_exists($val->getId(), $sortIdentifiers)) {
+        		
+        		$by = ($sortIdentifiers[$val->getId()] == 'ASC') ? 'DESC' : 'ASC';
         		
         		// save correct sorting field reference to re-inject in uri after column construction
         		// @todo think twice ! this is crappy as hell!
         		$sort = array($val->getId(), $sortIdentifiers[$val->getId()]);
         		
         	} else {
-        		
         		$by = 'ASC';
         	}
         	
-            $line .= '<th><strong>';
-            
-            $this->_uriAdapter->setArgument($val->getId(), $by, $this->_sortIdentifier);
+            if (is_object($val)) $this->_uriAdapter->setArgument($val->getId(), $by, $this->_sortIdentifier);
             
             $line .= sprintf('<a href="%s">%s</a></strong></th>'
             				, $this->_uriAdapter->makeUri()
@@ -225,17 +259,60 @@ HTML;
         }
 
         if (count($this->_obj->getEvents('row')) > 0) {
-        	
-        	$line .= str_repeat('<th>&nbsp;</th>', count($this->_obj->getEvents('row')));
-
+        	$line .= '<th>&nbsp;</th>';
         } else {
-        	
         	$line .= '<th>&nbsp;</th>';
         }
         
         return $line . "</tr>\n";
     }
 
+    
+    protected function _quickSearchRendering()
+    {
+    	$sort = null;
+    	 
+    	// build header line
+    	$line = '<tr>';
+    
+    	/* @var $val t41_View_Property_Abstract */
+    	foreach ($this->_obj->getColumns() as $val) {
+    		 
+    		//\Zend_Debug::dump($val); die;
+    		
+    		$prop = $this->_collection->getDataObject()->getRecursiveProperty($val->getParameter('property'));
+    		//\Zend_Debug::dump($prop); die;
+    		
+    		if ($prop instanceof Property\MetaProperty) {
+    			
+    			$line .= '<th></th>';
+    			continue;
+    		}
+    		
+    		$id = sprintf('%s[%s]', $this->_searchIdentifier, $val->getId());
+    		
+    		if ($prop instanceof Property\ObjectProperty) {
+    			
+    			$sf = new FormComponent\Element\ListElement($id);
+    			$deco = Decorator::factory($sf);
+    			 
+    		} else {
+    			
+    			$sf = new FormComponent\Element\FieldElement($id);
+    			$deco = Decorator::factory($sf, array('length' => 10));
+    			$line .= sprintf('<th>%s</th>', $deco->render());
+    		}
+    	}
+    
+    	if (count($this->_obj->getEvents('row')) > 0) {
+    		$line .= '<th>&nbsp;</th>';
+    	} else {
+    		$line .= '<th>&nbsp;</th>';
+    	}
+    
+    	return $line . "</tr>\n";
+    }
+    
     
     protected function _contentRendering()
     {
@@ -259,8 +336,14 @@ HTML;
 			
 			$altDec = (array) $this->_obj->getParameter('decorators');
 			
-            /* @var $property t41_Property_Abstract */
             foreach ($this->_obj->getColumns() as $column) {
+            	
+            	if ($column instanceof Element\MetaElement) {
+            		
+            		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
+            		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
+            		continue;
+            	}
             	
             	/* if a decorator has been declared for property/element, use it */
             	if (isset($altDec[$column->getId()])) {
@@ -270,21 +353,23 @@ HTML;
             		continue;
             	}
             	
-            	$attrib = '';//($property instanceof Property\CurrencyProperty) ? ' class="currency"' : null;
-				
             	$property = $this->_do->getProperty($column->getParameter('property'));
             	
-            	if ($column->getParameter('recursion')) { // instanceof Property\ObjectProperty) {
+            	$attrib = ($property instanceof Property\CurrencyProperty) ? ' class="cellcurrency"' : null;
+            	 
+            	if ($column->getParameter('recursion')) {
 
 					foreach ($column->getParameter('recursion') as $recursion) {
 						
-							$property = $property->getValue(ObjectModel::DATA)->getProperty($recursion);
+							$property = $property->getValue(ObjectModel::DATA);
+							if ($property) $property = $property->getProperty($recursion);
 					}
             	}
             	
-  				$value = $property->getDisplayValue();
-  				          	 
-            	$p .= "<td$attrib>" . $this->_escape($value) . '</td>';
+  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue(): null;
+  				
+            	//$p .= "<td$attrib>" . $this->_escape($value) . '</td>';
+            	$p .= "<td$attrib>" . $value . '</td>';
             }
 
             $p .= '<td>';

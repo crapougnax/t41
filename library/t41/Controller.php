@@ -43,7 +43,7 @@ class Controller {
 	
 	static public function init()
 	{
-		self::$_instance = \Zend\Controller\Front::getInstance();
+		self::$_instance = \Zend_Controller_Front::getInstance();
 		
 		foreach (Config::getPaths(Config::REALM_CONTROLLERS) as $controller) {
 			

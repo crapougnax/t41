@@ -31,6 +31,9 @@
 				<parameter id="columns" type="array">
 				<needed_empty_tag/>
 				</parameter>
+				<parameter id="altlabels" type="array">
+				<needed_empty_tag/>
+				</parameter>
 				<parameter id="decorators" type="array">
 				<needed_empty_tag/>
 				</parameter>
@@ -42,10 +45,22 @@
 					<type>array</type>
 				</parameter>
 				<parameter id="decorators" type="array"/>
-				<parameter id="redirect_on_success" type="string"/>
-				<parameter id="redirect_on_failure" type="string"/>
+				<parameter id="redirect_ok" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="redirect_nok" type="string">
+					<bogus/>
+				</parameter>
 				<parameter id="redirect_on_condition" type="array"/>
-				<parameter id="callback_action" type="array"/>
+				<parameter id="pre" type="array">
+					<bogus/>
+				</parameter>
+				<parameter id="post_ok" type="array">
+					<bogus/>
+				</parameter>
+				<parameter id="post_nok" type="array">
+					<bogus/>
+				</parameter>
 			</parameters>
 		</object>
 
@@ -71,9 +86,26 @@
 				<parameter id="recursion" type="array">
 					<bogus/>
 				</parameter>
+				<parameter id="align" type="string">
+					<bogus/>
+				</parameter>
 			</parameters>
 		</object>
-		
+
+		<object id="\t41\View\ListComponent\Element\MetaElement" extends="\t41\View\ViewObject">
+			<parameters>
+				<parameter id="property" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="action" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="type" type="string">
+					<bogus/>
+				</parameter>
+			</parameters>
+		</object>
+				
 		<object id="\t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="event" type="string">
@@ -106,6 +138,18 @@
 				</parameter>
 				<parameter id="display" type="array">
 				<bogus/>
+				</parameter>
+				<parameter id="member_reduce_params" type="array">
+				<bogus/>
+				</parameter>
+				<parameter id="offset" type="integer">
+					<defaultvalue>0</defaultvalue>
+				</parameter>
+				<parameter id="batch" type="integer">
+					<defaultvalue>10</defaultvalue>
+				</parameter>
+				<parameter id="sorting" type="array">
+					<bogus/>
 				</parameter>
 			</parameters>
 		</object>

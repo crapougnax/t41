@@ -41,7 +41,8 @@ class WebDefault extends AbstractWebDecorator {
 	public function render()
 	{
 		$extraHtml = array();
-		$class = array('element','button');
+		$class = array('element');
+		if ($this->getParameter('nolabel') != true) $class[] = 'button';
 		if ($this->getParameter('size')) $class[] = $this->getParameter('size');
 		
 		/* bind optional action to button */
@@ -54,9 +55,9 @@ class WebDefault extends AbstractWebDecorator {
 			$link = $this->_obj->getLink();
 
 			$uri = $this->_obj->getParameter('uri');
-			if ($uri instanceof ObjectUri) $link .= '/id/' . $uri->getIdentifier();
+			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') $link .= '/id/' . $uri->getIdentifier();
 			
-			$extraHtml[] = sprintf("onclick=\"t41.view.link('%s')\"", $link);
+			$extraHtml[] = sprintf("onclick=\"t41.view.link('%s', jQuery('#%s'))\"", $link, $this->getId());
 			
 		} else {
 			
@@ -88,18 +89,10 @@ class WebDefault extends AbstractWebDecorator {
 		}
 		
 		if ($this->getParameter('icon')) {
-			
 			$class[] = 'icon';
 		}			
-
 		
-		if ($this->getParameter('nolabel')) {
-			
-			$value = '';
-		} else {
-					
-			$value = $this->_escape($this->_obj->getTitle());
-		}
+		$value = $this->getParameter('nolabel') ? '' : $this->_escape($this->_obj->getTitle());
 					
 		$html = sprintf('<a class="%s" id="%s" data-help="%s" %s><span class="%s"></span>%s</a>'
 						, implode(' ', $class)

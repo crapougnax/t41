@@ -22,9 +22,11 @@ namespace t41\View\FormComponent\Adapter;
  * @version    $Revision: 876 $
  */
 
-use t41\ObjectModel;
-use t41\ObjectModel\Property;
-use t41\View\FormComponent\Element;
+use t41\ObjectModel,
+	t41\ObjectModel\Property,
+	t41\Backend\Condition,
+	t41\View\FormComponent\Element,
+	t41\View\Exception;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -41,7 +43,7 @@ class DefaultAdapter extends AbstractAdapter {
 	{
 		$class = get_class($property);
 		$class = substr($class, strrpos($class, '\\')+1);
-
+		
 		switch ($class) {
 			
 			case 'EnumProperty':
@@ -53,11 +55,63 @@ class DefaultAdapter extends AbstractAdapter {
 				$element = new Element\DateElement();
 				break;
 				
+			case 'CurrencyProperty':
+				$element = new Element\CurrencyElement();
+				break;
+
+			case 'StringProperty':
+				$element = $property->getParameter('multilines') ? new Element\TextElement() : new Element\FieldElement();
+				break;
+					
 			case 'ObjectProperty':
-				//Zend_Debug::dump($property); die;
+				// @todo join this code and the one in CollectionProperty::getValue
 				$element = new Element\ListElement();
 				$element->setParameter('display', $property->getParameter('display'));
-				$element->setCollection(new ObjectModel\Collection($property->getParameter('instanceof')));
+				
+				$collection = new ObjectModel\Collection($property->getParameter('instanceof'));
+				
+				/* inject the condition that allows to find collection members */
+				if ($property->getParameter('keyprop')) {
+					
+					$collection->having($property->getParameter('keyprop'))->equals($property->getParent());
+				}
+				
+				if ($property->getParameter('morekeyprop')) {
+				
+					foreach ($property->getParameter('morekeyprop') as $value) {
+							
+						if (strstr($value, ' ') !== false) {
+				
+							// if value contains spaces, it's a pattern
+							$parts = explode(' ', $value);
+							if (count($parts) == 3) {
+									
+								if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
+								$collection->having($parts[0])->$parts[1]($parts[2]);
+				
+							} else {
+								if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
+								$collection->having($parts[0])->equals($parts[1]);
+							}
+				
+						} else {
+				
+							// default case, we expect the member to hold a property
+							// with the same name and value as the current object
+							$collection->having($value)->equals($property->getParent()->getProperty($value)->getValue());
+						}
+					}
+				}
+				
+				if ($property->getParameter('sorting')) {
+				
+					$element->setParameter('sorting', $property->getParameter('sorting'));
+				}
+				
+				$element->setCollection($collection);
+				
+				//$collection->find();
+				//\Zend_Debug::dump(\t41\Backend::getLastQuery());
 				break;
 								
 			default:
@@ -69,6 +123,7 @@ class DefaultAdapter extends AbstractAdapter {
 		$element->setId($property->getId());
 		$element->setTitle($property->getLabel());
 		$element->setDefaultValue($property->getDefaultValue());
+		$element->setHelp($property->getParameter('help'));
 		
 		$value = $property->getValue();
 		if ($value instanceof ObjectModel\ObjectUri) {
@@ -111,7 +166,7 @@ class DefaultAdapter extends AbstractAdapter {
 	{
 		if (! $element instanceof Element\AbstractElement) {
 			
-			throw new View\Exception(array("OBJECT_NOT_INSTANCE_OF", 't41\View\FormComponent\Element\AbstractElement'));
+			throw new Exception(array("OBJECT_NOT_INSTANCE_OF", 't41\View\FormComponent\Element\AbstractElement'));
 		}
 		
 		return parent::addElement($element, $position);

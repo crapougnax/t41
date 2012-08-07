@@ -109,7 +109,7 @@ class ObjectUri implements Core\ClientSideInterface {
 					// uri contains a backend reference which is not an alias
 					// @todo implement tests
 					\Zend_Debug::dump($parts);
-					var_dump($str);
+					//var_dump($str);
 					die('litteral backend definition not yet implemented');
 				}
 			}
@@ -192,9 +192,14 @@ class ObjectUri implements Core\ClientSideInterface {
 	}
 	
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see t41\Core.ClientSideInterface::reduce()
+	 */
 	public function reduce(array $params = array())
 	{
 		return Core\Registry::set($this);
+		//return $this->asString();
 	}
 	
 	

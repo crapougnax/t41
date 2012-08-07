@@ -23,7 +23,9 @@ namespace t41\ObjectModel;
  */
 
 use t41\ObjectModel\Property,
-	t41\Parameter;
+	t41\Parameter,
+	t41\Core\Tag,
+	t41\View\Decorator\AbstractWebDecorator;
 
 /**
  * Class for Property.
@@ -35,6 +37,10 @@ use t41\ObjectModel\Property,
  */
 class Property {
 
+	
+	const UNDEFINED_LABEL	= "No defined display value";
+	
+	
 	/* constraints that can be enforced on a property's value */
 	
 	/**
@@ -134,7 +140,7 @@ class Property {
 		
 		try {
 			/* @var $property \t41\ObjectModel\Property\PropertyAbstract */
-			$property = new $className($id, $params, Parameter::getPropertyParameters($className));
+			$property = new $className($id, $params); //, Parameter::getPropertyParameters($className));
 
 			if (! $property instanceof Property\AbstractProperty) {
 				
@@ -146,6 +152,48 @@ class Property {
 		} catch (\Exception $e) {
 			
 			throw new Property\Exception(array("INSTANCIATION_ERROR",array($type, $e->getMessage())));
+		}
+	}
+	
+	
+
+	static public function parseDisplayProperty(ObjectModelAbstract $object, $display)
+	{
+		if (! $display) return false;
+		
+		if (substr($display,0,1) == '[') {
+			
+			// mask
+			Tag\ObjectTag::$object = $object;
+			return Tag::parse(substr($display, 1, strlen($display)-2));
+			
+		} else {
+			
+			$displayProps = explode(',', $display);
+			if (count($displayProps) == 1 && $displayProps[0] == '') {
+			
+				return self::UNDEFINED_LABEL;
+			
+			} else {
+			
+				$displayValue = array();
+				foreach ($displayProps as $disProp) {
+			
+					// display the identifier part of an uri
+					if ($disProp == ObjectUri::IDENTIFIER) {
+						
+						$displayValue[] = $object->getUri()->getIdentifier();
+						
+					} else {
+						// display property value, if property exists!
+						if (($prop = $object->getProperty($disProp)) !== false) {
+							$displayValue[] = $prop->getValue();
+						}
+					}
+				}
+			
+				return implode(' ', $displayValue);
+			}
 		}
 	}
 }

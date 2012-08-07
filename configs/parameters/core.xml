@@ -13,7 +13,7 @@
 					<defaultvalue>0</defaultvalue>
 				</parameter>"
 				<parameter id="memberType" type="string">
-				<defaultvalue>data</defaultvalue>
+				<defaultvalue>model</defaultvalue>
 				<values>
 					<value id="uri">uri</value>
 					<value id="data">data</value>

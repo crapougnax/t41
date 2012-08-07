@@ -22,6 +22,10 @@ namespace t41\View;
  * @version    $Revision: 832 $
  */
 
+use t41\ObjectModel,
+	t41\ObjectModel\DataObject,
+	t41\ObjectModel\Property\CurrencyProperty,
+	t41\View\FormComponent\Element;
 
 /**
  * Class providing parameters and methods to dsplay a data array in a table.
@@ -31,8 +35,6 @@ namespace t41\View;
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-use t41\ObjectModel;
-
 class TableComponent extends ViewObject {
 	
 	
@@ -153,31 +155,32 @@ class TableComponent extends ViewObject {
 	}
 	
 
-	public function setContent(ObjectModel\DataObject $do, array $columns = array())
+	/**
+	 * Add content from a data object and optional columns ids
+	 * 
+	 * @param t41\ObjectModel\DataObject $do
+	 * @param array $columns
+	 * @return t41\View\TableComponent
+	 */
+	public function setContent(DataObject $do, array $columns = array())
 	{
-		foreach ($do->getProperties() as $key => $val) {
-			
-			if (count($columns) > 0 && ! in_array($key, $columns)) continue;
-			
-			$this->addColumn($key, $val->getLabel());
+		foreach ($columns as $column) {
+			if (($prop = $do->getRecursiveProperty($column)) !== false) {
+				
+				$format = $prop instanceof CurrencyProperty ? self::FORM_CURRENCY : self::FORM_DEFAULT;
+				$this->addColumn($column, $prop->getLabel(), $format);
+			}
 		}
 		
-		$this->addDataRow($do);
+		$data = $do->toArray(null, false, true);
+	//	\Zend_Debug::dump($data); die;
+		$this->addDataRow($data['data']);
 		return $this;
 	}
 	
 	
 	public function addColumn($colId, $label = null, $formating = self::FORM_DEFAULT, $preserveLabel = false)
 	{
-		
-		if ($colId instanceof t41_Form_Element_Abstract) {
-			
-			$this->_columns2[] = $colId;
-			return $this;
-		}
-		
-		// new method
-		
 		switch ($formating) {
 			
 			case self::FORM_CURRENCY:
@@ -227,7 +230,7 @@ class TableComponent extends ViewObject {
 	 * 
 	 * @param t41_Form_Element_Button $button
 	 */
-	public function addButton(t41_Form_Element_Button $button)
+	public function addButton(Element\ButtonElement $button)
 	{
 		$this->_buttons[] = $button;
 	}

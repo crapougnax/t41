@@ -20,7 +20,7 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 	
 	public function init() {
 		
-		View::setTemplate('default.tpl');
+		View::setTemplate('default.html');
 		
 		// get page identifiers (module, controller and action)
 		Layout::$module		= $this->_getParam('module');
