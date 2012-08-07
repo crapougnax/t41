@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<messages>
-	<exceptions>
-		<exception id="MISSING_DEFINITION">
-			<label lang="en">there is no definition available to build a %0 data object</label>
-		</exception>
-	</exceptions>
-</messages>
