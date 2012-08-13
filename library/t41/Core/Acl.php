@@ -87,9 +87,9 @@ class Acl {
 				if (isset($module['controller']) && isset($module['controller']['items'])) {
 				
 					// walk recursively through all module's items (menu elements)
-					$resources += self::_getAcl($key, $module['controller']['items']);
+					$resources += self::_getAcl($module['controller']['base'], $module['controller']['items']);
 				}
-							
+	
 				// and optional menus extensions
 				if (isset($module['controllers_extends'])) {
 					
@@ -100,14 +100,15 @@ class Acl {
 				}
 			}
 		}
-		
+
+		if (! isset($config['acl']['resources'])) $config['acl']['resources'] = array();
 		$config['acl']['resources'] += $resources;
-
-
+		
 		self::$_config = $config['acl'];
 		if (isset($ckey)) {
 			Core::cacheSet($config['acl'], $ckey);
 		}
+		
 	}
 	
 	
