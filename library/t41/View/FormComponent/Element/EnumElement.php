@@ -22,6 +22,8 @@ namespace t41\View\FormComponent\Element;
  * @version    $Revision: 876 $
  */
 
+use t41\Core;
+
 /**
  * t41 Data Object handling a set of properties tied to an object
  *
@@ -34,8 +36,16 @@ namespace t41\View\FormComponent\Element;
 class EnumElement extends AbstractElement {
 	
 
+	/**
+	 * (non-PHPdoc)
+	 * @see \t41\View\FormComponent\Element\AbstractElement::formatValue()
+	 */
 	public function formatValue($val = null)
 	{
-		return isset($this->_enumValues[$val]['label']) ? $this->_enumValues[$val]['label'] : null;
+		if (isset($this->_enumValues[$val])) {
+			return is_array($this->_enumValues[$val]) ? $this->_enumValues[$val][Core::$lang] : $this->_enumValues[$val];
+		} else {
+			return false;
+		}
 	}
 }

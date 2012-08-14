@@ -128,63 +128,10 @@ class ListElement extends AbstractElement {
 
 		$this->_enumValues = array();
 
-    //    $sorts = $this->getParameter('sorting') ? $this->getParameter('sorting') : array(array($this->_foreign['pkey'], Zend_Db_Select::SQL_ASC));
-        
-        if (! is_null($str)) {
-	        
-      //  	$select->order(new Zend_Db_Expr(sprintf("LENGTH(%s)", $sorts[0][0])));
-        }
-        
-       // foreach ($sorts as $sort) {
-            	
-        //    $select->order(new Zend_Db_Expr(sprintf("%s %s", $sort[0], isset($sort[1]) ? $sort[1] : Zend_Db_Select::SQL_ASC))); 
-       // }
-        
-            if (!is_null($str) && trim($str) != '%') {
-            	
-           // 	foreach ($this->_foreign['fields'] as $field) {
-	       //     	$select->orWhere("$field LIKE ?", '%' . $str . '%');
-           // 	}
-            }
-            
-/*	        if (count($this->_conditions) > 0) {
-            	
-            	foreach ($this->_conditions as $condition) {
-            		
-            		if ($condition['obj'] instanceof t41_Form_Element_Abstract) {
-
-	            		$select->where(sprintf("%s %s ?", $condition['obj']->getId(), $condition['operator']), $condition['obj']->getValue());
-              		
-            		} else if (isset($condition['obj'])) {
-            		
-	            		$select->where(sprintf("%s %s ?", $condition['obj'], $condition['operator']), $condition['val']);
-            		}
-            	}
-            }
-            
-            $select->limit(($this->getParameter('select_max_values') > 1) ? $this->getParameter('select_max_values') + 1 : 20);
-*/            
         $this->_collection->find();
-//        \Zend_Debug::dump(Backend::getLastQuery());
         
         foreach ($this->_collection->getMembers() as $member) {
-/*                    
-        	$this->_displayProps = explode(',', $this->getParameter('display'));
-        	$str = array();
-        	foreach ($this->_displayProps as $disProp) {
-
-        		if (strlen($disProp) == 0) continue;
-        		
-        		$prop = $member->getProperty($disProp);
-        		if (! $prop instanceof Property\AbstractProperty) {
-        			
-        			\Zend_Debug::dump($this->_displayProps);
-        			//die($disProp);
-        		}
-        		
-            	$str[] = $prop->getValue();
-            }
-*/                
+               
             $this->_enumValues[$member->getUri()->getIdentifier()] = Property::parseDisplayProperty($member, $this->getParameter('display'));
         }
             
@@ -217,6 +164,9 @@ class ListElement extends AbstractElement {
         	$_do = $key->getDataObject();
         }
 
+        return Property::parseDisplayProperty($_do, $this->getParameter('display'));
+        
+        
         $this->_displayProps = explode(',', $this->getParameter('display'));
         
         $str = array();

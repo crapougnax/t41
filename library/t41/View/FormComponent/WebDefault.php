@@ -161,16 +161,6 @@ class WebDefault extends SimpleComponent\WebDefault {
     
     protected function _headerRendering()
     {
-/*    	$status = $this->_obj->getParameter('open_default') ? 'open' :  'close';
-		//$status .= $this->_obj->getParameter('locked') ? ' locked' : '';
-		$title = $this->_obj->getTitle() ? $this->_obj->getTitle() : 'Formulaire';
-		
-		$html = <<<HTML
-	<div class="t41_wrapper {$this->_cssStyle} {$this->_getTheme()} {$this->_getColor()}" id="{$this->_formId}_wrapper">
-		<h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
-		<div class="content">
-HTML;
-*/
 		return  parent::_headerRendering() . $this->_formHeader();
 		
     }
@@ -178,7 +168,7 @@ HTML;
     
     protected function _footerRendering()
     {
-    	return $this->_formFooter() . '</div>';
+    	return $this->_formFooter() . parent::_footerRendering();
     }
     
     
@@ -204,64 +194,6 @@ HTML;
     	$p = $deco->render();
     	
     	return sprintf('<fieldset id="actions"></fieldset>');
-    }
-    
-    
-    public function getJsArgs()
-    {
-    	$array = array(	'rules' => array()
-    				  , 'messages' => array()
-    		//		  , 'errorLabelContainer' => "#t41_errors_summary"
-    				  );
-    	        
-		/* @var $field t41_Form_Element_Abstract */
-    	foreach ($this->_obj->getAdapter()->getElements() as $element) {
-    		
-    		$field = $element;
-    		$fieldId = $field->getId();
-    		
-//    	    if ($field instanceof Element\EnumElement && $field->getParameter('render') == Element\EnumElement::RENDER_CHECKBOX) {
-//    			$fieldId .= '[]';
-//    		}
-       		$farray = array();
-    		$msg = '';
-    		
-    		if ($field->getConstraint('mandatory') == '1') {
-    			$farray['required'] = '';
-    			$msg = "Champ requis";
-    		}
-    		
-    		if (! $field instanceof Element\Foreignkey) {
-    			
-    			// these rules don't apply to foreign keys
-	    		if ($field->getValueConstraint('minval')) $farray['minlength'] = $field->getValueConstraint('minval');
-    			if ($field->getValueConstraint('maxval')) $farray['maxlength'] = $field->getValueConstraint('maxval');
-    		}
-    		
-    		if ($field instanceof Element\UriElement ) {
-    			
-    			switch ($field->getParameter('uritype')) {
-    				
-    				case 'email':
-    					$farray['email'] = '';
-    					break;
-    					
-    				case 'url':
-    					$farray['url'] = '';
-    					break;
-    			}
-    		}
-    		
-    		if (count($farray) == 1 && isset($farray['required'])) {
-    			
-    			$farray = "required";
-    		}
-
-    		$array['rules'][$fieldId] = $farray;
-    		if (! empty($msg)) $array['messages'][$fieldId]	= $msg;
-    	}
-    	
-    	return $array;
     }
     
     
