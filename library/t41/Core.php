@@ -483,7 +483,6 @@ class Core {
     				if (! is_array($value)) continue;
     				
     				if (isset($value['hostname']) && $value['hostname'] == $match) {
-    					
     					$envKey = self::$env = $key;
     					break;
     				}
@@ -492,7 +491,6 @@ class Core {
     	}
     	
     	if (is_null($envKey)) {
-    		
     		throw new Config\Exception("No matching environment found");
     	}
     	
@@ -530,7 +528,6 @@ class Core {
 		
 		// load ACL
 		Core\Acl::init($mpath ? $mpath : self::$basePath);
-		
 		
 		/* load configuration files if lazy mode is off */
 		if (self::$lazy !== true) {

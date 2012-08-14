@@ -2,6 +2,8 @@
 
 namespace t41\Core\Tag;
 
+use t41\ObjectModel\ObjectUri;
+
 /**
  * t41 Toolkit
  *
@@ -79,7 +81,7 @@ class ObjectTag implements TagInterface {
 		switch ($part) {
 	
 			case 'identifier':
-				return $uri->getIdentifier();
+				return $uri instanceof ObjectUri ? $uri->getIdentifier() : null;
 				break;
 		}
 	}

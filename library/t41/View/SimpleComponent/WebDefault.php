@@ -75,6 +75,6 @@ HTML;
 	
 	protected function _footerRendering()
 	{
-		return '</div></div>';
+		return "</div></div>\n";
 	}
 }

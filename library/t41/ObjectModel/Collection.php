@@ -603,9 +603,10 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function having($propertyName, $mode = Condition::MODE_AND)
 	{
-		// reset $_max
+		// reset $_max & populated
 		$this->_max = null;
-		
+		$this->setParameter('populated', false);
+
 		if (in_array($propertyName, array(Condition::MODE_AND, Condition::MODE_OR))) {
 
 			return $this->setConditionCombo($propertyName);
