@@ -100,7 +100,7 @@ class CollectionProperty extends AbstractProperty {
 	
 	/**
 	 * Return current ObjecModel\Collection instance handled by current instance
-	 * instant instanciation is performed if $_value is null or $force is true
+	 * Instant instanciation is performed if $_value is null or $force is true
 	 * 
 	 *  @param boolean $force
 	 *  @return t41\ObjectModel\Collection
@@ -143,7 +143,10 @@ class CollectionProperty extends AbstractProperty {
 						
 						// default case, we expect the member to hold a property
 						// with the same name and value as the current object
-						$this->_value->having($value)->equals($this->_parent->getProperty($value)->getValue());
+						if (($property = $this->_parent->getProperty($value)) === false) {
+							throw new Exception("keyprop doesn't match any property");
+						}
+						$this->_value->having($value)->equals($property->getValue());
 					}
 				}
 			}
@@ -157,7 +160,9 @@ class CollectionProperty extends AbstractProperty {
 				}
 			}
 			
-			// query now only if object exists in backend
+			$this->_value->setBoundaryBatch(1);
+			
+			// query now, only if object exists in backend
 			if ($this->_parent->getUri()) $this->_value->find();
 		}
 		
