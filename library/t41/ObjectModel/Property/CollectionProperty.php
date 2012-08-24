@@ -143,7 +143,10 @@ class CollectionProperty extends AbstractProperty {
 						
 						// default case, we expect the member to hold a property
 						// with the same name and value as the current object
-						$this->_value->having($value)->equals($this->_parent->getProperty($value)->getValue());
+						if (($property = $this->_parent->getProperty($value)) === false) {
+							throw new Exception("keyprop doesn't match any property");
+						}
+						$this->_value->having($value)->equals($property->getValue());
 					}
 				}
 			}
