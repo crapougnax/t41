@@ -27,7 +27,7 @@ use t41\ObjectModel,
 	t41\Backend\Condition;
 
 /**
- * Property class to use for object values
+ * Property class to manipulate collections of objects
  *
  * @category   t41
  * @package    t41_Property
@@ -60,7 +60,6 @@ class CollectionProperty extends AbstractProperty {
 		
 		// instanciate collection jit
 		if (is_null($this->_value)) {
-			
 			$this->getValue();
 		}
 		
@@ -176,7 +175,7 @@ class CollectionProperty extends AbstractProperty {
 	
 	public function reduce(array $params = array(), $cache = true)
 	{
-		if (isset($params['collections']) && $params['collections'] == true) {
+		if (isset($params['collections']) && $params['collections'] > 0) {
 			$value = $this->getValue();
 			$value = $value->reduce($params, $cache);
 		}

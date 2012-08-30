@@ -152,7 +152,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		}
 		
 		$this->_triggerRules('before/set');
-		
 		if ($value !== $this->_value) {
 			$this->_changed = true;
 			$this->_value = $value;
@@ -196,6 +195,10 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see \t41\ObjectModel\Property\PropertyInterface::getDisplayValue()
+	 */
 	public function getDisplayValue()
 	{
 		return $this->getValue();

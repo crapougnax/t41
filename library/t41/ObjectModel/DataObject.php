@@ -472,7 +472,7 @@ class DataObject extends ObjectModelAbstract {
     
 
     /**
-     * Populates a data object
+     * Populates a data object from a key/value array
      *
      * @param array $data
      * @param \t41\Backend\Mapper $mapper
@@ -481,42 +481,29 @@ class DataObject extends ObjectModelAbstract {
     public function populate(array $data, Backend\Mapper $mapper = null)
     {
     	if ($mapper) {
-    		
     		$data = $mapper->toDataObject($data, $this->_class);
     	}
-    	
+
     	// then sent to data object properties
     	foreach ($data as $key => $value) {
     		
-    		if (isset($this->_data[$key]) && ! empty($value)) {
+    		if (isset($this->_data[$key]) && $value != '') { // don't use empty() here to avoid zero being ignored
 
-    			/* @var $property t41_Property_Abstract */
     			$property = $this->_data[$key];
     			
     			if ($property instanceof Property\ObjectProperty) {
 
     				if ($property->getParameter('instanceof') == null) {
-    					
-    					//\Zend_Debug::dump($property); die;
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
     				}
     				
     				if (substr($value, 0, 1) == Backend::PREFIX) {
-    					
 		    			$property->setValue(new ObjectUri($value));
     					continue;
     				}
     				
+    				/* get & call object's backend to get a full configured object uri */
     				$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
-    			/*	
-    				if ($backend != t41_Backend::getDefaultBackend()) {
-
-    					$uri  = t41_Backend::PREFIX . t41_Object::getObjectBackend($property->getParameter('instanceof'))->getAlias();
-    					$ds = $backend->getMapper() ? $backend->getMapper()->getDataStore($property->getParameter('instanceof')) . '/' : null;
-	    				$value = $uri . '/' . $ds;
-    				}
-    			*/	
-    				/* call object's backend to get a full configured object uri */
     				$value = $backend->buildObjectUri($value, $property->getParameter('instanceof'));
     			}
     			
