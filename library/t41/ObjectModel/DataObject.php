@@ -621,6 +621,20 @@ class DataObject extends ObjectModelAbstract {
     }
     
     
+    /**
+     * Check wether the data object has changed
+     * @return boolean
+     */
+    public function hasChanged()
+    {
+    	foreach ($this->_data as $property) {
+    		 if ($property->hasChanged()) {
+    		 	return true;
+    		 }
+    	}
+    	return false;
+    }
+    
     
     /**
      * Reset changed state of property matching $name or all properties

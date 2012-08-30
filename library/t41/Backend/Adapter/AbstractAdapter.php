@@ -376,7 +376,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	
 	/**
-	 * Walk through given data object instance to detect & save potential new objects
+	 * Walk through given data object instance to detect & save potential new or changed objects
 	 * 
 	 * @param ObjectModel\DataObject $do
 	 * @return boolean
@@ -388,13 +388,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 		foreach ($do->getProperties() as $key => $property) {
 				
 			if ($property instanceof Property\ObjectProperty
-					&& $property->getValue() instanceof ObjectModel\BaseObject
-					&& ! $property->getValue()->getUri()) {
+					&& $property->getValue() instanceof ObjectModel\BaseObject // if value is not a base object, it is impossible is has been changed 
+					&& (! $property->getValue()->getUri() || $property->getValue()->getDataObject()->hasChanged())) {
 		
 				$res = $res && $property->getValue()->save();
 			}
 		}
-		
 		return $res;
 	}
 }
