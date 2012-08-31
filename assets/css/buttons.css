@@ -1,0 +1,730 @@
+
+
+.t41 a.element.disabled.button{
+	background-color:white;
+	cursor:no-drop;
+	opacity : 0.4;
+    filter : alpha(opacity=10);
+}
+
+.t41.element.disabled a.button.icon:hover, .t41.element.disabled a.button:hover{
+	cursor:no-drop;
+}
+
+.t41.element.disabled a.button.icon:active, .t41.element.disabled a.button:active, .t41.element.disabled a.button span:active{
+	cursor:no-drop;
+}
+
+.t41.element a.button:active, .t41.element a span:active{
+	cursor:wait;
+}
+
+/*.t41 a.element.button*/
+
+.t41 a.button, a.button.t41, a.button.element:hover{
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	color:#ffffff;
+	border: 1px solid #999;/* IE */
+	border: rgba(0, 0, 0, .2) 1px solid;/* Saf4+, Chrome, FF3.6 */
+	border-bottom:rgba(0, 0, 0, .4) 1px solid;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	background: -moz-linear-gradient(
+		center top,
+		rgba(255, 255, 255, .1) 0%,
+		rgba(0, 0, 0, .1) 100%
+	);/* FF3.6 */
+	background: -webkit-gradient(
+		linear,
+		center bottom,
+		center top,
+		from(rgba(0, 0, 0, .1)),
+		to(rgba(255, 255, 255, .1))
+	);/* Saf4+, Chrome */
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000'); /* IE6,IE7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000')"; /* IE8 */
+	-moz-user-select: none;
+	-webkit-user-select:none;
+	-khtml-user-select: none;
+	user-select: none;
+	display:-moz-inline-stack;
+	display:inline-block;
+	vertical-align:middle;
+	overflow: visible;
+	margin:5px;
+}
+
+/*.t41 a.element.button:hover*/
+.t41 a.button:hover, a.button.t41:hover, a.button.element:hover{
+	background: -moz-linear-gradient(
+		center top,
+		rgba(255, 255, 255, .6) 0%,
+		rgba(255, 255, 255, .1) 100%
+	);/* FF3.6 */
+	background: -webkit-gradient(
+		linear,
+		center bottom,
+		center top,
+		from(rgba(255, 255, 255, .1)),
+		to(rgba(255, 255, 255, .2))
+	);/* Saf4+, Chrome */
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF'); /* IE6,IE7 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF')"; /* IE8 */
+}
+
+/*propiétés taille button*/
+
+.t41 a.element.large,.t41.large a.element{
+	font-size:14px;
+	height: 1.75em;
+	line-height: 1.625em;
+	padding: 0.75em 1em 0.75em 0.90em;
+	line-height:1.75em;
+	text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.t41 a.element.medium,.t41.medium a.element{
+	font-size:12px;
+	height: 1.75em;
+	line-height: 1.625em;
+	padding: 0.75em 1em 0.75em 0.90em;
+	line-height:1.75em;
+	text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.t41 a.element.small,.t41.small a.element{
+	font-size:10px;
+	height: 1.75em;
+	line-height: 1.625em;
+	padding: 0.75em 1em 0.75em 0.90em;
+	line-height:1.75em;
+	text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+
+/*sprites*/
+
+.t41 a.element.small.icon span,.t41.small a.icon span{
+	background: url(img/sprite_small.png) no-repeat;
+	width:16px; 
+	height: 16px; 
+	display:inline-block;
+	margin-right:6px;
+	vertical-align:top;
+	position:relative;
+	bottom:0;
+}
+ 
+.t41 a.medium.icon span,.t41.medium a.icon span{
+	background: url(img/sprite_medium.png) no-repeat;
+	width:24px; 
+	height: 24px; 
+	display:inline-block;
+	margin-right:6px;
+	vertical-align:top;
+	position:relative;
+	bottom:2px; 
+}
+
+.t41 a.element.large.icon span,.t41.large a.icon span{
+	background: url(img/sprite_large.png) no-repeat;
+	width:32px; 
+	height: 32px; 
+	display:inline-block;
+	margin-right:6px;
+	vertical-align:top;
+	position:relative;
+	bottom:5px;
+}
+
+/*LARGE 32PX*/
+
+/*cart 32px large*/
+
+.t41 a.element.large.icon span.cart-grey,.t41.large span.cart-grey{
+	background-position: 0 0;
+}
+
+.t41 a.element.large.icon span.cart-blue,.t41.large span.cart-blue{
+	background-position: -32px 0;
+}
+
+.t41 a.element.large.icon span.cart-green,.t41.large span.cart-green{
+	background-position: -64px 0;
+}
+
+.t41 a.element.large.icon span.right-arrow,.t41.large span.right-arrow{
+	background-position: -96px 0;
+}
+
+.t41 a.element.large.icon span.right-arrow-blue,.t41.large span.right-arrow-blue{
+	background-position: -128px 0;
+}
+
+.t41 a.element.large.icon span.right-arrow-green,.t41.large span.right-arrow-green{
+	background-position: -160px 0;
+}
+
+.t41 a.element.large.icon span.cart-valid,.t41.large span.cart-valid{
+	background-position: -224px 0;
+}
+
+.t41 a.element.large.icon span.delete,.t41.large span.delete{
+	background-position: -256px 0;
+}
+
+.t41 a.element.large.icon span.left-arrow,.t41.large span.left-arrow{
+	background-position: 0 -32px;
+}
+
+.t41 a.element.large.icon span.left-arrow-blue,.t41.large span.left-arrow-blue{
+	background-position: -32px -32px;
+}
+
+.t41 a.element.large.icon span.left-arrow-green,.t41.large span.left-arrow-green{
+	background-position: -64px -32px;
+}
+
+.t41 .element.large.icon span.csv,.t41.large span.csv{
+	background-position: -96px -32px;
+}
+
+.t41 a.element.large.icon span.pdf,.t41.large span.pdf{
+	background-position:  -160px -32px;
+}
+
+.t41 a.element.large.icon span.xml,.t41.large span.xml{
+	background-position:-128px -32px;
+}
+
+.t41 a.element.large.icon span.euro-blue,.t41.large span.euro-blue{
+	background-position:-192px -32px;
+}
+
+.t41 a.element.large.icon span.euro-green,.t41.large span.euro-green{
+	background-position:-224px -32px;
+}
+
+.t41 a.element.large.icon span.more-circle-green,.t41.large span.more-circle-green{
+	background-position:-256px -32px;
+}
+
+.t41 a.element.large.icon span.less-circle-green,.t41.large span.less-circle-green{
+	background-position:-288px -32px;
+}
+
+.t41 a.element.large.icon span.less-circle-blue,.t41.large span.less-circle-blue{
+	background-position:-320px -32px;
+}
+
+.t41 a.element.large.icon span.more-blue,.t41.large span.more-blue{
+	background-position: -352px -32px;
+}
+
+.t41 a.element.large.icon span.less-blue,.t41.large span.less-blue{
+	background-position: -384px -32px;
+}
+
+.t41 a.element.large.icon span.more-green,.t41.large span.more-green{
+	background-position: -416px -32px;
+}
+
+.t41 a.element.large.icon span.less-green,.t41.large span.less-green{
+	background-position: -448px -32px;
+}
+
+.t41 a.element.large.icon span.search-grey,.t41.large span.search-grey{
+	background-position: -480px -32px;
+}
+
+.t41 a.element.large.icon span.search-blue,.t41.large span.search-blue{
+	background-position: -512px -32px;
+}
+
+.t41 a.element.large.icon span.calc,.t41.large span.calc{
+	background-position: 0 -64px;
+}
+
+.t41 a.element.large.icon span.mail,.t41.large span.mail{
+	background-position: -32px -64px;
+}
+
+.t41 a.element.large.icon span.graph-circle,.t41.large span.graph-circle{
+	background-position: -64px -64px;
+}
+
+.t41 a.element.large.icon span.floppy-disk,.t41.large span.floppy-disk{
+	background-position: -96px -64px;
+}
+
+.t41 a.element.large.icon span.blue-print,.t41.large span.blue-print{
+	background-position: -128px -64px;
+}
+
+.t41 a.element.large.icon span.green-print,.t41.large span.green-print{
+	background-position: -160px -64px;
+}
+
+.t41 a.element.large.icon span.help, .t41.large span.help{
+	background-position: -192px 0;
+}
+.t41 a.element.large.icon span.valid, .t41.large span.valid{
+	background-position: -224px 0;
+}
+
+.t41 a.element.large.icon span.delete, .t41.large span.delete{
+	background-position: -256px 0;
+}
+
+.t41 a.element.large.icon span.alert, .t41.large span.alert{
+	background-position: -288px 0;
+}
+
+.t41 a.element.large.icon span.admin, .t41.large span.admin{
+	background-position: -320px 0;
+}
+
+.t41 a.element.large.icon span.tool-blue, .t41.large span.tool-blue{
+	background-position: -352px 0;
+}
+
+.t41 a.element.large.icon span.tool-grey, .t41.large span.tool-grey{
+	background-position: -384px 0;
+}
+
+.t41 a.element.large.icon span.refresh, .t41.large span.refresh{
+	background-position: -416px 0;
+}
+
+.t41 a.element.large.icon span.trash, .t41.large span.trash{
+	background-position: -448px 0;
+}
+
+.t41 a.element.large.icon span.stock-ok, .t41.large span.stock-ok{
+	background-position: -512px 0;
+}
+
+.t41 a.element.large.icon span.stock-not-ok, .t41.large span.stock-not-ok{
+	background-position: -480px 0;
+}
+
+
+/*MEDIUM 24PX*/
+
+/*cart 24px medium*/
+
+.t41 a.element.medium.icon span.cart-grey,.t41.medium span.cart-grey{
+	background-position: 0 0;
+}
+
+.t41 a.element.medium.icon span.cart-blue,.t41.medium span.cart-blue{
+	background-position: -24px 0;
+}
+
+.t41 a.element.medium.icon span.cart-green,.t41.medium span.cart-green{
+	background-position: -48px 0;
+}
+
+.t41 a.element.medium.icon span.right-arrow,.t41.medium span.right-arrow{
+	background-position: -72px 0;
+}
+
+.t41 a.element.medium.icon span.right-arrow-blue,.t41.medium span.right-arrow-blue{
+	background-position: -96px 0;
+}
+
+.t41 a.element.medium.icon span.right-arrow-green,.t41.medium span.right-arrow-green{
+	background-position: -120px 0;
+}
+
+.t41 a.element.medium.icon span.cart-valid,.t41.medium span.cart-valid{
+	background-position: -144px 0;
+}
+
+.t41 a.element.medium.icon span.delete,.t41.medium span.delete{
+	background-position: -168px 0;
+}
+
+.t41 a.element.medium.icon span.left-arrow,.t41.medium span.left-arrow{
+	background-position: 0 -24px;
+}
+
+.t41 a.element.medium.icon span.left-arrow-blue,.t41.medium span.left-arrow-blue{
+	background-position: -24px -24px;
+}
+
+.t41 a.element.medium.icon span.left-arrow-green,.t41.medium span.left-arrow-green{
+	background-position: -48px -24px;
+}
+
+.t41 a.element.medium.icon span.csv,.t41.medium span.csv{
+	background-position: -72px -24px;
+}
+
+.t41 a.element.medium.icon span.pdf,.t41.medium span.pdf{
+	background-position: -120px -24px; 
+}
+
+.t41 a.element.medium.icon span.xml,.t41.medium span.xml{
+	background-position: -96px -24px;
+}
+
+.t41 a.element.medium.icon span.euro-blue,.t41.medium span.euro-blue{
+	background-position: -144px -24px;
+}
+
+.t41 a.element.medium.icon span.euro-green,.t41.medium span.euro-green{
+	background-position: -168px -24px;
+}
+
+.t41 a.element.medium.icon span.more-circle-green,.t41.medium span.more-circle-green{
+	background-position: -192px -24px;
+}
+
+.t41 a.element.medium.icon span.less-circle-green,.t41.medium span.less-circle-green{
+	background-position: -216px -24px;
+}
+
+.t41 a.element.medium.icon span.less-circle-blue,.t41.medium span.less-circle-blue{
+	background-position: -240px -24px;
+}
+
+.t41 a.element.medium.icon span.more-blue,.t41.medium span.more-blue{
+	background-position: -264px -24px;
+}
+
+.t41 a.element.medium.icon span.less-blue,.t41.medium span.less-blue{
+	background-position: -288px -24px;
+}
+
+.t41 a.element.medium.icon span.more-green,.t41.medium span.more-green{
+	background-position: -312px -24px;
+}
+
+.t41 a.element.medium.icon span.less-green,.t41.medium span.less-green{
+	background-position: -336px -24px;
+}
+
+.t41 a.element.medium.icon span.search-grey,.t41.medium span.search-grey{
+	background-position: -384px -24px;
+}
+
+.t41 a.element.medium.icon span.search-blue,.t41.medium span.search-blue{
+	background-position: -360px -24px; 
+}
+
+.t41 a.element.medium.icon span.calc,.t41.medium span.calc{
+	background-position: 0 -48px;
+}
+
+.t41 a.element.medium.icon span.mail,.t41.medium span.mail{
+	background-position: -24px -48px;
+}
+
+.t41 a.element.medium.icon span.graph-circle,.t41.medium span.graph-circle{
+	background-position: -48px -48px;
+}
+
+.t41 a.element.medium.icon span.floppy-disk,.t41.medium span.floppy-disk{
+	background-position: -72px -48px;
+}
+
+.t41 a.element.medium.icon span.blue-print,.t41.medium span.blue-print{
+	background-position: -96px -48px;
+}
+
+.t41 a.element.medium.icon span.green-print,.t41.medium span.green-print{
+	background-position: -120px -48px;
+}
+
+.t41 a.element.medium.icon span.help, .t41.medium span.help{
+	background-position: -144px 0;
+}
+
+.t41 a.element.medium.icon span.valid, .t41.medium span.valid{
+	background-position: -168px 0;
+}
+
+.t41 a.element.medium.icon span.delete, .t41.medium span.delete{
+	background-position: -192px 0;
+}
+
+.t41 a.element.medium.icon span.alert, .t41.medium span.alert{
+	background-position: -216px 0;
+}
+
+.t41 a.element.medium.icon span.admin, .t41.medium span.admin{
+	background-position: -240px 0;
+}
+
+.t41 a.element.medium.icon span.tool-blue, .t41.medium span.tool-blue{
+	background-position: -264px 0;
+}
+
+.t41 a.element.medium.icon span.tool-grey, .t41.medium span.tool-grey{
+	background-position: -288px 0;
+}
+
+.t41 a.element.medium.icon span.refresh, .t41.medium span.refresh{
+	background-position: -312px 0;
+}
+
+.t41 a.element.medium.icon span.trash, .t41.medium span.trash{
+	background-position: -336px 0;
+}
+
+.t41 a.element.medium.icon span.stock-ok, .t41.medium span.stock-ok{
+	background-position: -384px 0;
+}
+
+.t41 a.element.medium.icon span.stock-not-ok, .t41.medium span.stock-not-ok{
+	background-position: -360px 0;
+}
+
+/*SMALL 16PX*/
+
+/*cart 16px small*/
+ 
+.t41 a.element.small.icon span.help,.t41.small span.help{
+	background-position: 0 0;
+}
+
+.t41 a.element.small.icon span.valid,.t41.small span.valid{
+	background-position: -16px 0;
+}
+
+.t41 a.element.small.icon span.cart-grey,.t41.small span.cart-grey{
+	background-position: 0 -16px;
+}
+
+.t41 a.element.small.icon span.cart-blue,.t41.small span.cart-blue{
+	background-position: -16px -16px;
+}
+
+.t41 a.element.small.icon span.cart-green,.t41.small span.cart-green{
+	background-position: -32px -16px;
+}
+
+.t41 a.element.small.icon span span.right-arrow,.t41.small span.right-arrow{
+	background-position: -48px -16px;
+}
+
+.t41 a.element.small.icon span span.right-arrow-blue,.t41.small span.right-arrow-blue{
+	background-position: -64px -16px;
+}
+
+.t41 a.element.small.icon  span.right-arrow-green,.t41.small span.right-arrow-green{
+	background-position: -80px -16px;
+}
+
+.t41 a.element.small.icon span.delete,.t41.small span.delete{
+	background-position: -96px -16px;
+}
+
+.t41 a.element.small.icon span.left-arrow,.t41.small span.left-arrow{
+	background-position: -112px -16px;
+}
+
+.t41 a.element.small.icon span.left-arrow-blue,.t41.small span.left-arrow-blue{
+	background-position: -128px -16px;
+}
+
+.t41 a.element.small.icon span.left-arrow-green,.t41.small span.left-arrow-green{
+	background-position: -144px -16px;
+}
+
+.t41 a.element.small.icon span.csv,.t41.small span.csv{
+	background-position: -176px 0;
+}
+
+.t41 a.element.small.icon span.pdf,.t41.small span.pdf{
+	background-position: -192px 0;
+}
+
+.t41 a.element.small.icon span.xml,.t41.small span.xml{
+	background-position: -208px 0;
+}
+
+.t41 a.element.small.icon span.euro-blue,.t41.small span.euro-blue{
+	background-position: -160px -16px;
+}
+
+.t41 a.element.small.icon span.euro-green,.t41.small span.euro-green{
+	background-position: -176px -16px;
+}
+
+.t41 a.element.small.icon span.more-circle-green,.t41.small span.more-circle-green{
+	background-position: -192px -16px;
+}
+
+.t41 a.element.small.icon span.less-circle-green,.t41.small span.less-circle-green{
+	background-position: -208px -16px;
+}
+
+.t41 a.element.small.icon span.less-circle-blue,.t41.small span.less-circle-blue{
+	background-position: 0 -32px;
+}
+
+.t41 a.element.small.icon span.more-blue,.t41.small span.more-blue{
+	background-position: -16px -32px;
+}
+
+.t41 a.element.small.icon span.less-blue,.t41.small span.less-blue{
+	background-position: -32px -32px;
+}
+
+.t41 a.element.small.icon span.more-green,.t41.small span.more-green{
+	background-position: -48px -32px;
+}
+
+.t41 a.element.small.icon span.less-green,.t41.small span.less-green{
+	background-position: -64px -32px;
+}
+
+.t41 a.element.small.icon span.search-grey,.t41.small span.search-grey{
+	background-position:  -96px -32px;
+}
+
+.t41 a.element.small.icon span.search-blue,.t41.small span.search-blue{
+	background-position: -80px -32px;
+}
+
+.t41 a.element.small.icon span.calc,.t41.small span.calc{
+	background-position: -112px -32px;
+}
+
+.t41 a.element.small.icon span.mail,.t41.small span.mail{
+	background-position: -128px -32px;
+}
+
+.t41 a.element.small.icon span.graph-circle,.t41.small span.graph-circle{
+	background-position: -144px -32px;
+}
+
+.t41 a.element.small.icon span.floppy-disk,.t41.small span.floppy-disk{
+	background-position: -160px -32px;
+}
+
+.t41 a.element.small.icon span.blue-print,.t41.small span.blue-print{
+	background-position: -176px -32px;
+}
+
+.t41 a.element.small.icon span.green-print,.t41.small span.green-print{
+	background-position: -192px -32px;
+}
+
+.t41 a.element.small.icon span.delete, .t41.small span.delete{
+	background-position: -32px 0;
+}
+
+.t41 a.element.small.icon span.alert, .t41.small span.alert{
+	background-position: -48px 0;
+}
+
+.t41 a.element.small.icon span.tool-blue, .t41.small span.tool-blue{
+	background-position: -80px 0;
+}
+
+.t41 a.element.small.icon span.tool-grey, .t41.small span.tool-grey{
+	background-position: -96px 0;
+}
+
+.t41 a.element.small.icon span.admin, .t41.small span.admin{
+	background-position: -64px 0;
+}
+
+.t41 a.element.small.icon span.refresh, .t41.small span.refresh{
+	background-position: -112px 0;
+}
+
+.t41 a.element.small.icon span.trash, .t41.small span.trash{
+	background-position: -128px 0;
+}
+
+.t41 a.element.small.icon span.stock-ok, .t41.small span.stock-ok{
+	background-position: -160px 0;
+}
+
+.t41 a.element.small.icon span.stock-not-ok, .t41.small span.stock-not-ok{
+	background-position: -144px 0;
+}
+
+
+
+/*Couleurs*/
+
+
+.t41 a.element.white.button, .t41.white a.button, a.element.white.button.t41 {			
+	background-color: #FFFFFF;
+	color: #666666;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+	white-space: nowrap;
+}
+
+.t41 a.element.white,.t41.white a{									/*si background blanc A VOIR*/
+	color: #666666;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.t41 a.element.black.button, .t41.black a.button, a.element.black.button.t41 {
+	background-color: #333333;
+}
+
+.t41 a.element.grey.button, .t41.grey a.button, a.element.grey.button .t41 /*.t41.grey a.button*/{						
+	background-color: #666666;
+}
+
+.t41 a.element.red.button,a.element.red.button.t41{
+	background-color: #e62727;
+}
+
+.t41 a.element.orange.button,a.element.orange.button.t41{
+	background-color: #ff5c00;
+}
+
+.t41 a.element.magenta.button, a.element.magenta.button.t41{
+	background-color: #A9014B;
+}
+
+.t41 a.element.yellow.button,a.element.yellow.button.t41{
+	background-color: #ffb515;
+}
+
+.t41 a.element.blue.button, a.element.blue.button.t41{
+	background-color: #00ADEE;
+}
+
+.t41 a.element.pink.button, a.element.pink.button.t41, .t41.pink a.button{
+	background-color: #e22092;
+}
+
+/*.t41.pink a.button:hover{
+	background-color: blue ;*/
+
+
+.t41 a.element.green.button, a.element.green.button.t41{
+	background-color: #91bd09;
+}
+
+.t41 a.element.rosy.button, a.element.rosy.button.t41{
+	background-color: #F16C7C;
+}
+
+.t41 a.element.brown.button, a.element.brown.button.t41{
+	background-color: #804000;
+}
+
+.t41 a.element.purple.button, a.element.purple.button.t41{
+	background-color: #800080;
+}
+
+.t41 a.element.cyan.button, a.element.cyan.button.t41{
+	background-color: #46C7C7;
+}
+
+.t41 a.element.gold.button, a.element.gold.button.t41{
+	background-color: #D4A017;
+}

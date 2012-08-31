@@ -1,0 +1,603 @@
+/*
+ * @gradient0 = '#4d609c'
+ * @gradient1 = '#2b3658'
+ * @gradient2 = '#4d609c'
+ * @gradient3 = '#202841'
+ * @shadow = '#edf9ff'
+ * @boxborder = '#36446f'
+ * @menuheight = '42px'
+ * @headerheight = '50px'
+ * @componentborder = '#c1bebe'
+ */
+
+ @import url(https://fonts.googleapis.com/css?family=Abel);
+
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { 
+	margin:0;
+	padding:0;
+}
+
+fieldset,img {
+	border:0;
+}
+
+h1,h2,h3,h4,h5,h6,p,a {
+	font-size:100%;
+	font-weight:normal;
+	font-family: Abel, arial;
+}
+
+h1{
+	font-size: ;
+	font-weight:normal;
+	font-family:arial;
+	margin-bottom:20px;
+}
+
+a{
+	text-decoration:none;
+}
+
+a[href],a:hover, input[type='submit'], input[type='image'], label[for], select, button, .pointer {
+       cursor: pointer;
+}
+
+textarea{
+	overflow:auto;
+}
+
+ body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+ }
+
+.t41.component .title,
+h1,h2,h3,h4,h5 {
+  font-family: Abel, sans-serif;
+}
+
+/* -- BEGIN COMPONENT -- */
+.t41.component {
+  box-shadow: 1px 1px 1px #c1bebe;
+  border: 1px solid #c1bebe;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  -khtml-border-radius: 3px;
+  padding: 2px 5px 0 10px;
+  margin: 5px;
+  background-color: #ffffff;
+}
+
+.t41.component .title {
+  margin: 2px;
+  padding: 2px;
+  border-bottom: 1px dotted #c1bebe;
+  font-size: 1.5em;
+  line-height: 1em;
+  color: #444;
+}
+
+.t41.component .title:hover {
+  color: #000;
+  cursor: pointer;
+}
+
+.t41.component .content {
+
+}
+/* -- END COMPONENT -- */
+
+/* -- BEGIN TOPMENU -- */
+#header .t41.menu {
+  float: left;
+  font-size: 14px;
+  height: 42px;
+  box-shadow: 1px 1px 1px #c1bebe;
+  border: 1px solid #c1bebe;
+  padding: 4px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  -khtml-border-radius: 3px;
+  margin-right: 100px;
+}
+#header>.t41.component {
+  height: 65px;
+}
+
+#header .t41.menu ul {
+  list-style: none;
+  padding: 2px 2px;
+}
+
+#header .t41.menu ul li a,div {
+  font-family: Abel, sans-serif;
+}
+
+#header .t41.menu>ul {
+  display: inline-block;
+  float: left;
+}
+
+#header .t41.menu li.head {
+  padding: 8px 1px;
+}
+
+#header .t41.menu li.head a.head {
+  border: 1px solid transparent;
+  padding: 8px 12px;
+  margin: 3px 0;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+#header .t41.menu li.head:hover a.head {
+  box-shadow: 2px 1px 4px #c1bebe;
+  border: 1px solid #c1bebe;
+  background-color: #ffffff;
+  -moz-border-radius: 3px 3px 0px 0px;
+  -webkit-border-radius: 3px 3px 0px 0px;
+  border-radius: 3px 3px 0px 0px;
+  background-color: #ddd;
+}
+
+#header .t41.menu li.head div.drop {
+  position: absolute;
+  left: -999em;
+  box-shadow: 2px 1px 3px #c1bebe;
+  border: 1px solid #c1bebe;
+  background-color: #ffffff;
+  -moz-border-radius: 0px 3px 3px 3px;
+  -webkit-border-radius: 0px 3px 3px 3px;
+  border-radius: 0px 3px 3px 3px;
+  padding: 2px;
+  background-color: #ddd;
+  border-top: none;
+  z-index: 800; 
+}
+
+#header .t41.menu li.head:hover div.drop {
+  left: auto;
+  top: auto;
+}
+
+#header .t41.menu li.head div.drop li {
+  padding: 0px;
+  margin: 0px;
+
+  /* icon placement */
+}
+
+#header .t41.menu li.head div.drop li.icon {
+  background-position: 0% 50%;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  background-image: url(http://placehold.it/16x16.gif);
+}
+
+#header .t41.menu li.head div.drop li a {
+  text-decoration: none;
+  display: block;
+  padding: 3px 4px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  font-weight: bold;
+  color: #444;
+}
+
+#header .t41.menu li.head div.drop li a[href] {
+  padding: 2px 4px 2px 18px;
+  color: #555;
+  font-weight: normal;
+}
+
+#header .t41.menu li.head div.drop li a[href]:hover {
+  color: black;
+}
+
+#header .t41.menu li.head div.drop ul li a {
+  font-size: 15px;
+}
+
+#header .t41.menu li.head div.drop ul ul {
+  padding: 0px 1px;
+}
+
+#header .t41.menu li.head div.drop ul ul ul {
+  padding: 0px 10px;
+}
+
+#header .t41.menu li.head div.drop ul li ul li a {
+  padding: 2px 2px 2px 24px;
+  font-size: 13px;
+}
+/* -- END TOPMENU -- */
+
+/* -- BEGIN FOOTER -- */
+#footer .t41.component {
+  padding: 1px 5px 2px 5px;
+}
+
+#footer em {
+  font-size: 0.8em;
+}
+/* -- END FOOTER -- */
+
+/* -- BEGIN AUTOCOMPLETER -- */
+.t41.component.autocompletepropsgrid {
+  box-shadow: 2px 2px 10px #444444;
+  max-width: 650px;
+  padding: 0;
+  max-height: 380px;
+}
+
+.t41.component.autocompletepropsgrid h4 {
+  font-size: 17px;
+  margin: 8px;
+  float: left;
+}
+
+.t41.component.autocompletepropsgrid a.ac_extend {
+  float: right;
+  padding: 5px 6px;
+  text-align: left;
+}
+
+.t41.component.autocompletepropsgrid a.ac_extend:hover {
+  color: black;
+}
+
+.t41.component.autocompletepropsgrid a.ac_extend.icon span {
+  float: left;
+}
+
+.autocompletepropsgrid table {
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  border-spacing: 0;
+  margin: 0 5px 10px 0;
+  clear: both;
+}
+
+.autocompletepropsgrid table tbody {
+  overflow: auto;
+  max-height: 330px;
+  overflow-x: hidden;
+  display: block;
+}
+
+.autocompletepropsgrid table thead {
+  display: block;
+}
+
+.autocompletepropsgrid table tr td {
+  border-bottom: 1px solid #c1bebe;
+  font-size: 0.95em;
+}
+
+.autocompletepropsgrid table tr:hover td {
+  background: #c4dce3;
+}
+
+.autocompletepropsgrid table td {
+  padding: 2px 4px;
+  cursor: pointer;
+}
+/* -- END AUTOCOMPLETER -- */ 
+
+/* -- BEGIN TABLE -- */
+table.t41.table {
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  border-spacing: 0;
+  margin: 0 5px 10px 0;
+}
+
+table.t41.table th {
+  font-weight: bold;
+}
+
+table.t41.table td {
+  padding: 2px 4px;
+  cursor: pointer;
+  text-align: left;
+}
+
+table.t41.table tr:hover td {
+  background-color: #c4dce3;
+}
+
+table.t41.table td.cellcurrency {
+  text-align: right;
+}
+
+table.t41.list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.t41.list tr td,
+table.t41.list tr th {
+  padding: 4px;
+  color: #222;
+}
+
+.t41 table tr th,
+.t41 table tr th a {
+  font-family: Abel, sans-serif;
+  text-align:left;
+}
+
+table.t41.list tr:first-child th a {
+  display: block;
+  font-weight: bold;
+  color: #000;
+}
+table.t41.list tr:first-child th a:hover {
+  text-decoration: underline;
+}
+
+table.t41.list tr {
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+
+table.t41.list tr.even {
+  background-color: #ddd;
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+}
+
+table.t41.list tr.odd {
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+}
+
+table.t41.list tr.odd {
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+}
+
+table.t41.list tr:hover td {
+  color: #000;
+  background-color: #eee;
+  border-top: 1px solid #bbb;
+  border-bottom: 1px solid #bbb;
+}
+
+table.t41.list td.cellcurrency {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.t41.paginator {
+  text-align: center;
+  padding: 4px 0px;
+}
+
+.t41.component.table .content .line {
+  font-size: 0.9em;
+}
+
+.t41.component.table .content .line .key {
+  color: #444;
+  font-weight: bold;
+
+  width: 35%;
+  display: inline-block;
+  text-align: right;
+  padding: 0 12px 1px 0;
+}
+.t41.component.table .content .line .value {
+  color: #000;
+  display: inline-block;
+}
+/* -- END TABLE -- */
+
+/* -- BEGIN FORM -- */
+.t41 form fieldset {
+  padding: 4px;
+  margin: 6px 4px;
+  border: 1px dotted  #ccc;
+}
+
+.t41 form fieldset legend {
+  font-family: Abel, sans-serif;
+  font-size: 18px;
+  color: #444;
+  border: 1px dotted #ccc;
+  margin-left: 20px;
+  background-color: white;
+  padding: 1px 15px;
+}
+
+.t41 form fieldset .label, .t41 form fieldset .field {
+  display: inline-block;
+  padding: 1px 8px;
+  height: 24px;
+  font-size: 16px;
+  color: #444;
+}
+
+.t41 form fieldset .error, .t41 form fieldset .error {
+  display: inline-block;
+  padding: 1px 8px;
+  height: 24px;
+  font-size: 12px;
+  color: red;
+}
+
+.t41 form fieldset .label {
+  width: 25%;
+  text-align: right;
+  font-family: Abel, sans-serif;
+}
+
+.t41 form fieldset .label label {
+  margin-right:10px;
+}
+
+.t41 form fieldset .label.mandatory label {
+  margin-right:0;
+}
+
+.t41 form fieldset .label.mandatory label::after {
+  content: " *";
+}
+
+.t41 form fieldset .label strong {
+  font-weight: normal;
+  color: black;
+}
+
+.t41 form fieldset .field input {
+  height: 20px;
+  font-size: 14px;
+  margin:5px;
+}
+
+.t41 form fieldset .field select {
+  height: 30px;
+  font-size: 14px;
+  margin:5px;
+  padding:3px;
+}
+
+/* -- END FORM -- */
+
+/* -- BEGIN TITLES -- */
+h1,h2,h3,h4,h5 {
+  margin: 6px 0;
+}
+
+#default h1 {
+}
+
+#default h2 {
+}
+
+#default h3 {
+}
+
+#default h4 {
+}
+
+#default h5 {
+}
+/* -- END TITLES -- */
+
+/* -- BEGIN specific hard-coded styles, to be removed -- */
+.t41.component .content>input {
+  width: 350px;
+  height: 26px;
+  font-size: 22px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #05446c;
+  padding: 3px;
+  border: 2px solid #222222;
+  border-radius: 3px;
+}
+
+.t41.component .content>input:focus,
+.t41.component .content>input:hover {
+  background-color: #c7e8fd;
+  border: 2px solid #04395b;
+}
+/*
+.t41.component .content table {
+  width: 99%;
+  margin: 6px auto;
+  border-top: 1px dotted @componentborder;
+  border-bottom: 1px dotted @componentborder;
+}
+
+.t41.component .content table tr {
+  padding: 0 2px;
+  border-bottom: 1px dotted @componentborder;
+}
+*/
+/* -- END specific hard-coded styles, to be removed -- */
+
+/* -- BEGIN ALERT -- */
+.alert_overlay {
+  z-index: 90;
+  background-color: #fff;
+  opacity: 0.8;
+  -moz-opacity: 0.8;
+  filter:alpha(opacity=8);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+
+.t41.component.alert {
+  z-index: 300;
+  position: fixed;
+  top: auto;
+  left: auto;
+  min-width: 200px;
+  max-width: 400px;
+  min-height: 100px;
+  max-height: 400px;
+  background-color: #ffffff;
+  box-shadow: 1px 1px 10px #444;
+}
+
+.t41.component.alert .title {
+  display: block;
+  font-size: 19px;
+  line-height: 18px;
+  height: 1em;
+  padding: 0.3em 0.1em;
+}
+
+.t41.component.alert .content {
+  padding: 12px 4px;
+}
+
+.t41.component.alert .buttons {
+  padding: 8px 16px;
+}
+
+.t41.component.alert .title .close {
+  float: right;
+  width: 12px;
+  height: 12px;
+  border: 1px solid silver;
+}
+
+.t41.component.alert .title .close:hover {
+  background-color: gray;
+  cursor: pointer;
+}
+
+.t41.component.alert.warning {
+  border: 1px solid red;
+}
+
+.t41.component.alert.warning .title {
+  color: red;
+  border-bottom: 1px dotted red;
+}
+
+.t41.component.alert.warning .content {
+  color: #530d06;
+}
+
+.alert_overlay.warning {
+  background-color: #f36152;
+}
+/* -- END ALERT -- */ 
+
+
+.clear {
+  float: none !important;
+  clear: both !important;
+}
