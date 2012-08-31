@@ -1,5 +1,3 @@
-
-
 .t41 a.element.disabled.button{
 	background-color:white;
 	cursor:no-drop;
@@ -105,40 +103,6 @@
 }
 
 
-/*sprites*/
-
-.t41 a.element.small.icon span,.t41.small a.icon span{
-	background: url(img/sprite_small.png) no-repeat;
-	width:16px; 
-	height: 16px; 
-	display:inline-block;
-	margin-right:6px;
-	vertical-align:top;
-	position:relative;
-	bottom:0;
-}
- 
-.t41 a.medium.icon span,.t41.medium a.icon span{
-	background: url(img/sprite_medium.png) no-repeat;
-	width:24px; 
-	height: 24px; 
-	display:inline-block;
-	margin-right:6px;
-	vertical-align:top;
-	position:relative;
-	bottom:2px; 
-}
-
-.t41 a.element.large.icon span,.t41.large a.icon span{
-	background: url(img/sprite_large.png) no-repeat;
-	width:32px; 
-	height: 32px; 
-	display:inline-block;
-	margin-right:6px;
-	vertical-align:top;
-	position:relative;
-	bottom:5px;
-}
 
 /*LARGE 32PX*/
 
