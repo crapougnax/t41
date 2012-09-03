@@ -65,7 +65,7 @@ class t41_AssetsController extends Zend_Controller_Action {
 				$file = file_get_contents($path);
 				
 				// Apply minification and expires if we are not in dev mode
-				if (Core::$env != Core::ENV_DEV) {
+				if (false) { //Core::$env != Core::ENV_DEV) {
 					$file = str_replace(array(' ', "\n", "\t"), '', $file);
 				}
 				
