@@ -33,6 +33,7 @@ use t41\Core,
 	t41\View\ViewUri,
 	t41\View\Decorator,
 	t41\View\FormComponent,
+	t41\View\FormComponent\Element\ButtonElement,
 	t41\View\ListComponent\Element;
 
 /**
@@ -171,7 +172,12 @@ class WebDefault extends AbstractWebDecorator {
     }
 
 
-    protected function _renderButton(Element\ButtonElement $button)
+    /**
+     * Returns a rendered button
+     * @param ButtonElement $button
+     * @return string
+     */
+    protected function _renderButton(ButtonElement $button)
     {
     	$params = $button->getDecoratorParams();
     	$params['size'] = 'medium';
