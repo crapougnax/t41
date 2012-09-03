@@ -58,7 +58,6 @@ class t41_AssetsController extends Zend_Controller_Action {
 			}
 			
 			$path = $filepath . $filename;
-			//die($path);
 			
 			if (file_exists($path)) {
 				
