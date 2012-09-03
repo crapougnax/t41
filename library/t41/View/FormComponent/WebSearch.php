@@ -135,6 +135,8 @@ HTML;
             $p .= '</span>';
         }
         
+        View::addCoreLib('buttons.css');
+        View::addCoreLib('sprites.css');
         $p .= sprintf('<div class="clear"><a class="element button medium icon" onclick="jQuery(\'#t41sf\').submit()"><span class="search-blue"></span>Rechercher</a>'
         			. '<a class="element button medium icon" onclick="jQuery(\'#t41sf\').reset()"><span class="refresh"></span>RAZ</a></div>'
         			, $this->_obj->getParameter('baseurl'));

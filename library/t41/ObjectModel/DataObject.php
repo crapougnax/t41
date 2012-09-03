@@ -2,6 +2,8 @@
 
 namespace t41\ObjectModel;
 
+use t41\ObjectModel\Property\ArrayProperty;
+
 /**
  * t41 Toolkit
  *
@@ -364,23 +366,22 @@ class DataObject extends ObjectModelAbstract {
     						$value = $value->__toString();
     					}
     			}
+
     			
     			$result['data'][$key] = $value;
     			
+    		} else if ($value instanceof Property\ArrayProperty) {
+    			$result['data'][$key] = serialize($value->getValue());
     		} else if ($value instanceof Property\AbstractProperty){
-
     			$value = $value->getValue();
     			$result['data'][$key] = ($value instanceof ObjectModel) ? $value->getUri() : $value;
-    			
     		} else {
-
     			$result['data'][$key] = $value;
     		}
     	}
     	
     	return $result;
     }
-    
     
 
     /**

@@ -42,5 +42,4 @@ class ArrayProperty extends AbstractProperty {
 		}
 		parent::setValue($value);
 	}
-	
 }

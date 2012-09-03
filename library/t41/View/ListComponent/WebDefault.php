@@ -366,7 +366,7 @@ HTML;
 					}
             	}
             	
-  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue(): null;
+  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
   				
             	//$p .= "<td$attrib>" . $this->_escape($value) . '</td>';
             	$p .= "<td$attrib>" . $value . '</td>';

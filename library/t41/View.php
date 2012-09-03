@@ -176,16 +176,52 @@ class View {
 	 * Definit le contexte d'affichage particulier
 	 *
 	 * @param string $context
+	 * @deprecated
 	 */
-	static public function setDisplayContext($context) {
-		
+	static public function setDisplayContext($context)
+	{
 		if (self::_isInstanciated ()) {
-			
 			self::$_display->setSubContext($context);
 		}
 	}
 	
 
+	/**
+	 * Register a library from core
+	 * @param string $lib
+	 * @param array $params
+	 */
+	static public function addCoreLib($lib, array $params = null)
+	{
+		if (self::_isInstanciated ()) {
+			$type = substr($lib, strrpos($lib, '.')+1);
+			$file = '/t41/assets/core/' . $type . '/' . $lib;
+			
+			if (false) {
+				$hash = hash('md5', Core::$t41Path . $file);
+				$file = '/t41/assets/core/' . $type . '/' . $lib . '/cache/' . $hash . '.' . $type;
+			}
+			
+			return self::$_display->componentAdd ($file, $type);
+		}
+	}
+	
+	
+	/**
+	 * Register a library from a module or a pseudo-module (t41/vendor/...)
+	 * @param string $lib
+	 * @param string $module
+	 */
+	static public function addModuleLib($lib, $module)
+	{
+		if (self::_isInstanciated ()) {
+			$type = substr($lib, strrpos($lib, '.')+1);
+			$file = '/t41/' . $module . '/' . $lib;
+			return self::$_display->componentAdd ($file, $type);
+		}
+	}
+
+	
 	static public function addRequiredLib($file, $type, $lib = null, $priority = 0)
 	{
 		if (self::_isInstanciated ()) {

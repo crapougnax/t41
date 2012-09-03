@@ -46,12 +46,11 @@ class WebDefault extends SimpleComponent\WebDefault {
     public function render()
     {
     	// cache object and create its client-side js counterpart
-    	//$action = new View\Action\TestAction($this->_obj->getSource());
     	$reduced = $this->_obj->getSource()->reduce();
-    	$this->_id = 't41_' . md5(time());
+    	$this->_id = $this->_obj->getId() ? $this->_obj->getId() : 't41_' . md5(time());
     	
     	
-		View::addEvent(sprintf("%s = new t41.view.form('%s',%s,%s)"
+		View::addEvent(sprintf("%s_obj = new t41.view.form('%s_obj',%s,%s)"
 									, $this->_id
 									, $this->_id
 									, \Zend_Json::encode($reduced)
@@ -180,20 +179,10 @@ class WebDefault extends SimpleComponent\WebDefault {
     
     protected function _formFooter()
     {
-    	$p = '<fieldset><input type="button" onclick="history.go(-1)" value="Retour"/><input type="button" name="t41_save" value="Sauver" onclick="'.$this->_formId.'.check(false);" />';
-    	if ($this->_obj->getParameter('save_mode') == 'multiple') {
-    		$p .= '&nbsp;<input type="button" name="t41_save2" value="Sauver et suivant" onclick="'.$this->_formId.'.check(true);"/>';
-    	}
-    	$p .= '&nbsp;<input type="reset" name="t41_reset" value="Vider formulaire"/>'
-    	    .'</p></fieldset></form>';
-    	
-    	$submit = new Element\ButtonElement();
-    	$submit->setTitle("Sauver");
-    	$submit->setLink('t41_form.save()');
-    	$deco = View\Decorator::factory($submit);
-    	$p = $deco->render();
-    	
-    	return sprintf('<fieldset id="actions"></fieldset>');
+    	/**
+    	 * Buttons are displayed by t41.view.form.js
+    	 */    	
+    	return sprintf('<fieldset id="form_actions"></fieldset>');
     }
     
     

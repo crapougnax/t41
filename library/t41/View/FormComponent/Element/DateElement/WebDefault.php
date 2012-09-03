@@ -4,6 +4,7 @@ namespace t41\View\FormComponent\Element\DateElement;
 
 
 use t41\View,
+	t41\View\Externals,
 	t41\View\Decorator\AbstractWebDecorator;
 
 class WebDefault extends AbstractWebDecorator {
@@ -11,14 +12,16 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
-//		t41_Externals::enablejQueryUI();
+//		Externals::enablejQueryUI();
 //		t41_View::addRequiredLib('t41_icons', 'css', 't41');
 
+		View::addModuleLib('jquery-ui-1.8.9.custom.js', 'vendor/jquery/jqueryui');
+		
 		switch ($this->getParameter('mode')) {
 
 			case 'rttr': //t41_Form::SEARCH:
 				
-				$so = t41_View_Uri::getUriAdapter()->getIdentifier('search');
+				$so = ViewUri::getUriAdapter()->getIdentifier('search');
 				
 				$dataArray = isset($_GET[$so][$this->_obj->getAltId()]) ? $_GET[$so][$this->_obj->getAltId()] : array();
 				$html	= $this->_renderField($so . '[' . $this->_obj->getAltId() . '][from]'

@@ -165,15 +165,24 @@ abstract class ObjectModel extends ObjectModelAbstract {
 		
 		switch ($method_begin) {
 			
+			// reset a property value to null
+			case 'del':
+				$this->_triggerRules('before/set/' . $method_end);
+				$res = $this->_dataObject->getProperty($method_end);
+				if ($res === false) {
+					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
+				}
+				var_dump($res); die;
+				$res->resetValue();
+				$this->_triggerRules('after/set/' . $method_end);
+				break;
+				
 			case 'set':
 				$this->_triggerRules('before/set/' . $method_end);
 				$res = $this->_dataObject->$method_end = $a[0];
-				
 				if ($res === false) {
-					
 					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
 				}
-				
 				$this->_triggerRules('after/set/' . $method_end);
 				break;
 			

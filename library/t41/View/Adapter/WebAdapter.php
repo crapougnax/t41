@@ -62,7 +62,7 @@ class WebAdapter extends AdapterAbstract {
 
 	
 	/**
-	 * Ajoute un composant externe à la page sous réserve que le fichier de référence existe
+	 * Add a library to the page after some checks
 	 *
 	 * @param string $file
 	 * @param string $type
@@ -72,7 +72,7 @@ class WebAdapter extends AdapterAbstract {
     {
         if (!in_array($type, $this->_allowedComponents)) return false;
 
-        if (substr($file, 0, 4) != 'http') {
+        if (substr($file, 0, 4) != 'http' && substr($file, 0, 4) != '/t41') {
 	        if ($lib) {
 		        $filePath = '/lib/' . $lib . '/' . $type . '/' . $file . '.' . $type;
         	} else {
@@ -85,7 +85,7 @@ class WebAdapter extends AdapterAbstract {
         // return true if component is already listed
         if (in_array($filePath, $this->_component[$type])) return false;
 
-        if (substr($filePath, 0, 4) == 'http') {
+        if (substr($filePath, 0, 4) == 'http' || substr($filePath, 0, 4) == '/t41') {
         
         	if ($priority == -1) {
         		array_unshift($this->_component[$type], $filePath);
@@ -131,7 +131,7 @@ class WebAdapter extends AdapterAbstract {
     
     
 	/**
-	 * Ajout d'un événement à la vue
+	 * Add an event to the view
 	 *
 	 * @param string $event
 	 * @param string $type
@@ -151,7 +151,7 @@ class WebAdapter extends AdapterAbstract {
         if (array_key_exists($eventHash, $this->_event)) return false;
 
         if ($isFile) {
-        	$event = @file_get_contents(APP_PATH . $event);
+        	$event = @file_get_contents(Core::$basePath . $event);
         }
         $this->_event[$type][$eventHash] = $event;
         
@@ -256,11 +256,10 @@ class WebAdapter extends AdapterAbstract {
     	    if (isset($params['fullUrl']) && $params['fullUrl'] == true && substr($component, 0, 4) != 'http') {
     				$component = $baseUrl . $component;
     			}
-    			    		
+    	
     		switch ($type) {
     			
     			case 'css':
-    				
     				$html .= sprintf('<link rel="stylesheet" href="%s" type="text/css" />' . "\n", $component);
     				break;
     				
@@ -354,7 +353,6 @@ class WebAdapter extends AdapterAbstract {
     		}
     		
     		if ($content !== false) {
-    			
 	    		$template = str_replace($tag[0], $content, $template);
     		}
     	}
@@ -369,12 +367,10 @@ class WebAdapter extends AdapterAbstract {
     		switch ($tag[1]) {
     			
     			case 'components':
-    				
     				$content = $this->_renderComponents($tag[2], $tag[3]);
     				break;
     				    				
     			case 'env':
-    				
     				$content = Core::htmlEncode(View::getEnvData($tag[2]));
     				break;
     		}
@@ -386,7 +382,7 @@ class WebAdapter extends AdapterAbstract {
         $template = str_replace('</body>', $this->eventAttach() . '</body>', $template);
         
         // PHASE 4: display logged errors in dev mode
-        if (Core::getEnvData('webEnv') == Core::ENV_DEV) {
+        if (Core::$env == Core::ENV_DEV) {
         	
 	        $errors = View::getErrors();
         

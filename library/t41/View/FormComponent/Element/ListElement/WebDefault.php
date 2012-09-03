@@ -44,6 +44,7 @@ class WebDefault extends AbstractWebDecorator {
 		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('select_max_values') 
 				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
 
+			View::addCoreLib('view:action:autocomplete.js');
 			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
 			//$acfield->setValue($this->_obj->getValue()->getDisplayValue());
 			

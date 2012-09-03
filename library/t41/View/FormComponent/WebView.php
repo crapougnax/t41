@@ -24,7 +24,6 @@ class WebView extends WebDefault {
 		
 		$altDecorators = (array) $this->_obj->getParameter('decorators');
 		
-		/* @var $val t41_View_Element_Abstract */
         foreach ($this->_obj->getColumns() as $key => $element) {
         	
         	$field = $element;

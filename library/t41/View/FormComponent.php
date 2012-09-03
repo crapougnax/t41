@@ -60,7 +60,7 @@ class FormComponent extends View\ViewObject {
 	
 	public function __construct($source = null, array $params = null, FormComponent\Adapter\AbstractAdapter $adapter = null)
 	{
-		parent::__construct('toto', $params);
+		parent::__construct(null, $params);
     						  	   
 		$this->_adapter = $adapter ? $adapter : new FormComponent\Adapter\DefaultAdapter();
 		

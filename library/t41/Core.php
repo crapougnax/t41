@@ -123,6 +123,7 @@ class Core {
 	 */
     static public $basePath;
 
+    static public $t41Path;
     
     static public $env;
     
@@ -199,11 +200,29 @@ class Core {
     }
     
     
+    /**
+     * Set Application and t41 paths
+     * @param string $path
+     */
+    public static function setPaths($path)
+    {
+    	if (file_exists($path)) {
+	    	self::$basePath = $path;
+    		$dirs = explode(DIRECTORY_SEPARATOR, __DIR__);
+    		$dirs = array_slice($dirs, 0, count($dirs)-2);
+    		self::$t41Path = implode(DIRECTORY_SEPARATOR, $dirs);
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    
     public static function setIncludePaths($path)
     {
     	if (substr($path, -1) != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
     	
-    	self::$basePath = $path;
+		self::setPaths($path);
 
     	set_include_path(
     			get_include_path() . PATH_SEPARATOR
@@ -263,7 +282,6 @@ class Core {
 	public static function enableAutoloader($prefix = null)
 	{
 		if ($prefix) {
-			
 			self::addAutoloaderPrefix($prefix);
 		}
 		
@@ -389,7 +407,7 @@ class Core {
     	set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
     	// define path but only if it's empty
-    	if (empty(self::$basePath)) self::$basePath = $path;
+    	if (! is_null($path) && empty(self::$basePath)) self::setPaths($path);
 
     	/* add application & t41 config files path (in first position if none was declared before) */
     	Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
@@ -550,7 +568,6 @@ class Core {
         	ini_set('display_errors', 1);
         	
         } else {
-
             error_reporting(E_ALL & ~E_STRICT);
             ini_set('display_errors', 1);
         }
@@ -563,13 +580,11 @@ class Core {
 		
 	    // set a cache adapter
         if (! isset(self::$_adapters['registry'])) {
-        	
     		self::$_adapters['registry'] = new \Zend_Registry();
     	}
     	        
         // (re-)init session 
         if (! isset(self::$_adapters['session'])) {
-    		
     		self::$_adapters['session'] = '';//new t41_Session_Default();
     	}
 
@@ -577,28 +592,6 @@ class Core {
         if (self::$_fancyExceptions === true) {
 	        //set_exception_handler(array('t41\Core', 'exceptionHandler'));
         } 
-    }
-    
-    
-    /**
-     * Try to detect environment based on URL structure
-     * @deprecated
-     *
-     */
-    protected static function getEnv()
-    {
-	    self::$_env['webProto'] = ($_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
-    	self::$_env['hostname'] = $_SERVER['SERVER_NAME'];
-	    
-    	if (in_array($_SERVER['SERVER_NAME'], self::$_urls)) {
-    		
-    		self::$_env['webEnv'] = array_search($_SERVER['SERVER_NAME'], self::$_urls);
-
-    	} else {
-    		
-    		// default value
-    		self::$_env['webEnv'] = self::ENV_DEV;
-    	}
     }
 
     
@@ -641,10 +634,11 @@ class Core {
      *
      * @param string $str
      * @return string
+     * @deprecated
      */
     public static function htmlEncode($str)
     {
-    	// quite shaky right now
+    	trigger_error("htmlEncode() is marked as deprecated and will be removed soon");
     	if (mb_detect_encoding($str) == 'ISO-8859-1') {
     		
     		$str2 = htmlentities($str);
@@ -698,7 +692,7 @@ class Core {
     
 	/**
 	 * Returns the key to be used for the given application and vendor names
-	 * ex: t41_Core::getAppKey('map', 'google') to get a GoogleMap API Key.
+	 * ex: t41\Core::getAppKey('map', 'google') to get a GoogleMap API Key.
 	 * 
 	 * @param string $application
 	 * @param string $vendor

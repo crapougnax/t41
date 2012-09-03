@@ -40,6 +40,10 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
+		// add CSS libraries
+		View::addCoreLib('sprites.css');
+		View::addCoreLib('buttons.css');
+		
 		$extraHtml = array();
 		$class = array('element');
 		if ($this->getParameter('nolabel') != true) $class[] = 'button';

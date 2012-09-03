@@ -39,6 +39,18 @@ use t41\Core,
 abstract class AbstractWebDecorator extends AbstractDecorator {
 
 	
+	/**
+	 * Constructors, calls parent and add CSS librairies
+	 * @param t41\View\ViewObject $obj
+	 * @param array $params
+	 */
+	public function __construct($obj, array $params = null)
+	{
+		parent::__construct($obj, $params);
+		View::addCoreLib('style.css');
+	}
+	
+	
 	public function render()
 	{
 		return $this->_headerRendering() . $this->_contentRendering() . $this->_footerRendering();
