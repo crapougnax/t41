@@ -56,7 +56,7 @@ class t41_AppController extends t41_AssetsController {
 				$file = file_get_contents($path);
 				
 				// Apply minification and expires if we are not in dev mode
-				if (Core::$env != Core::ENV_DEV) {
+				if (false) {
 					$file = str_replace(array(' ', "\n", "\t"), '', $file);
 				}
 				
