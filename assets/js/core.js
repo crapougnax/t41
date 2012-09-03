@@ -1,7 +1,4 @@
-if (! window['t41']) {
-	
-	alert("Missing t41 namespace declaration!");
-}
+if (! window.t41) { window.t41 = []; }
 
 if (! window['t41']['core']) {
 

@@ -16,6 +16,8 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.constraints = [];
 	
+	this.posts = [];
+	
 	
 	/**
 	 * List of redirection URL
@@ -25,11 +27,11 @@ window.t41.view.form = function(id,obj,form) {
 
 	this.addButtons = function(container) {
 
-		var submit = new t41.view.button("Sauver", {size:'medium', icon:'valid'});
+		var submit = new t41.view.button("Sauver", {id:'form_submit', size:'medium', icon:'valid'});
 		t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save'), this.id);
 		container.append(submit);
 		
-		var back = new t41.view.button("Annuler", {size:'medium', icon:'alert'});
+		var back = new t41.view.button("Annuler", {id:'form_reset', size:'medium', icon:'alert'});
 		t41.view.bindLocal(back, 'click', function() { history.back(); }, this.id);
 		container.append(back);
 	};
@@ -126,6 +128,9 @@ window.t41.view.form = function(id,obj,form) {
 		
 		if (obj.status == t41.core.status.ok) {
 			
+			if (this.posts.ok && typeof this.posts.ok == 'function') {
+				this.posts.ok.call(obj);
+			}
 			var params = this.redirects && this.redirects.redirect_ok ? {defer:true} : {timer:10};
 			new t41.view.alert("Sauvegarde effectuée", params);
 			if (this.redirects && this.redirects.redirect_ok){

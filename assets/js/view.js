@@ -185,7 +185,9 @@ if (! window.t41.view) {
 		if (typeof action != 'function') {
 			var action = eval(action);
 		}
-		
+
+		// unbind any existing same type event
+		jQuery(element).unbind(event);
 		jQuery(element).bind(event, {caller:obj}, action);
 	};
 	
@@ -199,16 +201,13 @@ if (! window.t41.view) {
 		var element = typeof(val.element) == 'string' ? jQuery('#'+val.element) : jQuery(val.element);
 		
 		if (val.callback) {
-			if(t41.fn[val.callback]) {
-				
+			if (t41.core[val.callback]) {
 				var callback = t41.fn[val.callback];
 				
 			} else {
-				
 				var callback = eval(val.callback);
 			}
 		} else {
-			
 			var callback = t41.core.defaultCallback;
 		}
 
