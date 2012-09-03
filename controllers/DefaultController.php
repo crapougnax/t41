@@ -1,5 +1,7 @@
 <?php
 
+use t41\Core\Module;
+
 /**
  * DefaultController
  * 
@@ -17,6 +19,8 @@ require_once 'Zend/Controller/Action.php';
 abstract class t41_DefaultController extends Zend_Controller_Action {
 
 	
+	protected $_module;
+	
 	
 	public function init() {
 		
@@ -26,5 +30,17 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 		Layout::$module		= $this->_getParam('module');
 		Layout::$controller	= $this->_getParam('controller');
 		Layout::$action		= $this->_getParam('action');
+		
+		// provide controller with basic information about the current module
+		foreach (Module::getConfig() as $vendor => $modules) {
+			
+			foreach ($modules as $key => $module) {
+				
+				if (isset ($module['controller']) && Layout::$module == $module['controller']['base']) {
+					$this->_module = 'app/' . $vendor . '/' . $key;
+					break;
+				}
+			}
+		}
 	}
 }
