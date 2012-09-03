@@ -12,10 +12,8 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
-//		Externals::enablejQueryUI();
-//		t41_View::addRequiredLib('t41_icons', 'css', 't41');
-
 		View::addModuleLib('jquery-ui-1.8.9.custom.js', 'vendor/jquery/jqueryui');
+		View::addModuleLib('jquery-ui-1.8.9.custom.css', 'vendor/jquery/jqueryui');
 		
 		switch ($this->getParameter('mode')) {
 
@@ -84,13 +82,14 @@ class WebDefault extends AbstractWebDecorator {
 
 			if ($this->_obj->getParameter('enable_quickset')) {
 			$buttons = array(
-				array('title' => 'Hier', 			'value' => '-1', 	'icon'=>'playbackw'),
-				array('title' => 'Aujourd\'hui', 	'value' => '+0d',	'icon'=>'pause'),
-				array('title' => 'Demain',	 		'value' => '+1', 	'icon'=>'playforw')
+				array('title' => 'Hier', 			'value' => '-1', 	'icon'=>'left-arrow'),
+				array('title' => 'Aujourd\'hui', 	'value' => '+0d',	'icon'=>'valid'),
+				array('title' => 'Demain',	 		'value' => '+1', 	'icon'=>'right-arrow')
 			);
 			foreach ($buttons as $k => $v) {
-				$html .= sprintf('<button type="button" class="icon %s" onclick="javascript:jQuery(\'#%s\').datepicker(\'setDate\', \'%s\'); return false;" title="%s"></button>'
-								, $v['icon'], $dispField, $v['value'], $v['title']);
+				$html .= sprintf('<a class="element small icon" title="%s" href="javascript:" onclick="jQuery(\'#%s\').datepicker(\'setDate\', \'%s\'); return false;"><span class="%s"></span></a>'
+								, $v['title'], $dispField, $v['value'], $v['icon']
+								);
 			}
 		}
 		return $html;
