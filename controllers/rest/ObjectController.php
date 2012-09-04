@@ -1,5 +1,7 @@
 <?php
 
+use t41\Core\Registry;
+
 /**
  * DefaultController
  * 
@@ -28,7 +30,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 				
 				// walk through POST data
 				foreach ($this->_post as $key => $val) {
-						
+
 					if (($property = $this->_obj->getProperty($key)) !== false) {
 				
 						if ($property instanceof Property\ObjectProperty) {
@@ -36,9 +38,13 @@ class Rest_ObjectController extends Rest_DefaultController {
 							if ($val) {
 									
 								$class = $property->getParameter('instanceof');
-								$property->setValue(new $class($val));
+								if (substr($val,0,4) == 'obj_') {
+									// get object from cache
+									$property->setValue(Core::cacheGet($val));
+								} else {
+									$property->setValue(new $class($val));
+								}
 							} else {
-								
 								$property->resetValue();
 							}
 							
@@ -58,7 +64,6 @@ class Rest_ObjectController extends Rest_DefaultController {
 								
 								// action exists to update or remove member
 								if (isset($memberArray['action'])) {
-									
 									// get target member
 									$object = $property->getValue()->getMember($memberKey);
 										
@@ -74,7 +79,6 @@ class Rest_ObjectController extends Rest_DefaultController {
 											
 										case 'update':
 											foreach ($memberArray['props'] as $mApropN => $mApropV) {
-												
 												if (($mAprop = $object->getProperty($mApropN)) !== false) {
 													$mAprop->setValue($mApropV);
 												}
@@ -83,7 +87,6 @@ class Rest_ObjectController extends Rest_DefaultController {
 											$object->save();
 											break;
 									}
-									
 								} else {
 									
 									// no action, default is new member to add
@@ -149,6 +152,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 			} catch (\Exception $e) {
 
 				$this->_context['err'] = $e->getMessage();
+				if (Core::$env == Core::ENV_DEV) $this->_context['trace'] = $e->getTraceAsString();
 				$this->_status = 'ERR';
 			}
 	}
