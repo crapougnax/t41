@@ -109,6 +109,9 @@
 					<parameter id="mode">
 						<type>string</type>
 					</parameter>
+					<parameter id="defaultlabel">
+						<type>string</type>
+					</parameter>
 				</parameters>
 		</decorator>
 		</object>
