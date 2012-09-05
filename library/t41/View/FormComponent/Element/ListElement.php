@@ -57,8 +57,8 @@ class ListElement extends AbstractElement {
 	{
 		$this->_setParameterObjects(array('select_max_values'	=> new Parameter(Parameter::INTEGER, 100)
 										, 'display'				=> new Parameter(Parameter::STRING)
-										, 'sorting'				=> new Parameter(Parameter::ANY)	
-										
+										, 'sorting'				=> new Parameter(Parameter::ANY)
+										, 'altkey'				=> new Parameter(Parameter::STRING) // Alternate key coming from value's property
 										 )
 								   );
 		
@@ -132,7 +132,9 @@ class ListElement extends AbstractElement {
         
         foreach ($this->_collection->getMembers() as $member) {
                
-            $this->_enumValues[$member->getUri()->getIdentifier()] = Property::parseDisplayProperty($member, $this->getParameter('display'));
+        	// define value key (property val if altkey parameter is setted or uri's identifier by default
+        	$key = $this->getParameter('altkey') ? $member->getProperty($this->getParameter('altkey'))->getValue() : $member->getUri()->getIdentifier();
+            $this->_enumValues[$key] = Property::parseDisplayProperty($member, $this->getParameter('display'));
         }
             
        return $this->_enumValues;

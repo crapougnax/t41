@@ -70,8 +70,8 @@ class WebDefault extends AbstractWebDecorator {
 			
 			// display menu list
 			$zv = new \Zend_View();
-			$options = array(null => '') + (array) $this->_obj->getEnumValues();
-
+			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
+			
 			return $zv->formSelect($name, $value, null, $options);
 		}
 	}
