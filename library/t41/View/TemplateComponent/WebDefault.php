@@ -2,6 +2,12 @@
 
 namespace t41\View\TemplateComponent;
 
+use t41\ObjectModel\ObjectUri;
+
+use t41\View\Decorator;
+
+use t41\View\ViewObject;
+
 /**
  * t41 Toolkit
  *
@@ -31,14 +37,13 @@ use t41\Core,
 	t41\View\Decorator\AbstractWebDecorator;
 
 /**
- * Decorator class for template objects in a PDF context.
+ * Decorator class for template objects in a web context.
  *
  * @category   t41
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-
 class WebDefault extends AbstractWebDecorator {
 	
 	
@@ -67,16 +72,17 @@ class WebDefault extends AbstractWebDecorator {
 	{
     	$this->_template = $this->_obj->getTemplate();
    	
-    	$tagPattern = "/" . self::TAG_START . "([a-z0-9]+)\\:([a-z0-9.]*)\\{*([a-zA-Z0-9:,\\\"']*)\\}*" . self::TAG_END . "/";
+    	$tagPattern = "/" . self::TAG_START . "([a-z0-9]+)\\:([a-z0-9#.]*)\\{*([a-zA-Z0-9:,#\\\"']*)\\}*" . self::TAG_END . "/";
     	
     	$tags = array();
     	
     	preg_match_all($tagPattern, $this->_template, $tags, PREG_SET_ORDER);
 
-    	// transform some characters
-    	$this->_template = str_replace("\t", str_repeat("&nbsp;", 12), $this->_template);
-    	$this->_template = str_replace("\n", "<br/>", $this->_template);
-    	
+    	// transform some characters (if template is not an html snippet)
+    	if (strlen($this->_template) == strlen(strip_tags($this->_template))) {
+	    	$this->_template = str_replace("\t", str_repeat("&nbsp;", 12), $this->_template);
+    		$this->_template = str_replace("\n", "<br/>", $this->_template);
+    	}	
 		$this->_parseTags($tags);
     	
     	return $this->_template;
@@ -94,6 +100,7 @@ class WebDefault extends AbstractWebDecorator {
     		
 	    	$value = null;
     		
+	    	//\Zend_Debug::dump($tag);
     		switch($tag[1]) {
     			
     			case 'var':
@@ -110,16 +117,35 @@ class WebDefault extends AbstractWebDecorator {
    					$value = View::getEnvData($tag[2]);
    					break;
    					
+   				case 'container':
+   					if (($templates = $this->_obj->getSubtemplates($tag[2])) !== false) {
+   						$value = '';
+   						foreach ($templates as $template) {
+   							$deco = Decorator::factory($template);
+   							$value .= $deco->render();
+   						}
+   					} 
+   					break;
+   					
    				default:
-   					$obj = $this->_obj->getVariable($tag[1]);
+   					$tmp = explode('.', $tag[2]);
+//   					\Zend_Debug::dump($tmp);
+   					$obj = $this->_obj->getVariable($tmp[0]);
    					if ($obj instanceof BaseObject) {
-	   					$value = $obj->getProperty($tag[2]);
-   						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : null;
+	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
+   						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
    					}
    					break;
    			}
+   			
+   			if ($value instanceof ViewObject) {
+   				$deco = Decorator::factory($value);
+   				$value = $deco->render();
+   			} else {
+   				//$value = $this->_escape($value);
+   			}
     				
-       		$this->_template = str_replace($tag[0], Core::htmlEncode($value), $this->_template);
+       		$this->_template = str_replace($tag[0], $value, $this->_template);
 	    }
 	}
 }

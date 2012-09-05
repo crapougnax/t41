@@ -51,6 +51,9 @@ class TemplateComponent extends ViewObject {
 	protected $_template;
 	
 	
+	protected $_subTemplates = array();
+	
+	
 	public function __construct($id = null, array $params = null)
 	{
 		parent::__construct($id, $params);
@@ -67,10 +70,18 @@ class TemplateComponent extends ViewObject {
 	public function addVariable($name, $value)
 	{
 		$this->_variable[$name] = $value;
-		
 		return $this;
 	}
 	
+	public function addTemplate(self $template, $placeholder = View::PH_DEFAULT)
+	{
+		if (! isset($this->_subTemplates[$placeholder])) {
+			$this->_subTemplates[$placeholder] = array();
+		}
+		$this->_subTemplates[$placeholder][] = $template;
+		return $this;
+	}
+
 	
 	/**
      * Load the template file $filename
@@ -102,5 +113,11 @@ class TemplateComponent extends ViewObject {
 	public function getVariable($name)
 	{
 		return isset($this->_variable[$name]) ? $this->_variable[$name] : null;
+	}
+	
+	
+	public function getSubTemplates($placeholder)
+	{
+		return is_array($this->_subTemplates[$placeholder]) ? $this->_subTemplates[$placeholder] : false;
 	}
 }
