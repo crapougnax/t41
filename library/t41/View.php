@@ -188,11 +188,18 @@ class View {
 
 	/**
 	 * Register a library from core
-	 * @param string $lib
+	 * @param string|array $lib
 	 * @param array $params
 	 */
 	static public function addCoreLib($lib, array $params = null)
 	{
+		if (is_array($lib)) {
+			foreach ($lib as $libElement) {
+				self::addCoreLib($libElement, $params);
+			}
+			return true;
+		}
+		
 		if (self::_isInstanciated ()) {
 			$type = substr($lib, strrpos($lib, '.')+1);
 			$file = '/t41/assets/core/' . $type . '/' . $lib;
@@ -209,11 +216,18 @@ class View {
 	
 	/**
 	 * Register a library from a module or a pseudo-module (t41/vendor/...)
-	 * @param string $lib
+	 * @param string|array $lib
 	 * @param string $module
 	 */
 	static public function addModuleLib($lib, $module)
 	{
+		if (is_array($lib)) {
+			foreach ($lib as $libElement) {
+				self::addModuleLib($libElement, $module);
+			}
+			return true;
+		}
+		
 		if (self::_isInstanciated ()) {
 			$type = substr($lib, strrpos($lib, '.')+1);
 			$file = '/t41/' . $module . '/' . $lib;
