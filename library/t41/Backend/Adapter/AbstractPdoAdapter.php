@@ -127,18 +127,17 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	
 	
 	/**
-	 * Save new set of data from a t41_Data_Object object using INSERT 
+	 * Save new set of data from a DataObject object using INSERT 
 	 *
 	 * @param t41\ObjectModel\DataObject $do
 	 * @return boolean
-	 * @throws t41_Backend_Exception
+	 * @throws t41\Backend\Exception
 	 */
 	public function create(ObjectModel\DataObject $do)
 	{
 		$table = $this->_getTableFromClass($do->getClass());
 		
 		if (! $table) {
-
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
@@ -290,7 +289,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// @todo check that property::hasChanged is used everywhere
 		$data = $this->_mapper ? $do->map($this->_mapper, $this) : $data = $do->toArray($this, true);
 
-//		var_dump($data); die;
 		// @todo implement multi-columns pkey
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($uri->getClass()) : 'id';
 		
@@ -308,16 +306,16 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				
 			}
 			
+			// Reset properties changed state before saving collections to avoid recursion
+			$do->resetChangedState();
+				
 			if (count($data['collections']) > 0) {
-			
 				/* get collection handling properties (if any) and process them */
 				foreach ($data['collections'] as $collection) {
-					
 					$res = $res && $collection->getValue()->save();
 				}
 			}
 			
-			$do->resetChangedState();
 
 //			$this->_ressource->commit();
 			
