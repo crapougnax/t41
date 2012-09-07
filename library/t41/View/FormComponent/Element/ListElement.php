@@ -109,7 +109,6 @@ class ListElement extends AbstractElement {
 	public function getTotalValues()
 	{
 		if (is_null($this->_totalValues)) {
-			
 			$this->_collection->find();
 			$this->_totalValues = $this->_collection->getTotalMembers();
 		}
@@ -121,7 +120,6 @@ class ListElement extends AbstractElement {
 	public function setEnumValues($str = null)
 	{
 		if (is_array($str)) {
-
 	        $this->_enumValues = $str;
 			return;
 		}

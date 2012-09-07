@@ -33,4 +33,9 @@ namespace t41\View\FormComponent\Element;
 
 class TextElement extends AbstractElement {
 
+	
+	public function formatValue($val)
+	{
+		return nl2br($val);
+	}
 }

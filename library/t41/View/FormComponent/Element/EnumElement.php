@@ -32,7 +32,6 @@ use t41\Core;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-
 class EnumElement extends AbstractElement {
 	
 

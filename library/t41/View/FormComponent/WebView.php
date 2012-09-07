@@ -27,7 +27,7 @@ class WebView extends WebDefault {
         foreach ($this->_obj->getColumns() as $key => $element) {
         	
         	$field = $element;
-
+        	
         	/* hidden fields treatment */
         	if ($element->getConstraint(Element\AbstractElement::CONSTRAINT_HIDDEN) === true) {
         		continue;

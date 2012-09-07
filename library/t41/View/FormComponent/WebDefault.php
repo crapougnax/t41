@@ -43,14 +43,18 @@ class WebDefault extends SimpleComponent\WebDefault {
 	protected $_obj;
 
 
+	/**
+	 * Render form HTML and trigger t41.view.form() JS object
+	 * @see \t41\View\SimpleComponent\WebDefault::render()
+	 */
     public function render()
     {
     	// cache object and create its client-side js counterpart
     	$reduced = $this->_obj->getSource()->reduce();
     	$this->_id = $this->_obj->getId() ? $this->_obj->getId() : 't41_' . md5(time());
     	
-    	
-		View::addEvent(sprintf("%s_obj = new t41.view.form('%s_obj',%s,%s)"
+    	View::addCoreLib(array('buttons.css','sprites.css'));
+		View::addEvent(sprintf("%s_obj = new t41.view.form('%s_form',%s,%s)"
 									, $this->_id
 									, $this->_id
 									, \Zend_Json::encode($reduced)
