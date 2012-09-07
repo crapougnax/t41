@@ -115,6 +115,16 @@
 				</parameters>
 		</decorator>
 		</object>
+		
+		<object id="\t41\View\FormComponent\Element\EnumElement">
+			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
+				<parameters>
+					<parameter id="mode">
+						<type>string</type>
+					</parameter>
+				</parameters>
+		</decorator>
+		</object>
 				
 	</decorators>
 </config>

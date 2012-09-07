@@ -44,7 +44,10 @@
 				<parameter id="display">
 					<type>array</type>
 				</parameter>
-				<parameter id="decorators" type="array"/>
+				<parameter id="buttons">
+					<type>boolean</type>
+					<defaultvalue>true</defaultvalue>
+				</parameter>
 				<parameter id="redirect_ok" type="string">
 					<bogus/>
 				</parameter>
