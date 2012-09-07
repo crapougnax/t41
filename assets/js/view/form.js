@@ -1,6 +1,6 @@
 window.t41.view.form = function(id,obj,form) {
 	
-	this.form = id + '_form';
+	this.formId = '#' + id;
 	
 	this.id = id;
 	
@@ -70,35 +70,31 @@ window.t41.view.form = function(id,obj,form) {
 		jQuery('#' + this.id + '_form span.error').remove();
 		
 		// get form elements in an key/value array
-		var selector = '#' + this.id + '_form .field > :input';
+//		var selector = '#' + this.id + '_form .field > :input';
 		var elements = [];
-		jQuery.map(jQuery(selector).serializeArray(), function(n, i){ elements[n['name']] = n['value'];});
+		jQuery.map(jQuery(this.formId).serializeArray(), function(n, i){ elements[n['name']] = n['value'];});
 		
 		var errors = [];
 		var formdata = {};
 		
 		// control elements
 		for (var i in this.fields) {
-			
 			var field = this.fields[i];
-			
 			var value = elements[i];
 
 			if (field.constraints.mandatory && value == "") {
-				
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
 			}
 			
 			if (value && field.type == t41.view.currency) {
-				
 				value = value.replace(',','.');
 			}
 			
+			// register data value
 			formdata[i] = value;
 		}
 		
 		if (errors.length > 0) {
-			
 			for (var i in errors) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
@@ -107,9 +103,7 @@ window.t41.view.form = function(id,obj,form) {
 			}
 			jQuery('#' + errors[0].field).focus();
 			return false;
-			
 		} else {
-		
 			formdata['uuid'] = this.obj.uuid;
 			if (this.form.params.post_ok) {
 				formdata['post_ok'] = this.form.params.post_ok;
@@ -128,8 +122,9 @@ window.t41.view.form = function(id,obj,form) {
 		
 		if (obj.status == t41.core.status.ok) {
 			
+			// if a post function has been declared, execute it
 			if (this.posts.ok && typeof this.posts.ok == 'function') {
-				this.posts.ok.call(obj);
+				this.posts.ok.call(obj.data); // pass the server response as context
 			}
 			var params = this.redirects && this.redirects.redirect_ok ? {defer:true} : {timer:10};
 			new t41.view.alert("Sauvegarde effectuée", params);
