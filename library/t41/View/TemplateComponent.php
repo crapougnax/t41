@@ -118,6 +118,6 @@ class TemplateComponent extends ViewObject {
 	
 	public function getSubTemplates($placeholder)
 	{
-		return is_array($this->_subTemplates[$placeholder]) ? $this->_subTemplates[$placeholder] : false;
+		return isset($this->_subTemplates[$placeholder]) ? $this->_subTemplates[$placeholder] : false;
 	}
 }
