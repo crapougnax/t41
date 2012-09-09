@@ -47,12 +47,12 @@ abstract class AbstractWebDecorator extends AbstractDecorator {
 	public function __construct($obj, array $params = null)
 	{
 		parent::__construct($obj, $params);
-		View::addCoreLib('style.css');
 	}
 	
 	
 	public function render()
 	{
+		View::addCoreLib('style.css');
 		return $this->_headerRendering() . $this->_contentRendering() . $this->_footerRendering();
 	}
 
