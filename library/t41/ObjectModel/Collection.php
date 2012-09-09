@@ -639,18 +639,24 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
-	
+	/**
+	 * Return the number of distinct objects matching the given property
+	 * @param string $string
+	 * @param unknown_type $backend
+	 * @throws Backend\Exception
+	 * @return array
+	 */
 	public function returnsDistinct($string, $backend = null)
 	{
 		$prop = $this->_do->getProperty($string);
 		if (! $prop instanceof Property\AbstractProperty) {
-			
 			throw new Backend\Exception(array("CONDITION_UNKNOWN_PROPERTY", $string));
 		}
 		
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
 		return (array) Backend::returnsDistinct($this, $prop, $backend);
 	}
+
 	
 	/*
 	 * Capture unknown methods and try to match them with some shortcut patterns:

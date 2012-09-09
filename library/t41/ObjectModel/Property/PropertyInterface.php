@@ -39,7 +39,7 @@ interface PropertyInterface {
 	public function setValue($value);
 	
 	
-	public function getValue();
+	public function getValue($param);
 	
 	
 	public function getLabel($lang = null);

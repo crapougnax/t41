@@ -75,47 +75,37 @@ class ObjectUri implements Core\ClientSideInterface {
 	 * (ex: '1', '/1', '@backend/1', '/table/1', '@backend/table/1', 'mysql://user:pwd@host:port/database/table/1')
 	 *
 	 * @param string $str
-	 * @param t41_Backend_Uri $backendUri
+	 * @param t41\Backend\BackendUri $backendUri
 	 */
 	public function __construct($str = null, Backend\BackendUri $backendUri = null)
 	{
 		if (! is_null($str)) {
-			
 			$this->setUrl($str);
 			
 			$parts = explode('/', $str);
 			
 			// we only got one identifier, use default backend
 			if (count($parts) == 1) {
-				
 				$this->_backendUri = $backendUri ? $backendUri->getUri() : Backend::getDefaultBackend()->getUri();
 				$this->_identifier = $str;
 			
 			} else {
-				
 				if (substr($parts[0], 0, 1) == Backend::PREFIX) {
-
 					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);
 					$this->_identifier = $parts[count($parts) - 1];
 					$this->_url = implode('/', $parts);
 				
 				} else if ($backendUri) {
-
 					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);
 					$this->_url = $str;
 					
 				} else {
-					
 					// uri contains a backend reference which is not an alias
 					// @todo implement tests
-					\Zend_Debug::dump($parts);
-					//var_dump($str);
-					die('litteral backend definition not yet implemented');
+					throw new Exception('litteral backend definition not yet implemented');
 				}
 			}
 		}
-		
-//		Zend_Debug::dump($this); die;
 	}
 	
 	

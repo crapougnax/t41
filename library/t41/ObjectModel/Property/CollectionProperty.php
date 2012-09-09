@@ -2,6 +2,8 @@
 
 namespace t41\ObjectModel\Property;
 
+use t41\Backend;
+
 /**
  * t41 Toolkit
  *

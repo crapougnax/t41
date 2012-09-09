@@ -180,10 +180,24 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	 * (non-PHPdoc)
 	 * @see t41\ObjectModel\Property.PropertyInterface::getValue()
 	 */
-	public function getValue()
-	{		
+	public function getValue($param = null)
+	{	
 		$this->_triggerRules('before/get');
-		$value = $this->_value;
+		
+		switch ($param) {
+			
+			case 'display':
+				$value = $this->getDisplayValue();
+				break;
+				
+			case 'default':
+				$value = $this->getDefaultValue();
+				break;
+				
+			default:
+				$value = $this->_value;
+				break;
+		}
 		$this->_triggerRules('after/get');
 		return $value;
 	}
