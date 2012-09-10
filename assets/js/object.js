@@ -166,22 +166,18 @@ if (! window.t41.object) {
 		this.data,this.params,this.uuid;
 		
 		this.get = function(key, formatted) {
-			
-			return this.data && this.data.get(key) ? this.data.get(key, formatted): null;
+			return this.data && typeof this.data.get(key) != 'undefined' ? this.data.get(key, formatted): null;
 		};
 		
 		this.getProperty = function(key) {
-			
 			return this.data && this.data.getProperty(key) ? this.data.getProperty(key): null;
-		}
+		};
 		
 		this.set = function(key,val) {
-			
 			return this.data.set(key,val);
 		};
 		
 		this.save = function() {
-			
 			t41.core.ajax(t41.core.backend + '/object/save', {uuid:this.uuid, data:this.data.toArray()});
 		};
 	};
