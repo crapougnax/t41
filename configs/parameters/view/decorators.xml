@@ -21,8 +21,10 @@
 		</object>
 		<object id="\t41\View\FormComponent">
 			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
-				<bogus/>
-		</decorator>
+				<parameters>
+					<bogus/>
+				</parameters>
+			</decorator>
 		</object>
 
 		<object id="\t41\View\TableComponent">
@@ -106,6 +108,9 @@
 		<object id="\t41\View\FormComponent\Element\ListElement">
 			<decorator id="WebDefault" extends="\t41\View\Decorator\AbtractWebDecorator">
 				<parameters>
+					<parameter id="name">
+						<type>string</type>
+					</parameter>
 					<parameter id="mode">
 						<type>string</type>
 					</parameter>
