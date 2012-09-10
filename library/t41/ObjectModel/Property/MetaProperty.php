@@ -40,7 +40,7 @@ use t41\ObjectModel\DataObject,
 class MetaProperty extends AbstractProperty {
 
 	
-	public function getValue()
+	public function getValue($param = null)
 	{
 		if ($this->_value != null) {
 			return parent::getValue();
