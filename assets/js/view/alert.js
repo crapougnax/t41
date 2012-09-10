@@ -10,9 +10,10 @@
  */
 window.t41.view.alert = function(str,o) {
 
-	this.str = str || 'no content';
+	this.str = str || '';
 	this.o = o || {};
 	this.buttons = {};
+	this.visible = false;
 	
 	// default options
 	this.defaults = {
@@ -54,7 +55,6 @@ window.t41.view.alert = function(str,o) {
 	this.applyOptions = function() {
 		// extend given options with default ones
 		this.o = jQuery.extend(true, this.defaults, this.o);
-
 		if (this.o.level == 'error') this.o.title = 'Erreur';
 	};
 
@@ -62,52 +62,98 @@ window.t41.view.alert = function(str,o) {
 		// compile options at execution time only
 		this.applyOptions();
 
-		var o = this.o;
-		var str = this.str;
-
 		// remove any other element with my ID
-		jQuery('#'+o.id).remove();
+		jQuery('#' + this.o.id).remove();
 
 		// put wrapper in the DOM
-		jQuery('body').append('<div id="'+o.id+'" class="t41 component alert" style="display: none;" />');
+		jQuery('body').append('<div id="' + this.o.id + '" class="t41 component alert" style="display:none;" />');
 
 		// link wrapper in 'this'
-		this.alert = jQuery('#'+o.id);
+		this.alert = jQuery('#' + this.o.id);
 
 		// append the rest of the required HTML
 		this.alert.append('<a class="title"></a>');
 		
-		this.alert.children('.title').append('<span class="icon_"/>'+o.title);
+		this.alert.children('.title').append('<span class="icon_"/>' + this.o.title);
 
 		this.addIcon();
 
 		this.alert.append('<div class="content" />')
-			.addClass(o.addClass)
+			.addClass(this.o.addClass)
 			.children('.content')
-				.html(str)
+				.html(this.str)
 				.after('<div class="buttons" />');
 
 	
 		this.addButtons();
-
 		this.show();
 
 		// launch timer if set so
-		if (o.timer>0) {
-			setTimeout(jQuery.proxy(this, 'close'), o.timer*1000);
+		if (this.o.timer > 0) {
+			setTimeout(jQuery.proxy(this, 'close'), this.o.timer*1000);
 		}
 	};
+	
+	
+	this.setContent = function(str,level) {
+		
+		this.str = str;
+		if (this.visible == true) {
+			this.alert.find('.content').html(this.str);
+		}
+	};
+	
+	
+	this.addContent = function(str,params) {
+	
+		// remove waiting image
+		this.alert.find('.wait').remove();
+		
+		var params = params || {};
+		if (params.level) {
+			switch (params.level) {
+				case 'warning':
+					str = '<span style="color:orange">' + str + '</span>';
+					break;
+				
+				case 'error':
+					str = '<span style="color:red;font-weight:bold">' + str + '</span>';
+				break;
+				
+				case 'waiting':
+					// we don't want to keep the waiting image in this.str 
+					this.str += str;
+					this.alert.find('.content').html(this.str + '<img src="/assets/images/waiting.gif" class="wait" style="vertical-align:middle"/>');
+					return;
+					break;
+				
+				case 'return': //return status
+					if (str == t41.core.status.ok) {
+						str = '<span style="font-weight:bold;color:green">OK</span><br/>';
+					} else {
+						str = '<span style="font-weight:bold;color:red;text-align:right;width:100%">ERR</span><br/>';
+					}
+					break;
+			}
+		}
+		
+		this.str += str;
+		if (this.visible == true) {
+			this.alert.find('.content').html(this.str);
+		}
+	};	
 
 	
 	this.show = function() {
+
 		var alert = this.alert;
 		var o = {
-			position: this.o.position,
-			offset: this.o.offset,
-			parent: this.o.parent
-		};
+					position: this.o.position,
+					offset: this.o.offset,
+					parent: this.o.parent
+				};
 		// bind position update on parent resize
-		this.o.parent.bind('resize.t41_alert_'+this.o.id, function() {
+		this.o.parent.bind('resize.t41_alert_' + this.o.id, function() {
 			alert.css(t41.view.getPosition(alert, o));
 		});
 
@@ -118,31 +164,32 @@ window.t41.view.alert = function(str,o) {
 			this.showOverlay();
 		}
 
+		this.alert.css('z-index', 15000);
 		this.alert.fadeIn();
+		this.visible = true;
 	};
 
 	
 	this.showOverlay = function() {
 
 		// building the overlay
-		this.overlay = jQuery('<div class="alert_overlay" />');
-		jQuery('body').append(this.overlay);
+		this.overlay = new t41.view.overlay({loose:this.o.persistance});
+		this.overlay.show();
 
 		// if additional classes were set, put them on overlay too
-		this.overlay.addClass(this.o.addClass);
+		//this.overlay.addClass(this.o.addClass);
 
 		// persistance option forces to use the alert buttons to hide the overlay+alert 
 		if (this.o.persistance == false) {
-			this.overlay.bind('click', jQuery.proxy(this, 'close'));
+			//this.overlay.bind('click', jQuery.proxy(this, 'close'));
 		}
 	};
 
 	
 	this.hideOverlay = function() {
 		// fadeout and remove from DOM
-		this.overlay.fadeOut('slow', function() {
-			jQuery('.alert_overlay').remove();
-		});
+		this.overlay.hide();
+		//	jQuery('.alert_overlay').remove();
 	};
 
 	
@@ -151,9 +198,10 @@ window.t41.view.alert = function(str,o) {
 		this.alert.css('z-index', 100);
 
 		if (this.o.overlay) {
-			this.hideOverlay();
+			this.overlay.hide(); //hideOverlay();
 		}
 		// fadeout and destroy
+		this.visible = false;
 		this.alert.fadeOut('slow', function() {
 			jQuery.proxy(this, 'destroy');
 		});
@@ -217,6 +265,15 @@ window.t41.view.alert = function(str,o) {
 		}
 	};
 
+	/**
+	 * Add the given t41.view.button object to the button div and bind given callback
+	 */
+	this.addButton = function(button, callback) {
+		
+		jQuery('#' + this.o.id + ' .buttons').append(button);
+		jQuery(button).bind('click', callback);
+	};
+	
 	this.addIcon = function() {
 		if (this.o.icon===false) {
 			// no icon
@@ -237,18 +294,15 @@ window.t41.view.alert = function(str,o) {
 		}
 	};
 	
-	
 	// constructor
-	if (this.defaults.autorun == true) {
+	if ((o && o.autorun && o.autorun == true) || ((!o || typeof o.autorun == 'undefined') && this.defaults.autorun == true)) {
 
 		// run at once if param says so
 		this.applyOptions();
 		
 		if (this.o.defer == true) {
-		
 			// register alert for later
 			t41.core.setCookie('t41DeferredAlert', str);
-			
 		} else {
 			this.run();
 		}
