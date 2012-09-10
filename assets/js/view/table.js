@@ -299,7 +299,7 @@ if (! window['t41']['view']['table']) {
 						// data is a t41.object.data.property object
 						cell.innerHTML = data.get(true);
 					} else {
-						cell.innerHTML = data.value ? t41.view.format(data.value, data.type, args) : null;
+						cell.innerHTML = typeof data.value != 'undefined' ? t41.view.format(data.value, data.type, args) : null;
 					}
 				}
 			}
