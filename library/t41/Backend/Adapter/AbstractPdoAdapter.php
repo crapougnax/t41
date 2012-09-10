@@ -419,12 +419,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		/* @var $condition t41\Backend\Condition */
 		foreach ($collection->getConditions() as $conditionArray) {
 			
+			// combo conditions
 			if ($conditionArray[0] instanceof Condition\Combo) {
 				
 				$statement = array();
 				
 				foreach ($conditionArray[0]->getConditions() as $condition) {
-					
 					$statement[] = $this->_parseCondition($condition[0]);
 				}
 				
@@ -463,14 +463,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$condition = $condition->getCondition();
 						
 					if ($jtable) {
-						
 						$parentTable = $jtable;
-						
 					} else if ($parent) {
-						
 						$parentTable = $this->_mapper ? $this->_mapper->getDatastore($parent) : $parent;
 					} else {
-						
 						$parentTable = $table;
 					}
 						
@@ -520,12 +516,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$field = $property->getId();
 				
 				if ($this->_mapper) {
-
 					$field = $this->_mapper->propertyToDatastoreName($class, $field);
 				}
 			}
 
-			
 			if( $field == ObjectUri::IDENTIFIER) {
 				
 				// @todo search mapper for a different key
@@ -692,53 +686,40 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			 * @var $value t41\ObjectModel\BaseObject
 			 */
 			if ($value instanceof ObjectModel\BaseObject || $value instanceof ObjectModel\DataObject) {
-
 				if ($value->getUri() == null) {
-					
-					//\Zend_Debug::dump($value); die;
 					throw new Exception(array("OBJECT_HAS_NO_URI", get_class($value)));
 				}
 				
 				if ($value->getUri()->getBackendUri() && $value->getUri()->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
-					
 					$value = $value->getUri()->getIdentifier();
 				
 				} else {
-					
 					$value = $value->getUri();
 				}
 				
 			} else if ($value instanceof ObjectModel\ObjectUri) {
-								
 				if ($value->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
-				
 					$value = $value->getIdentifier();
 				}
 				/* in any other case, use uri's string representation as key */
 			}
 			
 			if (is_array($value)) {
-		
 				$_operators[Backend\Condition::OPERATOR_EQUAL]	= 'IN';
 				$_operators[Backend\Condition::OPERATOR_DIFF]	= 'NOT IN';
 			
 			} else {
-
 				if (in_array(Backend\Condition::OPERATOR_BEGINSWITH, $ops)) {
-			
 					$value .= '%';
 					$fuzzy = true;
 				}
-		
 				if (in_array(Backend\Condition::OPERATOR_ENDSWITH, $ops)) {
-			
 					$value = '%' . $value;
 					$fuzzy = true;
 				}
 			}
 			
 			if ($fuzzy) {
-				
 				$_operators[Backend\Condition::OPERATOR_EQUAL]	= 'LIKE';
 				$_operators[Backend\Condition::OPERATOR_DIFF]	= 'NOT LIKE';
 			}
@@ -832,8 +813,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$field = $property->getId();
 		
 			if ($this->_mapper) {
-		
 				$field = $this->_mapper->propertyToDatastoreName($class, $field);
+			} else {
+				
+				$field = $this->_getTableFromClass($property->getParent()->getClass()) . '.'  . $field;
 			}
 		}
 		
