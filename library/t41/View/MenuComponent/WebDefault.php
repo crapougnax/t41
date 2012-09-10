@@ -22,7 +22,7 @@ namespace t41\View\MenuComponent;
  * @version    $Revision: 865 $
  */
 
-use t41\View\Decorator\AbstractWebDecorator;
+use t41\View,t41\View\Decorator\AbstractWebDecorator;
 
 /**
  * Web Decorator for the MenuComponent View Element
@@ -37,6 +37,8 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
+		View::addCoreLib('style.css');
+		
 		$html = '';
 		
 		foreach ($this->_obj->getMenu()->getItems() as $moduleKey => $module) {

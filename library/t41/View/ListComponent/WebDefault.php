@@ -94,6 +94,8 @@ class WebDefault extends AbstractWebDecorator {
 	
     public function render()
     {
+    	View::addCoreLib('style.css');
+    	
     	$this->_collection = $this->_obj->getCollection();
     	
     	// set relevant uri adapter and get some identifiers 
