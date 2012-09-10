@@ -186,12 +186,25 @@ if (! window.t41.view) {
 			var action = eval(action);
 		}
 
-		// unbind any existing same type event
-		jQuery(element).unbind(event);
 		jQuery(element).bind(event, {caller:obj}, action);
+		return element;
 	};
 	
+
+	/**
+	 * unbind any existing same-type event
+	 * @param element
+	 * @param event
+	 */
+	window.t41.view.unbind = function(element, event) {
+		if (typeof element == 'string') {
+			var element = jQuery('#' + element);
+		}
+		jQuery(element).unbind(event);
+		return element;
+	};
 	
+
 	/**
 	 * Bind an event to a DOM element
 	 * @param val
@@ -296,7 +309,69 @@ if (! window.t41.view) {
         var css = {'top': top, 'left': left};
 
         return css;
-    }; 
+    };
+    
+
+    /**
+     * Sets a new overlay object and optionally bind an element to display
+     * 
+     * Params:
+     * dom		: id or dom object to display when the overlay is showed
+     * loose	: TRUE defines wether the overlay is hidden when user clicks anywhere on it
+     * color	: #000 overlay color
+     * opacity	: 75 overlay opacity
+     * 
+     * @param params
+     * @returns {t41.view.overlay}
+     */
+    window.t41.view.overlay = function(params) {
+    
+    	this.defaults = {loose:true, color:'#000', opacity:75};
+    	this.params = jQuery.extend(true, this.defaults, params);
+
+    	if (this.params.dom) {
+    		this.element = typeof this.params.dom == 'string' ? jQuery('#' + this.params.dom) : this.params.dom;
+    		this.element.hide();
+    	}
+    	
+    	this.show = function() {
+    		if (jQuery('#t41_overlay').length == 0) {
+    			
+    			var css = {
+    						'background-color':this.params.color, 
+    						opacity:this.params.opacity/100,
+    						filter:'alpha(opacity=' + this.params.opacity + ')', 
+    						'-moz-opacity':this.params.opacity/100,
+    						'-khtml-opacity':this.params.opacity/100,
+    						position:'fixed', 
+    						left:0, 
+    						top:0, 
+    						width:'100%', 
+    						height:'100%', 
+    						'z-index':10000
+    					  };
+    			var overlay = document.createElement('div');
+    			jQuery(overlay).attr('id', 't41_overlay').css(css);
+    			if (this.params.loose) jQuery(overlay).bind('click', jQuery.proxy(this, 'hide'));
+    			jQuery(overlay).appendTo(document.body);
+    		}
+    		
+    		if (this.element) {
+    			this.element.css({'z-index':15000, width:jQuery(window).width()/1.5, position:'absolute'});
+    			this.element.css("top", Math.max(0, ((jQuery(window).height() - this.element.outerHeight()) / 2) + jQuery(window).scrollTop()) + "px");
+    			this.element.css('left', Math.max(0, ((jQuery(window).width() - this.element.outerWidth()) / 2) + jQuery(window).scrollLeft()) + "px");
+    			this.element.show();
+    		}
+    		jQuery('#t41_overlay').fadeIn('slow');
+    		
+    	};
+    	
+    	this.hide = function() {
+    		jQuery('#t41_overlay').fadeOut('slow');
+    		if (this.element) this.element.hide();
+    	};
+    };
+    
 	
 	window.t41.view.component = function(params) {
 		
