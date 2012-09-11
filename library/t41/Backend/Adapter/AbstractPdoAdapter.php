@@ -520,11 +520,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 			}
 
-			if( $field == ObjectUri::IDENTIFIER) {
-				
+			if ($field == ObjectUri::IDENTIFIER) {
 				// @todo search mapper for a different key
 				$field = Backend::DEFAULT_PKEY;
 			}
+			
 			/* if a join was performed, prefix current field with table name */
 			else if ($jtable) {
 					
@@ -590,14 +590,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 
 			// return count on grouped columns
 			foreach ($returnCount as $field) {
-				
 				if ($this->_mapper) {
-						
 					$class = $field->getParent() ? $field->getParent()->getId() : $collection->getDataObject()->getClass();
 					$field = $this->_mapper->propertyToDatastoreName($class, $field->getId());
-						
 				} else {
-				
 					$field = $field->getId();
 				}
 				$select->group($field);
@@ -611,11 +607,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$context = array('table' => $table);
 		
 		try {
-
 			$result = $this->_ressource->fetchAll($select);
-		
 		} catch (\Zend_Db_Exception $e) {
-			
 			$context['error'] = $e->getMessage();
 			$this->_setLastQuery($select->__toString(), $select->getPart('where'), $context);
 			return false;
@@ -624,14 +617,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_setLastQuery($select->__toString(), $select->getPart('where'), $context);
 		
 		if ($returnCount !== false) {
-			
 			return is_array($returnCount) ? $result : $result[0][Backend::MAX_ROWS_IDENTIFIER];
 		}
 		
 		
 		// convert array of primary keys to strings
 		foreach ($result as $key => $val) {
-			
 			$result[$key] = implode(Backend\Mapper::VALUES_SEPARATOR, $val);
 		}
 		
@@ -821,13 +812,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		}
 		
 		/* if a join was performed, prefix current field with table name */
+		// @todo refactor there and in find()
 		if ($jtable) {
 				
-			$field = $jtable . '.' . $field;
+			//$field = $jtable . '.' . $field;
 		
 		} else if($table) {
 		
-			$field = $table . '.' . $field;
+			//$field = $table . '.' . $field;
 		}
 		
 		$statement = $this->_buildConditionStatement($field, $condition->getClauses(), 'OR'); //$conditionArray[1]);
