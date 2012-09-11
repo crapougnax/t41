@@ -40,6 +40,8 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
+		View::addCoreLib(array('view:table2.js','view:action:autocomplete.js'));
+		
 		$id = $this->_nametoDomId($this->_obj->getBoundObject()->getId());
 		$event = sprintf("t41.view.registry['%s'] = new t41.view.action.autocomplete(%s,'%s')"
 						, $id
