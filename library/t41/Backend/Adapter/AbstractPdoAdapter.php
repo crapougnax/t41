@@ -159,7 +159,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		} catch (\Exception $e) {
 			
 			if (true) {
-				throw new Exception("Error Creating Record: " . $e->getMessage());
+				throw new Exception("Error Creating Record in $table : " . $e->getMessage());
 			} else {
 				
 				return false;
