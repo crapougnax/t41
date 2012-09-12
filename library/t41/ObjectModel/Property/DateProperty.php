@@ -22,6 +22,8 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 832 $
  */
 
+use t41\ObjectModel\Property\Exception;
+
 /**
  * Class for a Date Property
  *
@@ -32,19 +34,29 @@ namespace t41\ObjectModel\Property;
  */
 class DateProperty extends AbstractProperty {
 
-/*	
+	
+	const TODAY		= 'TODAY';
+	
+
 	public function setValue($value)
 	{
-		Zend_Loader::loadClass('Zend_Date');
-		
-		if (! Zend_Date::isDate($value, $this->getParameter('format'))) {
+		switch ($value) {
 			
-			throw new t41_Property_Exception(array("VALUE_NOT_A_DATE", array($this->_id, $value)));
+			case self::TODAY:
+				$value = date('Y-m-d H:i:s');
+				break;
+				
+			default:
+				if ($this->getParameter('format') && ! \Zend_Date::isDate($value, $this->getParameter('format'))) {
+					throw new Exception(array("VALUE_NOT_A_DATE", array($this->_id, $value)));
+				}
+				break;
 		}
 		
-		parent::setValue(new Zend_Date($value));
+		parent::setValue($value);
 	}
-	*/
+	
+	
 	
 	public function getDisplayValue()
 	{
