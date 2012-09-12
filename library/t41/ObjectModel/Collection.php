@@ -172,16 +172,13 @@ class Collection extends ObjectModelAbstract {
 	{
 		$class = $this->getClass();
 		if (! $object instanceof $class) {
-			
-			throw new Exception(array('VALUE_MUST_BE_INSTANCEOF', $class));
+			throw new Exception(array('NOT_INSTANCEOF', array(get_class($object),$class)));
 		}
 
 		if ($position == self::MEMBER_PREPEND) {
-			
 			array_unshift($this->_members, $object);
 			
 		} else {
-			
 			// @todo add instant saving of unsaved members before any find()
 			$this->_members[] = $this->_spool['save'][] = $object;
 		}
