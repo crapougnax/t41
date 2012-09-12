@@ -192,7 +192,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		this.defaultSelect = function(id) {
 			
-			if (! this.currentSuggestions[i]) {
+			if (! this.currentSuggestions[id]) {
 				
 				console.log('Missing member for key ' + id);
 			}
@@ -419,7 +419,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		switch (ac.displayMode) {
 		
 			case 'table':
-				var id = jQuery(obj.target).parent('tr').data('id');
+				var id = jQuery(obj.target).parent('tr').attr('data-id');
 				break;
 				
 			case 'list':
