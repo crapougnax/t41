@@ -500,7 +500,7 @@ class Core {
     				
     				if (! is_array($value)) continue;
     				
-    				if (isset($value['hostname']) && $value['hostname'] == $match) {
+    				if (isset($value['hostname']) && in_array($match, (array) $value['hostname'])) {
     					$envKey = self::$env = $key;
     					break;
     				}
