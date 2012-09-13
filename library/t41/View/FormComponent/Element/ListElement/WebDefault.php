@@ -42,20 +42,12 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
-		$value = null;
-		
-		if ($this->_obj->getValue()) {
-		
-			$value = $this->_obj->getValue();
+		if (($value = $this->_obj->getValue()) !== false) {
 			if (($value instanceof ObjectModel\BaseObject || $value instanceof ObjectModel\DataObject) && $value->getUri()) {
-					
-				$value = $value->getUri()->getIdentifier();
-				
+				$value = $this->_obj->getParameter('altkey') ? $value->getProperty($this->_obj->getParameter('altkey'))->getValue() : $value->getUri()->getIdentifier();
 			} else if ($value instanceof ObjectModel\ObjectUri) {
-				
 				$value = $value->getIdentifier();
 			} else {
-				
 				$value = null;
 			}
 		}
@@ -71,7 +63,7 @@ class WebDefault extends AbstractWebDecorator {
 		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('select_max_values') 
 				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
 
-			View::addCoreLib('view:action:autocomplete.js');
+			View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
 			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
 			//$acfield->setValue($this->_obj->getValue()->getDisplayValue());
 			
@@ -90,15 +82,12 @@ class WebDefault extends AbstractWebDecorator {
 			$deco->render();
 			
 			$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s"/>', $name, $this->_nametoDomId($name), $value);
-			
 			return $html . "\n";
 			
 		} else {
-			
 			// display menu list
 			$zv = new \Zend_View();
 			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
-			
 			return $zv->formSelect($name, $value, null, $options);
 		}
 	}
