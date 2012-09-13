@@ -66,8 +66,16 @@ class DateProperty extends AbstractProperty {
 	
 	static public function format($str)
 	{
-		$parts = explode('-', $str);
-		$parts = array_reverse($parts);
-		return implode('/', $parts);
+		$parts = explode(' ', $str);
+			
+		$date = explode('-', $parts[0]);
+		$date = array_reverse($date);
+		$date = implode('/', $date);
+		
+		if (isset($parts[1])) {
+			$hour = explode(':',$parts[1]);
+			$date .= sprintf(' %dh%d', $hour[0], $hour[1]);
+		}
+		return $date;
 	}
 }
