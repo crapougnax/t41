@@ -2,6 +2,8 @@
 
 namespace t41\View\Action;
 
+use t41\ObjectModel\ObjectUri;
+
 /**
  * t41 Toolkit
  *
@@ -68,6 +70,8 @@ class AutocompleteAction extends AbstractAction {
 	public $queryfield = '_query';
 	
 	
+	public $queryidfield	= '_id';
+	
 	
 	/**
 	 * Execute the action and returns a result
@@ -76,32 +80,39 @@ class AutocompleteAction extends AbstractAction {
 	 */
 	public function execute($params = null)
 	{
-		if (! isset($params[$this->queryfield]) || empty($params[$this->queryfield])) {
-			
+		if ((! isset($params[$this->queryfield]) || empty($params[$this->queryfield]))
+		&& (! isset($params[$this->queryidfield]) || empty($params[$this->queryidfield]))) {
 			return false;
 		}
 		
 		if (isset($params['_offset'])) {
-			
 			$this->setParameter('offset', (int) $params['_offset']);
 		}
 		
 		if (Core::getEnvData('cache_datasets') === true) {
-			
+
+			$md5 = md5(isset($params[$this->queryfield]) ? $params[$this->queryfield] : $params[$this->queryidfield]);
 			//@todo check unicity, especially with hard-coded conditions having()
-			$ckey = 'ds_ac_' . $this->_cachePrefix . '_' . md5($params[$this->queryfield])
+			$ckey = 'ds_ac_' . $this->_cachePrefix . '_' . $md5
 				  . '_' . $this->getParameter('offset') . '_' . $this->getParameter('batch');
 		
 			if (($data = Core::cacheGet($ckey)) === false) {
-			
-				$data = $this->_getSuggestions(trim($params[$this->queryfield]));
+				if (isset($params[$this->queryfield])) {
+					$data = $this->_getSuggestions(trim($params[$this->queryfield]));
+				} else {
+					$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
+				}
 				$data['cache-key'] = $ckey;
 				Core::cacheSet($data,$ckey);
 			}
 			
 		} else {
 			
-			$data = $this->_getSuggestions($params[$this->queryfield]);
+			if (isset($params[$this->queryfield])) {
+				$data = $this->_getSuggestions(trim($params[$this->queryfield]));
+			} else {
+				$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
+			}
 		}
 		
 		return $data;
@@ -141,6 +152,31 @@ class AutocompleteAction extends AbstractAction {
 		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());	
 	}
 	
+	
+	/**
+	 * Execute a find() call on the collection with the current query
+	 * @param string $query
+	 * @return array
+	 */
+	protected function _getFromIdentifier($id)
+	{
+		$data = array();
+	
+		$this->_obj->having(ObjectUri::IDENTIFIER)->equals($id);	
+		$this->_obj->setBoundaryOffset(0);
+		$this->_obj->setBoundaryBatch(1);
+			
+		if ($this->_obj->find(ObjectModel::MODEL) === false) {
+			return false;
+		}
+	
+		//\Zend_Debug::dump(\t41\Backend::getLastQuery()); die;
+		foreach ($this->_obj->getMembers() as $member) {
+			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
+		}
+	
+		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());
+	}
 	
 	public function getDisplay()
 	{

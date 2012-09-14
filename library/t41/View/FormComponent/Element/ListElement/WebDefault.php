@@ -65,11 +65,11 @@ class WebDefault extends AbstractWebDecorator {
 
 			View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
 			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
-			//$acfield->setValue($this->_obj->getValue()->getDisplayValue());
+			$acfield->setValue($value);
 			
 			$action = new AutocompleteAction($this->_obj->getCollection());
 			$action->setParameter('search', array('label'));
-			$action->setParameter('display', array('type','label'));
+			$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
 			$action->setParameter('event', 'keyup');
 			$action->setContextData('onclick', 't41.view.element.autocomplete.close');
 			$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());

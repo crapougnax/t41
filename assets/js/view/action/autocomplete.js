@@ -67,12 +67,30 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			// add accessories DOM elements
 			var span = document.createElement('SPAN');
 			span.setAttribute('id', this.target + '_display');
+			span.setAttribute('title', 'cliquez pour modifier');
 			t41.view.bindLocal(span, 'click', t41.view.action.autocomplete.reset, this);
 			this.element.after(span);
 			
+			// if a value exists, transform it
+			if ((_id = jQuery('#' + this.target).val()) != '') {
+				
+				var config = {
+						action:this.action,
+						callback:jQuery.proxy(this, 'displaySavedValue'),
+						data:{_id:_id,uuid:this.uuid}
+					 };
+				t41.core.call(config);
+			}
 			// bind observer
 			t41.view.bindLocal(this.element, 'keyup', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
+		};
+		
+		
+		
+		this.displaySavedValue = function(obj) {
+			var val = obj.data.collection[obj.data._id];
+			this.setValue(obj.data._id, this.prepareDisplay(val));
 		};
 		
 		
@@ -150,7 +168,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			}
 
 			return {txt:helpertext, css:css};
-
 		};
 
 		
@@ -223,7 +240,9 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			var display = jQuery('#' + this.target + '_display').css({
 				width: width+'px',
 				display: 'inline-block',
-				cursor: 'pointer'
+				cursor: 'pointer',
+				'text-align':'left',
+				'margin-left':'5px'
 			});
 			display.html(label);
 			jQuery('#' + this.target).val(key);
