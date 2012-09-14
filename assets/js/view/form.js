@@ -63,14 +63,10 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.save = function(obj) {
 		
-		// get js object handling form
-		//var form = window[obj.data.caller];
-
 		// remove all error spans
 		jQuery('#' + this.id + '_form span.error').remove();
 		
 		// get form elements in an key/value array
-//		var selector = '#' + this.id + '_form .field > :input';
 		var elements = [];
 		jQuery.map(jQuery(this.formId).serializeArray(), function(n, i){ elements[n['name']] = n['value'];});
 		
