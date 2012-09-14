@@ -49,6 +49,9 @@ class WebDefault extends SimpleComponent\WebDefault {
 	 */
     public function render()
     {
+    	View::addCoreLib(array('style.css','buttons.css','sprites.css'));
+    	View::addCoreLib(array('core.js','view.js','view:form.js','view:alert.js'));
+    	
     	// cache object and create its client-side js counterpart
     	$reduced = $this->_obj->getSource()->reduce();
     	$this->_id = $this->_obj->getId() ? $this->_obj->getId() : 't41_' . md5(time());
@@ -114,14 +117,7 @@ class WebDefault extends SimpleComponent\WebDefault {
             			 );
             			 
             if ($field->getValue() != null && $field->getConstraint(Property::CONSTRAINT_PROTECTED) == true) {
-            	
             	$p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
-            	
-            	// if field is defined and not editable BUT data is not in backend, we need to provide field value
-  //          	if ($this->_obj->getParameter('rowid') == null) {
-            		
-            	//	$p .= sprintf('<input type="hidden" name="%s" value="%s" />' . "\n", $field->getAltId(), $field->getValue()); 
-            //	}
             	continue;
             }
             
