@@ -471,8 +471,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					}
 						
 					$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
-					
-					if (in_array($jtable, $alreadyJoined)) {
+					$uniqext = $jtable . '_' . uniqid();
+						
+					if (in_array($uniqext, $alreadyJoined)) {
 						$class = $property->getParameter('instanceof');
 						continue;
 					}
@@ -483,9 +484,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					/* pkey name in joined table */
 					$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 					
-					$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $jtable, $jpkey);
-					$select->joinLeft($jtable, $join, array());
-					$alreadyJoined[] = $jtable;
+					$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $uniqext, $jpkey);
+					$select->joinLeft($jtable . " AS $uniqext", $join, array());
+					$alreadyJoined[] = $uniqext; //$jtable;
+					$jtable = $uniqext;
 					$class = $property->getParameter('instanceof');
 				}
 			}
@@ -498,7 +500,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$jtable2 = $jtable ? $jtable : $table;
 				
 				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
-
+				$uniqext = $jtable . '_' . uniqid();
+				
 				if (in_array($jtable, $alreadyJoined)) {
 					continue;
 				}
@@ -506,10 +509,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
 				$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 
-				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $jtable, $rightkey);
-				$select->joinLeft($jtable, $join, array());
-				
-				$alreadyJoined[] = $jtable;
+				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
+				$select->joinLeft($jtable . " AS $uniqext", $join, array());
+				$jtable = $uniqext;
+				$alreadyJoined[] = $uniqext;
 				
 			} else {
 				
