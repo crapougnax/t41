@@ -471,15 +471,16 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					}
 						
 					$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
-					$uniqext = $jtable . '_' . uniqid();
 						
-					if (in_array($uniqext, $alreadyJoined)) {
-						$class = $property->getParameter('instanceof');
-						continue;
-					}
-					
 					/* column name in left table */
 					$jlkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
+						
+					$uniqext = $jtable . '__joined_for__' . $jlkey;
+					if (in_array($uniqext, $alreadyJoined)) {
+						$class = $property->getParameter('instanceof');
+						$jtable = $uniqext;
+						continue;
+					}
 						
 					/* pkey name in joined table */
 					$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
@@ -500,15 +501,15 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$jtable2 = $jtable ? $jtable : $table;
 				
 				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
-				$uniqext = $jtable . '_' . uniqid();
-				
-				if (in_array($jtable, $alreadyJoined)) {
-					continue;
-				}
 				
 				$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
 				$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 
+				$uniqext = $jtable . '__joined_for__' . $leftkey;
+				if (in_array($uniqext, $alreadyJoined)) {
+					continue;
+				}
+				
 				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
 				$select->joinLeft($jtable . " AS $uniqext", $join, array());
 				$jtable = $uniqext;
