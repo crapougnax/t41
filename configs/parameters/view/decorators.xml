@@ -127,6 +127,13 @@
 					<parameter id="mode">
 						<type>string</type>
 					</parameter>
+					<parameter id="radiomax">
+						<type>integer</type>
+						<defaultvalue>3</defaultvalue>
+					</parameter>
+					<parameter id="defaultlabel">
+						<type>string</type>
+					</parameter>
 				</parameters>
 		</decorator>
 		</object>

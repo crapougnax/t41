@@ -46,9 +46,9 @@ class WebDefault extends AbstractWebDecorator {
 			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
 		}
 
-		if (count($this->_obj->getEnumValues()) > 3) {
+		if (count($this->_obj->getEnumValues()) > $this->getParameter('radiomax')) {
 			// display menu list
-			$options = array(null => '') + (array) $this->_obj->getEnumValues();
+			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
 			$zv = new \Zend_View();
 			return $zv->formSelect($name, $this->_obj->getValue(), null, $options);
 		
