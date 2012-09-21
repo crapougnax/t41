@@ -23,11 +23,11 @@ namespace t41\View\ListComponent;
  */
 
 
-use t41\ObjectModel\Property\MetaProperty;
-
 use t41\Core,
 	t41\ObjectModel,
 	t41\ObjectModel\Property,
+	t41\ObjectModel\Property\MetaProperty,
+	t41\ObjectModel\Property\ObjectProperty,
 	t41\View\Decorator\AbstractWebDecorator,
 	t41\View,
 	t41\View\ViewUri,
@@ -125,8 +125,10 @@ class WebDefault extends AbstractWebDecorator {
     				$property = $this->_collection->getDataObject()->getProperty($field);
     				
     				if ($property instanceof MetaProperty) {
-    					
     					$this->_collection->having($property->getParameter('property'))->contains($value);
+    				} else if ($property instanceof ObjectProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->equals($value);
     				} else {
 
     					$this->_collection->resetConditions($field);

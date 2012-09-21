@@ -2,6 +2,8 @@
 
 namespace t41\View;
 
+use t41\Backend;
+
 /**
  * t41 Toolkit
  *
@@ -165,7 +167,6 @@ class ListComponent extends ViewObject {
     			$this->_columns[] = $obj;
     		}
     	}
-    //	\Zend_Debug::dump($this->_columns); die;
     	return $this->_columns;
     }
     
@@ -194,9 +195,7 @@ class ListComponent extends ViewObject {
      */
     public function addRowAction($link, $button = null, array $params = null)
     {
-    	
     	if (! $button instanceof ButtonElement) {
-    		
     		$title = $button;
     		$button = new ButtonElement();
     		$button->setTitle($title);

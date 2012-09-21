@@ -137,15 +137,15 @@ class AutocompleteAction extends AbstractAction {
 		
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
-			
-		if ($this->_obj->find(ObjectModel::MODEL) === false) {
+
+//		$this->_obj->find(ObjectModel::MODEL);
+//		var_dump(\t41\Backend::getLastQuery()); die;
 		
-			return false;
+		if ($this->_obj->find(ObjectModel::MODEL) === false) {
+		//	return false;
 		}
 		
-		//\Zend_Debug::dump(\t41\Backend::getLastQuery()); die;
 		foreach ($this->_obj->getMembers() as $member) {
-		
 			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
 		}
 
@@ -154,7 +154,7 @@ class AutocompleteAction extends AbstractAction {
 	
 	
 	/**
-	 * Execute a find() call on the collection with the current query
+	 * Execute a find() call on the collection with the current identifier
 	 * @param string $query
 	 * @return array
 	 */

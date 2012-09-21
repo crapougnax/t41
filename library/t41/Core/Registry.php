@@ -53,9 +53,9 @@ class Registry {
 	
 	static public function get($uuid)
 	{
+		// @todo refresh object data via read()
 		return Core::cacheGet($uuid);
 		
-		//self::loadStore();
 		if (isset(self::$_store[$uuid])) {
 			
 			return self::unserialize(self::$_store[$uuid]);

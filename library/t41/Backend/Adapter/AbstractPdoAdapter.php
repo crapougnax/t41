@@ -74,6 +74,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	// test dataobject
 	protected $_do = array();
 	
+	/**
+	 * Array of joined tables 
+	 * @var array
+	 */
+	protected $_alreadyJoined = array();
+	
 	
 	/**
 	 * Instanciate a PDO-based backend from a t41_Backend_Uri object 
@@ -385,7 +391,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$table = $this->_getTableFromClass($class);
 		
 		if (! $table) {
-
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
@@ -414,7 +419,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$select = $this->_ressource->select();
 		$select->from($table, $returnCount ? new \Zend_Db_Expr("COUNT(*) AS " . \t41\Backend::MAX_ROWS_IDENTIFIER) : $pkey);
 		
-		$alreadyJoined = array();
+		$this->_alreadyJoined = array();
 
 		/* @var $condition t41\Backend\Condition */
 		foreach ($collection->getConditions() as $conditionArray) {
@@ -425,7 +430,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$statement = array();
 				
 				foreach ($conditionArray[0]->getConditions() as $condition) {
-					$statement[] = $this->_parseCondition($condition[0]);
+					$statement[] = $this->_parseCondition($condition[0], $select);
 				}
 				
 				$statement = implode(' OR ', $statement);
@@ -476,7 +481,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$jlkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
 						
 					$uniqext = $jtable . '__joined_for__' . $jlkey;
-					if (in_array($uniqext, $alreadyJoined)) {
+					if (in_array($uniqext, $this->_alreadyJoined)) {
 						$class = $property->getParameter('instanceof');
 						$jtable = $uniqext;
 						continue;
@@ -487,7 +492,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					
 					$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $uniqext, $jpkey);
 					$select->joinLeft($jtable . " AS $uniqext", $join, array());
-					$alreadyJoined[] = $uniqext; //$jtable;
+					$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 					$jtable = $uniqext;
 					$class = $property->getParameter('instanceof');
 				}
@@ -506,14 +511,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 
 				$uniqext = $jtable . '__joined_for__' . $leftkey;
-				if (in_array($uniqext, $alreadyJoined)) {
+				if (in_array($uniqext, $this->_alreadyJoined)) {
 					continue;
 				}
 				
 				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
 				$select->joinLeft($jtable . " AS $uniqext", $join, array());
+				$this->_alreadyJoined[$jtable] = $uniqext;
 				$jtable = $uniqext;
-				$alreadyJoined[] = $uniqext;
 				
 			} else {
 				
@@ -523,7 +528,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$field = $this->_mapper->propertyToDatastoreName($class, $field);
 				}
 			}
-
+				
 			if ($field == ObjectUri::IDENTIFIER) {
 				// @todo search mapper for a different key
 				$field = Backend::DEFAULT_PKEY;
@@ -531,12 +536,17 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			/* if a join was performed, prefix current field with table name */
 			else if ($jtable) {
-					
-				$field = $jtable . '.' . $field;
-				
+				if (array_key_exists($jtable, $this->_alreadyJoined)) {
+					$field = $this->_alreadyJoined[$jtable] . '.' . $field;
+				} else {
+					$field = $jtable . '.' . $field;
+				}			
 			} else {
-				
-				$field = $table . '.' . $field;
+				if (array_key_exists($table, $this->_alreadyJoined)) {
+					$field = $this->_alreadyJoined[$table] . '.' . $field;
+				} else {
+					$field = $table . '.' . $field;
+				}
 			}
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
 
@@ -570,7 +580,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 			
 				// add a left join if the sorting field belongs to a table not yet part of the query
-				if ($stable != $table && ! in_array($stable, $alreadyJoined)) {
+				if ($stable != $table && ! in_array($stable, $this->_alreadyJoined)) {
 					
 					// get the property id from the class name
 					$tfield = $collection->getDataObject()->getObjectPropertyId($class);
@@ -581,7 +591,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $stable, $rightkey);
 					$select->joinLeft($stable, $join, array());
 					
-					$alreadyJoined[] = $jtable;
+					$this->_alreadyJoined[] = $jtable;
 				}
 				
 				$select->order(new \Zend_Db_Expr($stable . '.' . $sfield . ' ' . $sorting[1]));
@@ -737,9 +747,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	}
 	
 	
-	protected function _parseCondition(Condition $condition)
+	protected function _parseCondition(Condition $condition, \Zend_Db_Select $select)
 	{
-		global $table, $jtable, $alreadyJoined, $select;
+		global $table, $jtable;
 		
 		/* does condition contain another condition object ? */
 		if ($condition->isRecursive()) {
@@ -764,10 +774,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
 					
-				if (in_array($jtable, (array) $alreadyJoined)) {
+				if (array_key_exists($jtable, (array) $this->_alreadyJoined)) {
 					$class = $property->getParameter('instanceof');
 					continue;
 				}
+				
+				$uniqext = $jtable . '__joined_for__' . $parentTable;
 					
 				/* column name in left table */
 				$jlkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
@@ -776,8 +788,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 					
 				$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $jtable, $jpkey);
-				//$select->joinLeft($jtable, $join, array());
-				$alreadyJoined[] = $jtable;
+				$select->joinLeft("$jtable AS $uniqext", $join, array());
+				$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 				$class = $property->getParameter('instanceof');
 			}
 		}
@@ -791,17 +803,18 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 			$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
 		
-			if (in_array($jtable, $alreadyJoined)) {
+			if (array_key_exists($jtable, $this->_alreadyJoined)) {
 				continue;
 			}
-		
+				
 			$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
 			$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
-		
+			$uniqext = $jtable . '__joined_for__' . $leftkey;
+				
 			$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $jtable, $rightkey);
-			$select->joinLeft($jtable, $join, array());
+			$select->joinLeft("$jtable AS $uniqext", $join, array());
 		
-			$alreadyJoined[] = $jtable;
+			$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 		
 		} else {
 		
@@ -809,17 +822,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 			if ($this->_mapper) {
 				$field = $this->_mapper->propertyToDatastoreName($class, $field);
-			} else {
-				
-				$field = $this->_getTableFromClass($property->getParent()->getClass()) . '.'  . $field;
 			}
 		}
 		
 		/* if a join was performed, prefix current field with table name */
 		// @todo refactor there and in find()
 		if ($jtable) {
-				
-			//$field = $jtable . '.' . $field;
+			$field = $this->_alreadyJoined[$jtable] . '.' . $field;
 		
 		} else if($table) {
 		

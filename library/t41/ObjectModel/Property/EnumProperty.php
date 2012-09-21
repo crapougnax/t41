@@ -44,19 +44,18 @@ class EnumProperty extends AbstractProperty {
 		
 		if (! isset($this->_values[$lang])) {
 			
+			$this->_values[$lang] = array();
+			
 			foreach ($this->getParameter('values') as $key => $value) {
 			
 				/* a generic label can be specified */ 
 				if (isset($value['label'])) {
-					
 					$this->_values[$lang][$key] = $value['label'];
 					
 				} else if (isset($value[$lang])) {
-					
 					$this->_values[$lang][$key] = $value[$lang];
 					
 				} else {
-					
 					$this->_values[$lang][$key] = $value['en'];
 				}
 			}
