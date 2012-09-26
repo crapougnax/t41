@@ -17,6 +17,11 @@
 				</parameters>
 			</decorator>
 			<decorator id="PdfDefault">
+				<parameters>
+					<parameter id="newpage">
+						<type>string</type>
+					</parameter>
+				</parameters>
 			</decorator>
 		</object>
 		<object id="\t41\View\FormComponent">
