@@ -28,7 +28,8 @@ class t41_AssetsController extends Zend_Controller_Action {
 									'css'	=> 'text/css', 
 									'png'	=> 'image/png', 
 									'gif'	=> 'image/gif',
-									'jpg'	=> 'image/jpeg'
+									'jpg'	=> 'image/jpeg',
+									'ttf'   =>  'application/octet-stream'
 								 );
 	
 	

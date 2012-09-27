@@ -4,7 +4,7 @@ if (! window['t41']['core']) {
 
 (function() {
 	
-	window.t41.core = {version:'0.1.0', backend:'/rest', transparent:false, enableGA:true, cookies:false};
+	window.t41.core = {version:'0.1.0', backend:'/rest', transparent:false, enableGA:false, cookies:false};
 
 	window.t41.core.status = {ok:'OK',nok:'NOK',err:'ERR'};
 
@@ -120,7 +120,7 @@ if (! window['t41']['core']) {
 			_gaq.push(['_trackEvent', 'Ajax', p.action]);
 			_gaq.push(['_trackPageview', url]);
 		} else {
-			console.log('Google Analytics is not loaded');
+			//console.log('Google Analytics is not loaded');
 		}
 		
 		
