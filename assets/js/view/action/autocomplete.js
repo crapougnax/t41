@@ -40,7 +40,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		this.previous;
 		
-		// callback 
+		// callbacks
 		this.callbacks = obj.callbacks || {};
 		
 		if (! this.callbacks['display']) this.callbacks['display'] = 't41.view.action.autocomplete.display';
@@ -72,20 +72,30 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			this.element.after(span);
 			
 			// if a value exists, transform it
-			if ((_id = jQuery('#' + this.target).val()) != '') {
-				
-				var config = {
-						action:this.action,
-						callback:jQuery.proxy(this, 'displaySavedValue'),
-						data:{_id:_id,uuid:this.uuid}
-					 };
-				t41.core.call(config);
+			if ((val = jQuery('#' + this.target).val()) != '') {
+				this.initSavedValue(val);
 			}
+			
 			// bind observer
 			t41.view.bindLocal(this.element, 'keyup', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
 		};
 		
+		
+		/**
+		 * Detect & convert initial existing value
+		 */
+		this.initSavedValue = function(val) {
+			var config = {
+							action:this.action,
+							callback:jQuery.proxy(this, 'displaySavedValue'),
+							data:{
+									_id:val,
+									uuid:this.uuid
+								 }
+					 };
+			t41.core.call(config);
+		};
 		
 		
 		this.displaySavedValue = function(obj) {
@@ -202,39 +212,34 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		
 		this._displayAsList = function() {
-			
 			this._displayAsTable();
 		};
 		
 		
 		this.defaultSelect = function(id) {
-			
 			if (! this.currentSuggestions[id]) {
-				
 				console.log('Missing member for key ' + id);
 			}
-			
 
 			this.resetSuggestions();
 			var selected = this.currentSuggestions[id];
 			this.setValue(id, this.prepareDisplay(selected));
+			if (this.callbacks.postSelect && typeof this.callbacks.postSelect == 'function') {
+				this.callbacks.postSelect.call(this,selected,id);
+			}
 		};
 		
 		
-		this.prepareDisplay = function(obj)
-		{
+		this.prepareDisplay = function(obj) {
 			var label = '';
 			for (var i in this.display) {
-				
 				label += obj.props[i] ? obj.props[i].value + ' ': '';
 			}
-			
 			return label;
 		};
 		
 		
 		this.setValue = function(key, label) {
-			
 			this.element.hide();
 			var width = this.element.width()+5;
 			var display = jQuery('#' + this.target + '_display').css({
@@ -250,7 +255,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		
 		this.resetValue = function() {
-			
 			var display = jQuery('#' + this.target + '_display');
 			display.hide();
 			jQuery('#' + this.target).val('');
@@ -260,10 +264,8 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		
 		this.resetSuggestions = function() {
-			
 			jQuery('#'+this.props).remove();
-			this.element.val('');
-			this.element.show();
+			this.element.val('').show().focus();
 			this.previous = null;
 		};
 
@@ -409,7 +411,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 				
 				// ignore queries coming back home too late
 				if (ac.sequence > obj.data._sequence) {
-					console.log('ignored server late response #' + obj.data._sequence + ' for query "' + obj.data._query + '".');
+					//console.log('ignored server late response #' + obj.data._sequence + ' for query "' + obj.data._query + '".');
 					return false;
 				}
 				
