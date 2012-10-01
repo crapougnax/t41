@@ -21,6 +21,8 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 	
 	protected $_module;
 	
+	protected $_resource;
+	
 	
 	public function init() {
 		
@@ -36,11 +38,42 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 			
 			foreach ($modules as $key => $module) {
 				
-				if (isset ($module['controller']) && Layout::$module == $module['controller']['base']) {
+				if (isset($module['controller']) && Layout::$module == $module['controller']['base']) {
 					$this->_module = 'app/' . $vendor . '/' . $key;
+
+					$resource = Layout::$controller;
+					if (Layout::$action) $resource .= '/' . Layout::$action;
+					//Zend_Debug::dump($module);
+					if (isset($module['controller']['items'])) {
+						foreach ($module['controller']['items'] as $controller) {
+							if ($this->_getCurrentItem($resource, $controller) == true) break;
+						}
+					}
+					if (isset($module['controllers_extends'])) {
+						foreach ($module['controllers_extends'] as $controller) {
+							if ($this->_getCurrentItem($resource, $controller['items']) == true) break;
+						}
+					}
 					break;
 				}
 			}
 		}
+	}
+	
+	protected function _getCurrentItem($resource,$items)
+	{
+		//Zend_Debug::dump($items);
+		foreach ($items as $key => $item) {
+		
+			if ($key == $resource) {
+				$this->_resource = $item['label'];
+				return true;
+			}
+			
+			if (isset($item['items'])) {
+				return $this->_getCurrentItem($resource, $item['items']);
+			}
+		}
+		return false;
 	}
 }
