@@ -108,7 +108,27 @@
 				</parameter>
 			</parameters>
 		</object>
-				
+
+		<object id="\t41\View\FormComponent\Element\ListElement" extends="\t41\View\ViewObject">
+			<parameters>
+				<parameter id="display" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="altkey" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="sorting" type="any">
+					<bogus/>
+				</parameter>
+				<parameter id="pattern" type="string">
+					<bogus/>
+				</parameter>
+				<parameter id="selectmax" type="integer">
+					<defaultvalue>30</defaultvalue>
+				</parameter>
+			</parameters>
+		</object>
+					
 		<object id="\t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="event" type="string">

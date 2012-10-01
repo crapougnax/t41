@@ -60,7 +60,7 @@ class WebDefault extends AbstractWebDecorator {
 		}
 		
 		// display autocompleter field
-		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('select_max_values') 
+		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('selectmax') 
 				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
 
 			View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));

@@ -122,6 +122,10 @@
 					<parameter id="defaultlabel">
 						<type>string</type>
 					</parameter>
+					<parameter id="selectmax">
+						<type>integer</type>
+						<defaultvalue>30</defaultvalue>
+					</parameter>
 				</parameters>
 		</decorator>
 		</object>

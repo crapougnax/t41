@@ -46,36 +46,13 @@ class ListElement extends AbstractElement {
 	protected $_collection;
 	
 	
-	protected $_foreign = array();
-	
 	protected $_totalValues;
-	
-	protected $_displayProps = array();
-	
-	
-	public function __construct($id = null, array $params = null)
-	{
-		$this->_setParameterObjects(array('select_max_values'	=> new Parameter(Parameter::INTEGER, 100)
-										, 'display'				=> new Parameter(Parameter::STRING)
-										, 'sorting'				=> new Parameter(Parameter::ANY)
-										, 'altkey'				=> new Parameter(Parameter::STRING) // Alternate key coming from value's property
-										 )
-								   );
-		
-		parent::__construct($id, $params);
 
-		if (isset($this->_has['maxval']) && $this->_has['maxval'] != 0) {
-			
-			// maxval has no meaning within this field so we use it to define boundary value between select and autocompleter
-			$this->setParameter('select_max_values',  $this->_has['maxval']);
-		}
-	}
 	
-
 	public function setCollection(ObjectModel\Collection $collection)
 	{
 		$this->_collection = $collection;
-		$this->_collection->setBoundaryBatch($this->getParameter('select_max_values')+1);
+		$this->_collection->setBoundaryBatch($this->getParameter('selectmax')+1);
 		if ($this->getParameter('sorting')) {
 		
 			if (! is_array($this->getParameter('sorting'))) {
@@ -88,7 +65,6 @@ class ListElement extends AbstractElement {
 				$this->_collection->setSortings($array);
 				
 			} else {
-		
 				$this->_collection->setSortings($this->getParameter('sorting'));
 			}
 		}
@@ -112,7 +88,6 @@ class ListElement extends AbstractElement {
 			$this->_collection->find();
 			$this->_totalValues = $this->_collection->getTotalMembers();
 		}
-		
 		return $this->_totalValues;
 	}
 	
@@ -129,12 +104,10 @@ class ListElement extends AbstractElement {
         $this->_collection->find();
         
         foreach ($this->_collection->getMembers() as $member) {
-               
         	// define value key (property val if altkey parameter is setted or uri's identifier by default
-        	$key = $this->getParameter('altkey') ? $member->getProperty($this->getParameter('altkey'))->getValue() : $member->getUri()->getIdentifier();
+        	$key = $this->getParameter('altkey') ? $member->getProperty($this->getParameter('altkey'))->getValue() : $member->getIdentifier();
             $this->_enumValues[$key] = Property::parseDisplayProperty($member, $this->getParameter('display'));
         }
-            
        return $this->_enumValues;
 	}
 
@@ -145,94 +118,39 @@ class ListElement extends AbstractElement {
 
         // value is already available (foreign key with no specific constraint in it
         if (isset($this->_enumValues[$key])) {
-        	
         	return $this->_enumValues[$key];
         }
 
         // value no more available to select, though we need to display it !
-
         if (is_string($key)) {
 	        $uri = new ObjectModel\ObjectUri($key);
     	    $uri->setClass($this->getCollection()->getClass());
         
         	$_do = clone $this->_collection->getDataObject();
      		$_do->setUri($uri);
-        
         	Backend::read($_do);
         } else {
-        	
         	$_do = $key->getDataObject();
         }
 
         return Property::parseDisplayProperty($_do, $this->getParameter('display'));
-        
-        
-        $this->_displayProps = explode(',', $this->getParameter('display'));
-        
-        $str = array();
-        foreach ($this->_displayProps as $disProp) {
-        	
-            $property = $_do->getProperty($disProp);
-        	if (! $property instanceof Property\AbstractProperty) continue;
-            $str[] = $property->getValue();
-        }
-                
-        $str = implode(' ', $str);
-        if (is_string($key)) $this->_enumValues[$key] = $str;
-
-        return $str;
     }
     
     
     public function getEnumValues($str = null)
     {
     	if (is_null($str)) {
-    		
     		if (is_null($this->_enumValues)) {
-    			
     			$this->setEnumValues();
     		}
     		return $this->_enumValues;
     	
     	} else {
-    		
     		$this->setEnumValues($str);
     		return $this->_enumValues;
     	}
     }
 
-    
-    protected function _setLabelElements($str = null)
-    {
-    	if ($str == null) {
-    		
-    		return array(preg_replace('/_id$/', '_label', $this->_foreign['pkey']));
-    		
-    	} else {
-    		
-    		$fields = array();
-    		
-    		if (substr($str, 0, 4) == 'tpl:') {
-    			
-    			$this->_foreign['tpl'] = substr($str, 5, -1);
-
-    			//$matches = array();
-		        //extract fields from motif
-    	        //preg_match_all('/\{([a-z0-9_-]+)\}/', $this->_foreign['tpl'], $matches, PREG_SET_ORDER);
-
-    			$matches = explode(',', $this->_foreign['tpl']);
-    		
-    		} else {
-    		
-    			$matches = explode(',', $str);
-    		}
-    			
-    		foreach ($matches as $val) $fields[] = trim($val);
-        	    
-    		return $fields;
-    	}
-    }
-    
     
 	public function setValue($val)
 	{
@@ -240,8 +158,6 @@ class ListElement extends AbstractElement {
 			$class = $this->getCollection()->getClass();
 			$val = new $class($val);
 		}
-		
 		parent::setValue($val);
 	}
 }
-
