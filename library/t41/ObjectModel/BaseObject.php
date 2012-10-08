@@ -187,6 +187,30 @@ abstract class BaseObject extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Magic method to access a property value
+	 *
+	 * @param string $key
+	 * @return t41\ObjectModel\Property\AbstractProperty
+	 */
+	public function __get($key)
+	{
+		return $this->_dataObject->$key;
+	}
+	
+
+	/**
+	 * Magic method to set a property value
+	 *
+	 * @param string $key
+	 * @param mixed $val
+	 */
+	public function __set($key,$val)
+	{
+		$this->__call('set' . $key, array($val));
+	}
+	
+	
 	public function __call($m, $a)
 	{
 		$method_begin = substr($m, 0, 3);
