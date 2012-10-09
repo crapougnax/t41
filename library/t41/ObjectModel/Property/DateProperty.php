@@ -37,6 +37,9 @@ class DateProperty extends AbstractProperty {
 	
 	const TODAY		= 'TODAY';
 	
+	const TODAY_DATE	= 'STODAY';
+
+	const TODAY_TIME	= 'TTODAY';
 
 	public function setValue($value)
 	{
@@ -45,7 +48,15 @@ class DateProperty extends AbstractProperty {
 			case self::TODAY:
 				$value = date('Y-m-d H:i:s');
 				break;
+
+			case self::TODAY_DATE:
+				$value = date('Y-m-d');
+				break;
 				
+			case self::TODAY_TIME:
+				$value = date('H:i:s');
+				break;
+					
 			default:
 				if ($this->getParameter('format') && ! \Zend_Date::isDate($value, $this->getParameter('format'))) {
 					throw new Exception(array("VALUE_NOT_A_DATE", array($this->_id, $value)));
