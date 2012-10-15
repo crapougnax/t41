@@ -210,16 +210,15 @@ class DataObject extends ObjectModelAbstract {
     	$this->_data = array();
     	
     	if (ObjectModel::getObjectExtends($var)) {
-
     		$properties = ObjectModel::getObjectProperties(ObjectModel::getObjectExtends($var));
-    		
     	} else {
-    		
     		$properties = array();
     	}
     	
-    	$properties += (array) ObjectModel::getObjectProperties($var);
-    	
+    	if (is_array(ObjectModel::getObjectProperties($var))) {
+	    	$properties += ObjectModel::getObjectProperties($var);
+    	}
+    		
     	if ($properties !== false) {
     		
     		foreach ($properties as $propertyId => $propertyParams) {
