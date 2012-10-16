@@ -37,7 +37,7 @@ use t41\ObjectModel,
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class WebDefault extends AbstractWebDecorator {
+class WebAutocomplete extends AbstractWebDecorator {
 
 	
 	public function render()
@@ -59,39 +59,26 @@ class WebDefault extends AbstractWebDecorator {
 			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
 		}
 		
-		// display autocompleter field
-		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('selectmax') 
-				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
-
-			$deco = new WebAutocomplete($this->_obj, array($this->_params));
-			return $deco->render();
-			
-			View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
-			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
-			$acfield->setValue($value);
-			
-			$action = new AutocompleteAction($this->_obj->getCollection());
-			$action->setParameter('search', array('label'));
-			$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
-			$action->setParameter('event', 'keyup');
-			$action->setContextData('onclick', 't41.view.element.autocomplete.close');
-			$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());
-			$action->bind($acfield);
-			
-			$deco = View\Decorator::factory($acfield);
-			$html = $deco->render();
-			
-			$deco = View\Decorator::factory($action);
-			$deco->render();
-			
-			$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s"/>', $name, $this->_nametoDomId($name), $value);
-			return $html . "\n";
-			
-		} else {
-			// display menu list
-			$zv = new \Zend_View();
-			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
-			return $zv->formSelect($name, $value, null, $options);
-		}
+		View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
+		$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
+		$acfield->setValue($value);
+		
+		$action = new AutocompleteAction($this->_obj->getCollection());
+		$action->setParameter('search', array('label'));
+		$action->setParameter('searchmode', $this->getParameter('searchmode'));
+		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
+		$action->setParameter('event', 'keyup');
+		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
+		$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());
+		$action->bind($acfield);
+		
+		$deco = View\Decorator::factory($acfield);
+		$html = $deco->render();
+		
+		$deco = View\Decorator::factory($action);
+		$deco->render();
+		
+		$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s"/>', $name, $this->_nametoDomId($name), $value);
+		return $html . "\n";
 	}
 }

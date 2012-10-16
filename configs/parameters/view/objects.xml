@@ -162,6 +162,9 @@
 				<parameter id="display" type="array">
 				<bogus/>
 				</parameter>
+				<parameter id="searchmode" type="string">
+					<defaultvalue>contains</defaultvalue>
+				</parameter>
 				<parameter id="member_reduce_params" type="array">
 				<bogus/>
 				</parameter>

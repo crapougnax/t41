@@ -127,7 +127,21 @@
 						<defaultvalue>30</defaultvalue>
 					</parameter>
 				</parameters>
-		</decorator>
+			</decorator>
+			<decorator id="WebAutocomplete" extends="\t41\View\Decorator\AbtractWebDecorator">
+				<parameters>
+					<parameter id="name">
+						<type>string</type>
+					</parameter>
+					<parameter id="mode">
+						<type>string</type>
+					</parameter>
+					<parameter id="searchmode">
+						<type>string</type>
+						<defaultvalue>contains</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
 		</object>
 		
 		<object id="\t41\View\FormComponent\Element\EnumElement">
