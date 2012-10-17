@@ -112,6 +112,17 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			//this.dataset = data;
 			this.currentSuggestions = data.collection;
 			
+			var size = 0;
+			for (var id in this.currentSuggestions) {
+				if (this.currentSuggestions.hasOwnProperty(id)) size++;
+			}
+			if (size == 1) {
+				for (var id in this.currentSuggestions) {
+					this.defaultSelect(id);
+					return true;
+				}
+			}
+			
 			switch (this.displayMode) {
 			
 				case 'table':
