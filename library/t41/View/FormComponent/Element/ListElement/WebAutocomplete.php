@@ -64,7 +64,7 @@ class WebAutocomplete extends AbstractWebDecorator {
 		$acfield->setValue($value);
 		
 		$action = new AutocompleteAction($this->_obj->getCollection());
-		$action->setParameter('search', array('label'));
+		$action->setParameter('searchprops', explode(',', $this->getParameter('searchprops')));
 		$action->setParameter('searchmode', $this->getParameter('searchmode'));
 		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
 		$action->setParameter('event', 'keyup');

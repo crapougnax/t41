@@ -162,6 +162,9 @@
 				<parameter id="display" type="array">
 				<bogus/>
 				</parameter>
+				<parameter id="searchprops" type="array">
+					<bogus/>
+				</parameter>
 				<parameter id="searchmode" type="string">
 					<defaultvalue>contains</defaultvalue>
 				</parameter>

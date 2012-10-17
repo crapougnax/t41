@@ -47,6 +47,11 @@ use t41\ObjectModel;
 class AutocompleteAction extends AbstractAction {
 
 	
+	const SEARCHMODE_CONTAINS = 'contains';
+	
+	const SEARCHMODE_BEGINS   = 'begins';
+	
+	
 	protected $_id = 'action/autocomplete';
 	
 	
@@ -130,9 +135,19 @@ class AutocompleteAction extends AbstractAction {
 		
 		$combo = $this->_obj->having(Condition::MODE_AND);
 		
-		foreach ($this->getParameter('search') as $property) {
+		foreach ($this->getParameter('searchprops') as $property) {
+			
+			switch ($this->getParameter('searchmode')) {
 				
-			$combo->having($property)->orMode()->contains($query);
+				case self::SEARCHMODE_BEGINS:
+					$combo->having($property)->orMode()->beginsWith($query);
+					break;
+					
+				case self::SEARCHMODE_CONTAINS:
+				default:
+					$combo->having($property)->orMode()->contains($query);
+					break;
+			} 
 		}
 		
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));
