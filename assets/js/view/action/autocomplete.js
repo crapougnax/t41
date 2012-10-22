@@ -244,7 +244,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		this.prepareDisplay = function(obj) {
 			var label = '';
 			for (var i in this.display) {
-				label += obj.props[i] ? obj.props[i].value + ' ': '';
+				label += obj.props[i] && obj.props[i].value != null ? obj.props[i].value + ' ': '';
 			}
 			return label;
 		};
@@ -262,6 +262,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			});
 			display.html(label);
 			jQuery('#' + this.target).val(key);
+			this.triggerChangeEvent();
 		};
 		
 		
@@ -271,6 +272,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			jQuery('#' + this.target).val('');
 			this.resetSuggestions();
 			this.offset = 0;
+			this.triggerChangeEvent();
 		};
 		
 		
@@ -280,6 +282,13 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			this.previous = null;
 		};
 
+		
+		this.triggerChangeEvent = function() {
+			// trigger a 'change' event upon value setting so external observers can catch it
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent("change", true, false);
+			document.getElementById(this.target).dispatchEvent(event);
+		};
 	};
 
 	window.t41.view.action.autocomplete.extendSuggestions = function(obj) {
