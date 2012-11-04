@@ -2,6 +2,10 @@
 
 namespace t41\View;
 
+use t41\ObjectModel\Property\IdentifierProperty;
+
+use t41\ObjectModel\ObjectUri;
+
 use t41\Backend;
 
 /**
@@ -126,6 +130,12 @@ class ListComponent extends ViewObject {
     				continue;
     			}
 
+    			if ($column == ObjectUri::IDENTIFIER) {
+    				
+    				$obj = new Element\IdentifierElement();
+    				$this->_columns[] = $obj;
+    			}
+    			
     			// $column may contain recursive property reference
     			$parts = explode('.', $column);
     			 
@@ -134,7 +144,6 @@ class ListComponent extends ViewObject {
     			//\Zend_Debug::dump($property);
     			 
     			if (! $property instanceof Property\AbstractProperty) {
-    				
     				continue;
     			}
     			

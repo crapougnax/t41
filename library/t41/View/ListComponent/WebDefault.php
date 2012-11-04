@@ -141,9 +141,7 @@ class WebDefault extends AbstractWebDecorator {
     	
     	// set query sorting from context
         if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
-
         	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			
     			$this->_collection->setSorting(array($field, $value));
     		}
     	}
@@ -237,7 +235,6 @@ HTML;
         	$line .= '<th><strong>';
         	 
         	if ($this->getParameter('sortable') == false) {
-        		
         		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
         		continue;
         	}
@@ -353,6 +350,10 @@ HTML;
             		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
             		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
             		continue;
+            	}
+            	
+            	if ($column instanceof Element\IdentifierElement) {
+            		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
             	}
             	
             	/* if a decorator has been declared for property/element, use it */

@@ -247,7 +247,7 @@ abstract class AbstractAdapter {
 	protected function _collateKeyVal($key, $val = null, $set = null)
 	{
 		return sprintf("%s%s%s"
-									, $set ? $set . '[' . $key . ']' : $key
+									, $set ? $set . '[' . rawurlencode($key) . ']' : rawurlencode($key)
 									, $this->_assignSeparator
 									, $this->_escape($val)
 					  );

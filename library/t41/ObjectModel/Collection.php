@@ -291,8 +291,13 @@ class Collection extends ObjectModelAbstract {
 			}
 
 			$order = isset($property['mode']) ? $property['mode'] : isset($property[1]) ? $property[1] : 'ASC';
-			$property = $this->_do->getRecursiveProperty(isset($property['property']) ? $property['property'] : $property[0]);
 			
+			if ($property[0] == ObjectUri::IDENTIFIER) {
+				$property = new IdentifierProperty(ObjectUri::IDENTIFIER);
+			} else {
+				$property = $this->_do->getRecursiveProperty(isset($property['property']) ? $property['property'] : $property[0]);
+			}
+					
 			if (! $property instanceof Property\PropertyInterface) {
 				throw new Exception("PARAM_DOESNT_MATCH_PROPERTY");
 			}

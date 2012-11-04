@@ -202,10 +202,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			/* @var $member t41\ObjectModel\BaseObject */
 			foreach ($collection->getMembers() as $member) {
 
+				// @todo check that keyprop is set before
 				if (($prop = $member->getProperty($property->getParameter('keyprop'))) !== false) {
 					$prop->setValue($uri);
 				} else {
-					//var_dump($property); die;
 					throw new Exception(sprintf("member of '%s' class missing '%s' property"
 										, $collection->getClass(), $property->getParameter('keyprop')));
 				}
@@ -567,6 +567,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			foreach ($collection->getSortings() as $sorting) {
 
+				if ($sorting[0]->getId() == ObjectUri::IDENTIFIER) {
+					$id = Backend::DEFAULT_PKEY;
+					$select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
+					continue;
+				}
+				
 				$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
 				$stable = $this->_getTableFromClass($class);
 				
@@ -615,7 +621,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 		}
 		
-//		echo $select;// die;
+//		echo $select; die;
 
 		$result = array();
 		$context = array('table' => $table);
