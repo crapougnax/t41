@@ -225,8 +225,8 @@ window.t41.view.alert = function(str,o) {
 	};
 
 	this.confirm = function () {
-		if (typeof this.o.callbacks.confirm != false) {
-			eval(this.o.callbacks.confirm);
+		if (typeof this.o.callbacks.confirm == 'function') {
+			this.o.callbacks.confirm(this);
 		}
 	};
 
@@ -252,6 +252,7 @@ window.t41.view.alert = function(str,o) {
 				case 'confirm':
 					this.buttons.confirm = new t41.view.button(t41.lget('confirm'), {icon:'valid'});
 					this.buttons.confirm.setAttribute('id', 'confirm');
+					jQuery(this.buttons.confirm).bind('click', jQuery.proxy(this, 'confirm'));
 					jQuery('#' + this.o.id + ' .buttons').append(this.buttons.confirm);
 					//jQuery(button).bind('click', this.o.callbacks.confirm);
 					break;
