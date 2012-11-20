@@ -63,6 +63,7 @@ class PdfAdapter extends AdapterAbstract {
 	
 	public function __construct(array $parameters = null)
 	{
+		define ('K_PATH_IMAGES','');
 		$params = array();
 		
 		$params['format']	 	= new \t41\Parameter(\t41\Parameter::STRING, self::FORMAT_A4, false, array(self::FORMAT_A3, self::FORMAT_A4));
@@ -110,7 +111,7 @@ class PdfAdapter extends AdapterAbstract {
     {
     	require_once 'vendor/tcpdf/tcpdf/tcpdf.php';
         $this->_document = new \TCPDF($this->getParameter('orientation'), 'mm', $this->getParameter('format'), true); 
-        
+     //   $this->_document->setImageScale(1/28);
         $this->_document->setPrintHeader($this->getParameter('addHeader'));
         $this->_document->setPrintFooter($this->getParameter('addFooter'));
         
@@ -122,24 +123,34 @@ class PdfAdapter extends AdapterAbstract {
         $this->_document->SetTitle($this->getParameter('title'));
         $this->_document->SetSubject($this->getParameter('title'));
 
-        //set margins
-        $this->_document->SetMargins( $this->getParameter('marginLeft')
-        							, $this->getParameter('marginTop')
-        							, $this->getParameter('marginRight')
-        							);
-
         //set auto page breaks
         $this->_document->SetAutoPageBreak($this->getParameter('autoPageBreak'), $this->getParameter('marginBottom'));
         
         // header and footer declaration
         if ($this->getParameter('headerMargin') > 0) {
         	
-        	$this->_document->setHeaderMargin($this->getParameter('headerMargin'));
-        	$this->_document->setHeaderData($this->getParameter('logo'), '', utf8_encode($this->getParameter('title')));
+        	if ($this->getParameter('logo')) {
+        		$imgformat = getimagesize($this->getParameter('logo'));
+        		//\Zend_Debug::dump($imgformat);
+        		$this->setParameter('marginTop', 50);// (int) round($this->getParameter('marginTop') + $imgformat[1]/7));
+	       		$this->setParameter('headerMargin', 50); //(int) ($this->getParameter('marginTop') + ($imgformat[1]/7)));
+        		$this->_document->setHeaderData($this->getParameter('logo'), $imgformat[0]/4);
+        	} else {
+            
+	        	$this->_document->setHeaderMargin($this->getParameter('headerMargin'));
+    	    	$this->_document->setHeaderData('','', utf8_encode($this->getParameter('title')));
+        	}
         }
         
         $this->_document->SetFooterMargin($this->getParameter('footerMargin'));
 
+        //set margins
+        $this->_document->SetMargins( $this->getParameter('marginLeft')
+        		, $this->getParameter('marginTop')
+        		, $this->getParameter('marginRight')
+        );
+        
+        
         // font definition
         if ($this->getParameter('fontName')) {
         	
@@ -266,7 +277,6 @@ class PdfAdapter extends AdapterAbstract {
     		$content = '';
     		
     		if($tag[1] == 'env') {
-    			
     			$content = \t41\Core::htmlEncode(\t41\View::getEnvData($tag[2]));
     			unset($tag[$key]);
     		}
