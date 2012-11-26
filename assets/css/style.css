@@ -318,7 +318,7 @@ table.t41.table td.cellcurrency {
 }
 
 table.t41.list {
-  width: 100%;
+  width: 90%;
   border-collapse: collapse;
 }
 
@@ -420,7 +420,6 @@ table.t41.list td.cellcurrency {
 .t41 form fieldset .label, .t41 form fieldset .field {
   display: inline-block;
   padding: 1px 8px;
-  height: 24px;
   font-size: 16px;
   color: #444;
 }
