@@ -89,6 +89,15 @@ class Core {
 	 */
 	static public $name;
 
+	
+	/**
+	 * Unique application identifier
+	 * Used for the cache for example
+	 * @var string
+	 */
+	static public $appId = 't41';
+	
+	
 	/**
 	 * Lazy(-loading) mode
 	 * 
@@ -97,7 +106,18 @@ class Core {
 	static public $lazy = false;
 	
 	
+	/**
+	 * Cache backend type (ZF adapters)
+	 * @var string
+	 */
 	static public $cache = 'File';
+	
+	
+	/**
+	 * Cache Time To Live (in seconds)
+	 * @var integer
+	 */
+	static public $cacheTTL = 7200;
 	
 	
 	/**
@@ -714,10 +734,15 @@ class Core {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, self::$cache
-    													, array('automatic_serialization' => true)
+    													, array('automatic_serialization' => true,
+    															'cache_id_prefix' => self::$appId . '__',
+    															'lifetime'					=> self::$cacheTTL,
+    													)
     													, array(
     															'hashed_directory_level'	=> 2,
-    															'cache_dir' => '/dev/shm'))
+    															'cache_dir' => '/dev/shm',
+    															)
+    														)
     													 );
     	}
 
@@ -744,11 +769,13 @@ class Core {
     		
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
     													, self::$cache
-    													, array('automatic_serialization' 	=> true)
+    													, array('automatic_serialization'	=> true,
+    															'cache_id_prefix'			=> self::$appId . '__',
+    															'lifetime'					=> self::$cacheTTL,
+    													)
     													, array( 
     															'hashed_directory_level'	=> 2,
-    															'lifetime'					=> 600,
-    															'cache_dir' => '/dev/shm'
+    															'cache_dir' => '/dev/shm',
     															)
     													  )
     						);
