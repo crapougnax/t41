@@ -493,9 +493,10 @@ class Core {
 		
     	/* define which environment matches current mode value */
     	if (is_null($match)) {
-    		
     		throw new Config\Exception("environment value not detected");
     	}
+
+    	self::$appId = str_replace('.', '_', $match);
     	
     	$envKey = null;
     	
@@ -728,60 +729,64 @@ class Core {
      * CACHE GLOBAL ACCESS METHODS
      */
     
-    public static function cacheSet($val, $key = null, $force = false)
+    /**
+     * Returns a Zend Framework cache instance
+     * @return \Zend_Cache_Core
+     */
+    public static function cacheGetAdapter()
     {
     	if (! isset(self::$_adapters['cache'])) {
-    		
+    	
+    		$cacheDir = '/dev/shm';
+    		if (! file_exists($cacheDir . '/' . self::$appId)) {
+    			if (mkdir($cacheDir . '/' . self::$appId)) {
+    				$cacheDir .= '/' . self::$appId;
+    			}
+    		} else {
+    			$cacheDir .= '/' . self::$appId;
+    		}
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
-    													, self::$cache
-    													, array('automatic_serialization' => true,
-    															'cache_id_prefix' => self::$appId . '__',
-    															'lifetime'					=> self::$cacheTTL,
-    													)
-    													, array(
-    															'hashed_directory_level'	=> 2,
-    															'cache_dir' => '/dev/shm',
-    															)
-    														)
-    													 );
+    				, self::$cache
+    				, array('automatic_serialization' 	=> true,
+    						'cache_id_prefix' 			=> self::$appId . '__',
+    						'lifetime'					=> self::$cacheTTL,
+    				)
+    				, array(
+    						'hashed_directory_level'	=> 3,
+    						'cache_dir' => $cacheDir,
+    				)
+    		)
+    		);
     	}
+
+    	return self::$_adapters['cache'];
+    }
+    
+    
+    public static function cacheSet($val, $key = null, $force = false, array $options = array())
+    {
+    	$cache = self::cacheGetAdapter();
 
     	if (is_null($key)) $key = md5(microtime() . $_SERVER['REMOTE_ADDR']);
     	 
         if (is_object($val)) {
-
         	$val = array('_class' => get_class($val), 'content' => serialize($val));
         }
         
         // don't re-cache already cached-content, except if force is set to true
-        if (self::$_adapters['cache']->load($key) !== false && $force == false) {
-        	
+        if ($cache->load($key) !== false && $force == false) {
         	return $key;
         }
         
-    	return self::$_adapters['cache']->save($val, $key) ? $key : false;
+    	return $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : null) ? $key : false;
     }
     
     
     public static function cacheGet($key)
     {
-        if (! isset(self::$_adapters['cache'])) {
-    		
-    		self::setAdapter('cache', \Zend_Cache::factory('Core'
-    													, self::$cache
-    													, array('automatic_serialization'	=> true,
-    															'cache_id_prefix'			=> self::$appId . '__',
-    															'lifetime'					=> self::$cacheTTL,
-    													)
-    													, array( 
-    															'hashed_directory_level'	=> 2,
-    															'cache_dir' => '/dev/shm',
-    															)
-    													  )
-    						);
-    	}
+    	$cache = self::cacheGetAdapter();
     	
-    	$cached = self::$_adapters['cache']->load($key);
+    	$cached = $cache->load($key);
     	
         if (is_array($cached)) {
         	
@@ -795,12 +800,9 @@ class Core {
                 return unserialize($cached['content']);
                 
             } else {
-            	
                 return $cached;
             }
-            
         } else {
-        	
             return $cached;
         }
     }

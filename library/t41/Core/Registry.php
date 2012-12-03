@@ -2,6 +2,8 @@
 
 namespace t41\Core;
 
+use t41\View\ViewObject;
+
 use t41\ObjectModel,
 	t41\Core\UUID,
 	t41\Core,
@@ -26,9 +28,9 @@ class Registry {
 	
 	static public function set($obj, $id = null, $force = false)
 	{
-		//self::loadStore();
+		$tags = array();
+		
 		if (! $obj instanceof ObjectModel\ObjectModelAbstract  && ! $obj instanceof ObjectModel\ObjectUri) {
-			
 			throw new Exception("no object or of unrecognized heritance");
 		}
 		
@@ -37,7 +39,6 @@ class Registry {
 			if (($obj instanceof ObjectModel\BaseObject || $obj instanceof ObjectModel\DataObject) && $obj->getUri()) {
 				
 				$prefix = ($obj instanceof ObjectModel\BaseObject) ? 'obj_' : 'do_';
-				
 				$id = $prefix . md5($obj->getUri()->asString());
 				
 			} else {
@@ -46,7 +47,15 @@ class Registry {
 			}
 		}
 		
-		Core::cacheSet($obj, $id, $force);
+		if ($obj instanceof ObjectModel\BaseObject) {
+			$tags[] = ObjectModel::MODEL;
+		} else if ($obj instanceof ObjectModel\DataObject) {
+			$tags[] = ObjectModel::DATA;
+		} else if ($obj instanceof ViewObject) {
+			$tags[] = 'view';
+		}
+		
+		Core::cacheSet($obj, $id, $force, array('tags' => $tags));
 		return $id;
 	}
 	
