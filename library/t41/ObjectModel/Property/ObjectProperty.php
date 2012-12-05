@@ -56,8 +56,9 @@ class ObjectProperty extends AbstractProperty {
 			$value = new ObjectModel\ObjectUri($value);
 		}
 		
+		$instanceof = $this->getParameter('instanceof');
 		if (! is_object($value) 
-		   || (get_class($value) != $this->getParameter('instanceof')
+		   || (! $value instanceof $instanceof
 		   		&& ! $value instanceof ObjectModel\DataObject
 		   		&& ! $value instanceof ObjectModel\ObjectUri)) {
 			
