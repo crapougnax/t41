@@ -144,5 +144,13 @@
 			</parameters>
 		</property>
 		
+		<property id="\t41\ObjectModel\Property\MediaProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="maxsize">
+					<type>any</type>
+					<defaultvalue>0</defaultvalue>
+				</parameter>
+			</parameters>
+		</property>
 	</properties>
 </config>

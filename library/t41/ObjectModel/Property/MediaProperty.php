@@ -45,20 +45,19 @@ class MediaProperty extends AbstractProperty {
 	 * Set a value for the property
 	 * 
 	 * Value can be either:
-	 * an instance of the object designated in the 'instanceof' parameter
-	 * a data object if its getClass() method returns the same value as the 'instanceof' parameter
-	 * a t41_Object_Uri instance (loosely validated)
+	 * the full path to a file
+	 * the binary content of the file
 	 * 
-	 * @param object $value
+	 * @param string $value
 	 */
 	public function setValue($value)
 	{
 		// @todo implement constraints
 		
 		if (substr($value, 0, 1) == DIRECTORY_SEPARATOR) {
-			return parent::setValue($value);
+			return $this->setValueFromFile($value);
 		} else {
-			$this->setValueFromFile($value);
+			return parent::setValue($value);
 		}
 	}
 	
@@ -80,13 +79,13 @@ class MediaProperty extends AbstractProperty {
 	 */
 	public function getValue($param = null)
 	{
-		return '';
+		return $this->_value;
 	}
 	
 	
 	public function getDisplayValue()
 	{
-		return '';
+		return array('uri' => $this->_parent->getUri(), 'property' => $this->_id);
 	}
 	
 	
