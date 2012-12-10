@@ -63,7 +63,10 @@ class PdfAdapter extends AdapterAbstract {
 	
 	public function __construct(array $parameters = null)
 	{
-		define ('K_PATH_IMAGES','');
+		if (!defined('K_PATH_IMAGES')) {
+			define ('K_PATH_IMAGES','');
+		}
+		
 		$params = array();
 		
 		$params['format']	 	= new \t41\Parameter(\t41\Parameter::STRING, self::FORMAT_A4, false, array(self::FORMAT_A3, self::FORMAT_A4));
