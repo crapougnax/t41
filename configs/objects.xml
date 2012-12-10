@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<objects>
-
+		<object id="t41\ObjectModel\MediaObject">
+			<properties>
+				<property id="label" type="string">
+					<label>Label</label>
+				</property>
+				<property id="mime" type="string">
+					<label>Mime Type</label>
+				</property>
+				<property id="extension" type="string">
+					<label>Extension</label>
+				</property>
+				<property id="media" type="media">
+					<label>Binary Data</label>
+				</property>
+			</properties>
+			<rules>
+				<rule id="defineMimeExt" type="simple">
+				    <source>
+                    	<method>defineMimeAndExtensionFromData</method>
+                    </source>
+					<trigger>
+						<when>after</when>
+						<event>set</event>
+						<property>media</property>
+					</trigger>
+				</rule>
+			</rules>
+		</object>
 		<object id="t41\ObjectModel\Collection\StatsObject">
 			<properties>
 				<property id="total" type="integer">
