@@ -737,13 +737,13 @@ class Core {
     {
     	if (! isset(self::$_adapters['cache'])) {
     	
-    		$cacheDir = '/dev/shm';
-    		if (! file_exists($cacheDir . '/' . self::$appId)) {
-    			if (mkdir($cacheDir . '/' . self::$appId)) {
-    				$cacheDir .= '/' . self::$appId;
+    		$cacheDir = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'C:\TEMP' : '/dev/shm';
+    		if (! file_exists($cacheDir . DIRECTORY_SEPARATOR . self::$appId)) {
+    			if (mkdir($cacheDir . DIRECTORY_SEPARATOR . self::$appId)) {
+    				$cacheDir .= DIRECTORY_SEPARATOR . self::$appId;
     			}
     		} else {
-    			$cacheDir .= '/' . self::$appId;
+    			$cacheDir .= DIRECTORY_SEPARATOR . self::$appId;
     		}
     		self::setAdapter('cache', \Zend_Cache::factory('Core'
     				, self::$cache
