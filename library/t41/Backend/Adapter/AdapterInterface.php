@@ -24,6 +24,7 @@ namespace t41\Backend\Adapter;
 
 use t41\Backend;
 use t41\ObjectModel;
+use t41\ObjectModel\Property;
 
 /**
  * Interface for backend adapters
@@ -58,4 +59,7 @@ interface AdapterInterface {
 
 	
 	public function find(ObjectModel\Collection $collection);
+	
+	
+	public function loadBlob(ObjectModel\DataObject $do, Property\AbstractProperty $property);
 }
