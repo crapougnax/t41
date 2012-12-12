@@ -139,11 +139,7 @@ class ListComponent extends ViewObject {
     				continue;
     			}
     			
-    			if ($property instanceof MediaProperty) {
-    				$obj = new Element\MediaElement($column);
-    			} else {
-	    			$obj = new Element\ColumnElement($column);
-    			}
+	    		$obj = new Element\ColumnElement($column);
     						
     			if (count($parts) > 1) {
     				$obj->setParameter('recursion', array_slice($parts, 1));
