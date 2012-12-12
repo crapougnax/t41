@@ -93,6 +93,9 @@ class ObjectUri implements Core\ClientSideInterface {
 				if (substr($parts[0], 0, 1) == Backend::PREFIX) {
 					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);
 					$this->_identifier = $parts[count($parts) - 1];
+					unset($parts[count($parts) - 1]);
+					unset($parts[array_search($this->_backendUri->getDbName(), $parts)]);
+					unset($parts[array_search($this->_backendUri->getAlias(), $parts)]);
 					$this->_url = implode('/', $parts);
 				
 				} else if ($backendUri) {
