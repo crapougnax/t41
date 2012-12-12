@@ -94,20 +94,6 @@
 				</parameter>
 			</parameters>
 		</object>
-
-		<object id="\t41\View\ListComponent\Element\MediaElement" extends="\t41\View\ViewObject">
-			<parameters>
-				<parameter id="property" type="string">
-					<bogus/>
-				</parameter>
-				<parameter id="recursion" type="array">
-					<bogus/>
-				</parameter>
-				<parameter id="align" type="string">
-					<bogus/>
-				</parameter>
-			</parameters>
-		</object>
 		
 		<object id="\t41\View\ListComponent\Element\MetaElement" extends="\t41\View\ViewObject">
 			<parameters>

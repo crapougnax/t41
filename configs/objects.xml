@@ -12,6 +12,9 @@
 				<property id="extension" type="string">
 					<label>Extension</label>
 				</property>
+				<property id="size" type="integer">
+					<label>Size</label>
+				</property>
 				<property id="media" type="media">
 					<label>Binary Data</label>
 				</property>
