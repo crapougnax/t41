@@ -58,6 +58,9 @@ abstract class AbstractElement extends View\ViewObject {
 	
 	protected $_helpText;
 	
+	
+	protected $_defaultVal;
+	
 
 	public function hide()
 	{

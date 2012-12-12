@@ -2,12 +2,6 @@
 
 namespace t41\View;
 
-use t41\ObjectModel\Property\IdentifierProperty;
-
-use t41\ObjectModel\ObjectUri;
-
-use t41\Backend;
-
 /**
  * t41 Toolkit
  *
@@ -28,12 +22,13 @@ use t41\Backend;
  * @version    $Revision: 879 $
  */
 
+use t41\ObjectModel\Property\MediaProperty;
+use t41\ObjectModel\Property\IdentifierProperty;
+use t41\ObjectModel\ObjectUri;
+use t41\Backend;
 use t41\ObjectModel\Property\CurrencyProperty;
-
 use t41\View\ListComponent\Element\MetaElement;
-
 use t41\View\ListComponent\Element\ColumnElement;
-
 use t41\View\FormComponent\Element\ListElement;
 
 use t41\View,
@@ -117,7 +112,6 @@ class ListComponent extends ViewObject {
     			
     			// meta columns are useful to display calculated (not stored) values
     			if (substr($column, 0, 1) == self::METACOL) {
-    				
     				$parts = explode(':', substr($column, 1));
     				$obj = new Element\MetaElement($parts[0]);
     				$obj->setParameter('property', $parts[0]);
@@ -131,7 +125,6 @@ class ListComponent extends ViewObject {
     			}
 
     			if ($column == ObjectUri::IDENTIFIER) {
-    				
     				$obj = new Element\IdentifierElement();
     				$this->_columns[] = $obj;
     			}
@@ -141,20 +134,21 @@ class ListComponent extends ViewObject {
     			 
     			// find matching property
     			$property = $do->getProperty($parts[0]);
-    			//\Zend_Debug::dump($property);
     			 
     			if (! $property instanceof Property\AbstractProperty) {
     				continue;
     			}
     			
-    			$obj = new Element\ColumnElement($column);
-    			
+    			if ($property instanceof MediaProperty) {
+    				$obj = new Element\MediaElement($column);
+    			} else {
+	    			$obj = new Element\ColumnElement($column);
+    			}
+    						
     			if (count($parts) > 1) {
-
     				$obj->setParameter('recursion', array_slice($parts, 1));
     				
     				foreach (array_slice($parts, 1) as $recursion) {
-    					
     					// recursion to find the related property
     					if ($property instanceof Property\ObjectProperty) {
     						
@@ -162,7 +156,6 @@ class ListComponent extends ViewObject {
     						$property = $do2->getProperty($recursion);
     						
     						if (! $property instanceof Property\AbstractProperty) {
-    						
     							continue;
     						}
     					}
@@ -176,6 +169,7 @@ class ListComponent extends ViewObject {
     			$this->_columns[] = $obj;
     		}
     	}
+    	
     	return $this->_columns;
     }
     

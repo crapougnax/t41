@@ -233,7 +233,6 @@ HTML;
         foreach ($this->_obj->getColumns() as $val) {
         	
         	$line .= '<th><strong>';
-        	 
         	if ($this->getParameter('sortable') == false) {
         		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
         		continue;
@@ -329,6 +328,7 @@ HTML;
         // print out rows
         foreach ($this->_obj->getCollection()->getMembers() as $key => $this->_do) {
         	
+        	//\Zend_Debug::dump($this->_do); die;
         	$css = $i%2 == 0 ? 'odd' : 'even';
 			$p .= sprintf('<tr data-member="%s" class="%s">', $key, $css);
         	$i++;
@@ -345,8 +345,10 @@ HTML;
 			
             foreach ($this->_obj->getColumns() as $column) {
             	
+            	$property = $this->_do->getProperty($column->getParameter('property'));
+            	$column->setValue($property->getValue());
+            	
             	if ($column instanceof Element\MetaElement) {
-            		
             		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
             		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
             		continue;
@@ -354,38 +356,39 @@ HTML;
             	
             	if ($column instanceof Element\IdentifierElement) {
             		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
+            		continue;
             	}
             	
             	/* if a decorator has been declared for property/element, use it */
             	if (isset($altDec[$column->getId()])) {
-
-            		$deco = new $altDec[$column->getId()]($this->_do->getProperty($column->getId()));
+            		$column->setDecorator($altDec[$column->getId()]);
+            		$deco = Decorator::factory($column);
             		$p .= sprintf('<td>%s</td>', $deco->render());
             		continue;
             	}
             	
-            	$property = $this->_do->getProperty($column->getParameter('property'));
-            	
             	$attrib = ($property instanceof Property\CurrencyProperty) ? ' class="cellcurrency"' : null;
             	 
             	if ($column->getParameter('recursion')) {
-
 					foreach ($column->getParameter('recursion') as $recursion) {
-						
 							$property = $property->getValue(ObjectModel::DATA);
 							if ($property) $property = $property->getProperty($recursion);
 					}
             	}
             	
-  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
-  				
+            	if ($property instanceof Property\MediaProperty) {
+            		$column->setValue($property->getDisplayValue());
+            		$deco = Decorator::factory($column);
+            		$value = $deco->render();
+            	} else {
+	  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
+            	}
             	//$p .= "<td$attrib>" . $this->_escape($value) . '</td>';
             	$p .= "<td$attrib>" . $value . '</td>';
             }
 
             $p .= '<td>';
             foreach ($this->_obj->getEvents('row') as $button) {
-            	    	
             	$button->setParameter('uri', $this->_do->getUri());
                 $p .= $this->_renderButton($button);
             }
