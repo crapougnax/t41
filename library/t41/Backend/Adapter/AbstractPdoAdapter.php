@@ -233,21 +233,30 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$table = $this->_getTableFromUri($do->getUri());
 				
 		if (! $table) {
-		
 			\Zend_Debug::dump($do->getUri());
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
+		// get properties name
+		$columns = array();
+		foreach ($do->getProperties() as $property) {
+			if ($property instanceof Property\MediaProperty 
+					|| $property instanceof Property\CollectionProperty
+						|| $property instanceof Property\MetaProperty) {
+				continue;
+			}
+			$columns[] = $this->_mapper ? $this->_mapper->propertyToDatastoreName($do->getClass(), $property->getId()) : $property->getId();
+		}
 		
 		// primary key is either part of the mapper configuration or 'id'
-		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : 'id';
+		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
 		
 		$this->_connect();
 		
 		// get data from backend
 		// @todo Handle complex pkeys (via mapper definition)
 		$select = $this->_ressource->select()
-								   ->from($table)
+								   ->from($table,$columns)
 								   ->where("$pkey = ?", $do->getUri()->getIdentifier())
 								   ->limit(1);
 		
@@ -266,6 +275,39 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$do->populate($data, $this->_mapper);
 		
 		return true;
+	}
+	
+	
+	/**
+	 * Query and return a blob column
+	 * @param ObjectModel\DataObject $do
+	 * @param Property\AbstractProperty $property
+	 * @throws Exception
+	 * @return binary
+	 */
+	public function loadBlob(ObjectModel\DataObject $do, Property\AbstractProperty $property)
+	{
+		// get table to use
+		$table = $this->_getTableFromUri($do->getUri());
+		
+		if (! $table) {
+			throw new Exception('MISSING_DBTABLE_PARAM');
+		}
+		
+		$column = $this->_mapper ? $this->_mapper->propertyToDatastoreName($do->getClass(), $property->getId()) : $property->getId();
+
+		// primary key is either part of the mapper configuration or 'id'
+		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
+		$this->_connect();
+		
+		// get data from backend
+		// @todo Handle complex pkeys (via mapper definition)
+		$select = $this->_ressource->select()
+								     ->from($table,$column)
+								       ->where("$pkey = ?", $do->getUri()->getIdentifier())
+										 ->limit(1);
+		
+		return $this->_ressource->fetchOne($select);
 	}
 	
 	

@@ -188,6 +188,21 @@ abstract class BaseObject extends ObjectModelAbstract {
 	
 	
 	/**
+	 * Load and return the blob value of the given property
+	 * @param string $propertyName
+	 * @return boolean
+	 */
+	public function loadBlob($propertyName)
+	{
+		if (($property = $this->getProperty($propertyName)) !== false) {
+			return Backend::loadBlob($this->_dataObject, $property);
+		} else {
+			return false;
+		}
+	}
+	
+	
+	/**
 	 * Magic method to access a property value
 	 *
 	 * @param string $key

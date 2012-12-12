@@ -2,6 +2,8 @@
 
 namespace t41;
 
+use t41\ObjectModel\Property;
+
 /**
  * t41 Toolkit
  *
@@ -538,6 +540,22 @@ class Backend {
 		}
 		
 		return $backend->find($co, $properties);
+	}
+	
+	
+	/**
+	 * Load and return a blob
+	 * @param ObjectModel\DataObject $do
+	 * @param Property\AbstractProperty $property
+	 * @return binary
+	 */
+	static public function loadBlob(ObjectModel\DataObject $do, Property\AbstractProperty $property)
+	{
+		$backend = self::getInstance($do->getUri()->getBackendUri()->getAlias());
+		if ($backend instanceof Backend\Adapter\AbstractAdapter) {
+			return $backend->loadBlob($do, $property);
+		}
+		return null;
 	}
 	
 	
