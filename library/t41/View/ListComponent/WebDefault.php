@@ -344,9 +344,11 @@ HTML;
 			$altDec = (array) $this->_obj->getParameter('decorators');
 			
             foreach ($this->_obj->getColumns() as $column) {
-            	
-            	$property = $this->_do->getProperty($column->getParameter('property'));
-            	$column->setValue($property->getValue());
+
+            	if ($column instanceof Element\IdentifierElement) {
+            		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
+            		continue;
+            	}
             	
             	if ($column instanceof Element\MetaElement) {
             		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
@@ -354,10 +356,8 @@ HTML;
             		continue;
             	}
             	
-            	if ($column instanceof Element\IdentifierElement) {
-            		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
-            		continue;
-            	}
+            	$property = $this->_do->getProperty($column->getParameter('property'));
+            	$column->setValue($property->getValue());
             	
             	/* if a decorator has been declared for property/element, use it */
             	if (isset($altDec[$column->getId()])) {
