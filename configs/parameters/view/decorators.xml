@@ -138,7 +138,6 @@
 					</parameter>
 					<parameter id="searchprops">
 						<type>string</type>
-						<defaultvalue>label</defaultvalue>
 					</parameter>
 					<parameter id="searchmode">
 						<type>string</type>

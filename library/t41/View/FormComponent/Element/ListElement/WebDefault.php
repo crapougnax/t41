@@ -66,27 +66,6 @@ class WebDefault extends AbstractWebDecorator {
 			$deco = new WebAutocomplete($this->_obj, array($this->_params));
 			return $deco->render();
 			
-			View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
-			$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
-			$acfield->setValue($value);
-			
-			$action = new AutocompleteAction($this->_obj->getCollection());
-			$action->setParameter('search', array('label'));
-			$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
-			$action->setParameter('event', 'keyup');
-			$action->setContextData('onclick', 't41.view.element.autocomplete.close');
-			$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());
-			$action->bind($acfield);
-			
-			$deco = View\Decorator::factory($acfield);
-			$html = $deco->render();
-			
-			$deco = View\Decorator::factory($action);
-			$deco->render();
-			
-			$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s"/>', $name, $this->_nametoDomId($name), $value);
-			return $html . "\n";
-			
 		} else {
 			// display menu list
 			$zv = new \Zend_View();

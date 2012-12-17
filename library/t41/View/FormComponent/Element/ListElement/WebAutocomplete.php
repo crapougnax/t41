@@ -64,12 +64,12 @@ class WebAutocomplete extends AbstractWebDecorator {
 		$acfield->setValue($value);
 		
 		$action = new AutocompleteAction($this->_obj->getCollection());
-		$action->setParameter('searchprops', explode(',', $this->getParameter('searchprops')));
+		$action->setParameter('searchprops', explode(',', $this->getParameter('searchprops') ? $this->getParameter('searchprops') : $this->_obj->getParameter('display')));
 		$action->setParameter('searchmode', $this->getParameter('searchmode'));
 		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
 		$action->setParameter('event', 'keyup');
 		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
-		$action->setContextData('target', $this->_nametoDomId($name)); //$this->_obj->getId());
+		$action->setContextData('target', $this->_nametoDomId($name));
 		$action->bind($acfield);
 		
 		$deco = View\Decorator::factory($acfield);
