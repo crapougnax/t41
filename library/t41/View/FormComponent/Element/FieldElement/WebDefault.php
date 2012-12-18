@@ -2,6 +2,8 @@
 
 namespace t41\View\FormComponent\Element\FieldElement;
 
+use t41\ObjectModel\Property;
+
 /**
  * t41 Toolkit
  *
@@ -64,11 +66,12 @@ class WebDefault extends AbstractWebDecorator {
 		}
 
 		$size = $this->getParameter('length');
-		$max = $this->_obj->getValueConstraint('maxval');
-		$html  = sprintf('<input type="text" name="%s" id="%s" size="%s" value="%s"%s/>'
+		$max = $this->_obj->getConstraint(Property::CONSTRAINT_MAXLENGTH);
+		$html  = sprintf('<input type="text" name="%s" id="%s" size="%s"%s value="%s"%s/>'
 							, $name
 							, $this->_nametoDomId($name)
 							, ($max > $size || $max == 0) ? $size : $max
+							, $max ? ' maxlength="' . $max . '"' : null
 							, $this->_obj->getValue()
 							, $extraArgs
 						);
