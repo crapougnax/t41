@@ -133,7 +133,6 @@ class WebDefault extends AbstractWebDecorator {
 	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
    						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
    					} else {
-   						\Zend_Debug::dump(get_class($obj)); die;
    					}
    					break;
    			}
