@@ -72,6 +72,7 @@ class PdfAdapter extends AdapterAbstract {
 		$params['format']	 	= new \t41\Parameter(\t41\Parameter::STRING, self::FORMAT_A4, false, array(self::FORMAT_A3, self::FORMAT_A4));
 		$params['orientation'] 	= new \t41\Parameter(\t41\Parameter::STRING, self::ORIENTATION_PORTRAIT, false, array(self::ORIENTATION_PORTRAIT, self::ORIENTATION_LANDSCAPE));
 		$params['destination']	= new \t41\Parameter(\t41\Parameter::STRING, 'D');
+		$params['copies']		= new \t41\Parameter(\t41\Parameter::INTEGER, 1);
 		
 		$params['fontSize']		= new \t41\Parameter(\t41\Parameter::ANY, 9);
 		$params['fontName'] 	= new \t41\Parameter(\t41\Parameter::STRING, 'Helvetica');
@@ -195,6 +196,16 @@ class PdfAdapter extends AdapterAbstract {
         	
         	// registered objects rendering mode
         	$this->_render();
+        }
+        
+        // duplicate pages x times if parameter is set to
+        if ($this->getParameter('copies') > 1) {
+        	$total = $this->_document->getNumPages()+1;
+        	for ($i = 1 ; $i < $this->getParameter('copies') ; $i++) {
+        		for ($j = 1 ; $j < $total ; $j++) {
+        			$this->_document->copyPage($j);
+        		}
+        	}
         }
         
         
