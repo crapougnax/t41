@@ -100,7 +100,6 @@ class WebDefault extends AbstractWebDecorator {
     		
 	    	$value = null;
     		
-	    	//\Zend_Debug::dump($tag);
     		switch($tag[1]) {
     			
     			case 'var':
@@ -127,13 +126,14 @@ class WebDefault extends AbstractWebDecorator {
    					} 
    					break;
    					
-   				default:
+   				default: // obj:
    					$tmp = explode('.', $tag[2]);
-//   					\Zend_Debug::dump($tmp);
    					$obj = $this->_obj->getVariable($tmp[0]);
    					if ($obj instanceof BaseObject) {
 	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
    						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
+   					} else {
+   						\Zend_Debug::dump(get_class($obj)); die;
    					}
    					break;
    			}

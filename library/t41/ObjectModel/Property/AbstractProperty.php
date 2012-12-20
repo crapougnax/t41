@@ -329,7 +329,10 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	protected function _parseDisplayProperty()
 	{
 		$display = $this->getParameter('display');
-		if (! $display) return false;
+		if (! $display) {
+			$this->_displayValue = $this->getValue()->__toString();
+			return true;
+		}
 		
 		if (substr($display,0,1) == '[') {
 			
