@@ -66,6 +66,22 @@
 				</parameter>
 			</parameters>
 		</object>
+		
+		<object id="\t41\View\ImageComponent" extends="\t41\View\ViewObject">
+			<parameters>
+				<parameter id="ratio">
+					<type>float</type>
+					<defaultvalue>1.0</defaultvalue>
+				</parameter>
+				<parameter id="link">
+					<type>string</type>
+				</parameter>
+				<parameter id="border">
+					<type>integer</type>
+					<defaultvalue>0</defaultvalue>
+				</parameter>
+			</parameters>
+		</object>
 
 		<object id="\t41\View\FormComponent\Element\ButtonElement" extends="\t41\View\ViewObject">
 			<parameters>
