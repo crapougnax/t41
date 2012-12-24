@@ -201,6 +201,16 @@ abstract class AdapterAbstract implements AdapterInterface {
 	
 	
 	/**
+	 * (non-PHPdoc)
+	 * @see \t41\Backend\Adapter\AdapterInterface::loadBlob()
+	 */
+	public function loadBlob(ObjectModel\DataObject $do, Property\AbstractProperty $property)
+	{
+		throw new Exception("The " . __METHOD__ . " method is not available in the " . __CLASS__ . " backend adapter");
+	}
+	
+	
+	/**
 	 * Convert a given integer or string into an array of all operators definitions it contains
 	 * 
 	 * @param integer|string $operator
