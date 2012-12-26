@@ -77,7 +77,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			}
 			
 			// bind observer
-			t41.view.bindLocal(this.element, 'keyup', t41.view.action.autocomplete.observer, this);
+			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
 		};
 		
