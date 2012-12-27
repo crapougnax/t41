@@ -85,7 +85,7 @@ class DateProperty extends AbstractProperty {
 		
 		if (isset($parts[1])) {
 			$hour = explode(':',$parts[1]);
-			$date .= sprintf(' %dh%d', $hour[0], $hour[1]);
+			$date .= sprintf(' %sh%s', $hour[0], $hour[1]);
 		}
 		return $date;
 	}
