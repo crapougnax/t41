@@ -41,21 +41,35 @@ class PdfDefault extends AbstractPdfDecorator {
     public function render(\TCPDF $pdf, $width = null)
 	{
 		$image = $this->_obj->getContent();
-		
 		$imgSize = getimagesize(Core::$basePath . $image);
 			
 		$height = $pdf->pixelsToUnits($imgSize[1]);
 		$width  = $pdf->pixelsToUnits($imgSize[0]);
 		
-		//$pdf->setJPEGQuality(75);
+		$pdf->setJPEGQuality(75);
+		
+		if ($this->_obj->getParameter('pos_x') || $this->_obj->getParameter('pos_y')) {
+			$currentY = $pdf->getY();
+			$currentAPB = $pdf->getAutoPageBreak();
+			$currentMB = $pdf->getMargins();
+			$currentMB = $currentMB['bottom'];
+			$pdf->setAutoPageBreak(false, 0);
+			$pdf->write('');
+		}
+		
 		$pdf->Image(  Core::$basePath . $image
-					, $this->_obj->getParameter('pos_x') ? $pdf->pixelsToUnits($this->_obj->getParameter('pos_x')) : $pdf->getX()
-					, $this->_obj->getParameter('pos_y') ? $pdf->pixelsToUnits($this->_obj->getParameter('pos_y')) : $pdf->getY()
+					, $this->_obj->getParameter('pos_x') ? $pdf->pixelsToUnits($this->_obj->getParameter('pos_x')) : null
+					, $this->_obj->getParameter('pos_y') ? $pdf->pixelsToUnits($this->_obj->getParameter('pos_y')) : null
 					, $width * $this->_obj->getParameter('ratio')
 					, $height * $this->_obj->getParameter('ratio')
 					, null // img type
 					, $this->_obj->getParameter('link')
 					, 'N'
 				  );
+		
+		if (isset($currentY)) {
+			$pdf->setY($currentY);
+			$pdf->setAutoPageBreak($currentAPB, $currentMB);
+		}
 	}
 }
