@@ -77,7 +77,8 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			}
 			
 			// bind observer
-			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
+//			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
+			this.element.on('keyup change', this, t41.view.action.autocomplete.observer);
 			this.element.focus();
 		};
 		
@@ -109,7 +110,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		 */
 		this.displaySuggestions = function(data) {
 			
-			//this.dataset = data;
 			this.currentSuggestions = data.collection;
 			
 			var size = 0;
@@ -122,7 +122,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 					return true;
 				}
 			}
-			
 			switch (this.displayMode) {
 			
 				case 'table':
@@ -135,7 +134,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			}
 
 			jQuery('#'+this.props).remove();
-			jQuery('<div class="t41 component autocompletepropsgrid">').attr('id', this.props).appendTo('body');
+			jQuery('<div></div>').addClass('t41 component autocompletepropsgrid').attr('id', this.props).appendTo('body');
 
 			var helper = this.getHelper(data);
 			var helpertext = helper.txt;
@@ -153,7 +152,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 			jQuery(document).bind('click.propsgrid', function(e) {
 
 				if (e.target.id==id+'_extend' || jQuery(e.srcElement).parent().attr('id')==id+'_extend') {
-
 					t41.view.action.autocomplete.extender(t41.view.registry[element]);
 
 				} else if (e.target.id!=id) {
@@ -163,15 +161,15 @@ if (! window['t41']['view']['action']['autocomplete']) {
 				}
 			});
 
-			if (data.total>=1) {
-				this.table.render(jQuery('#'+this.props));
-				t41.view.bindLocal(jQuery('#'+this.props+'_table'), 'click', eval(this.callbacks['select']), this);
+			if (data.total > 0) {
+				this.table.render(jQuery('#' + this.props));
+				t41.view.bindLocal(jQuery('#' + this.props + '_table'), 'click', eval(this.callbacks['select']), this);
 			}
 
-			this.refreshSuggestionsPosition(this.element, this.props);
-
+			this.refreshSuggestionsPosition();
 		};
 
+		
 		this.getHelper = function(data) {
 
 			if (data.total == 0) {
@@ -192,13 +190,12 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		};
 
 		
-		this.refreshSuggestionsPosition = function(element, props) {
+		this.refreshSuggestionsPosition = function() {
 		
-			var input = element;
-			var grid = jQuery('#'+props);
+			var grid = jQuery('#' + this.props);
 			jQuery(document).unbind('resize.propsgrid');
-			var offset = input.offset();
-			var height = input.outerHeight();
+			var offset = this.element.offset();
+			var height = this.element.height()+4;
 			var top = parseInt(offset.top) + parseInt(height) + 5 + 'px';
 			var left = parseInt(offset.left) + 'px';
 			grid.css({position:'absolute', top:top, left:left});
@@ -212,7 +209,6 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		this._displayAsTable = function() {
 			
-			//console.log(this.currentSuggestions);
 			this.table = new t41.view.table({
 				'display': this.display,
 				'collection': this.currentSuggestions,
@@ -397,7 +393,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 	window.t41.view.action.autocomplete.observer = function(obj) {
 	
 		var search = (jQuery(obj.target).val());
-		var ac = obj.data.caller;
+		var ac = obj.data.caller ? obj.data.caller : obj.data;
 
 		if (search.length < ac.minChars || (search == ac.previous)) {
 			return;
@@ -407,7 +403,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 		
 		var config = {
 						action:ac.action,
-						callback:eval(ac.callbacks['display']),
+						callback:eval(ac.callbacks.display),
 					 	context:ac.element,
 					 	//method:'get',
 						data:{_query:search,uuid:ac.uuid,_sequence:++ac.sequence}
@@ -436,9 +432,7 @@ if (! window['t41']['view']['action']['autocomplete']) {
 				}
 				
 				ac.displaySuggestions(obj.data);
-
 				ac.offset = obj.data.total;
-
 				break;
 
 			case t41.core.status.err:
