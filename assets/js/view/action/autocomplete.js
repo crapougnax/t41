@@ -269,6 +269,9 @@ if (! window.t41.view.action.autocomplete) {
 			jQuery('#' + this.target).val('');
 			this.resetSuggestions();
 			this.offset = 0;
+			if (this.callbacks.postReset && typeof this.callbacks.postReset == 'function') {
+				this.callbacks.postReset.call(this,selected,id);
+			}
 			this.triggerChangeEvent();
 		};
 		
