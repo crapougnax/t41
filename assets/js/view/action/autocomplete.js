@@ -270,7 +270,7 @@ if (! window.t41.view.action.autocomplete) {
 			this.resetSuggestions();
 			this.offset = 0;
 			if (this.callbacks.postReset && typeof this.callbacks.postReset == 'function') {
-				this.callbacks.postReset.call(this,selected,id);
+				this.callbacks.postReset.call(this);
 			}
 			this.triggerChangeEvent();
 		};
