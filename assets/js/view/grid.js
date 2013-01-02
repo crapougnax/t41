@@ -1,6 +1,8 @@
-if (! window.t41 || ! window.t41.view) {
-	
-	alert("Missing t41 or t41.view namespace declaration!");
+if (! window.t41) {
+	window.t41 = [];
+}
+if (window.t41.view) {
+	window.t41.view = [];
 }
 
 if (! window.t41.view.grid) {

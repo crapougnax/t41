@@ -1,6 +1,5 @@
 if (! window.t41) {
-	
-	alert("Missing t41 namespace declaration!");
+	window.t41 = [];
 }
 
 if (! window.t41.object) {

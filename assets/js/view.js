@@ -1,6 +1,5 @@
 if (! window.t41) {
-	
-	alert("Missing t41 namespace declaration!");
+	window.t41 = [];
 }
 
 if (! window.t41.view) {
@@ -186,7 +185,7 @@ if (! window.t41.view) {
 			var action = eval(action);
 		}
 
-		jQuery(element).bind(event, {caller:obj}, action);
+		jQuery(element).on(event, {caller:obj}, action);
 		return element;
 	};
 	

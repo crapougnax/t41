@@ -1,14 +1,15 @@
-if (! window['t41'] || ! window['t41']['view']) {
-	
-	alert("Missing t41 namespace declaration!");
+if (! window.t41) {
+	window.t41 = [];
+}
+if (window.t41.view) {
+	window.t41.view = [];
 }
 
-if (! window['t41']['view']['action']) {
-	
+if (! window.t41.view.action) {
 	window.t41.view.action = {registry:{}};
 }
 
-if (! window['t41']['view']['action']['autocomplete']) {
+if (! window.t41.view.action.autocomplete) {
 
 	/**
 	 * Autocompleter object

@@ -1,3 +1,10 @@
+if (! window.t41) {
+	window.t41 = [];
+}
+if (window.t41.view) {
+	window.t41.view = [];
+}
+
 window.t41.view.form = function(id,obj,form) {
 	
 	this.formId = '#' + id;
