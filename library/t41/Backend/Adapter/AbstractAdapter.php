@@ -17,16 +17,15 @@ namespace t41\Backend\Adapter;
  *
  * @category   t41
  * @package    t41_Backend
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 918 $
  */
-
-use t41\ObjectModel\DataObject;
 
 use t41\Backend;
 use t41\ObjectModel;
+use t41\ObjectModel\DataObject;
 use t41\ObjectModel\Property;
+use t41\ObjectModel\Property\AbstractProperty;
 
 /**
  * Abstract class for Backend adapters
@@ -51,7 +50,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	/**
 	 * Object <-> Backend Mapping Object
 	 *
-	 * @var t41_Backend_Mapper Mapper
+	 * @var t41\Backend\Mapper Mapper
 	 */
 	protected $_mapper;
 	
@@ -228,7 +227,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	 * 
 	 * @param integer|string $operator
 	 * @return array
-	 * @throws t41_Exception
+	 * @throws t41\Backend\Exception
 	 */
 	protected function _matchOperator($operator)
 	{
@@ -335,6 +334,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 	}
 	
 	
+	public function loadBlob(DataObject $do, AbstractProperty $property)
+	{
+		trigger_error("This method is not implemented for this backend", E_WARNING);
+	}
+	
+	
 	protected function _setLastQuery($literal, $data = null, array $context = array())
 	{
 		$context['db'] 	= $this->_database;
@@ -347,7 +352,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	/**
 	 * Return a key/value array of all backend keys needed to build a query for a unique record
 	 * 
-	 * @param t41_Data_Object $do
+	 * @param t41\ObjectModel\DataObject $do
 	 * @return array
 	 */
 	protected function _preparePrimaryKeyClauses(t41_Data_Object $do)
