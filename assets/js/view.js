@@ -382,7 +382,8 @@ if (! window.t41.view) {
 		
 		this.content = params.content || '';
 		
-		this.class = params.class || 't41 component';
+		// css instead of class which is kind of a protected keyword
+		this.css = params.css || 't41 component';
 		
 		this.domObject;
 		
@@ -392,7 +393,7 @@ if (! window.t41.view) {
 			
 			this.domObject = document.createElement('DIV');
 			this.domObject.setAttribute('id', this.id);
-			this.domObject.setAttribute('class', this.class);
+			this.domObject.setAttribute('class', this.css);
 			
 			var title = document.createElement('H4');
 			title.setAttribute('class', 'title open');
@@ -435,5 +436,21 @@ if (! window.t41.view) {
         jQuery(obj).animate({
             scrollTop: offset
         }, speed);
+    };
+    
+
+    /**
+     * Fire a custom event on the given element
+     * Compatible with IE 8!
+     */
+    window.t41.view.customEvent = function(element,trigger) {
+    	var domObject = document.getElementById(element);
+        if (document.fireEvent) {
+        	domObject.fireEvent('on' + trigger);
+        } else if (document.createEvent) {
+        	var event = document.createEvent("HTMLEvents");
+			event.initEvent(trigger, true, false);
+			domObject.dispatchEvent(event);
+        }
     };
 }
