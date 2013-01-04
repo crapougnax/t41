@@ -99,13 +99,11 @@ class Module {
 		
 			// remove useless "modules" key
 			foreach ($config as $key => $val) {
-			
 				self::$_config[$key] = $val['modules'];
 			}
 			
 			// cache config if cache is enabled
 			if (isset($ckey)) {
-				
 				Core::cacheSet(self::$_config, $ckey);
 			}
 		}
@@ -130,6 +128,8 @@ class Module {
 			foreach (self::$_config as $prefix => $modules) {
 			
 				foreach ($modules as $key => $module) {
+					
+					if ($module['enabled'] != 'true') continue;
 				
 					$path = Core::$basePath . 'application/modules' . DIRECTORY_SEPARATOR . $prefix . DIRECTORY_SEPARATOR . $key;
 					self::bind($module, $path);
@@ -137,18 +137,16 @@ class Module {
 					// if module has controllers, declare them to front controller
 					// then add them to main menu
 					if (isset($module['controller']) || isset($module['controllers_extends'])) {
-						
 						Config::addPath($path . '/controllers/', Config::REALM_CONTROLLERS, null, $module['controller']['base']);
 					}
 				
 					if (isset($module['controller'])) {				
-						$menu->addItem($key, $module['controller']);
+						$menu->addItem($module['controller']['base'], $module['controller']);
 					}
 				
 					// if module extends existing controllers, declare them for inclusion at the end of the process
 					if (isset($module['controllers_extends']) && ! empty($module['controllers_extends'])) {
-				
-						$menu->registerExtends($key, $module['controllers_extends']);
+						$menu->registerExtends($module['controller']['base'], $module['controllers_extends']);
 					}
 				}
 			}

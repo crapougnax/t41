@@ -65,7 +65,6 @@ class Acl {
 	public static function init($path)
 	{
 		if (Core::getEnvData('cache_configs') !== false) {
-
 			$ckey = 'configs_acl';
 			if (($cached = Core::cacheGet($ckey)) !== false) {
 				self::$_config = $cached;
@@ -85,17 +84,14 @@ class Acl {
 
 				// module menus
 				if (isset($module['controller']) && isset($module['controller']['items'])) {
-				
 					// walk recursively through all module's items (menu elements)
 					$resources += self::_getAcl($module['controller']['base'], $module['controller']['items']);
 				}
 	
 				// and optional menus extensions
 				if (isset($module['controllers_extends'])) {
-					
 					foreach ($module['controllers_extends'] as $controller => $data) {
-						//\Zend_Debug::dump($controller); die;
-						$resources += self::_getAcl($key, $data['items']);
+						$resources += self::_getAcl($module['controller']['base'], $data['items']);
 					}
 				}
 			}
@@ -106,9 +102,8 @@ class Acl {
 		
 		self::$_config = $config['acl'];
 		if (isset($ckey)) {
-			Core::cacheSet($config['acl'], $ckey);
+			Core::cacheSet($config['acl'], $ckey, true, array('tags' => 'acl'));
 		}
-		
 	}
 	
 	
@@ -195,11 +190,9 @@ class Acl {
 		foreach ($array as $path => $data) {
 				
 			if (isset($data['items'])) {
-				
 				$acl += self::_getAcl($key, $data['items']);
 			
 			} else {
-				
 				if (! isset($data['acl'])) $data['acl'] = array('all' => self::GRANTED);
 				$acl[$key . '/' . $path] = $data['acl'];
 			}
