@@ -1,3 +1,7 @@
+/* hack intented at IE8 and lowers lack of console */
+window.console = window.console || {log:function(){}};
+
+
 if (! window.t41) { window.t41 = []; }
 
 if (! window.t41.core) {

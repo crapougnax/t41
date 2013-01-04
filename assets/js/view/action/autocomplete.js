@@ -283,14 +283,15 @@ if (! window.t41.view.action.autocomplete) {
 		};
 
 		
+		/**
+		 * trigger a 'change' event upon value setting so external observers can catch it
+		 */
 		this.triggerChangeEvent = function() {
-			// trigger a 'change' event upon value setting so external observers can catch it
-			var event = document.createEvent("HTMLEvents");
-			event.initEvent("change", true, false);
-			document.getElementById(this.target).dispatchEvent(event);
+			t41.view.customEvent(this.target, 'change');
 		};
 	};
 
+	
 	window.t41.view.action.autocomplete.extendSuggestions = function(obj) {
 
 		switch (obj.status) {
