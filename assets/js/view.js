@@ -445,6 +445,7 @@ if (! window.t41.view) {
      */
     window.t41.view.customEvent = function(element,trigger) {
     	var domObject = document.getElementById(element);
+    	if (! domObject) return false;
         if (document.fireEvent) {
         	domObject.fireEvent('on' + trigger);
         } else if (document.createEvent) {
