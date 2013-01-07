@@ -21,20 +21,6 @@ require_once 'Zend/Controller/Action.php';
 class t41_MediasController extends Zend_Controller_Action {
 
 	
-	/**
-	 * Array of acceptable mime types
-	 * @var array
-	 */
-	protected $_mimetypes = array(
-									'js'	=> 'application/javascript', 
-									'css'	=> 'text/css', 
-									'png'	=> 'image/png', 
-									'gif'	=> 'image/gif',
-									'jpg'	=> 'image/jpeg',
-									'ttf'   =>  'application/octet-stream'
-								 );
-	
-	
 	public function downloadAction()
 	{
 		if ($this->_getParam('obj')) {
@@ -42,15 +28,13 @@ class t41_MediasController extends Zend_Controller_Action {
 			$etag = md5($this->_getParam('obj'));
 			
 			if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
-				$response->setHttpResponseCode(304);
-				$this->_sendResponse();
+				$this->_sendResponse(304);
 			}
 
 			$media = new MediaObject(base64_decode($this->_getParam('obj')));
 
 			if (! $media->mime) {
-				$response->setHttpResponseCode(404);
-				$this->_sendResponse();
+				$this->_sendResponse(404);
 			}
 			
 			$response->setHeader('Content-Type', $media->mime);
@@ -63,14 +47,16 @@ class t41_MediasController extends Zend_Controller_Action {
 			$this->_sendResponse();
 
 		} else {
-			$response->setHttpResponseCode(404);
-			$this->_sendResponse();
+			$this->_sendResponse(404);
 		}
 	}
 	
 	
-	protected function _sendResponse()
+	protected function _sendResponse($code = null)
 	{
+		if ($code) {
+			$this->getResponse()->setHttpResponseCode($code);
+		}
 		$this->getResponse()->sendResponse();
 		exit();		
 	}
