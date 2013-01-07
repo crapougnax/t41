@@ -34,7 +34,7 @@ use t41\View,
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-class CsvAdapter extends AdapterAbstract {
+class CsvAdapter extends AbstractAdapter {
 
 	
 	const ID = 'Csv';

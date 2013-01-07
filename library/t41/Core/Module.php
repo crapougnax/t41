@@ -179,6 +179,11 @@ class Module {
 			Core::addAutoloaderPrefix($config['namespace'], $path . '/models/');
 			Config::addPath($path . '/models', Config::REALM_OBJECTS, null, $config['namespace']);
 		}
+		
+		// Register views directory if it exists
+		if (is_dir($path . '/views')) {
+		//	Config::addPath($path . '/views', Config::REALM_TEMPLATES, Config::POSITION_TOP);
+		}
 	}
 	
 	

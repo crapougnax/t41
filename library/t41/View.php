@@ -2,6 +2,8 @@
 
 namespace t41;
 
+use t41\Core\Layout;
+
 /**
  * t41 Toolkit
  *
@@ -112,13 +114,14 @@ class View {
 	
 	private static $_errors = array();
 	
+	
 	/**
 	 * Set display via instanciation of the given view adapter. 
 	 * If an adapter has already been declared, it will be silently replaced by the new one
 	 *
 	 * @param string $adapter Must match one of all available adapter classes ID constant (ex: Web, Pdf, Csv)
 	 * @param array $parameters
-	 * @throws t41_View_Exception
+	 * @throws t41\View\Exception
 	 */
 	static public function setDisplay($adapter, array $parameters = null)
 	{
@@ -126,9 +129,7 @@ class View {
 		$adapterClass = sprintf('t41\View\Adapter\%sAdapter', $adapter);
 		try {
 			self::$_display = new $adapterClass($parameters);
-			
 		} catch (\Exception $e) {
-			
 			throw new View\Exception("The adapter class '$adapterClass' can't be instanciated: " . $e->getMessage());
 		}
 		
@@ -146,13 +147,12 @@ class View {
 	static public function setViewParameters(array $params, $view = null)
 	{
 		if (self::_isInstanciated()) {
-			
 			foreach ($params as $key => $val) {
-				
 				self::$_display->setParameter($key, $val);
 			}
 		}
 	}
+
 	
 	/**
 	 * Controls wether the given view type has been instanciated. Throws an exception otherwise.
@@ -162,12 +162,9 @@ class View {
 	 */
 	static protected function _isInstanciated($view = null)
 	{
-		if (! self::$_display instanceof View\Adapter\AdapterAbstract) {
-			
+		if (! self::$_display instanceof View\Adapter\AbstractAdapter) {
 			throw new View\Exception("No view adapter has been selected");
-
 		} else {
-			
 			return true;
 		}
 	}
@@ -292,7 +289,6 @@ class View {
 	static public function addRequiredMedia($name, $lib = 't41')
 	{
 		if (self::_isInstanciated ()) {
-			
 			return self::$_display->mediaAdd($name, $lib);
 		}		
 	}
@@ -414,7 +410,6 @@ class View {
 	static public function setTemplate($tpl, $view = null)
 	{
 		if (self::_isInstanciated($view)) {
-			
 			self::$_display->setTemplate($tpl);
 		}
 	}

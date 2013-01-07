@@ -23,7 +23,8 @@ namespace t41\View\Adapter;
  */
 
 use t41\ObjectModel\ObjectModelAbstract,
-	t41\Config;
+	t41\Config,
+	t41\Core;
 
 /**
  * Abstract class providing the view engine with basic methods and
@@ -34,7 +35,7 @@ use t41\ObjectModel\ObjectModelAbstract,
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-abstract class AdapterAbstract extends ObjectModelAbstract implements AdapterInterface {
+abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInterface {
 
 		
     /**
@@ -148,28 +149,34 @@ abstract class AdapterAbstract extends ObjectModelAbstract implements AdapterInt
     /**
      * Set template to be used when view rendering will occur.
      * Template can either be an html skeleton or an xml configuration file for the generation of a PDF view
+     * Templates are searched in module views/ folder bu default then in the global views/ folder
      * 
      * @param string $tpl file name (if template is in views directory) or complete access path
-     * @throws t41_View_Exception
+     * @throws t41\View\Exception
      */
     public function setTemplate($tpl)
     {
     	/* reset template */
     	$this->_template = null;
     	
-    	$files = Config\Loader::findFile($tpl, Config::REALM_TEMPLATES);
+    	$paths = Config::getPaths(Config::REALM_TEMPLATES);
+    	if (Core\Layout::$module) {
+    		$path = Core::$basePath . 'application/modules/' . Core\Layout::$vendor . DIRECTORY_SEPARATOR
+    			  . Core\Layout::$moduleKey . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+    		if (is_dir($path)) {
+    			array_unshift($paths, $path);	
+    		}
+    	}
+    	$files = Config\Loader::findFile($tpl, $paths);
     	
     	foreach ($files[Config::DEFAULT_PREFIX] as $file) {
-
     		if (file_exists($file)) {
-				
 	    		$this->_template = $file;
 	    		break;
 			}
 		}
 		
 		if (is_null($this->_template)) {
-			
 			throw new Exception("Unable to find '$tpl' template file in paths");
 		}
     }

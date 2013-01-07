@@ -26,6 +26,8 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 	
 	public function init() {
 		
+		// Just in cas something goes wrong before the end
+		// @todo replace with a setTemplate() in t41\Exception
 		View::setTemplate('default.html');
 		
 		// get page identifiers (module, controller and action)
@@ -40,10 +42,11 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 				
 				if (isset($module['controller']) && Layout::$module == $module['controller']['base']) {
 					$this->_module = 'app/' . $vendor . '/' . $key;
+					Layout::$vendor = $vendor;
+					Layout::$moduleKey = $key;
 
 					$resource = Layout::$controller;
 					if (Layout::$action) $resource .= '/' . Layout::$action;
-					//Zend_Debug::dump($module);
 					if (isset($module['controller']['items'])) {
 						foreach ($module['controller']['items'] as $controller) {
 							if ($this->_getCurrentItem($resource, $controller) == true) break;
@@ -59,10 +62,10 @@ abstract class t41_DefaultController extends Zend_Controller_Action {
 			}
 		}
 	}
+
 	
 	protected function _getCurrentItem($resource,$items)
 	{
-		//Zend_Debug::dump($items);
 		foreach ($items as $key => $item) {
 		
 			if ($key == $resource) {

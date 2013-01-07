@@ -115,7 +115,7 @@ class Loader {
 	 * Looks for the given file name in all declared paths in ordered list for the given realm
 	 * Returns the full path of the matching files or null.
 	 * @param string $file
-	 * @param string $realm
+	 * @param string|array $realm
 	 * @return string
 	 */		
 	static public function findFile($file, $realm = Config::REALM_CONFIGS, $returnFirst = false)
@@ -123,10 +123,9 @@ class Loader {
 		$prefix = Config::DEFAULT_PREFIX;
 		$files = array($prefix => array());
 
-		foreach (Config::getPaths($realm) as $path) {
-							
+		$paths = is_array($realm) ? $realm : Config::getPaths($realm);
+		foreach ($paths as $path) {
 			if (strstr($path, Config::PREFIX_SEPARATOR) !== false) {
-
 				list($path, $prefix) = explode(Config::PREFIX_SEPARATOR, $path);
 				if (! isset($files[$prefix])) $files[$prefix] = array();
 				

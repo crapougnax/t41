@@ -38,6 +38,10 @@ class Layout {
 
 	static protected $_menus = array();
 	
+	static public $vendor;
+	
+	static public $moduleKey;
+	
 	static public $module;
 	
 	static public $controller;
