@@ -28,7 +28,7 @@ use t41\ObjectModel;
 use t41\ObjectModel\Property;
 
 /**
- * Abstract class providing all CRUD methods to use with PDO adapters
+ * Class providing all CRUD methods to use with a DB2 server
  * 
  * Must be inherited by an adapter-binded class (ex: t41_Backend_Adapter_Pdo_Mysql
  *
@@ -224,7 +224,6 @@ class Db2Adapter extends AbstractAdapter {
 		
 		/* add clause for primary key(s) */
 		foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
-			
 			$select->where("$key = ?", $val);
 		}
 		
@@ -282,7 +281,6 @@ class Db2Adapter extends AbstractAdapter {
 		
 		$where = '';
 		foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
-			
 			$where .= $this->_ressource->quoteInto("$key = ?", $val);
 		}
 		

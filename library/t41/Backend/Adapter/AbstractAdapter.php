@@ -355,24 +355,21 @@ abstract class AbstractAdapter implements AdapterInterface {
 	 * @param t41\ObjectModel\DataObject $do
 	 * @return array
 	 */
-	protected function _preparePrimaryKeyClauses(t41_Data_Object $do)
+	protected function _preparePrimaryKeyClauses(DataObject $do)
 	{
 		/* no mapper or no pkey definition in mapper */
 		if (! $this->_mapper || ! $this->_mapper->getPrimaryKey($do->getUri()->getClass())) {
-			
 			return array(Backend::DEFAULT_PKEY => $do->getUri()->getIdentifier());
 		}
 		
 		$array = array();
 
 		// example of mapper definition: <mapper id="myid" pkey="key1:string,key2:integer">...</mapper>
-		$pkeyVals  = explode(\t41\Mapper::VALUES_SEPARATOR, $do->getUri()->getIdentifier());
+		$pkeyVals  = explode(Backend\Mapper::VALUES_SEPARATOR, $do->getUri()->getIdentifier());
 		
 		/* @var $obj t41_Backend_Key */
 		foreach ($this->_mapper->getPrimaryKey($do->getClass()) as $key => $obj) {
-			
 			if (! isset($pkeyVals[$key])) continue;
-			
 			$array[$obj->getName()] = $obj->castValue($pkeyVals[$key]);
 		}
 		

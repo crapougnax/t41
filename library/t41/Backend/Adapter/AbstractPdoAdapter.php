@@ -250,20 +250,22 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		// primary key is either part of the mapper configuration or 'id'
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
-		
 		$this->_connect();
 		
 		// get data from backend
 		// @todo Handle complex pkeys (via mapper definition)
 		$select = $this->_ressource->select()
 								   ->from($table,$columns)
-								   ->where("$pkey = ?", $do->getUri()->getIdentifier())
 								   ->limit(1);
 		
+		/* add clause for primary key(s) */
+		foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
+			$select->where("$key = ?", $val);
+		}
+
 		$data = $this->_ressource->fetchRow($select);
 		
 		if (empty($data)) {
-
 			$do->resetUri();
 			return false;
 		}
@@ -348,9 +350,16 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			if (count($data['data']) > 0) {
 				// don't use return statut of update() because if record isn't changed, value is false
-				$ures = $this->_ressource->update($table
-										, $data['data']
-										, $this->_ressource->quoteInto("$pkey = ?", $uri->getIdentifier()));
+			//	$ures = $this->_ressource->update($table
+			//							, $data['data']
+			//							, $this->_ressource->quoteInto("$pkey = ?", $uri->getIdentifier()));
+				
+				$where = '';
+				foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
+					$where .= $this->_ressource->quoteInto("$key = ?", $val);
+				}
+				
+				$ures = $this->_ressource->update($table, $data, $where);
 				
 			}
 			
@@ -406,7 +415,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$this->_setLastQuery('delete', null, array('table' => $table));
 				
 		} catch (\Exception $e) {
-			
 			$this->_setLastQuery('delete', null, array('table' => $table, 'context' => $e->getMessage()));
 			return false;
 		}
@@ -573,7 +581,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				
 			if ($field == ObjectUri::IDENTIFIER) {
 				// @todo search mapper for a different key
-				$field = Backend::DEFAULT_PKEY;
+				$field = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
 			}
 			
 			/* if a join was performed, prefix current field with table name */
@@ -663,7 +671,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 		}
 		
-//		echo $select; die;
+		//echo $select; die;
 
 		$result = array();
 		$context = array('table' => $table);
@@ -718,7 +726,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			// switch mode if requested 
 			$mode = $clause['mode'];
-		
 			$value = $clause['value'];
 			
 			// IS NULL support
@@ -788,7 +795,15 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 		
 			$needle = is_array($value) ? '(?)' : '?';
-			$statements[] = $this->_ressource->quoteInto(sprintf("%s %s $needle", $field, $operator), $value);
+			if (is_array($field)) { // $field contains primary keys
+				$pkeyVals  = explode(Backend\Mapper::VALUES_SEPARATOR, $value);
+				foreach ((array) $field as $fkey => $fpart) {
+					if (! isset($pkeyVals[$fkey])) continue;
+					$statements[] = $this->_ressource->quoteInto(sprintf("%s %s $needle", $fpart->getName(), $operator), $fpart->castValue($pkeyVals[$fkey]));
+				}
+			} else {
+				$statements[] = $this->_ressource->quoteInto(sprintf("%s %s $needle", $field, $operator), $value);
+			}
 		}
 		
 		return implode(" $mode ", $statements);
