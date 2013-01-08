@@ -66,8 +66,6 @@ class Mapper
 	public function __construct(array $mappingArray)
 	{
 		$this->_mapping = $mappingArray;
-		
-		//Zend_Debug::dump($mappingArray);
 	}
 	
 	
@@ -81,12 +79,10 @@ class Mapper
 	public function propertyToDatastoreName($className, $propertyName = null)
 	{
 		if (! isset($this->_mapping[$className])) {
-			
 			return $propertyName;
 		}
 		
 		if (! isset($this->_mapping[$className]['map'][$propertyName])) {
-		
 			return $propertyName;
 		}
 		
@@ -105,7 +101,6 @@ class Mapper
 	public function toDataObject(array $array, $objectName)
 	{
 		if (! is_array($this->_mapping[$objectName]) || ! is_array($this->_mapping[$objectName]['map']) || count($this->_mapping[$objectName]['map']) == 0) {
-			
 			return $array;
 		}
 		
@@ -154,7 +149,6 @@ class Mapper
 		}
 		
 		if (isset($this->_mapping[$objectName]['extends'])) {
-
 			$result += $this->toDataObject($array, $this->_mapping[$objectName]['extends']);
 		} 
 		
@@ -168,7 +162,6 @@ class Mapper
 	public function toArray(array $array, $objectName)
 	{
 		if (! isset($this->_mapping[$objectName]) || ! isset($this->_mapping[$objectName]['map']) || ! is_array($this->_mapping[$objectName]['map'])) {
-			
 			return $array;
 		}
 		
@@ -213,7 +206,6 @@ class Mapper
 					}
 					
 				} else {
-				
 					$val = isset($array[$property]) ? $array[$property] : null;
 				}
 
@@ -235,7 +227,6 @@ class Mapper
 				$result[isset($key) ? $key : $property] = $val;
 				
 				if (isset($key)) {
-					
 					unset($addedArray[$property]);
 					unset($key);
 				}
@@ -252,7 +243,6 @@ class Mapper
 	public function getDatastore($objectName)
 	{
 		if (isset($this->_mapping[$objectName])) {
-			
 			return isset($this->_mapping[$objectName]['datastore']) ? $this->_mapping[$objectName]['datastore'] : null;
 		
 		} else {
@@ -273,11 +263,9 @@ class Mapper
 	public function getDataclass($objectName)
 	{
 		if (isset($this->_mapping[$objectName])) {
-			
 			return isset($this->_mapping[$objectName]['dataclass']) ? $this->_mapping[$objectName]['dataclass'] : $objectName;
 		
 		} else {
-			
 			return $objectName;
 		}
 	}
@@ -295,22 +283,19 @@ class Mapper
 	public function getPrimaryKey($objectName)
 	{
 		if (! isset($this->_mapping[$objectName]) || ! isset($this->_mapping[$objectName]['pkey'])) {
-			
 			return Backend::DEFAULT_PKEY;
 		}
 		
 		if (isset($this->_mapping[$objectName]['pkey_parsed'])) {
-			
 			return $this->_mapping[$objectName]['pkey_parsed'];
 		}
 		
-		$keys  = explode(\t41\Mapper::VALUES_SEPARATOR, $this->_mapping[$objectName]['pkey']);
+		$keys  = explode(self::VALUES_SEPARATOR, $this->_mapping[$objectName]['pkey']);
 		
 		$array = array();
 		
 		foreach ($keys as $key) {
-			
-			$elements = explode(\t41\Mapper::ARGS_SEPARATOR, $key);
+			$elements = explode(self::ARGS_SEPARATOR, $key);
 			$array[] = new Key($elements[0], isset($elements[1]) ? $elements[1] : null);
 		}
 		
@@ -323,15 +308,10 @@ class Mapper
 	public function getExtraArg($key, $class = null)
 	{
 		if ($class && isset($this->_mapping[$class]['parameters'][$key])) {
-			
 			return $this->_mapping[$class]['parameters'][$key];
-			
 		} else if (isset($this->_mapping['parameters'][$key])) {
-			
 			return $this->_mapping['parameters'][$key];
-			
 		} else {
-			
 			return false;
 		}
 	}
@@ -340,7 +320,6 @@ class Mapper
 	public function translate($objectName, $arraySource, $source = 'object')
 	{		
 		if (! isset ($this->_mapping[$objectName]) || ! isset ($this->_mapping[$objectName]['map'])) {
-			
 			return $arraySource;
 		}
 		
@@ -348,15 +327,11 @@ class Mapper
 		$arrayDest = array();
 		
 		foreach ($arraySource as $key => $val) {
-			
 			if (isset($map[$key])) {
-				
 				if (isset($map[$key]['datastorename'])) {
-					
 					$arrayDest[ $map[$key]['datastorename'] ] = $val;
 				}
 			} else {
-				
 				$arrayDest[$key] = $val;
 			}
  		}
@@ -368,7 +343,6 @@ class Mapper
 	public function setDatastoreName($objectName, $datastoreName)
 	{
 		if (isset($this->_mapping[$objectName])) {
-		
 			$this->_mapping[$objectName]['datastore'] = $datastoreName;
 		}
 		return $this;
