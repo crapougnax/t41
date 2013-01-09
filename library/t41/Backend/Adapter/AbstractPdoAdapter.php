@@ -480,7 +480,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$statement = array();
 				
 				foreach ($conditionArray[0]->getConditions() as $condition) {
-					$statement[] = $this->_parseCondition($condition[0], $select);
+					$statement[] = $this->_parseCondition($condition[0], $select, $table);
 				}
 				
 				$statement = implode(' OR ', $statement);
@@ -810,10 +810,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	}
 	
 	
-	protected function _parseCondition(Condition $condition, \Zend_Db_Select $select)
+	protected function _parseCondition(Condition $condition, \Zend_Db_Select $select, $table)
 	{
-		global $table, $jtable;
-		
+		$jtable = '';
 		/* does condition contain another condition object ? */
 		if ($condition->isRecursive()) {
 		
@@ -874,7 +873,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 			$uniqext = $jtable . '__joined_for__' . $leftkey;
 				
-			$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $jtable, $rightkey);
+			$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
 			$select->joinLeft("$jtable AS $uniqext", $join, array());
 		
 			$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
@@ -892,10 +891,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// @todo refactor there and in find()
 		if ($jtable) {
 			$field = $this->_alreadyJoined[$jtable] . '.' . $field;
-		
 		} else if($table) {
-		
-			//$field = $table . '.' . $field;
+			$field = $table . '.' . $field;
 		}
 		
 		$statement = $this->_buildConditionStatement($field, $condition->getClauses(), 'OR'); //$conditionArray[1]);
