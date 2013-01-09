@@ -350,17 +350,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			if (count($data['data']) > 0) {
 				// don't use return statut of update() because if record isn't changed, value is false
-			//	$ures = $this->_ressource->update($table
-			//							, $data['data']
-			//							, $this->_ressource->quoteInto("$pkey = ?", $uri->getIdentifier()));
-				
 				$where = '';
 				foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
 					$where .= $this->_ressource->quoteInto("$key = ?", $val);
 				}
 				
-				$ures = $this->_ressource->update($table, $data, $where);
-				
+				$ures = $this->_ressource->update($table, $data['data'], $where);
 			}
 			
 			// Reset properties changed state before saving collections to avoid recursion
