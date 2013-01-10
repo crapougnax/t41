@@ -238,19 +238,34 @@ class Core {
     }
     
     
-    public static function setIncludePaths($path)
+    /**
+     * Sets the necessary paths and optionaly remove an already existing Zend Framework path
+     * @param string $path
+     * @param boolean $removeZfPath
+     */
+    public static function setIncludePaths($path, $removeZfPath = false)
     {
     	if (substr($path, -1) != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
     	
 		self::setPaths($path);
 
+		$dpaths = explode(PATH_SEPARATOR, get_include_path());
+		
+		if ($removeZfPath === true) {
+			foreach ($dpaths as $key => $dpath) {
+				if (strpos($dpath, "/ZendFramework/") !== false) {
+					unset($paths[$key]);
+				}
+			}
+		}
+		
     	set_include_path(
-    			get_include_path() . PATH_SEPARATOR
+    			implode(PATH_SEPARATOR, $dpaths) . PATH_SEPARATOR
     			. $path . PATH_SEPARATOR
     			. $path . 'application/' . PATH_SEPARATOR
     			. $path . 'vendor/' . PATH_SEPARATOR
     			. $path . 'vendor/quatrain/t41/library' . PATH_SEPARATOR
-    			. $path . 'vendor/zend/zf1/library' . PATH_SEPARATOR
+    			. $path . 'vendor/zend/zf1/library'
     	);
     }
 
@@ -778,7 +793,7 @@ class Core {
         	return $key;
         }
         
-    	return $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : null) ? $key : false;
+    	return $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : array()) ? $key : false;
     }
     
     
