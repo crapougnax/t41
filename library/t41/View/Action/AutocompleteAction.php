@@ -94,16 +94,18 @@ class AutocompleteAction extends AbstractAction {
 			$this->setParameter('offset', (int) $params['_offset']);
 		}
 		
+		$extra = isset($params['extra']) ? (array) $params['extra'] : array();
+		
 		if (Core::getEnvData('cache_datasets') === true) {
 
-			$md5 = md5(isset($params[$this->queryfield]) ? $params[$this->queryfield] : $params[$this->queryidfield]);
+			$md5 = md5($extra . isset($params[$this->queryfield]) ? $params[$this->queryfield] : $params[$this->queryidfield]);
 			//@todo check unicity, especially with hard-coded conditions having()
 			$ckey = 'ds_ac_' . $this->_cachePrefix . '_' . $md5
 				  . '_' . $this->getParameter('offset') . '_' . $this->getParameter('batch');
 		
 			if (($data = Core::cacheGet($ckey)) === false) {
 				if (isset($params[$this->queryfield])) {
-					$data = $this->_getSuggestions(trim($params[$this->queryfield]));
+					$data = $this->_getSuggestions(trim($params[$this->queryfield]), $extra);
 				} else {
 					$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
 				}
@@ -114,7 +116,7 @@ class AutocompleteAction extends AbstractAction {
 		} else {
 			
 			if (isset($params[$this->queryfield])) {
-				$data = $this->_getSuggestions(trim($params[$this->queryfield]));
+				$data = $this->_getSuggestions(trim($params[$this->queryfield]), $extra);
 			} else {
 				$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
 			}
@@ -129,7 +131,7 @@ class AutocompleteAction extends AbstractAction {
 	 * @param string $query
 	 * @return array
 	 */
-	protected function _getSuggestions($query)
+	protected function _getSuggestions($query, array $extras = array())
 	{
 		$data = array();
 		
@@ -148,6 +150,12 @@ class AutocompleteAction extends AbstractAction {
 					$combo->having($property)->orMode()->contains($query);
 					break;
 			} 
+		}
+		
+		if (count($extras) > 0) {
+			foreach ($extras as $prop => $extra) {
+				$this->_obj->having($prop)->equals($extra);
+			}
 		}
 		
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));

@@ -414,6 +414,9 @@ if (! window.t41.view.action.autocomplete) {
 						data:{_query:search,uuid:ac.uuid,_sequence:++ac.sequence}
 					 };
 		
+		if (ac.callbacks.preQuery && typeof ac.callbacks.preQuery == 'function') {
+			config = ac.callbacks.preQuery.call(this,config);
+		}
 		t41.core.call(config);
 	};
 	
