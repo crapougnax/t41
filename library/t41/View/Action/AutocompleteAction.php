@@ -97,8 +97,10 @@ class AutocompleteAction extends AbstractAction {
 		$extra = isset($params['extra']) ? (array) $params['extra'] : array();
 		
 		if (Core::getEnvData('cache_datasets') === true) {
-
-			$md5 = md5(serialize($extra) . isset($params[$this->queryfield]) ? $params[$this->queryfield] : $params[$this->queryidfield]);
+			$hash  = serialize($extra);
+			$hash .= isset($params[$this->queryfield]) ? $params[$this->queryfield] : $params[$this->queryidfield];
+			$md5 = md5($hash);
+			
 			//@todo check unicity, especially with hard-coded conditions having()
 			$ckey = 'ds_ac_' . $this->_cachePrefix . '_' . $md5
 				  . '_' . $this->getParameter('offset') . '_' . $this->getParameter('batch');
