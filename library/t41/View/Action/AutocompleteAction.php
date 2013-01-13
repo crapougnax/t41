@@ -152,9 +152,12 @@ class AutocompleteAction extends AbstractAction {
 			} 
 		}
 		
+		// if extra parameters are passed, complete query with given key/value pairs
 		if (count($extras) > 0) {
 			foreach ($extras as $prop => $extra) {
-				$this->_obj->having($prop)->equals($extra);
+				if (! empty($extra)) {
+					$this->_obj->having($prop)->equals($extra);
+				}
 			}
 		}
 		
