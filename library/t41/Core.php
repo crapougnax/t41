@@ -511,7 +511,7 @@ class Core {
     		throw new Config\Exception("environment value not detected");
     	}
 
-    	self::$appId = str_replace('.', '_', $match);
+    	self::$appId = str_replace(array('.','-'), '_', $match);
     	
     	$envKey = null;
     	
