@@ -44,6 +44,7 @@ class WebDefault extends AbstractWebDecorator {
 		
 		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
 			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
+			$this->setParameter('radiomax',0);
 		}
 
 		if (count($this->_obj->getEnumValues()) > $this->getParameter('radiomax')) {
