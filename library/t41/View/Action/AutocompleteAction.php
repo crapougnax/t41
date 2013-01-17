@@ -2,6 +2,8 @@
 
 namespace t41\View\Action;
 
+use t41\ObjectModel\Property\ObjectProperty;
+
 use t41\ObjectModel\ObjectUri;
 
 /**
@@ -166,7 +168,7 @@ class AutocompleteAction extends AbstractAction {
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
 
-//		$this->_obj->find(ObjectModel::MODEL);
+		$this->_obj->find(ObjectModel::MODEL);
 //		var_dump(\t41\Backend::getLastQuery()); die;
 		
 		if ($this->_obj->find(ObjectModel::MODEL) === false) {

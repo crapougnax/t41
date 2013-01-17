@@ -104,10 +104,13 @@ class DefaultAdapter extends AbstractAdapter {
 				}
 				
 				if ($property->getParameter('sorting')) {
-				
 					$element->setParameter('sorting', $property->getParameter('sorting'));
 				}
 				
+				if ($property->getParameter('search')) {
+					$element->setParameter('search', $property->getParameter('search'));
+				}
+								
 				$element->setCollection($collection);
 				
 				//$collection->find();

@@ -39,6 +39,10 @@
 						<type>string</type>
 						<protected>true</protected>
 					</parameter>
+					<parameter id="search">
+						<type>string</type>
+						<protected>false</protected>
+					</parameter>
 					<parameter id="display">
 						<type>string</type>
 						<protected>false</protected>

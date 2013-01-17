@@ -127,6 +127,9 @@
 
 		<object id="\t41\View\FormComponent\Element\ListElement" extends="\t41\View\ViewObject">
 			<parameters>
+				<parameter id="search" type="string">
+					<bogus/>
+				</parameter>
 				<parameter id="display" type="string">
 					<bogus/>
 				</parameter>
