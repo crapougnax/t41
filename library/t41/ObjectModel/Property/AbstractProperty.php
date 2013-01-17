@@ -47,6 +47,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	 */
 	protected $_value;
 	
+	
 	protected $_initialValue;
 	
 	
@@ -108,28 +109,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	{
 		$this->_parent = $parent;
 		return $this;
-	}
-	
-	
-	/**
-	 * Attach a rule instance and its trigger to the property
-	 * @param ObjectModel\Rule\AbstractRule $rule
-	 * @param unknown_type $trigger
-	 */
-	public function attach(AbstractRule $rule, $trigger)
-	{
-		if (! isset($this->_rules[$trigger]) || ! is_array($this->_rules[$trigger])) {
-			
-			$this->_rules[$trigger] = array();
-		}
-		$this->_rules[$trigger][] = $rule;
-		return $this;
-	}
-	
-	
-	public function getRules()
-	{
-		return $this->_rules;
 	}
 	
 	
@@ -302,29 +281,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		return $this;
 	}
 	
-	
-	/**
-	 * Execute defined rules for given trigger
-	 *
-	 * @param string $trigger
-	 * @return boolean
-	 */
-	protected function _triggerRules($trigger)
-	{
-		if (! isset($this->_rules[$trigger])) {
-			return true;
-		}
-	
-		$result = true;
-
-		foreach ($this->_rules[$trigger] as $rule) {
-			$result = $result && $rule->execute($this);
-		}
-	
-		return $result;
-	}
-	
-	
 
 	protected function _parseDisplayProperty()
 	{
@@ -353,7 +309,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 				foreach ($displayProps as $disProp) {
 			
 					if ($this->_value->getProperty($disProp)) {
-						$this->_displayValue[] = $this->_value->getProperty($disProp)->getValue();
+						$this->_displayValue[] = $this->_value->getProperty($disProp)->getDisplayValue();
 					} elseif ($disProp == '#identifier') {
 						//@todo refactor this
 						$this->_displayValue[] = $this->_value->getIdentifier();
