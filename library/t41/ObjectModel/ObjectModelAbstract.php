@@ -46,11 +46,18 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	
 	/**
 	 * Object parameters
-	 * a collection of t41_Parameter instances
+	 * a collection of t41\Parameter instances
 	 *
 	 * @var array
 	 */
 	protected $_params = array();
+	
+	
+	/**
+	 * Array of rules to apply on defined trigger
+	 * @var array
+	 */
+	protected $_rules;
 	
 	
 	/**
@@ -201,10 +208,59 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	}
 	
 	
+	/**
+	 * RULES
+	 */
+	
+
+	/**
+	 * Attach a rule instance and its trigger to the property
+	 * @param ObjectModel\Rule\AbstractRule $rule
+	 * @param unknown_type $trigger
+	 */
+	public function attach(AbstractRule $rule, $trigger)
+	{
+		if (! isset($this->_rules[$trigger]) || ! is_array($this->_rules[$trigger])) {
+			$this->_rules[$trigger] = array();
+		}
+		$this->_rules[$trigger][] = $rule;
+		return $this;
+	}
+	
+	
+	public function getRules()
+	{
+		return $this->_rules;
+	}
+
+
+	/**
+	 * Execute defined rules for given trigger
+	 *
+	 * @param string $trigger
+	 * @return boolean
+	 */
+	protected function _triggerRules($trigger)
+	{
+		if (! isset($this->_rules[$trigger])) {
+			/* return true if no defined rule for trigger */
+			return true;
+		}
+	
+		$result = true;
+	
+		foreach ($this->_rules[$trigger] as $rule) {
+			//\Zend_Debug::dump($rule); die;
+			$result = $result && $rule->execute($this->_dataObject);
+		}
+	
+		return $result;
+	}
+	
+	
 	public function __clone()
 	{
 		foreach ($this->_params as $key => $param) {
-			
 			$this->_params[$key] = clone $param;
 		}
 	}
@@ -214,7 +270,6 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	{
 		$res = Core::cacheSet($this);
 		if ($res !== false) {
-			
 			$this->_id = $res;
 		}
 		
@@ -235,7 +290,6 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 		foreach ($this->_params as $key => $parameter) {
 			
 			if (isset($params['params']) && is_array($params['params']) && ! array_key_exists($key, $params['params'])) {
-				
 				continue;
 			}
 			

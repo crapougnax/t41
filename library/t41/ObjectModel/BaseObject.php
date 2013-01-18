@@ -53,6 +53,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 	 */
 	protected $_rules;
 	
+	
 	/**
 	 * Latest call on object's status
 	 * @var t41\Core\Status
@@ -71,7 +72,6 @@ abstract class BaseObject extends ObjectModelAbstract {
 		$this->_setParameterObjects();
 		
 		if (is_array($params)) {
-			
 			$this->_setParameters($params);
 		}
 
@@ -79,7 +79,6 @@ abstract class BaseObject extends ObjectModelAbstract {
 		if ($val instanceof DataObject) {
 
 			if ($val->getClass() != get_class($this)) {
-				
 				throw new Exception("Provided Data Object is not build on class definition");
 			}
 			
@@ -338,36 +337,9 @@ abstract class BaseObject extends ObjectModelAbstract {
 	}
 	
 	
-	/**
-	 * Execute defined rules for given trigger
-	 * 
-	 * @param string $trigger
-	 * @return boolean
-	 */
-	protected function _triggerRules($trigger)
-	{
-		if (! isset($this->_rules[$trigger])) {
-			
-			//echo 'no rule for ' . $trigger . "\n";
-			/* return true if no defined rule for trigger */
-			return true;
-		}
-		
-		$result = true;
-		
-		foreach ($this->_rules[$trigger] as $rule) {
-
-			$result = $result && $rule->execute($this);
-		}
-		
-		return $result;
-	}
-	
-	
 	public function setRules(array $rules = array())
 	{
 		if (count($rules) == 0) {
-			
 			$rules = (array) ObjectModel::getRules($this);
 		}
 		
@@ -377,11 +349,9 @@ abstract class BaseObject extends ObjectModelAbstract {
 			$parts = explode('/', $trigger);
 			foreach ($rulesArray as $key => $rule) {
 				
-				if (($property = $this->_dataObject->getProperty($parts[2])) !== false) {
-					
+				// rules on properties
+				if (isset($parts[2]) && ($property = $this->_dataObject->getProperty($parts[2])) !== false) {
 					$property->attach($rule, $parts[0] . '/' . $parts[1]);
-				
-					// unset delegated rule @todo handle no-property-related rules
 					unset($rules[$trigger][$key]);
 					
 					/*
@@ -389,6 +359,8 @@ abstract class BaseObject extends ObjectModelAbstract {
 					 * ex: if the rules allows to compute data from a collection, any change to the collection
 					 * members should trigger the rule.
 					 */
+				} else {
+					$this->attach($rule, $parts[0] . '/' . $parts[1]);
 				}
 			}
 		}
@@ -414,13 +386,25 @@ abstract class BaseObject extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Save object
+	 * Save object (create or update)
 	 * 
+	 * @param t41\Backend\Adapter\AbstractAdapter $backend
 	 * @return boolean
 	 */
 	public function save(Backend\Adapter\AbstractAdapter $backend = null)
 	{
-		return Backend::save($this->_dataObject, $backend);
+		$this->_triggerRules('before/save');
+		if (! $this->_uri) {
+			$new = true;
+			$this->_triggerRules('before/create');
+		}
+		$result = Backend::save($this->_dataObject, $backend);
+		$this->_triggerRules('after/save');
+		if (isset($new)) {
+			$this->_triggerRules('after/create');
+		}
+		
+		return $result;
 	}
 	
 	
