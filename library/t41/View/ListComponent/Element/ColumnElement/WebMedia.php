@@ -41,11 +41,13 @@ class WebMedia extends AbstractWebDecorator {
 	
 	public function render()
 	{
-		if (($uri = $this->_obj->getValue()) !== false) {
+		if (! is_null($uri = $this->_obj->getValue())) {
 			return sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s</a>'
 				, rawurlencode(base64_encode($uri))
 				, 'Télécharger'
 				);
+		} else {
+			return 'Pas de fichier lié';
 		}
 	}
 }
