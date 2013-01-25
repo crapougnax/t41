@@ -256,9 +256,10 @@ window.t41.view.alert = function(str,o) {
 					break;
 					
 				case 'confirm':
-					this.buttons.confirm = new t41.view.button(t41.lget('confirm'), {icon:'valid'});
+					this.buttons.confirm = new t41.view.button(t41.lget('confirm:button'), {icon:'valid'});
 					this.buttons.confirm.setAttribute('id', 'confirm');
-					jQuery(this.buttons.confirm).bind('click', jQuery.proxy(this, 'confirm'));
+					t41.view.bindLocal(this.buttons.confirm, 'click', jQuery.proxy(this,'confirm'));	
+//					jQuery(this.buttons.confirm).bind('click', jQuery.proxy(this, 'confirm'));
 					jQuery('#' + this.o.id + ' .buttons').append(this.buttons.confirm);
 					//jQuery(button).bind('click', this.o.callbacks.confirm);
 					break;
@@ -326,3 +327,15 @@ window.t41.view.alert.runDeferred = function() {
 		t41.core.removeCookie('t41DeferredAlert');
 	}
 };
+
+
+window.t41.view.alert.confirm = function(content,callbacks) {
+	var content = content || t41.locale.get('confirm:message');
+	return new t41.view.alert(content,{
+										title:t41.locale.get('confirm:title'), 
+										buttons:{confirm:true, abort:true},
+										callbacks:callbacks
+		  							  }
+							 );
+};
+

@@ -14,7 +14,7 @@ if (! window.t41.core) {
 	/* t41 libraries declaration */
 	window.t41.core.libs = {view:{depends:['google.jquery']},objectmodel:{}};
 	
-	window.t41.core.store = [];
+	window.t41.core.store = {actions:{}};
 	
 	/**
 	 * Library loader
@@ -283,6 +283,26 @@ if (! window.t41.core) {
 
 		t41.core.setCookie(name, '', -1);
 		if (t41.core.cookies[name]) t41.core.cookies[name] = false;
+	};
+	
+	
+	/**
+	 * Returns a YYYY-MM-DD HH:MM:SS formatted current date
+	 */
+	window.t41.core.date = function() {
+		
+		this.pad = function(n) {
+			return n < 10 ? '0' + n : n;
+		};
+		  
+		var date = new Date();
+
+		return date.getUTCFullYear() + '-'
+			+ this.pad(date.getUTCMonth()+1) + '-'
+		    + this.pad(date.getUTCDate()) + ' '
+		    + this.pad(date.getUTCHours()) + ':'
+		    + this.pad(date.getUTCMinutes()) + ':'
+		    + this.pad(date.getUTCSeconds());
 	};
 
 	

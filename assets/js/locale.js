@@ -68,9 +68,13 @@ if (! window.t41.locale) {
 			
 		yes:'yes',
 		no:'no',
-		confirm:'Confirm',
 		cancel:'Cancel',
 		back:'Back',
+		confirm:{
+			button:'Confirm',
+			title:'Confirmation Request',
+			message:"Please confirm the demanded action"
+		},
 		wd:{ // weekdays
 			sunday:'Sunday',
 			monday:'Monday',
@@ -101,9 +105,13 @@ if (! window.t41.locale) {
 			
 		yes:'oui',
 		no:'non',
-		confirm:'Confirmer',
 		cancel:'Annuler',
 		back:'Retour',
+		confirm:{
+			button:'Confirmer',
+			title:'Demande de confirmation',
+			message:"Veuillez confirmer l'action demandée"
+		},
 		wd:{
 			sunday:'Dimanche',
 			monday:'Lundi',

@@ -231,7 +231,7 @@ textarea{
 
 /* -- BEGIN AUTOCOMPLETER -- */
 .t41.component.autocompletepropsgrid {
-  box-shadow: 2px 2px 10px #444444;
+  box-shadow: 4px 4px 9px #737373;
   max-width: 650px;
   padding: 0;
   max-height: 380px;
@@ -318,7 +318,7 @@ table.t41.table td.cellcurrency {
 }
 
 table.t41.list {
-  width: 90%;
+  width: 100%;
   border-collapse: collapse;
 }
 
@@ -378,17 +378,32 @@ table.t41.list td.cellcurrency {
 
 .t41.paginator {
   text-align: center;
-  padding: 4px;
-  word-spacing: 5px;
+  padding: 40px 13px;
+  word-spacing: 3px;
+}
+
+.t41 .paginator a, .t41.paginator.current{
+  padding: 2px 4px;
+  position:relative;
+  top:20px;
+  border-color:#737373;
 }
 
 .t41.paginator.current{
   font-weight: bold;
+  color: white;
+  background-color: grey;
+}
+
+.t41 .paginator a{
+  border:solid 1px;
+  color:#363535;
 }
 
 .t41 .paginator a:hover{
-   text-decoration:underline;
-   color:#363535;
+  background-color: #777777;
+  border:solid 1px #555555;
+  color:#ffffff;
 }
 
 .t41.component.table .content .line {
@@ -475,6 +490,7 @@ table.t41.list td.cellcurrency {
   font-size: 14px;
   margin:5px;
   padding:3px;
+  font-family: Abel,​sans-serif;
 }
 
 /* -- END FORM -- */
