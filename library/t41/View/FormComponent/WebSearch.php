@@ -77,7 +77,7 @@ class WebSearch extends SimpleComponent\WebDefault {
 		
 
 		$html_head = <<<HTML
-	<div class="t41_wrapper {$this->_cssStyle} {$this->_getTheme()} {$this->_getColor()}" id="{$this->_instanceof}_{$this->_obj->getId()}">
+	<div class="t41 component" id="{$this->_instanceof}_{$this->_obj->getId()}">
 		<h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 		<div class="content">
 HTML;
