@@ -451,11 +451,11 @@ class View {
 	 * @param string $class
 	 * @return mixed
 	 */
-	static public function getHelper($class)
+	static public function getHelper($class, array $params = array())
 	{
 		$className = '\t41\View\Helper\\' . $class;
 		try {
-			$helper = new $className;
+			$helper = new $className($params);
 			return $helper->get();
 		} catch (\Exception $e) {
 			return false;

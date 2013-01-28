@@ -11,12 +11,12 @@ class BackButton extends ViewObject {
 	protected $_obj;
 	
 	
-	public function __construct($id = 'back')
+	public function __construct(array $params = array())
 	{
-		$this->_obj = new ButtonElement($id);
+		$this->_obj = new ButtonElement('back');
 		$this->_obj->setTitle("Retour")
 					->setHelp("Cliquez ici pour retourner à l'écran précédent")
-					  ->setLink($_SERVER['HTTP_REFERER'])
+					  ->setLink(isset($params['url']) ? $params['url'] : $_SERVER['HTTP_REFERER'])
 					    ->setDecoratorParams(array('icon' => 'left-arrow-green'));
 	}
 	
