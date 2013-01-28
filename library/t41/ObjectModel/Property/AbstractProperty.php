@@ -93,7 +93,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 
 				// @todo throw nice exception
 				throw new Exception($e->getMessage());
-				//\Zend_Debug::dump($params); die;
 			}
 		}
 	}
@@ -137,7 +136,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 			
 			/* defines first initialized value */
 			if (! $this->_initialValue && $value != $this->getParameter('defaultvalue')) {
-				
 				$this->_initialValue = $value;
 			}
 		}
@@ -198,6 +196,12 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	}
 	
 	
+	public function getInitialValue()
+	{
+		return $this->_initialValue; 
+	}
+	
+	
 	public function getLabel($lang = null)
 	{
 		$label = $this->getParameter('label');
@@ -239,7 +243,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	
 	public function hasChanged()
 	{
-		return $this->_changed;
+		return (bool) $this->_changed;
 	}
 	
 	
@@ -251,18 +255,14 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	public function reset()
 	{
 		if ($this->_initialValue) {
-			
 			$this->setValue($this->_initialValue);
 		
 		} else if ($this->getParameter('defaultvalue')) {
-			
 			$this->setValue($this->getParameter('defaultvalue'));
 			
 		} else {
-			
 			$this->resetValue();
 		}
-		
 		$this->resetChangedState();
 	}
 	
@@ -275,7 +275,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	
 	public function resetValue()
 	{
-//		unset($this->_value);
 		$this->_value = null;
 		$this->_changed = true;
 		return $this;
@@ -329,7 +328,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	public function __clone()
 	{
 		foreach ($this->_rules as $key => $rule) {
-			
 			$this->_rules[$key] = clone $rule;
 		}
 	}
@@ -342,10 +340,8 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	public function changeRulesObjectReference(ObjectModel\BaseObject $object)
 	{
 		foreach ($this->_rules as $rule) {
-				
 			$rule->setObject($object);
 		}
-		
 		return $this;
 	}
 	
