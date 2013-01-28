@@ -2,6 +2,8 @@
 
 namespace t41;
 
+use t41\View\Action\AbstractAction;
+
 use t41\Core\Layout;
 
 /**
@@ -183,6 +185,19 @@ class View {
 	}
 	
 
+	/**
+	 * Add an action to the active view
+	 * @param AbstractAction $action
+	 * @param string $id
+	 */
+	static public function addAction(AbstractAction $action, $id = null)
+	{
+		if (self::_isInstanciated ()) {
+			return self::$_display->actionAdd($action, $id);
+		}
+	}
+	
+	
 	/**
 	 * Register a library from core
 	 * @param string|array $lib
@@ -427,6 +442,23 @@ class View {
 	{
 		if (self::_isInstanciated ()) {
 			return self::$_display->getTemplate();
+		}
+	}
+	
+	
+	/**
+	 * Load the helper matching the class name in parameter and trigger its get() method
+	 * @param string $class
+	 * @return mixed
+	 */
+	static public function getHelper($class)
+	{
+		$className = '\t41\View\Helper\\' . $class;
+		try {
+			$helper = new $className;
+			return $helper->get();
+		} catch (\Exception $e) {
+			return false;
 		}
 	}
 	
