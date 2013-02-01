@@ -3,6 +3,8 @@
 namespace t41\View\FormComponent;
 
 
+use t41\ObjectModel\BaseObject;
+
 use t41\View,
 	t41\ObjectModel\Property,
 	t41\View\FormComponent\Element,
@@ -113,11 +115,14 @@ class WebDefault extends SimpleComponent\WebDefault {
     	    				, $field->getHelp()
             				, $label
             			 );
-            			 
-            if ($field->getValue() && (is_object($field->getValue()) && $field->getValue()->getUri()) && $field->getConstraint(Property::CONSTRAINT_PROTECTED) == true) {
-            	$p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
-            	continue;
-            }
+            
+    	    // value is already defined and can't be changed
+    	    if ($field->getConstraint(Property::CONSTRAINT_PROTECTED) == true && $field->getValue()) {
+	            if (! is_object($field->getValue()) || ($field->getValue() instanceof BaseObject && $field->getValue()->getUri())) {
+    	        	$p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
+        	    	continue;
+            	}
+    	    }
             
             /* look for a required decorator */
             if (isset($altDecorators[$element->getId()])) {
