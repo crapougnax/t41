@@ -187,7 +187,7 @@ class Property {
 					} else {
 						// display property value, if property exists!
 						if (($prop = $object->getProperty($disProp)) !== false) {
-							$displayValue[] = $prop->getValue();
+							$displayValue[] = $prop->getDisplayValue();
 						}
 					}
 				}
