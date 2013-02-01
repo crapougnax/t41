@@ -70,7 +70,7 @@ class WebDefault extends SimpleComponent\WebDefault {
     
     protected function _contentRendering()
     {
-		$p = '<fieldset>';
+		$p = '<fieldset id="form_fields">';
 		$p .= '<legend></legend>';
 		
 		$altDecorators = (array) $this->_obj->getParameter('decorators');
@@ -79,10 +79,9 @@ class WebDefault extends SimpleComponent\WebDefault {
         foreach ($this->_obj->getColumns() as $key => $element) {
         	
         	$field = $element;
-
+        	 
         	/* hidden fields treatment */
         	if ($element->getConstraint(Element\AbstractElement::CONSTRAINT_HIDDEN) === true) {
-
         		$p .= sprintf('<input type="hidden" name="%s" id="%s" value="%s" />'
         					, $field->getAltId()
         					, $field->getAltId()
@@ -93,15 +92,13 @@ class WebDefault extends SimpleComponent\WebDefault {
         	}
         	
         	if (! isset($focus) && $element instanceof Element\FieldElement) {
-        			
-	        	View::addEvent(sprintf("jQuery('#%s').focus()", $field->getAltId()), 'js');
-	        	$focus = $field;
+	        	View::addEvent(sprintf("jQuery('#%s').focus()", $element->getAltId()), 'js');
+	        	$focus = $element;
         	}
         	
         	$label = '&nbsp;';
 	        $label = $this->_escape($element->getTitle());
-    	    if ($field->getConstraint('mandatory') == 'Y') {
-    	    
+    	    if ($element->getConstraint(Property::CONSTRAINT_MANDATORY) == true) {
     	    	$class=' mandatory';
     	        $mandatory = ' mandatory';
     	    } else {
@@ -109,21 +106,21 @@ class WebDefault extends SimpleComponent\WebDefault {
     	        $mandatory = '';
     	    }
 
-    	    $line = sprintf('<div class="clear"></div><div class="label%s"><label for="%s" data-help="%s">%s</label></div>'
-            				, $class
+    	    $line = sprintf('<div class="clear"></div><div id="label_%s" class="label%s"><label for="%s" data-help="%s">%s</label></div>'
+            				, $field->getAltId()
+    	    				, $class
     	    				, $field->getAltId()
     	    				, $field->getHelp()
             				, $label
             			 );
             			 
-            if ($field->getValue() != null && $field->getConstraint(Property::CONSTRAINT_PROTECTED) == true) {
+            if ($field->getValue() && (is_object($field->getValue()) && $field->getValue()->getUri()) && $field->getConstraint(Property::CONSTRAINT_PROTECTED) == true) {
             	$p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
             	continue;
             }
             
             /* look for a required decorator */
             if (isset($altDecorators[$element->getId()])) {
-            	
             	$element->setDecorator($altDecorators[$element->getId()]);
             }
             
