@@ -25,6 +25,7 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.posts = [];
 	
+	this.re = false;
 	
 	/**
 	 * List of redirection URL
@@ -36,6 +37,10 @@ window.t41.view.form = function(id,obj,form) {
 
 		var submit = new t41.view.button("Sauver", {id:'form_submit', size:'medium', icon:'valid'});
 		t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save'), this.id);
+		container.append(submit);
+
+		var submit = new t41.view.button("Sauver & Nouveau", {id:'form_submit', size:'medium', icon:'valid'});
+		t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save2'), this.id);
 		container.append(submit);
 		
 		var back = new t41.view.button("Annuler", {id:'form_reset', size:'medium', icon:'alert'});
@@ -121,6 +126,13 @@ window.t41.view.form = function(id,obj,form) {
 	};
 	
 	
+	this.save2 = function(obj) {
+		this.redirects.redirect_ok = window.location.href;
+		this.re = true;
+		this.save(obj);
+	}
+	
+	
 	this.retSave = function(obj) {
 		
 		if (obj.status == t41.core.status.ok) {
@@ -130,7 +142,9 @@ window.t41.view.form = function(id,obj,form) {
 				this.posts.ok.call(obj.data); // pass the server response as context
 			}
 			var params = this.redirects && this.redirects.redirect_ok ? {defer:true} : {timer:10};
-			new t41.view.alert("Sauvegarde effectuée", params);
+			if (this.re == false) {
+				new t41.view.alert("Sauvegarde effectuée", params);
+			}
 			if (this.redirects && this.redirects.redirect_ok){
 				window.location.href = this.redirects.redirect_ok;
 			}

@@ -251,7 +251,7 @@ if (! window.t41.view.action.autocomplete) {
 			this.element.hide();
 			var width = this.element.width()+5;
 			var display = jQuery('#' + this.target + '_display').css({
-				width: width+'px',
+				width: '100%', //width+'px',
 				display: 'inline-block',
 				cursor: 'pointer',
 				'text-align':'left',
