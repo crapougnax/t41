@@ -41,12 +41,16 @@
 		</object>
 		<object id="\t41\View\FormComponent" extends="\t41\View\ViewObjectModel">
 			<parameters>
+				<parameter id="identifier">
+					<type>boolean</type>
+					<defaultvalue>false</defaultvalue>
+				</parameter>
 				<parameter id="display">
 					<type>array</type>
 				</parameter>
 				<parameter id="buttons">
-					<type>boolean</type>
-					<defaultvalue>true</defaultvalue>
+					<type>string</type>
+					<defaultvalue>all</defaultvalue>
 				</parameter>
 				<parameter id="redirect_ok" type="string">
 					<bogus/>

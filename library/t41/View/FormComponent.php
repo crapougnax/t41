@@ -2,6 +2,8 @@
 
 namespace t41\View;
 
+use t41\ObjectModel\Property;
+
 /**
  * t41 Toolkit
  *
@@ -69,7 +71,6 @@ class FormComponent extends View\ViewObject {
 			$this->_source = $source;
 			$this->_adapter->build($this->_source->getDataObject(), $this->getParameter('display'));
 			
-			
 		} else if ($source instanceof ObjectModel\DataObject) {
 			
 			$this->_source = $source->getDataObject();
@@ -79,7 +80,10 @@ class FormComponent extends View\ViewObject {
 			
 			$this->_source = ObjectModel\DataObject::factory($source);
 			$this->_adapter->build($this->_source, $this->getParameter('display'));
-				
+		}
+		
+		if ($this->_source->getUri() !== null) {
+			$this->setParameter('buttons','savecancel');
 		}
 	}
 	
@@ -141,24 +145,29 @@ class FormComponent extends View\ViewObject {
      */
     public function getColumns()
     {
-    	if (! is_array($this->getParameter('display')) || count($this->getParameter('display')) == 0) {
-    		
-    		return $this->getAdapter()->getElements();
-    	}
-    	
     	if (! is_array($this->_columns)) {
-    		
 	    	$fields = $this->getAdapter()->getElements();
     		$this->_columns = array();
+    		
+    		if (! is_array($this->getParameter('display')) || count($this->getParameter('display')) == 0) {
+    			$this->setParameter('display', array_keys($fields));
+    		}
+    		
+    		if ($this->getParameter('identifier') === true) {
+    			$identifier = new FieldElement('identifier');
+    			$identifier->setTitle("Identifiant unique")
+    						 ->setConstraint(Property::CONSTRAINT_MANDATORY, true)
+    						   ->setConstraint(Property::CONSTRAINT_PROTECTED, true)
+    							 ->setConstraint(Property::CONSTRAINT_MAXLENGTH, 10);
+    			$this->_columns[] = $identifier;
+    		}
     		
     		foreach ($this->getParameter('display') as $column) {
     		
     			if (isset($fields[$column])) {
-    			
     				$this->_columns[] = $fields[$column];
     				
     			} else {
-    				
     				$this->_columns[] = new FieldElement($column);
     			}
     		}
