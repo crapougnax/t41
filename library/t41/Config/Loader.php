@@ -61,16 +61,13 @@ class Loader {
 	{
 		// try to get cached version if configs caching is enabled
 		if (Core::getEnvData('cache_configs') === true) {
-
 			$ckey = self::getCacheKey($file, $realm);
 			if (($cached = Core::cacheGet($ckey)) !== false) {
-				
 				return $cached;
 			}
 		}
 		
 		if (($filePath = self::findFile($file, $realm)) == null) {
-		
 			/* no matching file name in paths */
 			return false;
 		}
@@ -79,23 +76,18 @@ class Loader {
 		
 		/* use existing adapter instance or create it */
 		if (! isset(self::$_adapters[$type])) {
-		
 			$className = sprintf('\t41\Config\Adapter\%sAdapter', ucfirst(strtolower($type)));
 		
 			try {
-
 				self::$_adapters[$type] = new $className($filePath, $params);
 			
 				if (! self::$_adapters[$type] instanceof Adapter\AbstractAdapter) {
-				
 					throw new Exception("$className is not implementing AbstractAdapter.");
 				}			
 			} catch (\Exception $e) {
-			
 				throw new Exception($e->getMessage());
 			}
 		} else {
-			
 			self::$_adapters[$type]->setPath($filePath);
 		}
 
@@ -103,10 +95,8 @@ class Loader {
 		
 		/* if ckey is set, cache is activated but empty */
 		if (isset($ckey)) {
-			
-			Core::cacheSet($config, $ckey);
+			Core::cacheSet($config, $ckey, true, array('tags' => array('config')));
 		}
-		
 		return $config;
 	}
 	
@@ -130,14 +120,12 @@ class Loader {
 				if (! isset($files[$prefix])) $files[$prefix] = array();
 				
 			} else {
-				
 				$prefix = '_';
 			}
 			
 			$filePath = (substr($file, 0, 1) == DIRECTORY_SEPARATOR) ? $file : $path . $file;
 		
 			if (file_exists($filePath)) {
-				
 				if ($returnFirst) return $filePath;
 				$files[$prefix][] = $filePath;
 			}
