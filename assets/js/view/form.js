@@ -39,9 +39,11 @@ window.t41.view.form = function(id,obj,form) {
 		t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save'), this.id);
 		container.append(submit);
 
-		//var submit = new t41.view.button("Sauver & Nouveau", {id:'form_submit', size:'medium', icon:'valid'});
-		//t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save2'), this.id);
-		//container.append(submit);
+		if (this.form.params.buttons == 'all') {
+			var submit = new t41.view.button("Sauver & Nouveau", {id:'form_submit', size:'medium', icon:'valid'});
+			t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save2'), this.id);
+			container.append(submit);
+		}
 		
 		var back = new t41.view.button("Annuler", {id:'form_reset', size:'medium', icon:'alert'});
 		t41.view.bindLocal(back, 'click', function() { history.back(); }, this.id);
