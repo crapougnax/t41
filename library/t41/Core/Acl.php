@@ -102,7 +102,7 @@ class Acl {
 		
 		self::$_config = $config['acl'];
 		if (isset($ckey)) {
-			Core::cacheSet($config['acl'], $ckey, true, array('tags' => 'acl'));
+			Core::cacheSet($config['acl'], $ckey, true, array('tags' => array('config','acl')));
 		}
 	}
 	
