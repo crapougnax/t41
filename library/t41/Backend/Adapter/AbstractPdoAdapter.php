@@ -197,8 +197,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			$collection = $property->getValue();
 			
-			//var_dump($collection->getMembers());
-			
 			/* @var $member t41\ObjectModel\BaseObject */
 			foreach ($collection->getMembers() as $member) {
 
@@ -742,7 +740,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			 */
 			if ($value instanceof ObjectModel\BaseObject || $value instanceof ObjectModel\DataObject) {
 				if ($value->getUri() == null) {
-					throw new Exception(array("OBJECT_HAS_NO_URI", get_class($value)));
+					return false;
+//					throw new Exception(array("OBJECT_HAS_NO_URI", get_class($value)));
 				}
 				
 				if ($value->getUri()->getBackendUri() && $value->getUri()->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
