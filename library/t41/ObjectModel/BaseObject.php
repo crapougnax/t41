@@ -128,6 +128,16 @@ abstract class BaseObject extends ObjectModelAbstract {
 	}
 	
 	
+	public function setUri($identifier)
+	{
+		if ($this->_uri instanceof ObjectUri) {
+			throw new Exception("Identifier can only be defined if object uri is null");
+		}
+		$this->_dataObject->setUri($identifier);
+		return $this;
+	}
+	
+	
 	public function getIdentifier()
 	{
 		return $this->_dataObject->getUri() ? $this->_dataObject->getUri()->getIdentifier() : false;
@@ -394,7 +404,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 	public function save(Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		$this->_triggerRules('before/save');
-		if (! $this->_uri) {
+		if (! $this->_uri instanceof ObjectUri) {
 			$new = true;
 			$this->_triggerRules('before/create');
 		}

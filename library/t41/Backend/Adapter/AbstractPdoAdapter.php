@@ -153,7 +153,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// get a valid data array passing mapper if any
 		$recordSet = $this->_mapper ? $do->map($this->_mapper, $this) : $do->toArray($this);
 
-		// @todo handle collections
+		if ($do->getUri()) { // User-defined primary key (since uri can't be an ObjectUri instance
+			$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
+			$recordSet['data'][$pkey] = $do->getUri();
+		}
 		
 		$this->_setLastQuery('insert', $recordSet['data']);
 		
@@ -223,7 +226,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	 */
 	public function read(ObjectModel\DataObject $do) 
 	{	
-		if ($do->getUri() == null) {
+		if (! $do->getUri() instanceof ObjectUri) {
 			throw new Exception('MISSING_URI_IN_DATAOBJECT');
 		}
 		

@@ -36,7 +36,7 @@ use t41\Backend,
 class ObjectUri implements Core\ClientSideInterface {
 	
 	
-	const IDENTIFIER = '#identifier';
+	const IDENTIFIER = '_identifier';
 	
 
 	/**

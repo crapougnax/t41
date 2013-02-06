@@ -131,12 +131,20 @@ class DataObject extends ObjectModelAbstract {
     /**
      * Set parent object access uri
      * 
-     * @param t41\ObjectModel\ObjectUri $uri
+     * @param t41\ObjectModel\ObjectUri|string $uri
      * @param boolean $recursion
      * @return t41\ObjectModel\DataObject
      */
-    public function setUri(ObjectModel\ObjectUri $uri, $recursion = false)
+    public function setUri($uri, $recursion = false)
     {
+    	if (! $uri instanceof ObjectUri) {
+    		if ($this->_uri) {
+    			throw new Exception("Uri can only be set as a string when object is new");
+    		}
+    		$this->_uri = $uri;
+    		return $this;
+    	}
+
     	$this->_uri = $uri;
     	
     	// populate new uri in properties 'parent' parameter

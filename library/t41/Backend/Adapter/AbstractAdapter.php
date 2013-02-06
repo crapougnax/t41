@@ -173,7 +173,6 @@ abstract class AbstractAdapter implements AdapterInterface {
 			}
 			
 		} else {
-
 			return $this->_getTableFromClass($uri->getClass());
 		}
 	}

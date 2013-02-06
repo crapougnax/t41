@@ -2,6 +2,8 @@
 
 namespace t41;
 
+use t41\ObjectModel\ObjectUri;
+
 use t41\ObjectModel\Property;
 
 /**
@@ -401,7 +403,7 @@ class Backend {
 	{
 		if (is_null($backend)) {
 
-			if ($do->getUri()) {
+			if ($do->getUri() instanceof ObjectUri) {
 			
 				/* uri n'est pas vide, on peu alors essayer d'y trouver le backend */
 				$backend = self::getInstance($do->getUri()->getBackendUri());
@@ -424,7 +426,7 @@ class Backend {
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 			
-		if ($do->getUri()) {
+		if ($do->getUri() instanceof ObjectUri) {
 				
 			// Update de l'objet dans le backend
 			return $backend->update($do);
