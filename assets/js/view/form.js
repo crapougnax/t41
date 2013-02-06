@@ -81,8 +81,8 @@ window.t41.view.form = function(id,obj,form) {
 		jQuery('#' + this.id + '_form span.error').remove();
 		
 		// get form elements in an key/value array
-		var elements = [];
-		jQuery.map(jQuery(this.formId).serializeArray(), function(n, i){ elements[n['name']] = n['value'];});
+		var elements = {};
+		jQuery.map(jQuery(this.formId).serializeArray(), function(e) { elements[e.name] = e.value;});
 		
 		var errors = [];
 		var formdata = {};
@@ -122,6 +122,10 @@ window.t41.view.form = function(id,obj,form) {
 				formdata['post_nok'] = this.form.params.post_nok;
 			}			
 
+			if (this.form.params.identifier == true) {
+				formdata['_identifier'] = jQuery(this.formId).find('#_identifier').val();
+			}
+			
 			// send query to server
 			t41.core.call({action:'object/update', data:formdata, callback:jQuery.proxy(this,'retSave')});
 		}

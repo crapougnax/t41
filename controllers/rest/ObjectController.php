@@ -1,5 +1,9 @@
 <?php
 
+use t41\ObjectModel\ObjectUri;
+
+use t41\ObjectModel\Property\IdentifierProperty;
+
 use t41\Core\Registry;
 
 /**
@@ -32,11 +36,9 @@ class Rest_ObjectController extends Rest_DefaultController {
 				foreach ($this->_post as $key => $val) {
 
 					if (($property = $this->_obj->getProperty($key)) !== false) {
-				
 						if ($property instanceof Property\ObjectProperty) {
 								
 							if ($val) {
-									
 								$class = $property->getParameter('instanceof');
 								if (substr($val,0,4) == 'obj_') {
 									// get object from cache
@@ -49,13 +51,11 @@ class Rest_ObjectController extends Rest_DefaultController {
 							}
 							
 						} else if ($property instanceof Property\CollectionProperty) {
-				
 							$class = $property->getParameter('instanceof');
 							$keyprop = $property->getParameter('keyprop');
 				
 							// val for a collection should come as an array of new/existing members
 							foreach ($val as $memberKey => $memberArray) {
-
 								if (! is_numeric($memberKey)) {
 									$this->_status = "NOK";
 									$this->_context['message'] = 'member-id is not a number';
@@ -90,7 +90,6 @@ class Rest_ObjectController extends Rest_DefaultController {
 								} else {
 									
 									// no action, default is new member to add
-								
 									$member = new $class();
 				
 									// set keyprop property value
@@ -102,26 +101,19 @@ class Rest_ObjectController extends Rest_DefaultController {
 										$mprop = $member->getProperty($memberPropKey);
 										
 										if ($mprop instanceof Property\ObjectProperty) {
-											
 											$memberPropVal = Core\Registry::get($memberPropVal);
-											
 											if ($memberPropVal instanceof Property\AbstractProperty) {
-				
 												$mprop->setValue($memberPropVal->getValue());
-												
 											} else {
-												
 												$mprop->setValue($memberPropVal);
 											}
 										} else {
-				
 											$mprop->setValue($memberPropVal);
 										}
 									}
 				
 									// check if member was added successfully, break otherwise
 									if ($property->setValue($member) === false) {
-									
 										$this->_status = "NOK";
 										$this->_context['message'] = 'error adding member to collection';
 										break;
@@ -129,28 +121,29 @@ class Rest_ObjectController extends Rest_DefaultController {
 								}
 							}	
 						} else {
-								
 							$property->setValue($val);
 						}
 					}
+				}
+
+				// if record has no uri yet and an identifier value is present, inject it so backend will use it as primary key 
+				if (! $this->_obj->getUri() && isset($this->_post[ObjectUri::IDENTIFIER])) {
+					$this->_obj->setUri($this->_post[ObjectUri::IDENTIFIER]);
 				}
 				
 				$result = $this->_obj->save();
 	
 				if ($result === false) {
-	
 					$this->_context['message'] = Backend::getLastQuery();
 					$this->_status = 'NOK';
 	
 				} else {
-	
 					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true, 'collections' => 1));
 					$this->_executeActions('ok');
 					$this->_refreshCache = true;
 				}
 	
 			} catch (\Exception $e) {
-
 				$this->_context['err'] = $e->getMessage();
 				if (Core::$env == Core::ENV_DEV) $this->_context['trace'] = $e->getTraceAsString();
 				$this->_status = 'ERR';
@@ -164,11 +157,9 @@ class Rest_ObjectController extends Rest_DefaultController {
 			$result = $this->_obj->execute();
 		
 			if ($result === false) {
-		
 				$this->_status = 'NOK';
 						
 			} else {
-
 				$this->_data['object'] = $this->_obj->getObject()->reduce(array('params' => array()));
 			}
 		
@@ -185,7 +176,6 @@ class Rest_ObjectController extends Rest_DefaultController {
 			$res = $this->_obj->read();
 				
 		} catch (\Exception $e) {
-				
 			$this->_context['message'] = $e->getMessage();
 			$this->_status = 'ERR';
 		}
