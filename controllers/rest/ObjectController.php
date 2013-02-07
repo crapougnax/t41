@@ -210,6 +210,33 @@ class Rest_ObjectController extends Rest_DefaultController {
 	
 	
 	/**
+	 * returns a collection of objects matching the dependency parameter
+	 */
+	public function dependAction()
+	{
+		if (($property = $this->_obj->getProperty($this->_post['destProperty']['id'])) !== false) {
+			
+			// @todo implement cache mechanism for the following collection
+			$collection = new Collection($property->getParameter('instanceof'));
+			$collection->having($this->_post['srcProperty']['id'])->equals($this->_post['srcProperty']['val']);
+			$collection->setBoundaryBatch(50);
+			$collection->find(ObjectModel::MODEL);
+			
+			$data = array();
+			foreach ($collection->getMembers() as $member) {
+				$data[$member->getUri()->getIdentifier()] = $member->reduce();
+			}
+			
+			$this->_data['total'] = $collection->getTotalMembers();
+			$this->_data['collection'] = $data;
+			$this->_data['value'] = $property->getValue() ? $property->getValue()->reduce() : null;
+		} else {
+			$this->_status = 'NOK';
+		}
+	}
+	
+	
+	/**
 	 * Returns the value of the given property
 	 * 
 	 */

@@ -185,7 +185,7 @@ if (! window.t41.view) {
 			var action = eval(action);
 		}
 
-		jQuery(element).on(event, {caller:obj}, action);
+		jQuery(element).live(event, {caller:obj}, action);
 		return element;
 	};
 	
