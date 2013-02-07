@@ -40,6 +40,9 @@ abstract class ViewObject extends ObjectModelAbstract {
 	protected $_title;
 	
 	
+	protected $_parent;
+	
+	
 	protected $_help;
 	
 	
@@ -94,6 +97,24 @@ abstract class ViewObject extends ObjectModelAbstract {
 	}
 	
 
+	/**
+	 * Register the c
+	 * @param ViewObject $parent
+	 * @return \t41\View\Decorator\AbstractDecorator
+	 */
+	public function setParent(ViewObject $parent)
+	{
+		$this->_parent = $parent;
+		return $this;
+	}
+	
+	
+	public function getParent()
+	{
+		return $this->_parent;
+	}
+	
+	
 	/**
 	 * Sets a help text message
 	 * @param string $str
