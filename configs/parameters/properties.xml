@@ -57,6 +57,9 @@
 					<parameter id="sorting">
 						<type>any</type>
 					</parameter>
+					<parameter id="depends">
+						<type>string</type>
+					</parameter>
 			</parameters>
 		</property>
 		<property id="\t41\ObjectModel\Property\CollectionProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
@@ -84,6 +87,9 @@
 					</parameter>
 					<parameter id="unique">
 						<type>string</type>
+					</parameter>
+					<parameter id="sorting">
+						<type>any</type>
 					</parameter>
 			</parameters>
 		</property>
