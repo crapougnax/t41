@@ -54,12 +54,12 @@ class DateElement extends AbstractElement {
 	}
 	
 	
-	public function formatValue($str = null)
+	public function formatValue($str = null, $fancy = false)
 	{
 		 if (! is_null($str)) {
 
 		 	$date = new \Zend_Date($str);
-		 	return $date->toString(\Zend_Date::DATE_LONG);
+		 	return $fancy ? $date->toString(\Zend_Date::DATE_LONG) : $date->toString('d/M/Y');
 			
 		} else {
 			

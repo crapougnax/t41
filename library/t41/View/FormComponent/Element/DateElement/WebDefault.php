@@ -3,6 +3,14 @@
 namespace t41\View\FormComponent\Element\DateElement;
 
 
+use t41\ObjectModel\Property;
+
+use t41\ObjectModel\Property\AbstractProperty;
+
+use t41\View\FormComponent\Element\AbstractElement;
+
+use t41\View\FormComponent;
+
 use t41\View,
 	t41\View\Externals,
 	t41\View\Decorator\AbstractWebDecorator;
@@ -73,7 +81,7 @@ class WebDefault extends AbstractWebDecorator {
 						, $value
 						);
 						
-		$dispValue = $value ? $this->_obj->formatValue($value) : null;
+		$dispValue = $value ? $this->_obj->formatValue($value, (bool) $this->getParameter(Property::CONSTRAINT_PROTECTED)) : null;
 		
 		$html .= sprintf('<input type="text" id="%s" value="%s" size="10" maxlength="10"/>'
 						, $dispField
