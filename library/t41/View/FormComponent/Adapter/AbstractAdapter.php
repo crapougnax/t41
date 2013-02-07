@@ -2,6 +2,10 @@
 
 namespace t41\View\FormComponent\Adapter;
 
+use t41\ObjectModel\ObjectUri;
+
+use t41\View\FormComponent\Element\FieldElement;
+
 /**
  * t41 Toolkit
  *
@@ -49,7 +53,16 @@ abstract class AbstractAdapter implements AdapterInterface {
 	protected $_errors = array();
 	
 
-	public function build(ObjectModel\DataObject $do, array $display = null) {
+	public function build(ObjectModel\DataObject $do, array $display = null, $identifier = false) {
+		
+		if ($identifier === true) {
+			$identifier = new FieldElement(ObjectUri::IDENTIFIER);
+			$identifier->setTitle("Identifiant unique")
+			->setConstraint(Property::CONSTRAINT_MANDATORY, true)
+			->setConstraint(Property::CONSTRAINT_MAXLENGTH, 10);
+			
+			$this->addElement($identifier);
+		}
 		
 		foreach ($do->getProperties() as $property) {
 			
@@ -76,6 +89,9 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	public function addElement($element, $position = null)
 	{
+		/* give to the element a reference to its parent */
+		$element->setParent($this);
+		
 		/* @todo $element should not be required to have a getId() function */ 
 		$this->_elements[$element->getId()]  = $element;
 		// @todo find a way to store fields positions // new t41_Position($position));
@@ -124,7 +140,6 @@ abstract class AbstractAdapter implements AdapterInterface {
 				unset($this->_elements[$key]);
 			}
 		}
-		
 		return $this;
 	}
 }
