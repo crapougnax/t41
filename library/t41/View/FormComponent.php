@@ -65,25 +65,8 @@ class FormComponent extends View\ViewObject {
 		parent::__construct(null, $params);
     						  	   
 		$this->_adapter = $adapter ? $adapter : new FormComponent\Adapter\DefaultAdapter();
-		
-		if ($source instanceof ObjectModel\BaseObject) {
-			
-			$this->_source = $source;
-			$this->_adapter->build($this->_source->getDataObject(), $this->getParameter('display'));
-			
-		} else if ($source instanceof ObjectModel\DataObject) {
-			
-			$this->_source = $source->getDataObject();
-			$this->_adapter->build($this->_source, $this->getParameter('display'));
-			
-		} else if (is_string($source)) {
-			
-			$this->_source = ObjectModel\DataObject::factory($source);
-			$this->_adapter->build($this->_source, $this->getParameter('display'));
-		}
-		
-		if ($this->_source->getUri() !== null) {
-			$this->setParameter('buttons','savecancel');
+		if ($source) {
+			$this->setSource($source);
 		}
 	}
 	
@@ -94,6 +77,40 @@ class FormComponent extends View\ViewObject {
 	}
 	
 
+	/**
+	 * Set form source which could be a BaseObject or a DataObject instance
+	 * @param t41\ObjectModel\BaseObject|t41\ObjectModel\DataObject $source
+	 */
+	public function setSource($source)
+	{
+		if ($this->_source) {
+			throw new Exception("Source can only be defined once");
+		}
+		
+		if ($source instanceof ObjectModel\BaseObject) {
+				
+			$this->_source = $source;
+			$this->_adapter->build($this->_source->getDataObject(), $this->getParameter('display'), $this->getParameter('identifier'));
+				
+		} else if ($source instanceof ObjectModel\DataObject) {
+				
+			$this->_source = $source->getDataObject();
+			$this->_adapter->build($this->_source, $this->getParameter('display'), $this->getParameter('identifier'));
+				
+		} else if (is_string($source)) {
+				
+			$this->_source = ObjectModel\DataObject::factory($source);
+			$this->_adapter->build($this->_source, $this->getParameter('display'), $this->getParameter('identifier'));
+		}
+		
+		if ($this->_source->getUri() !== null) {
+			$this->setParameter('buttons','savecancel');
+		}
+		
+		return $this;
+	}
+	
+	
 	public function getSource()
 	{
 		return $this->_source;
@@ -151,15 +168,6 @@ class FormComponent extends View\ViewObject {
     		
     		if (! is_array($this->getParameter('display')) || count($this->getParameter('display')) == 0) {
     			$this->setParameter('display', array_keys($fields));
-    		}
-    		
-    		if ($this->getParameter('identifier') === true) {
-    			$identifier = new FieldElement('identifier');
-    			$identifier->setTitle("Identifiant unique")
-    						 ->setConstraint(Property::CONSTRAINT_MANDATORY, true)
-    						   ->setConstraint(Property::CONSTRAINT_PROTECTED, true)
-    							 ->setConstraint(Property::CONSTRAINT_MAXLENGTH, 10);
-    			$this->_columns[] = $identifier;
     		}
     		
     		foreach ($this->getParameter('display') as $column) {
