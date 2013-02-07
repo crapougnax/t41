@@ -83,4 +83,14 @@ class ButtonElement extends AbstractElement {
 	{
 		return $this->setAction(new Action\FormComponent\ResetAction());
 	}
+	
+	
+	public static function factory($label, $link, array $params = array('icon' => 'tool-blue'))
+	{
+		$button = new self();
+		$button->setTitle($label);
+		$button->setLink($link);
+		$button->setDecoratorParams($params);
+		return $button;
+	}
 }
