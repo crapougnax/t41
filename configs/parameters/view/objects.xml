@@ -149,6 +149,9 @@
 				<parameter id="selectmax" type="integer">
 					<defaultvalue>30</defaultvalue>
 				</parameter>
+				<parameter id="dependency" type="string">
+					<bogus/>
+				</parameter>
 			</parameters>
 		</object>
 					
