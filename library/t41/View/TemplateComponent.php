@@ -22,8 +22,9 @@ namespace t41\View;
  * @version    $Revision: 832 $
  */
 
-use t41\View,
-	t41\Config;
+use t41\View;
+use t41\Config;
+use t41\Core;
 
 /**
  * Class providing a simple template component.
@@ -89,14 +90,22 @@ class TemplateComponent extends ViewObject {
      * If path is relative (not starting with a "/"), the base path is prefixed
      * 
      * @param string $filename
-     * @return t41_View_Template $this instance
+     * @param string $module module to search for the template
+     * @return t41\View\TemplateComponent $this instance
 	 */
-	public function load($filename)
+	public function load($filename, $module = null)
 	{
-		$file = Config\Loader::findFile($filename, Config::REALM_TEMPLATES, true);
+	    $paths = Config::getPaths(Config::REALM_TEMPLATES);
+    	if ($module) {
+    		$path = Core::$basePath . 'application/modules/' . $module . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+    		if (is_dir($path)) {
+    			array_unshift($paths, $path);	
+    		}
+    	}
+		
+		$file = Config\Loader::findFile($filename, $paths, true);
 
 		if (($this->_template = file_get_contents($file)) === false) {
-			
 			throw new Exception(array("ERROR_LOADING_FILE", $filename));
 		}
 		
