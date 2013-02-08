@@ -456,6 +456,12 @@ table.t41.list td.cellcurrency {
   color: red;
 }
 
+#left .t41 form fieldset .label {
+    text-align: left;
+    width: 100%;
+	font-weight: bold;
+}
+
 .t41 form fieldset .label {
   width: 25%;
   text-align: right;
