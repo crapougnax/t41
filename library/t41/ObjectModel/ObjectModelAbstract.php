@@ -121,7 +121,6 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 		if (strstr($key, '.') !== false) list($key, $arraykey) = explode('.', $key);
 		
 		if (isset($this->_params[$key]) && $this->_params[$key] instanceof Parameter) {
-			
 			return $this->_params[$key]->getValue($arraykey);
 		
 		} else {
@@ -145,17 +144,22 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	 */
 	public function setParameter($key, $value)
 	{
+		$arraykey = null;
+		if (strstr($key, '.') !== false) list($key, $arraykey) = explode('.', $key);
+		
 		if (isset($this->_params[$key]) && $this->_params[$key] instanceof \t41\Parameter) {
-			
 			try {
+				if ($arraykey) { // parameter stores an array
+					$values = (array) $this->_params[$key]->getValue();
+					$values[$arraykey] = $value;
+					$value = $values;
+				}
 				$this->_params[$key]->setValue($value);
 				
 			} catch (Exception $e) {
-				
-				throw new Exception("Impossible de definir le parametre '$key' avec la valeur '$value' : " . $e->getMessage());
+				throw new Exception("Unable to define '$key' parameter with value '$value'");
 			}
 		}
-		
 		return $this;
 	}
 	
