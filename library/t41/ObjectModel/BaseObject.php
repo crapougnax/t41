@@ -249,39 +249,35 @@ abstract class BaseObject extends ObjectModelAbstract {
 				
 			// reset a property value to null
 			case 'del':
-				$this->_triggerRules('before/set/' . $method_end);
+				$this->_triggerRules('before/set/' . $method_end, $this->_dataObject);
 				$res = $this->_dataObject->getProperty($method_end);
 				if ($res === false) {
 					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
 				}
 				$res->resetValue();
-				$this->_triggerRules('after/set/' . $method_end);
+				$this->_triggerRules('after/set/' . $method_end, $this->_dataObject);
 				break;
 				
 			case 'set':
-				$this->_triggerRules('before/set/' . $method_end);
+				$this->_triggerRules('before/set/' . $method_end, $this->_dataObject);
 				$res = $this->_dataObject->$method_end = $a[0];
 				
 				if ($res === false) {
-					
 					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
 				}
 				
-				$this->_triggerRules('after/set/' . $method_end);
+				$this->_triggerRules('after/set/' . $method_end, $this->_dataObject);
 				break;
 			
 			/* get a property value with optional parameter passed in $a[0] */
 			case 'get':
 				if (($property = $this->_dataObject->getProperty($method_end)) !== false) {
-					
-					$this->_triggerRules('before/get/' . $method_end);
+					$this->_triggerRules('before/get/' . $method_end, $this->_dataObject);
 					$prop = $property->getValue(isset($a[0]) ? $a[0] : null);
-					$this->_triggerRules('after/get/' . $method_end);
-					
+					$this->_triggerRules('after/get/' . $method_end, $this->_dataObject);
 					return $prop;
 					
 				} else {
-					
 					throw new Exception('OBJECT_UNKNOWN_PROPERTY', $method_end);
 				}
 				break;
@@ -290,12 +286,10 @@ abstract class BaseObject extends ObjectModelAbstract {
 			// @todo untested
 			case 'got':
 				if (($property = $this->_dataObject->getProperty($method_end)) !== false) {
-							
 					$prop = $property->getValue(isset($a[0]) ? $a[0] : null);
 					return $prop;
 							
 				} else {
-							
 					throw new Exception(array('OBJECT_UNKNOWN_PROPERTY', $method_end));
 				}
 				break;	
@@ -320,14 +314,11 @@ abstract class BaseObject extends ObjectModelAbstract {
 		
 		// change rules' bound object reference
 		foreach ($this->_dataObject->getProperties() as $property) {
-			
 			$property->changeRulesObjectReference($this);
 		}
 		
-		
 		// clone parameters
 		foreach ($this->_params as $key => $val) {
-			
 			$this->_params[$key] = clone $val;
 		}
 	}
