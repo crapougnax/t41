@@ -238,9 +238,10 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	 * Execute defined rules for given trigger
 	 *
 	 * @param string $trigger
+	 * @param mixed $params
 	 * @return boolean
 	 */
-	protected function _triggerRules($trigger)
+	protected function _triggerRules($trigger, $params = null)
 	{
 		if (! isset($this->_rules[$trigger])) {
 			/* return true if no defined rule for trigger */
@@ -250,8 +251,7 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 		$result = true;
 	
 		foreach ($this->_rules[$trigger] as $rule) {
-			//\Zend_Debug::dump($rule); die;
-			$result = $result && $rule->execute($this->_dataObject);
+			$result = $result && $rule->execute($params);
 		}
 	
 		return $result;
