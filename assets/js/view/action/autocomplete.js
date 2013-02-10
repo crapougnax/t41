@@ -78,8 +78,7 @@ if (! window.t41.view.action.autocomplete) {
 			}
 			
 			// bind observer
-//			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
-			this.element.on('keyup change', this, t41.view.action.autocomplete.observer);
+			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
 		};
 		
@@ -251,7 +250,6 @@ if (! window.t41.view.action.autocomplete) {
 			this.element.hide();
 			var width = this.element.width()+5;
 			var display = jQuery('#' + this.target + '_display').css({
-				width: '100%', //width+'px',
 				display: 'inline-block',
 				cursor: 'pointer',
 				'text-align':'left',
