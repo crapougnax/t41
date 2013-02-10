@@ -224,12 +224,15 @@ class Rest_ObjectController extends Rest_DefaultController {
 			
 			$data = array();
 			foreach ($collection->getMembers() as $member) {
-				$data[$member->getUri()->getIdentifier()] = $member->reduce();
+				$reduced = $member->reduce();
+				$data[$member->getUri()->getIdentifier()] = $reduced;
+				if ($property->getValue() && $property->getValue()->getIdentifier() == $member->getIdentifier()) {
+					$this->_data['value'] = $reduced['uuid'];
+				}
 			}
 			
 			$this->_data['total'] = $collection->getTotalMembers();
 			$this->_data['collection'] = $data;
-			$this->_data['value'] = $property->getValue() ? $property->getValue()->reduce() : null;
 		} else {
 			$this->_status = 'NOK';
 		}
