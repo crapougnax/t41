@@ -220,10 +220,7 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 			if (obj.data.total > 0) {
 				var collection = new t41.object.collection(obj.data);
 				if (obj.data.value) {
-					var current = new t41.object(obj.data.value);
-					value = current.uuid;
-				} else {
-					value = null;
+					value = obj.data.value || null;
 				}
 				this.prepareDest();
 
