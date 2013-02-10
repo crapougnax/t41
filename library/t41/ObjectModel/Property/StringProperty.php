@@ -32,4 +32,17 @@ namespace t41\ObjectModel\Property;
  */
 class StringProperty extends AbstractProperty {
 
+	
+	public function setValue($value)
+	{
+		if ($this->getParameter('constraint.uppercase')) {
+			$value = mb_strtoupper($value,'UTF-8');
+		}
+		
+		if ($this->getParameter('constraint.lowercase')) {
+			$value = mb_strtolower($value,'UTF-8');
+		}
+		
+		return parent::setValue($value);
+	}
 }
