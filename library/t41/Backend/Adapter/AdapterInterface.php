@@ -62,4 +62,13 @@ interface AdapterInterface {
 	
 	
 	public function loadBlob(ObjectModel\DataObject $do, Property\AbstractProperty $property);
+	
+	
+	public function transactionStart($key = null);
+	
+	
+	public function transactionCommit();
+	
+	
+	public function transactionExists();
 }

@@ -95,16 +95,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$url = explode('/', $uri->getUrl());
 		
 		if (isset($url[0])) {
-			
 			$this->_database = $url[0];
 			
 		} else {
-			
 			throw new Exception('MISSING_DBNAME_PARAM');
 		}
 		
 		if (isset($url[1])) {
-			
 			$this->_table = $url[1];
 		}
 	}
@@ -113,7 +110,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	protected function _connect()
 	{
 		if (! $this->_ressource) {
-			
 			try {
 				/* @var $this->_ressource Zend_Db_Adapter_Pdo */
 				$this->_ressource = \Zend_Db::factory($this->_adapter, array(
@@ -125,7 +121,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 																		   )
 													);
 			} catch (\Zend_Db_Exception $e) {
-			
 				throw new Exception($e->getMessage());
 			}		
 		}
@@ -194,7 +189,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		foreach ($do->getProperties() as $property) {
 			
 			if (! $property instanceof Property\CollectionProperty) {
-				
 				continue;
 			}
 			
@@ -254,7 +248,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_connect();
 		
 		// get data from backend
-		// @todo Handle complex pkeys (via mapper definition)
 		$select = $this->_ressource->select()
 								   ->from($table,$columns)
 								   ->limit(1);
@@ -263,7 +256,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
 			$select->where("$key = ?", $val);
 		}
-
+		
 		$data = $this->_ressource->fetchRow($select);
 		
 		if (empty($data)) {
@@ -699,6 +692,33 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$uri->setUrl($this->_database . '/' . $table . '/');
 		
 		return $this->_populateCollection($result, $collection, $uri);
+	}
+	
+	
+	public function transactionStart($key = null)
+	{
+		$this->_connect();
+		if ($this->_ressource->beginTransaction()) {
+			$this->_transaction = $key ? $key : true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	public function transactionCommit()
+	{
+		if ($this->transactionExists()) {
+			$this->_transaction = false;
+			try {
+				$this->_ressource->commit();
+				return true;
+			} catch (\Exception $e) {
+				$this->_ressource->rollBack();
+				return false;
+			}
+		}
 	}
 	
 	

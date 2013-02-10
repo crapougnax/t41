@@ -82,6 +82,9 @@ abstract class AbstractAdapter implements AdapterInterface {
 	protected $_tableNameFromClassSegments = 0;
 	
 	
+	protected $_transaction = false;
+	
+	
 	/**
 	 * Class constructor
 	 * 
@@ -218,6 +221,26 @@ abstract class AbstractAdapter implements AdapterInterface {
 	public function returnsDistinct(ObjectModel\Collection $collection, PropertyAbstract $property)
 	{
 		return array();
+	}
+	
+	
+	public function transactionStart($key = null)
+	{
+		$this->_transaction = $key ? $key : true;
+		return true;
+	}
+	
+	
+	public function transactionCommit()
+	{
+		$this->_transaction = false;
+		return true;
+	}
+
+	
+	public function transactionExists()
+	{
+		return $this->_transaction;
 	}
 	
 	
