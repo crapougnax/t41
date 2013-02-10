@@ -113,7 +113,13 @@ class Property {
 	 */
 	const CONSTRAINT_URLSCHEME		= 'urlscheme';
 	
+	
+	const CONSTRAINT_UPPERCASE		= 'uppercase';
+	
+	
+	const CONSTRAINT_LOWERCASE		= 'lowercase';
 
+	
 	/* available options to get a t41_Property_Object stored value */
 	
 	const URI		= 'uri';

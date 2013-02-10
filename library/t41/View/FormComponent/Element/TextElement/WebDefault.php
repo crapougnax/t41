@@ -2,6 +2,8 @@
 
 namespace t41\View\FormComponent\Element\TextElement;
 
+use t41\ObjectModel\Property;
+
 use t41\ObjectModel,
 t41\View,
 t41\View\ViewUri,
@@ -30,6 +32,8 @@ class WebDefault extends AbstractWebDecorator {
 							, ($max > 10 || $max == 0) ? 10 : $max
 							, $this->_obj->getValue()
 						);
+		
+		$this->addConstraintObserver(array(Property::CONSTRAINT_UPPERCASE,Property::CONSTRAINT_LOWERCASE));
 		
 		return $html;
 	}

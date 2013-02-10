@@ -76,6 +76,8 @@ class WebDefault extends AbstractWebDecorator {
 							, $extraArgs
 						);
 		
+		$this->addConstraintObserver(array(Property::CONSTRAINT_UPPERCASE,Property::CONSTRAINT_LOWERCASE));
+		
 		return $html;
 	}
 }

@@ -72,8 +72,11 @@ class DefaultAdapter extends AbstractAdapter {
 				
 				/* inject the condition that allows to find collection members */
 				if ($property->getParameter('keyprop')) {
-					
 					$collection->having($property->getParameter('keyprop'))->equals($property->getParent());
+				}
+				
+				if ($property->getParameter('depends')) {
+					$element->setParameter('dependency',$property->getParameter('depends'));
 				}
 				
 				if ($property->getParameter('morekeyprop')) {
@@ -116,7 +119,12 @@ class DefaultAdapter extends AbstractAdapter {
 				//$collection->find();
 				//\Zend_Debug::dump(\t41\Backend::getLastQuery());
 				break;
-								
+			
+			case 'CollectionProperty':
+				$element = new Element\GridElement();
+				$element->setCollection($property->getValue());
+				break;
+				
 			default:
 				$element = new Element\FieldElement();
 				break;
@@ -130,11 +138,8 @@ class DefaultAdapter extends AbstractAdapter {
 		
 		$value = $property->getValue();
 		if ($value instanceof ObjectModel\ObjectUri) {
-			
 			$value = $value->__toString();
-			
 		} else if ($value instanceof ObjectModel\BaseObject) {
-		
 			$value = $value->getUri()->__toString();
 		}
 		$element->setValue($value);
@@ -151,12 +156,12 @@ class DefaultAdapter extends AbstractAdapter {
 								, Property::CONSTRAINT_MAXLENGTH
 								, Property::CONSTRAINT_HASDIGITS
 								, Property::CONSTRAINT_HASLETTERS
+								, Property::CONSTRAINT_UPPERCASE
+								, Property::CONSTRAINT_LOWERCASE
 								);
 
 		foreach ($constraintsList as $key) {
-
 			if (isset($constraints[$key])) {
-			
 				$element->setConstraint($key, empty($constraints[$key]) ? true : $constraints[$key]);
 			}
 		}
@@ -168,10 +173,8 @@ class DefaultAdapter extends AbstractAdapter {
 	public function addElement($element, $position = null)
 	{
 		if (! $element instanceof Element\AbstractElement) {
-			
 			throw new Exception(array("OBJECT_NOT_INSTANCE_OF", 't41\View\FormComponent\Element\AbstractElement'));
 		}
-		
 		return parent::addElement($element, $position);
 	}
 	
@@ -182,12 +185,9 @@ class DefaultAdapter extends AbstractAdapter {
 		
 		/* @var $element t41_View_Form_Element_Abstract */
 		foreach ($this->_elements as $element) {
-			
 			$value = $this->_data[$element->getId()];
-			
 			/* test each form element for data consistency */
 			if ($element) {
-				
 			}
 		}
 	}

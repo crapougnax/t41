@@ -2,6 +2,8 @@
 
 namespace t41\View\Decorator;
 
+use t41\ObjectModel\Property;
+
 /**
  * t41 Toolkit
  *
@@ -91,11 +93,14 @@ abstract class AbstractWebDecorator extends AbstractDecorator {
 	/**
 	 * Bind action to element in view
 	 * 
-	 * @param View\Action\AbstractAction $action
+	 * @param array $array
 	 * @param string $callback
 	 */
-	protected function _bindAction(View\Action\AbstractAction $action, $callback = null)
+	protected function _bindAction(array $array, $callback = null)
 	{
+		$action = $array['obj'];
+		$parameters = $array['parameters'];
+		
 		// prepare extra data (provided callback would replace default callback)
 		$data = array('element' => $this->getId());
 		if ($callback) $data['callback'] = $callback;
@@ -103,6 +108,50 @@ abstract class AbstractWebDecorator extends AbstractDecorator {
 		// reduce action
 		$reduced = $action->reduce(array('extra' => $data));
 		
+		if (isset($parameters['action'])) {
+			$reduced['action'] = 'action/' . $parameters['action'];
+		}
+		
 		View::addEvent(sprintf('t41.view.bind(%s)', \Zend_Json::encode($reduced)), 'js');
+	}
+	
+	
+	/**
+	 * Add a Javascript observer and a callback function to the element if the given constraint is setted
+	 * @param string $constraints
+	 */
+	protected function addConstraintObserver($constraints)
+	{
+		$constraints = (array) $constraints;
+
+		foreach ($constraints as $constraint) {
+
+			if (! $this->_obj->getConstraint($constraint)) {
+				continue;
+			}
+		
+			switch ($constraint) {
+			
+				case Property::CONSTRAINT_UPPERCASE:
+					View::addEvent(sprintf("t41.view.bindLocal('%s','blur', function() { var f = jQuery('#%s'); f.val(f.val().toUpperCase())})"
+											, $this->getId()
+											, $this->getId()
+										  ), 'js');
+					break;
+				
+				case Property::CONSTRAINT_LOWERCASE:
+					View::addEvent(sprintf("t41.view.bindLocal('%s','blur', function() { var f = jQuery('#%s'); f.val(f.val().toLowerCase())})"
+											, $this->getId()
+											, $this->getId()
+										  ), 'js');
+					break;
+				
+				case Property::CONSTRAINT_URLSCHEME:
+					break;
+				
+				case Property::CONSTRAINT_EMAILADDRESS:
+					break;
+			}
+		}
 	}
 }
