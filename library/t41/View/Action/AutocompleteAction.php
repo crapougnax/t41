@@ -114,7 +114,7 @@ class AutocompleteAction extends AbstractAction {
 					$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
 				}
 				$data['cache-key'] = $ckey;
-				Core::cacheSet($data,$ckey);
+				Core::cacheSet($data,$ckey, true, array('tags' => array('view','ac')));
 			}
 			
 		} else {
