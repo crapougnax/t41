@@ -60,7 +60,7 @@ class WebAutocomplete extends AbstractWebDecorator {
 		}
 		
 		View::addCoreLib(array('core.js','locale.js','view.js','view:table.js','view:action:autocomplete.js'));
-		$acfield = new View\FormComponent\Element\FieldElement('_' . $name);
+		$acfield = new View\FormComponent\Element\FieldElement('_' . $this->_nametoDomId($name));
 		$acfield->setValue($value);
 		
 		$action = new AutocompleteAction($this->_obj->getCollection());
