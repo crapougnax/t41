@@ -72,7 +72,7 @@ class WebDefault extends AbstractWebDecorator {
 	{
     	$this->_template = $this->_obj->getTemplate();
    	
-    	$tagPattern = "/" . self::TAG_START . "([a-z0-9]+)\\:([a-z0-9#.]*)\\{*([a-zA-Z0-9:,#\\\"']*)\\}*" . self::TAG_END . "/";
+    	$tagPattern = "/" . self::TAG_START . "([a-z0-9]+)\\:([a-z0-9_.]*)\\{*([a-zA-Z0-9:_,\\\"']*)\\}*" . self::TAG_END . "/";
     	
     	$tags = array();
     	
@@ -107,7 +107,6 @@ class WebDefault extends AbstractWebDecorator {
     				$value = $this->_obj->getVariable($keys[0]);
     			
 	    			if (count($keys) > 1) {
-    				
    						$value = $value[$keys[1]];
    					}
    					break;
@@ -133,6 +132,7 @@ class WebDefault extends AbstractWebDecorator {
 	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
    						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
    					} else {
+   						$value = sprintf("Can't substitute any value to '%s'", $tag[0]);
    					}
    					break;
    			}
