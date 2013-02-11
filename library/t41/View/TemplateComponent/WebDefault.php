@@ -132,7 +132,7 @@ class WebDefault extends AbstractWebDecorator {
 	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
    						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
    					} else {
-   						$value = sprintf("Can't substitute any value to '%s'", $tag[0]);
+   						$value = Core::$env == Core::ENV_DEV ? sprintf("Can't substitute any value to '%s'", $tag[0]) : null;
    					}
    					break;
    			}
