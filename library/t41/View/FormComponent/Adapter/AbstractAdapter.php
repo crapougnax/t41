@@ -2,10 +2,6 @@
 
 namespace t41\View\FormComponent\Adapter;
 
-use t41\ObjectModel\ObjectUri;
-
-use t41\View\FormComponent\Element\FieldElement;
-
 /**
  * t41 Toolkit
  *
@@ -28,7 +24,10 @@ use t41\View\FormComponent\Element\FieldElement;
 
 use t41\View;
 use t41\ObjectModel;
+use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property;
+use t41\ObjectModel\Property\ObjectProperty;
+use t41\View\FormComponent\Element\FieldElement;
 
 /**
  * t41 View Form Adapter Abstract class
@@ -58,19 +57,30 @@ abstract class AbstractAdapter implements AdapterInterface {
 		if ($identifier === true) {
 			$identifier = new FieldElement(ObjectUri::IDENTIFIER);
 			$identifier->setTitle("Identifiant unique")
-			->setConstraint(Property::CONSTRAINT_MANDATORY, true)
-			->setConstraint(Property::CONSTRAINT_MAXLENGTH, 10);
-			
+						 ->setConstraint(Property::CONSTRAINT_MANDATORY, true)
+						   ->setConstraint(Property::CONSTRAINT_MAXLENGTH, 10);
 			$this->addElement($identifier);
 		}
 		
-		foreach ($do->getProperties() as $property) {
-			
-			if (is_null($display) || in_array($property->getId(), $display)) {
-
-				/* convert property to form element */
-				$this->addElementFromProperty($property, (count($this->_elements)+1) * 100);
+		if (is_null($display)) {
+			$display = array_keys($do->getProperties());
+		}
+		
+		foreach ($display as $element) {
+			if (strpos($element,'.') !== false) {
+				$parts = explode('.', $element);
+				$tmprop = $do->getProperty($parts[0]);
+				if ($tmprop instanceof ObjectProperty) {
+					$property = $tmprop->getInstanceOf()->getProperty($parts[1]);
+				} else {
+					$property = $tmprop;
+				}
+			} else {
+				$property = $do->getProperty($element);
 			}
+			
+			/* convert property to form element */
+			$this->addElementFromProperty($property, $element, (count($this->_elements)+1) * 100);
 		}
 	}
 		
