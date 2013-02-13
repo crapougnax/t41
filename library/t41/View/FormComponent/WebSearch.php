@@ -3,16 +3,11 @@
 namespace t41\View\FormComponent;
 
 
-use t41\View,
-	t41\ObjectModel\Property,
-	t41\View\FormComponent\Element,
-	t41\View\SimpleComponent,
-	t41\Core,
-	t41\ObjectModel,
-	t41\View\Decorator\AbstractWebDecorator,
-	t41\View\ViewUri,
-	t41\View\Decorator,
-	t41\View\FormComponent;
+use t41\View;
+use	t41\View\ViewUri;
+use t41\View\Decorator;
+use	t41\View\SimpleComponent;
+use t41\View\FormComponent;
 
 
 class WebSearch extends SimpleComponent\WebDefault {
@@ -42,9 +37,9 @@ class WebSearch extends SimpleComponent\WebDefault {
 	
 	
 	/**
-	 * t41_Form_Search instance
+	 * t41\View\FormComponent instance
 	 *
-	 * @var t41_Form_Search
+	 * @var t41\View\FormComponent
 	 */
 	protected $_obj;
 	
@@ -135,10 +130,9 @@ HTML;
             $p .= '</span>';
         }
         
-        View::addCoreLib('buttons.css');
-        View::addCoreLib('sprites.css');
+        View::addCoreLib(array('buttons.css','sprites.css'));
         $p .= sprintf('<div class="clear"><a class="element button medium icon" onclick="jQuery(\'#t41sf\').submit()"><span class="search-blue"></span>Rechercher</a>'
-        			. '<a class="element button medium icon" onclick="jQuery(\'#t41sf\').reset()"><span class="refresh"></span>RAZ</a></div>'
+        			. '<a class="element button medium icon" onclick="jQuery(\'#t41sf\').find(\':input\').each(function() {jQuery(this).val(null)})"><span class="refresh"></span>RAZ</a></div>'
         			, $this->_obj->getParameter('baseurl'));
         $p .= '</fieldset></form>';
         			       
