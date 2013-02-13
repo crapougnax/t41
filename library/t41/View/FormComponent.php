@@ -2,8 +2,6 @@
 
 namespace t41\View;
 
-use t41\ObjectModel\Property;
-
 /**
  * t41 Toolkit
  *
@@ -23,8 +21,6 @@ use t41\ObjectModel\Property;
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  * @version    $Revision: 865 $
  */
-
-use t41\View\FormComponent\Element\FieldElement;
 
 use t41\View,
 	t41\ObjectModel,
@@ -88,17 +84,14 @@ class FormComponent extends View\ViewObject {
 		}
 		
 		if ($source instanceof ObjectModel\BaseObject) {
-				
 			$this->_source = $source;
 			$this->_adapter->build($this->_source->getDataObject(), $this->getParameter('display'), $this->getParameter('identifier'));
 				
 		} else if ($source instanceof ObjectModel\DataObject) {
-				
 			$this->_source = $source->getDataObject();
 			$this->_adapter->build($this->_source, $this->getParameter('display'), $this->getParameter('identifier'));
 				
 		} else if (is_string($source)) {
-				
 			$this->_source = ObjectModel\DataObject::factory($source);
 			$this->_adapter->build($this->_source, $this->getParameter('display'), $this->getParameter('identifier'));
 		}
@@ -162,26 +155,7 @@ class FormComponent extends View\ViewObject {
      */
     public function getColumns()
     {
-    	if (! is_array($this->_columns)) {
-	    	$fields = $this->getAdapter()->getElements();
-    		$this->_columns = array();
-    		
-    		if (! is_array($this->getParameter('display')) || count($this->getParameter('display')) == 0) {
-    			$this->setParameter('display', array_keys($fields));
-    		}
-    		
-    		foreach ($this->getParameter('display') as $column) {
-    		
-    			if (isset($fields[$column])) {
-    				$this->_columns[] = $fields[$column];
-    				
-    			} else {
-    				$this->_columns[] = new FieldElement($column);
-    			}
-    		}
-    	}
-    	
-    	return $this->_columns;
+    	return $this->getAdapter()->getElements();
     }
     
     
