@@ -154,6 +154,10 @@
 				</parameter>
 			</parameters>
 		</object>
+		
+		<object id="\t41\View\FormComponent\Element\DateElement" extends="\t41\View\ViewObject">
+			<empty/>
+		</object>
 					
 		<object id="\t41\View\Action\AbstractAction">
 			<parameters>
