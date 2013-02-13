@@ -22,8 +22,13 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel,
-	t41\Core;
+use	t41\Core;
+use t41\Backend;
+use t41\ObjectModel;
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\BaseObject;
+use t41\ObjectModel\Property;
+use t41\ObjectModel\DataObject;
 
 /**
  * Property class to use for object values
@@ -51,16 +56,15 @@ class ObjectProperty extends AbstractProperty {
 	 */
 	public function setValue($value)
 	{
-		if (is_string($value) && substr($value, 0,1) == \t41\Backend::PREFIX) {
-			
-			$value = new ObjectModel\ObjectUri($value);
+		if (is_string($value) && substr($value, 0,1) == Backend::PREFIX) {
+			$value = new ObjectUri($value);
 		}
 		
 		$instanceof = $this->getParameter('instanceof');
 		if (! is_object($value) 
 		   || (! $value instanceof $instanceof
-		   		&& ! $value instanceof ObjectModel\DataObject
-		   		&& ! $value instanceof ObjectModel\ObjectUri)) {
+		   		&& ! $value instanceof DataObject
+		   		&& ! $value instanceof ObjectUri)) {
 			
 		   	$type = is_object($value) ? get_class($value) : gettype($value);
 		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF"
@@ -88,24 +92,23 @@ class ObjectProperty extends AbstractProperty {
 			case ObjectModel::MODEL:
 				if ($this->_value instanceof ObjectModel\DataObject) {
 					
-					$this->_value = \t41\ObjectModel::factory($this->_value);
+					$this->_value = ObjectModel::factory($this->_value);
 					return $this->_value;
 					
-				} else if ($this->_value instanceof ObjectModel\ObjectUri) {
+				} else if ($this->_value instanceof ObjectUri) {
 					/* object uri */
-					$this->_value = \t41\ObjectModel::factory($this->_value);
+					$this->_value = ObjectModel::factory($this->_value);
 				}
 				return $this->_value;
 				break;
 				
 			case ObjectModel::DATA:
-				if ($this->_value instanceof ObjectModel\ObjectUri) {
+				if ($this->_value instanceof ObjectUri) {
 					
-					$this->_value = \t41\ObjectModel::factory($this->_value);
+					$this->_value = ObjectModel::factory($this->_value);
 					return $this->_value->getDataObject();
 					
-				} else if ($this->_value instanceof ObjectModel\DataObject) {
-					
+				} else if ($this->_value instanceof DataObject) {
 					return $this->_value;
 					
 				} else {
@@ -116,11 +119,11 @@ class ObjectProperty extends AbstractProperty {
 
 			case ObjectModel::URI:
 			default:
-				if ($this->_value instanceof ObjectModel\ObjectUri) {
+				if ($this->_value instanceof ObjectUri) {
 					
 					return $this->_value;
 					
-				} else if ($this->_value instanceof ObjectModel\DataObject) {
+				} else if ($this->_value instanceof DataObject) {
 					
 					return $this->_value->getUri();
 					
@@ -137,9 +140,8 @@ class ObjectProperty extends AbstractProperty {
 	{
 		if (empty($this->_displayValue) && $this->_value) {
 			
-			if (! $this->_value instanceof ObjectModel\BaseObject) {
-				
-				$this->getValue(ObjectModel\Property::OBJECT);
+			if (! $this->_value instanceof BaseObject) {
+				$this->getValue(Property::OBJECT);
 			}
 			
 			$this->_parseDisplayProperty();
@@ -152,25 +154,26 @@ class ObjectProperty extends AbstractProperty {
 	public function reduce(array $params = array(), $cache = true)
 	{
 		if (! $this->_value) {
-			
 			return parent::reduce($params, $cache);
 			
 		} else {
 
 			// @todo improve performances !!
-			
 			$uuid = Core\Registry::set($this->getValue(ObjectModel::DATA));
 			
 			if (isset($params['extprops']) && ($params['extprops'] === true || array_key_exists($this->_id, $params['extprops']))) {
-
 				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id]), $cache);
 				
 			} else {
-				
 				$value = $this->getDisplayValue();
 			}				
-				
 			return array_merge(parent::reduce($params, $cache), array('value' => $value, 'uuid' => $uuid));
 		}
+	}
+	
+	
+	public function getInstanceOf()
+	{
+		return ObjectModel::factory($this->getParameter('instanceof'));
 	}
 }
