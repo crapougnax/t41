@@ -610,31 +610,23 @@ class Collection extends ObjectModelAbstract {
 		$this->setParameter('populated', false);
 
 		if (in_array($propertyName, array(Condition::MODE_AND, Condition::MODE_OR))) {
-
 			return $this->setConditionCombo($propertyName);
 		}
 		
 		// condition on the identifier part of the uri
 		if ($propertyName == ObjectUri::IDENTIFIER) {
-			
 			return $this->setCondition(new Property\IdentifierProperty(ObjectUri::IDENTIFIER, null, null, $mode));
-			
-		} else if (($property = $this->_do->getRecursiveProperty($propertyName)) !== false) {
-
-			return $this->setCondition($property, null, null, $mode);
-		
 		} else if (strstr($propertyName, '.') !== false) {
-			
 			// deal with recursive properties
 			$parts = explode('.', $propertyName);
 			$condition = $this->setCondition($this->_do->getProperty($parts[0]));
 				
 			foreach (array_slice($parts,1) as $property) {
-				
 				$condition = $condition->having($property);
 			}
-			
 			return $condition;
+		} else if (($property = $this->_do->getRecursiveProperty($propertyName)) !== false) {
+			return $this->setCondition($property, null, null, $mode);
 		}
 		
 		throw new Backend\Exception(array("CONDITION_UNKNOWN_PROPERTY", $propertyName));
