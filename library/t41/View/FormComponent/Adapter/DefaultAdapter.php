@@ -22,11 +22,10 @@ namespace t41\View\FormComponent\Adapter;
  * @version    $Revision: 876 $
  */
 
-use t41\ObjectModel,
-	t41\ObjectModel\Property,
-	t41\Backend\Condition,
-	t41\View\FormComponent\Element,
-	t41\View\Exception;
+use t41\ObjectModel;
+use	t41\ObjectModel\Property;
+use	t41\View\FormComponent\Element;
+use	t41\View\Exception;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -39,7 +38,7 @@ use t41\ObjectModel,
 class DefaultAdapter extends AbstractAdapter {
 
 	
-	public function addElementFromProperty(Property\AbstractProperty $property, $position = null)
+	public function addElementFromProperty(Property\AbstractProperty $property, $fname, $position = null)
 	{
 		$class = get_class($property);
 		$class = substr($class, strrpos($class, '\\')+1);
@@ -131,7 +130,7 @@ class DefaultAdapter extends AbstractAdapter {
 
 		}
 		
-		$element->setId($property->getId());
+		$element->setId(str_replace('.','-', $fname));
 		$element->setTitle($property->getLabel());
 		$element->setDefaultValue($property->getDefaultValue());
 		$element->setHelp($property->getParameter('help'));
@@ -140,7 +139,7 @@ class DefaultAdapter extends AbstractAdapter {
 		if ($value instanceof ObjectModel\ObjectUri) {
 			$value = $value->__toString();
 		} else if ($value instanceof ObjectModel\BaseObject) {
-			$value = $value->getUri()->__toString();
+			$value = $value->getUri() ? $value->getUri()->__toString() : null;
 		}
 		$element->setValue($value);
 		
@@ -165,7 +164,6 @@ class DefaultAdapter extends AbstractAdapter {
 				$element->setConstraint($key, empty($constraints[$key]) ? true : $constraints[$key]);
 			}
 		}
-				
 		return $this->addElement($element, $position);
 	}
 	
