@@ -2,6 +2,8 @@
 
 namespace t41\ObjectModel\Property;
 
+use t41\ObjectModel\ObjectUri;
+
 /**
  * t41 Toolkit
  *
@@ -23,7 +25,6 @@ namespace t41\ObjectModel\Property;
  */
 
 use t41\ObjectModel,
-	t41\ObjectModel\Rule\AbstractRule,
 	t41\ObjectModel\DataObject,
 	t41\ObjectModel\ObjectModelAbstract,
 	t41\ObjectModel\Property,
@@ -118,9 +119,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		}
 		
 		if (is_array($this->getParameter('validators'))) {
-
 			foreach ($this->getParameter('validators') as $validator => $namespace) {
-				
 				if (! \Zend_Validate::is($value, $validator)) { //, array(), $namespace)) {
 					
 					$exMsgid = "VALUE_VALIDATOR_" . strtoupper($validator) . "_FAILED";
@@ -207,19 +206,15 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		$label = $this->getParameter('label');
 		
 		if (! is_array($label)) {
-			
 			return $label;
 		}
 		
 		if ($lang && isset($label[$lang])) {
-
 			return $label[$lang];
 		
 		} else if (isset($label['en'])) {
-			
 			return $label['en'];
 		} else {
-			
 			return null;
 		}
 	}
@@ -229,6 +224,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	{
 		return $this->_helpText;
 	}
+	
 	
 	/**
 	 * Returns the parent data object instance of the current property
@@ -245,7 +241,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	{
 		return (bool) $this->_changed;
 	}
-	
 	
 	
 	/**
@@ -290,8 +285,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 		}
 		
 		if (substr($display,0,1) == '[') {
-			
-			// mask
+			// mask @todo have distinct parameter ?
 			Tag\ObjectTag::$object = $this->getValue();
 			$this->_displayValue = Tag::parse(substr($display, 1, strlen($display)-2));
 			
@@ -299,22 +293,19 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 			
 			$displayProps = explode(',', $display);
 			if (count($displayProps) == 1 && $displayProps[0] == '') {
-			
 				$this->_displayValue = Property::UNDEFINED_LABEL;
 			
 			} else {
 			
 				$this->_displayValue = array();
 				foreach ($displayProps as $disProp) {
-			
 					if ($this->_value->getProperty($disProp)) {
 						$this->_displayValue[] = $this->_value->getProperty($disProp)->getDisplayValue();
-					} elseif ($disProp == '#identifier') {
+					} elseif ($disProp == ObjectUri::IDENTIFIER) {
 						//@todo refactor this
 						$this->_displayValue[] = $this->_value->getIdentifier();
 					}
 				}
-			
 				$this->_displayValue = implode(' ', $this->_displayValue);
 			}
 		}
