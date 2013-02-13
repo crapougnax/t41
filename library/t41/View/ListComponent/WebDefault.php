@@ -23,8 +23,7 @@ namespace t41\View\ListComponent;
  */
 
 
-use t41\Core,
-	t41\ObjectModel,
+use t41\ObjectModel,
 	t41\ObjectModel\Property,
 	t41\ObjectModel\Property\MetaProperty,
 	t41\ObjectModel\Property\ObjectProperty,
@@ -120,8 +119,9 @@ class WebDefault extends AbstractWebDecorator {
 
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
     			
-    			if (! empty($value)) { // @todo also test array values for empty values
+    			$field = str_replace("-",".",$field);
 
+    			if (! empty($value)) { // @todo also test array values for empty values
     				$property = $this->_collection->getDataObject()->getProperty($field);
     				
     				if ($property instanceof MetaProperty) {
@@ -130,7 +130,6 @@ class WebDefault extends AbstractWebDecorator {
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->equals($value);
     				} else {
-
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->contains($value);
     				}
