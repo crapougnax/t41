@@ -226,7 +226,7 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 
 				for (var i in collection.members) {
 					var member = collection.members[i];
-					var option = new Option(member.get('label'),member.uuid, (value == member.uuid));
+					var option = new Option(member.get('label'),member.uuid, (typeof value != 'undefined' && value == member.uuid));
 					this.dest.append(option);
 				}
 			}
