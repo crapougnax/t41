@@ -173,7 +173,7 @@ if (! window.t41.view) {
 	 */
 	window.t41.view.bindLocal = function(element, event, action, obj) {
 		
-		if (typeof element == 'string') {
+		if (typeof element == 'string' && element.indexOf(',') < 0) {
 			var element = jQuery('#' + element);
 		}
 		

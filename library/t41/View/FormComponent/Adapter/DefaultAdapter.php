@@ -60,7 +60,11 @@ class DefaultAdapter extends AbstractAdapter {
 				break;
 
 			case 'StringProperty':
-				$element = $property->getParameter('multilines') ? new Element\TextElement() : new Element\FieldElement();
+				if ($property->getParameter('multilines')) {
+					$element = new Element\TextElement();
+				} else {
+					$element = new Element\FieldElement();
+				}
 				break;
 					
 			case 'ObjectProperty':
@@ -80,15 +84,12 @@ class DefaultAdapter extends AbstractAdapter {
 				}
 				
 				if ($property->getParameter('morekeyprop')) {
-				
 					foreach ($property->getParameter('morekeyprop') as $value) {
-							
 						if (strstr($value, ' ') !== false) {
 				
 							// if value contains spaces, it's a pattern
 							$parts = explode(' ', $value);
 							if (count($parts) == 3) {
-									
 								if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
 								$collection->having($parts[0])->$parts[1]($parts[2]);
 				
@@ -98,7 +99,6 @@ class DefaultAdapter extends AbstractAdapter {
 							}
 				
 						} else {
-				
 							// default case, we expect the member to hold a property
 							// with the same name and value as the current object
 							$collection->having($value)->equals($property->getParent()->getProperty($value)->getValue());
@@ -113,7 +113,7 @@ class DefaultAdapter extends AbstractAdapter {
 				if ($property->getParameter('search')) {
 					$element->setParameter('search', $property->getParameter('search'));
 				}
-								
+
 				$element->setCollection($collection);
 				
 				//$collection->find();
@@ -165,6 +165,12 @@ class DefaultAdapter extends AbstractAdapter {
 				$element->setConstraint($key, empty($constraints[$key]) ? true : $constraints[$key]);
 			}
 		}
+		
+		// property uses a special format for which we should have a decorator
+		if (isset($constraints['format'])) {
+			$element->setDecorator($constraints['format']);
+		}
+		
 		return $this->addElement($element, $position);
 	}
 	

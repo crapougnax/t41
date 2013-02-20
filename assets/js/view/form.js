@@ -235,3 +235,38 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	
 	t41.view.bindLocal(this.src, 'change', jQuery.proxy(this, 'refresh'));
 };
+
+
+/**
+ * UI controls for the Street Number field format
+ */
+window.t41.view.form.streetNumber = function(id) {
+
+	this.id = id;
+	
+	this.updateValue = function() {
+		var value = jQuery('#' + this.id + '_number').val();
+		if (value) {
+			jQuery('#' + this.id + '_ext').prop('disabled',false);
+			if (jQuery('#' + this.id + '_ext').val()) {
+				value += '.' + jQuery('#' + this.id + '_ext').val();
+			}
+		} else {
+			jQuery('#' + this.id + '_ext').prop('disabled',true);
+		}
+		jQuery('#' + this.id).val(value);
+	};
+	
+	
+	this.initValue = function() {
+		var parts = jQuery('#' + this.id).val().split('.');
+		jQuery('#' + this.id + '_number').val(parts[0] || '');
+		jQuery('#' + this.id + '_ext').val(parts[1] || '');
+		this.updateValue();
+	}
+	
+	var selector = '#' + this.id + '_number,#' + this.id + '_ext';
+	t41.view.bindLocal(selector, 'change', jQuery.proxy(this,'updateValue'));
+	this.initValue();
+};
+
