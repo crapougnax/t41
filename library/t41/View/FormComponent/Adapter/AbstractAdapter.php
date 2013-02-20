@@ -28,6 +28,7 @@ use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\View\FormComponent\Element\FieldElement;
+use t41\ObjectModel\Property\AbstractProperty;
 
 /**
  * t41 View Form Adapter Abstract class
@@ -79,8 +80,10 @@ abstract class AbstractAdapter implements AdapterInterface {
 				$property = $do->getProperty($element);
 			}
 			
-			/* convert property to form element */
-			$this->addElementFromProperty($property, $element, (count($this->_elements)+1) * 100);
+			if ($property instanceof AbstractProperty) {
+				/* convert property to form element */
+				$this->addElementFromProperty($property, $element, (count($this->_elements)+1) * 100);
+			}
 		}
 	}
 		

@@ -26,6 +26,7 @@ use t41\ObjectModel;
 use	t41\ObjectModel\Property;
 use	t41\View\FormComponent\Element;
 use	t41\View\Exception;
+use t41\ObjectModel\Property\AbstractProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -38,7 +39,7 @@ use	t41\View\Exception;
 class DefaultAdapter extends AbstractAdapter {
 
 	
-	public function addElementFromProperty(Property\AbstractProperty $property, $fname, $position = null)
+	public function addElementFromProperty(AbstractProperty $property, $fname, $position = null)
 	{
 		$class = get_class($property);
 		$class = substr($class, strrpos($class, '\\')+1);
