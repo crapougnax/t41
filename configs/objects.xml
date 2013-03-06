@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<objects>
+	
+		<object id="t41\ObjectModel\HybridObject">
+			<properties>
+				<none/>
+			</properties>
+		</object>
+		
 		<object id="t41\ObjectModel\MediaObject">
 			<properties>
 				<property id="label" type="string">
