@@ -46,12 +46,10 @@ class WebDefault extends AbstractWebDecorator {
 			$menu = '';
 	
 			foreach ($module->getItems() as $item) {
-	
 				$menu .= $this->_renderMenu($item, $moduleKey);
 			}
 			
 			if ($menu) {
-				
 				// top level menu
 				$html .= sprintf('<ul><li class="head" data-help="%s"><a class="head">%s</a><div class="drop">%s</div></li></ul>'
 						, $this->_escape($module->getHelp())
@@ -128,14 +126,14 @@ class WebDefault extends AbstractWebDecorator {
 	 */
 	protected function _makeLink($item, $module = null)
 	{
-		if ($item->fullRes) {
+		if ($item->fullRes || substr($item->getId(),0,1) == '/') {
 			$module = null;
 		} else {
-			if ($module) $module .= '/';
+			if ($module) $module = '/' . $module . '/';
 		}
 		
 		return sprintf('<a%s>%s</a>'
-						, $item->noLink ? null : sprintf(' href="/%s%s"', $module, $item->getId())
+						, $item->noLink ? null : sprintf(' href="%s%s"', $module, $item->getId())
 						, $this->_escape($item->getLabel())
 					  );
 	}
