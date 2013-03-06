@@ -70,7 +70,6 @@ class WebDefault extends AbstractWebDecorator {
 		$resource = $item->getId();
 		if (! $item->fullRes) $resource = $moduleKey . '/' . $resource;
 		if (! $item->noLink && (! $this->_obj->isGranted($resource) || $item->hidden)) {
-		
 			return '';
 		}
 				
@@ -85,18 +84,15 @@ class WebDefault extends AbstractWebDecorator {
 			$sublevel = true;
 				
 			foreach ($item->getItems() as $item2) {
-				
 				$html .= $this->_renderMenu($item2, $moduleKey);
 			}
 		}
 		
 		if ($item->noLink != true) {
-			
 			 $html = $prefix;
 		}
 
 		if ($sublevel && $html) {
-				
 			$html = $prefix . $html;
 				
 		}
@@ -126,7 +122,9 @@ class WebDefault extends AbstractWebDecorator {
 	 */
 	protected function _makeLink($item, $module = null)
 	{
-		if ($item->fullRes || substr($item->getId(),0,1) == '/') {
+		if ($item->fullRes) {
+			$module = '/';
+		} else if (substr($item->getId(),0,1) == '/') {
 			$module = null;
 		} else {
 			if ($module) $module = '/' . $module . '/';

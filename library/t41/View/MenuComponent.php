@@ -22,9 +22,8 @@ namespace t41\View;
  * @version    $Revision: 865 $
  */
 
-use t41\View,
-	t41\Core\Layout,
-	t41\Core\Acl;
+use t41\Core\Layout;
+use t41\Core\Acl;
 
 
 class MenuComponent extends ViewObject {
