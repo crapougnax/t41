@@ -22,20 +22,14 @@ namespace t41\ObjectModel;
  * @version    $Revision: 870 $
  */
 
-use t41\ObjectModel\Property\MetaProperty;
+use t41\Backend;
+use t41\Backend\Adapter;
+use t41\Backend\Condition;
 
+use t41\ObjectModel;
 use t41\ObjectModel\Property\AbstractProperty;
-
 use t41\ObjectModel\Property\ObjectProperty;
-
-use t41\ObjectModel\Collection\StatsObject;
-
-use t41\ObjectModel,
-	t41\Backend,
-	t41\Backend\Condition,
-	t41\Backend\Adapter,
-	t41\ObjectModel\Property\PropertyAbstract,
-	t41\ObjectModel\Property\IdentifierProperty;
+use t41\ObjectModel\Property\IdentifierProperty;
 
 /**
  * Class for a collection of Objects
@@ -433,36 +427,29 @@ class Collection extends ObjectModelAbstract {
 		$this->_lastSubFind = null;
 		
 		if (! is_array($this->_members)) {
-			
 			return $returnCount ? 0 : array();
 		}
 		
 		$subArray = $this->_members;
 		
 		foreach ($conditions as $propertyName => $propertyVal) {
-			
-			if ($propertyVal instanceof ObjectModel\BaseObject || $propertyVal instanceof ObjectModel\DataObject) {
-				
-				$propertyVal = $propertyVal->getUri();
+			if ($propertyVal instanceof ObjectModel\BaseObject || $propertyVal instanceof ObjectModel\DataObject  || $propertyVal instanceof ObjectModel\ObjectUri) {
+				$propertyVal = $propertyVal->getIdentifier();
 			}
 			
 			foreach ($subArray as $key => $val) {
-				
 				$memberProp = $val->getProperty($propertyName);
 				$val = $memberProp->getValue();
-				
-				if ($val instanceof ObjectModel\BaseObject || $val instanceof ObjectModel\DataObject) {
-				
-					$val = $val->getUri();
+				if ($val instanceof ObjectModel\BaseObject || $val instanceof ObjectModel\DataObject || $val instanceof ObjectModel\ObjectUri) {
+					$val = $val->getIdentifier();
 					
 					if (! $val) {
 						unset($subArray[$key]);
-						continu;
+						continue;
 					}
 				}
 				
 				if ($val != $propertyVal) {
-					
 					unset($subArray[$key]);
 				}
 			}
