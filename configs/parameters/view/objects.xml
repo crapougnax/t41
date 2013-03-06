@@ -52,6 +52,12 @@
 					<type>string</type>
 					<defaultvalue>all</defaultvalue>
 				</parameter>
+				<parameter id="action">
+					<type>string</type>
+				</parameter>
+				<parameter id="labels">
+					<type>array</type>
+				</parameter>
 				<parameter id="redirect_ok" type="string">
 					<bogus/>
 				</parameter>
