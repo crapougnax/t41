@@ -27,15 +27,18 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.re = false;
 	
+	this.action;
+	
+	this.labels = {submit:"Sauver"};
+	
 	/**
 	 * List of redirection URL
 	 */
 	this.redirects = {redirect_ok:document.referrer};
 	
-
 	this.addButtons = function(container) {
 
-		var submit = new t41.view.button("Sauver", {id:'form_submit', size:'medium', icon:'valid'});
+		var submit = new t41.view.button(this.labels.submit, {id:'form_submit', size:'medium', icon:'valid'});
 		t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save'), this.id);
 		container.append(submit);
 
@@ -57,10 +60,9 @@ window.t41.view.form = function(id,obj,form) {
 	this.convert = function() {
 	
 		// walk through all properties
-		for (var i in this.obj.props) {
-			
-			var prop = this.obj.props[i];
-			var constraints = prop.params.constraints || {};
+		for (var i in this.form.elements) {
+			var prop = this.form.elements[i];
+			var constraints = prop.constraints || {};
 			var c = [];
 			
 			// convert constraints
@@ -68,15 +70,15 @@ window.t41.view.form = function(id,obj,form) {
 				c[j] = true;
 			}
 			
-			this.fields[i] = {label:prop.params.label,
+			this.fields[i] = {label:prop.label,
 							  value:prop.value,
 							  type:prop.type,
-							  constraints:c
+							  constraints:prop.constraints
 							 };
 			
 			// add an observer on field with dependency
-			if (! prop.params.protected && prop.params.depends) {
-				new t41.view.form.elementUpdater(this.obj.uuid,i,prop.params.depends);
+			if (! prop.constraints.protected && prop.params && prop.params.dependency) {
+				new t41.view.form.elementUpdater(this.obj.uuid,i,prop.params.dependency);
 			}
 		}
 	};
@@ -132,8 +134,12 @@ window.t41.view.form = function(id,obj,form) {
 				formdata['_identifier'] = jQuery(this.formId).find('#_identifier').val();
 			}
 			
-			// send query to server
-			t41.core.call({action:'object/update', data:formdata, callback:jQuery.proxy(this,'retSave')});
+			if (this.action && typeof this.action == 'function') {
+				this.action.call(this,formdata);
+			} else {
+				// send query to server
+				t41.core.call({action:'object/update', data:formdata, callback:jQuery.proxy(this,'retSave')});
+			}
 		}
 	};
 	
@@ -170,11 +176,13 @@ window.t41.view.form = function(id,obj,form) {
 	
 	// constructor
 	jQuery('#actions').attr('style','text-align:center');
-	if (this.form.params && this.form.params.buttons != false) this.addButtons(jQuery('#form_actions'));
 	this.convert();
 	if (form.params) {
 		if (form.params.redirect_ok) this.redirects.redirect_ok = form.params.redirect_ok;
+		if (form.params.action) this.action = eval(form.params.action);
+		if (form.params.labels) this.labels = form.params.labels;
 	}
+	if (this.form.params && this.form.params.buttons != false) this.addButtons(jQuery('#form_actions'));
 };
 
 
