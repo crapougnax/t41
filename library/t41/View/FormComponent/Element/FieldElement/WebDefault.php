@@ -25,10 +25,8 @@ use t41\ObjectModel\Property;
  */
 
 use t41\View\Decorator\AbstractWebDecorator,
-	t41\Parameter,
 	t41\View,
-	t41\View\ViewUri,
-	t41\Core;
+	t41\View\ViewUri;
 
 /**
  * Web decorator for the FieldElement class
@@ -53,13 +51,11 @@ class WebDefault extends AbstractWebDecorator {
 		$name =  $this->getId();
 		
 		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
-				
-			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
+			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $this->_nametoDomId($name) . ']';
 		}
 
 		$extraArgs = '';
 		if ($this->getParameter('args')) {
-
 			foreach ($this->getParameter('args') as $argKey => $argVal) {
 				$extraArgs .= sprintf(' %s="%s"', $argKey, $argVal);
 			}
@@ -69,7 +65,7 @@ class WebDefault extends AbstractWebDecorator {
 		$max = $this->_obj->getConstraint(Property::CONSTRAINT_MAXLENGTH);
 		$html  = sprintf('<input type="text" name="%s" id="%s" size="%s"%s value="%s"%s/>'
 							, $name
-							, $this->_nametoDomId($name)
+							, $this->_obj->getId()
 							, ($max > $size || $max == 0) ? $size : $max
 							, $max ? ' maxlength="' . $max . '"' : null
 							, $this->_obj->getValue()

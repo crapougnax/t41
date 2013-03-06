@@ -2,8 +2,6 @@
 
 namespace t41\View\FormComponent\Element\FieldElement;
 
-use t41\ObjectModel\Property;
-
 /**
  * t41 Toolkit
  *
@@ -24,9 +22,9 @@ use t41\ObjectModel\Property;
  * @version    $Revision: 876 $
  */
 
-use t41\View\Decorator\AbstractWebDecorator,
-	t41\View,
-	t41\View\ViewUri;
+use	t41\View;
+use	t41\View\ViewUri;
+use t41\View\Decorator\AbstractWebDecorator;
 
 /**
  * Web decorator for the FieldElement class
@@ -64,7 +62,7 @@ class WebStreetNumber extends AbstractWebDecorator {
 		$options = array('2' => 'Bis', '3' => 'Ter', '4' => 'Quater', 'A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D');
 		$options = array(null => $this->getParameter('defaultlabel')) + $options;
 		$zv = new \Zend_View();
-		$html .= $zv->formSelect($name, null, array('id' => $this->_obj->getId() . '_ext'), $options);
+		$html .= $zv->formSelect(null, null, array('id' => $this->_obj->getId() . '_ext'), $options);
 
 		View::addCoreLib('view:form.js');
 		View::addEvent(sprintf("new t41.view.form.streetNumber('%s')", $this->_obj->getId()), 'js');
