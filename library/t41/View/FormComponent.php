@@ -281,4 +281,14 @@ class FormComponent extends View\ViewObject {
     		$this->_executeAction($action['class'], $action['method'], $action['id'], $paData);
     	}
     }
+    
+    
+    public function reduce(array $params = array())
+    {
+    	$elements = array();
+    	foreach ($this->_adapter->getElements() as $element) {
+    		$elements[$element->getId()] = $element->reduce();
+    	}
+    	return array_merge(parent::reduce($params), array('elements' => $elements));
+    }
 }
