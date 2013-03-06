@@ -207,11 +207,8 @@ abstract class AbstractElement extends View\ViewObject {
 	public function getValue($useDefault = true)
 	{
 		if (isset($this->_value)) {
-			
 			return $this->_value;
-			
 		} else if ($useDefault === true) {
-			
 			return $this->_defaultVal;
 		}
 	}
@@ -255,9 +252,14 @@ abstract class AbstractElement extends View\ViewObject {
     }
     
     
-    public function setAction(Action\AbstractAction $action)
+    /**
+     * Bind an action and optional parameters to the element
+     * @param Action\AbstractAction $action
+     * @return \t41\View\FormComponent\Element\AbstractElement
+     */
+    public function setAction(Action\AbstractAction $action, array $parameters = array())
     {
-    	$this->_action = $action;
+    	$this->_action = array('obj' => $action, 'parameters' => $parameters);
     	return $this;
     }
     
@@ -265,5 +267,15 @@ abstract class AbstractElement extends View\ViewObject {
     public function getAction()
     {
     	return $this->_action;
+    }
+    
+    
+    public function reduce(array $params = array())
+    {
+    	$type = get_class($this);
+    	$type = lcfirst(substr($type, strrpos($type,'\\')+1));
+    	$array = array('type' => $type, 'label' => $this->_title, 'value' => $this->_value, 'constraints' => $this->_is);
+    	
+    	return array_merge($array, parent::reduce($params));
     }
 }
