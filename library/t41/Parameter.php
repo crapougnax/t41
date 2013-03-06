@@ -243,20 +243,14 @@ class Parameter implements Core\ClientSideInterface {
 		$config = Config\Loader::loadConfig($file);
 
 		if ($config === false) {
-			
 			return false;
 		}
 		
 		if ($add === false) {
-        
 			self::$_config = $config;
-		
 		} else {
-			
 	        self::$_config = array_merge(self::$_config, $config);
 		}
-
-//		\Zend_Debug::dump(self::$_config);
 		return true;
 	}
 	
@@ -264,10 +258,8 @@ class Parameter implements Core\ClientSideInterface {
 	static protected function _cloneParametersArray($array)
 	{
 		foreach ($array as $key => $parameter) {
-			
 			$array[$key] = clone $parameter;
 		}
-		
 		return $array;
 	}
 
@@ -279,44 +271,22 @@ class Parameter implements Core\ClientSideInterface {
 		// Sometimes, namespaced-class comes without its initial ns separator
 		if (substr($class, 0, 1) != '\\') $class = '\\' . $class;
 
-		//$cacheKey = 'params_' . md5($class);
-		
-		// send cache content if available
-		//if (($cached = Core::cacheGet($cacheKey)) !== false) {
-		
-		//	return count($cached) > 0 ? self::_cloneParametersArray($cached) : $cached;
-		//}
-		
-		
 		if ($object instanceof ObjectModel\BaseObject) {
-			
 			$params = self::getObjectParameters($class);
 			
 		} else if ($object instanceof Property\AbstractProperty) {
-			
 			$params = self::getPropertyParameters($class);
 		
 		} else if ($object instanceof View\ViewObject || $object instanceof View\Action\AbstractAction) {
-			
 			$params = self::getViewObjectParameters($class);
 		
 		} else if ($object instanceof View\Decorator\AbstractDecorator) {
-
 			$params =  self::getDecoratorParameters($class);
 		}
 		
-		//if (isset($params)) {
-			
-			//Core::cacheSet($params, $cacheKey);
-			//return $params;
-		//}
-		
 		if (isset($params)) {
-			
 			return $params;
-			
 		} else if ($object instanceof ObjectModel\ObjectModelAbstract) {
-
 			return self::getCoreParameters($class);
 		}
 	}
@@ -325,13 +295,9 @@ class Parameter implements Core\ClientSideInterface {
 	static public function getCoreParameters($objectClass)
 	{
 		if (! isset(self::$_config['core'])) {
-			
 			/* @todo get config from t41_Object */
 			self::loadConfig('parameters/core.xml');
 		}
-
-		//Zend_Debug::dump(self::$_config);
-		
 		$array = self::_compileFragments($objectClass, 'core');
 
 		// transform each array value into t41_Parameter
@@ -342,11 +308,9 @@ class Parameter implements Core\ClientSideInterface {
 	static public function getObjectParameters($objectClass)
 	{
 		if (! isset(self::$_config['objects'])) {
-			
 			/* @todo get config from t41_Object */
 			self::loadConfig('objects.xml');
 		}
-
 		$array = self::_compileFragments($objectClass);
 
 		// transform each array value into t41_Parameter
@@ -357,12 +321,10 @@ class Parameter implements Core\ClientSideInterface {
 	static public function getPropertyParameters($objectClass)
 	{
 		if (! isset(self::$_config['properties'])) {
-			
 			self::loadConfig('parameters/properties.xml');
 		}
 
 		$array = self::_compileFragments($objectClass, 'properties');
-
 		// transform each array value into t41_Parameter
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
@@ -371,12 +333,9 @@ class Parameter implements Core\ClientSideInterface {
 	static public function getViewObjectParameters($objectClass)
 	{
 		if (! isset(self::$_config['view_objects'])) {
-			
 			self::loadConfig('parameters/view/objects.xml');
 		}
-		
 		$array = self::_compileFragments($objectClass, 'view');
-		
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
 	
@@ -391,12 +350,9 @@ class Parameter implements Core\ClientSideInterface {
 		$class = implode('\\', $elems);
 		
 		if (! isset(self::$_config['decorators'])) {
-			
 			self::loadConfig('parameters/view/decorators.xml');
 		}
-		
 		$array = self::_compileFragments($class, 'decorators', $sublevel);
-		
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;		
 	}
 	
@@ -414,33 +370,25 @@ class Parameter implements Core\ClientSideInterface {
 		$array = array();
 		
 		if (isset(self::$_config[$objectType][$objectClass])) {
-			
 			$sub = self::$_config[$objectType][$objectClass];
 			
 			if ($subLevel) {
-
 				$levels = explode('/', $subLevel);
 				foreach ($levels as $level) {
-					
 					if (isset($sub[$level])) {
-						
 						$sub = $sub[$level];
-						
 					} else {
-						
 						return $array;
 					}
 				}
 
 			}
 			if (isset($sub['parameters']) && is_array($sub['parameters'])) {
-			
 				$array += $sub['parameters'];
 			}
 			
 			/* if class extends another, get parent parameters */
 			if (isset($sub['extends']) && ! empty($sub['extends'])) {
-			
 				$array += self::_compileFragments($sub['extends'], $objectType, $subLevel);
 			}
 		}
