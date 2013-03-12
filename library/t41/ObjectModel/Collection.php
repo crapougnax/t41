@@ -582,6 +582,12 @@ class Collection extends ObjectModelAbstract {
 		$this->_max = (integer) Backend::find($this, $backend, true);
 	}
 	
+	public function count(Backend\Adapter\AbstractAdapter $backend = null)
+	{
+		$this->_count($backend);
+		return $this->_max;
+	}
+	
 	
 	/**
 	 * Set a new condition on property given id or throws an exception if property doesn't exist
