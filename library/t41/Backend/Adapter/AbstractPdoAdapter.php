@@ -22,14 +22,13 @@ namespace t41\Backend\Adapter;
  * @version    $Revision: 915 $
  */
 
-use t41\ObjectModel\ObjectUri;
 
-use t41\Backend,
-	t41\Mapper,
-	t41\Backend\Condition,
-	t41\ObjectModel,
-	t41\ObjectModel\Property;
+use t41\Backend;
 use t41\Backend\Key;
+use t41\Backend\Condition;
+use t41\ObjectModel;
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\Property;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters
@@ -574,7 +573,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (array_key_exists($jtable, $this->_alreadyJoined)) {
 					$field = $this->_alreadyJoined[$jtable] . '.' . $field;
 				} else {
-					$field = $jtable . '.' . is_array($field) ? $field[0] : $field;
+					$tmp = $jtable . '.';
+					$tmp .= is_array($field) ? $field[0] : $field;
+					$field = $tmp;
 				}			
 			} else {
 				if (array_key_exists($table, $this->_alreadyJoined)) {
