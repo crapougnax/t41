@@ -68,6 +68,10 @@
 						<type>string</type>
 						<protected>true</protected>
 					</parameter>
+					<parameter id="display">
+						<type>string</type>
+						<protected>false</protected>
+					</parameter>s
 					<parameter id="keyprop">
 						<type>string</type>
 						<protected>true</protected>
