@@ -121,6 +121,10 @@ if (! window.t41.object) {
 					return !formatted || formatted == false ? this.val : t41.view.format(this.val,'Currency');
 					break;
 					
+				case 'Date':
+					return !formatted || formatted == false ? this.val : t41.view.format(this.val,'Date');
+					break;
+					
 				default:
 					return this.val;
 					break;
