@@ -29,6 +29,7 @@ use t41\Backend,
 	t41\Backend\Condition,
 	t41\ObjectModel,
 	t41\ObjectModel\Property;
+use t41\Backend\Key;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters
@@ -540,7 +541,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$property = $condition->getProperty();
 			
 			if ($property instanceof Property\ObjectProperty) {
-
 				// which table to join with ? (in case of condition is last element of a recursion)
 				$jtable2 = $jtable ? $jtable : $table;
 				
@@ -553,24 +553,20 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (in_array($uniqext, $this->_alreadyJoined)) {
 					continue;
 				}
-				
-				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
+				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
 				$select->joinLeft($jtable . " AS $uniqext", $join, array());
 				$this->_alreadyJoined[$jtable] = $uniqext;
 				$jtable = $uniqext;
 				
 			} else {
-				
 				$field = $property->getId();
-				
-				if ($this->_mapper) {
-					$field = $this->_mapper->propertyToDatastoreName($class, $field);
-				}
 			}
 				
 			if ($field == ObjectUri::IDENTIFIER) {
-				// @todo search mapper for a different key
-				$field = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
+				// @todo handle multiple keys from mapper
+				$field = $table . '.';
+				$key = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
+				$field .= is_array($key) ? $key[0] : $key;
 			}
 			
 			/* if a join was performed, prefix current field with table name */
@@ -578,7 +574,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (array_key_exists($jtable, $this->_alreadyJoined)) {
 					$field = $this->_alreadyJoined[$jtable] . '.' . $field;
 				} else {
-					$field = $jtable . '.' . $field;
+					$field = $jtable . '.' . is_array($field) ? $field[0] : $field;
 				}			
 			} else {
 				if (array_key_exists($table, $this->_alreadyJoined)) {
@@ -587,6 +583,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$field = $table . '.' . $field;
 				}
 			}
+
+			if ($field instanceof Key) {
+				$field = $table . '.' . $field->getName();
+			}
+
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
 
 			switch ($conditionArray[1]) {
@@ -735,7 +736,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$statements = array();
 		
 		foreach ($clauses as $key => $clause) {
-			
 			$ops = $this->_matchOperator($clause['operator']);
 			$_operators = $this->_operators;
 			$fuzzy = false;
@@ -746,7 +746,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			// IS NULL support
 			if ($value == Condition::NO_VALUE) {
-				
 				if (array_sum($ops) == Condition::OPERATOR_EQUAL) {
 					$statements[] = sprintf("%s IS NULL", $field);
 				} else {
@@ -804,9 +803,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$operator = '';
 		
 			foreach ($ops as $op) {
-			
 				if (isset($_operators[$op])) {
-				
 					$operator .= $_operators[$op];
 				}
 			}
