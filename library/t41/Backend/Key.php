@@ -110,4 +110,10 @@ class Key {
 		
 		return $value;
 	}
+	
+	
+	public function __toString()
+	{
+		return $this->getName();
+	}
 }
