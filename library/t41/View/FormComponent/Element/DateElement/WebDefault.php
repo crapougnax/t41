@@ -4,16 +4,9 @@ namespace t41\View\FormComponent\Element\DateElement;
 
 
 use t41\ObjectModel\Property;
-
-use t41\ObjectModel\Property\AbstractProperty;
-
-use t41\View\FormComponent\Element\AbstractElement;
-
-use t41\View\FormComponent;
-
-use t41\View,
-	t41\View\Externals,
-	t41\View\Decorator\AbstractWebDecorator;
+use t41\View;
+use t41\View\ViewUri;
+use	t41\View\Decorator\AbstractWebDecorator;
 
 class WebDefault extends AbstractWebDecorator {
 
@@ -22,6 +15,12 @@ class WebDefault extends AbstractWebDecorator {
 	{
 		View::addModuleLib('jquery-ui-1.8.9.custom.js', 'vendor/jquery/jqueryui');
 		View::addModuleLib('jquery-ui-1.8.9.custom.css', 'vendor/jquery/jqueryui');
+		
+		$name =  $this->getId();
+		
+		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
+			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $this->_nametoDomId($name) . ']';
+		}
 		
 		switch ($this->getParameter('mode')) {
 
@@ -44,7 +43,7 @@ class WebDefault extends AbstractWebDecorator {
 					$html = $this->_obj->formatValue($this->_obj->getValue());	
 				} else {
 
-					$html = $this->_renderField($this->_obj->getAltId(), $this->_obj->getValue());
+					$html = $this->_renderField($name, $this->_obj->getValue());
 				}
 				break;
 		}
