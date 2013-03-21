@@ -38,9 +38,9 @@ class Decorator {
 	/**
 	 * Factory pattern used to instanciate a proper decorator for the given object extended from t41_Object_Abstract
 	 *
-	 * @param t41_View_Object $object disabled for now because of legacy problems
+	 * @param t41\View\ViewObject $object disabled for now because of legacy problems
 	 * @param array $params
-	 * @return t41_View_Decorator
+	 * @return t41\View\AbstractDecorator
 	 */
 	public static function factory($object, array $params = null)
 	{
