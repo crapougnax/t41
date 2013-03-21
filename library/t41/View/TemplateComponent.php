@@ -90,25 +90,14 @@ class TemplateComponent extends ViewObject {
      * If path is relative (not starting with a "/"), the base path is prefixed
      * 
      * @param string $filename
-     * @param string $module module to search for the template
      * @return t41\View\TemplateComponent $this instance
 	 */
-	public function load($filename, $module = null)
+	public function load($filename)
 	{
-	    $paths = Config::getPaths(Config::REALM_TEMPLATES);
-    	if ($module) {
-    		$path = Core::$basePath . 'application/modules/' . $module . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
-    		if (is_dir($path)) {
-    			array_unshift($paths, $path);	
-    		}
-    	}
-		
-		$file = Config\Loader::findFile($filename, $paths, true);
-
+		$file = View::getAdapter()->loadTemplate($filename);
 		if (($this->_template = file_get_contents($file)) === false) {
 			throw new Exception(array("ERROR_LOADING_FILE", $filename));
 		}
-		
 		return $this;
 	}
 	

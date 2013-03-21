@@ -39,4 +39,8 @@ interface AdapterInterface {
     public function componentAdd($file, $type);
 
     public function eventAdd($event, $type, $isFile = false);
+    
+    public function setTemplate($tpl);
+    
+    public function loadTemplate($tpl);
 }

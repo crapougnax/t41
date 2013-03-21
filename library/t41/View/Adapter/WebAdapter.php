@@ -159,6 +159,16 @@ class WebAdapter extends AbstractAdapter {
     }
 
     
+    public function actionAttach()
+    {
+    	if (count($this->_action) == 0) return;
+    	 
+    	foreach ($this->_action as $key => $action) {
+    		$this->eventAdd(sprintf("t41.core.store.actions['%s'] = %s", $key, \Zend_Json::encode($action->reduce())), 'js');
+    	}
+    }
+    
+    
     public function eventAttach()
     {
     	if (count($this->_event) == 0) return;
@@ -183,7 +193,7 @@ class WebAdapter extends AbstractAdapter {
         			if (strstr(implode(' ', $this->_component['js']), 'jquery') !== false && $this->getParameter('js_documentready') === true) {
         				$str = "jQuery(document).ready(function() {\n" . $str . "\n});";
         			}
-        			$code .= "\n<script language=\"javascript\">\n$str\n</script>\n";
+        			$code .= "\n<script type=\"text/javascript\">\n$str\n</script>\n";
         			break;
         			
         		case 'css':
@@ -378,10 +388,13 @@ class WebAdapter extends AbstractAdapter {
        		$template = str_replace($tag[0], $content, $template);
     	}	
 
-    	// PHASE 3: events attachment
+    	// PHASE 3: actions attachment
+    	$this->actionAttach();
+    	
+    	// PHASE 4: events attachment
         $template = str_replace('</body>', $this->eventAttach() . '</body>', $template);
         
-        // PHASE 4: display logged errors in dev mode
+        // PHASE 5: display logged errors in dev mode
         if (Core::$env == Core::ENV_DEV) {
         	
 	        $errors = View::getErrors();

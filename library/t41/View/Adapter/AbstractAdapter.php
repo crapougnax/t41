@@ -2,6 +2,8 @@
 
 namespace t41\View\Adapter;
 
+use t41\View\Action\AbstractAction;
+
 /**
  * t41 Toolkit
  *
@@ -68,12 +70,16 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
     protected $_component = array();
 
     /**
-     * Tableau des événements à insérer dans la vue
+     * Array of events to be inserted in view
      *
      * @var array
      */
     protected $_event = array();
 
+    
+    protected $_action = array();
+    
+    
     /**
      * Contexte d'affichage de la vue
      *
@@ -156,29 +162,33 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
      */
     public function setTemplate($tpl)
     {
-    	/* reset template */
-    	$this->_template = null;
-    	
+    	$this->_template = $this->loadTemplate($tpl);
+		
+		if (! $this->_template) {
+			throw new Exception("Unable to find '$tpl' template file in paths");
+		}
+    }
+    
+    
+    public function loadTemplate($tpl)
+    {
     	$paths = Config::getPaths(Config::REALM_TEMPLATES);
     	if (Core\Layout::$module) {
     		$path = Core::$basePath . 'application/modules/' . Core\Layout::$vendor . DIRECTORY_SEPARATOR
-    			  . Core\Layout::$moduleKey . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+    		. Core\Layout::$moduleKey . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
     		if (is_dir($path)) {
-    			array_unshift($paths, $path);	
+    			array_unshift($paths, $path);
     		}
     	}
     	$files = Config\Loader::findFile($tpl, $paths);
-    	
+    	 
     	foreach ($files[Config::DEFAULT_PREFIX] as $file) {
     		if (file_exists($file)) {
-	    		$this->_template = $file;
-	    		break;
-			}
-		}
-		
-		if (is_null($this->_template)) {
-			throw new Exception("Unable to find '$tpl' template file in paths");
-		}
+    			return $file;
+    		}
+    	}
+    	
+    	return false; 	
     }
     
     
@@ -204,6 +214,22 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
     
     
     public function mediaAdd($file, $lib = null) { }
+    
+
+    /**
+     * 
+     * @param AbstractAction $action
+     * @param string $id
+     * @return \t41\View\Adapter\AbstractAdapter
+     */
+    public function actionAdd(AbstractAction $action, $id = null)
+    {
+    	if (is_null($id)) {
+    		$id = count($this->_action);
+    	}
+    	$this->_action[$id] = $action;
+    	return $this;
+    }
     
     
 	/**
