@@ -629,6 +629,13 @@ h1,h2,h3,h4,h5 {
 }
 /* -- END ALERT -- */
 
+/* -- ENV SPAN --*/
+.dev {
+	background-color:red;
+	color:white;
+	padding:1px;
+	font-weight:bold;
+}
 
 .clear {
   float: none !important;
