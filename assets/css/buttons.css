@@ -75,7 +75,7 @@
 
 /*propiétés taille button*/
 
-.t41 a.element.large,.t41.large a.element{
+.t41 a.button.element.large,a.element.large,.t41.large a.element{
 	font-size:14px;
 	height: 1.75em;
 	line-height: 1.625em;
@@ -84,7 +84,7 @@
 	text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-.t41 a.element.medium,.t41.medium a.element{
+.t41 a.button.element.medium,a.element.medium,.t41.medium a.element{
 	font-size:12px;
 	height: 1.75em;
 	line-height: 1.625em;
@@ -93,7 +93,7 @@
 	text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
 }
 
-.t41 a.element.small,.t41.small a.element{
+.t41 a.button.element.small,a.element.small,.t41.small a.element{
 	font-size:10px;
 	height: 1.75em;
 	line-height: 1.625em;
