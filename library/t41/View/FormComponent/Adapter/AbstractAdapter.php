@@ -102,8 +102,8 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	public function addElement($element, $position = null)
 	{
-		/* give to the element a reference to its parent */
-		$element->setParent($this);
+		/* give the element a reference to its parent */
+//		$element->setParent($this);
 		
 		/* @todo $element should not be required to have a getId() function */ 
 		$this->_elements[$element->getId()]  = $element;
