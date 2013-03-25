@@ -149,6 +149,12 @@ abstract class AbstractElement extends View\ViewObject {
 	}
 	
 	
+	public function getDefaultValue()
+	{
+		return $this->_defaultVal;
+	}
+
+	
 	public function getEnumValues()
 	{
 		return $this->_enumValues;
