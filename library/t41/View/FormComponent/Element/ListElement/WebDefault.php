@@ -47,6 +47,8 @@ class WebDefault extends AbstractWebDecorator {
 				$value = $this->_obj->getParameter('altkey') ? $value->getProperty($this->_obj->getParameter('altkey'))->getValue() : $value->getUri()->getIdentifier();
 			} else if ($value instanceof ObjectModel\ObjectUri) {
 				$value = $value->getIdentifier();
+			} else if ($this->_obj->getDefaultValue()) {
+				$value = is_object($this->_obj->getDefaultValue()) ? $this->_obj->getDefaultValue()->getIdentifier() : $this->_obj->getDefaultValue();
 			} else {
 				$value = null;
 			}
