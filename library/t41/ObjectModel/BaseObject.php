@@ -459,8 +459,8 @@ abstract class BaseObject extends ObjectModelAbstract {
 	 */
 	public function reduce(array $params = array(), $cache = true)
 	{
-		/* keep object in registry */
-		$uuid = $cache ? Core\Registry::set($this) : null;
+		/* keep object in registry (force refresh) */
+		$uuid = $cache ? Core\Registry::set($this, null, true) : null;
 		
 		// build an array with remotely callable methods
 		$methods = array();
