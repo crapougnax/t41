@@ -471,6 +471,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 //		}
 		
 		$array = $uuid ? array('uuid' => $uuid) : array();
+		$array['value'] = $this->__toString();
 
 		return array_merge($this->_dataObject->reduce($params, false), $array);
 	}

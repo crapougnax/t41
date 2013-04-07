@@ -242,7 +242,7 @@ if (! window.t41.view.action.autocomplete) {
 			for (var i in this.display) {
 				label += obj.props[i] && obj.props[i].value != null ? obj.props[i].value + ' ': '';
 			}
-			return label || '???';
+			return label || obj.value;
 		};
 		
 		
