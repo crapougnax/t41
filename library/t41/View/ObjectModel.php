@@ -24,7 +24,6 @@ namespace t41\View;
 
 use t41\Parameter;
 use t41\View;
-use t41\ObjectModel;
 
 /**
  * class providing basic methods to every view-related object.
@@ -35,7 +34,7 @@ use t41\ObjectModel;
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-abstract class ObjectModel extends ObjectModel\ObjectModelAbstract {
+abstract class ObjectModel extends \t41\ObjectModel\ObjectModelAbstract {
 	
 	
 	protected $_title;
