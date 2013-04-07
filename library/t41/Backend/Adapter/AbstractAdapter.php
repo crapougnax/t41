@@ -26,6 +26,7 @@ use t41\ObjectModel;
 use t41\ObjectModel\DataObject;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\AbstractProperty;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * Abstract class for Backend adapters
@@ -410,10 +411,10 @@ abstract class AbstractAdapter implements AdapterInterface {
 		$res = true;
 		
 		foreach ($do->getProperties() as $key => $property) {
-				
 			if ($property instanceof Property\ObjectProperty
 					&& $property->getValue() instanceof ObjectModel\BaseObject // if value is not a base object, it is impossible is has been changed 
-					&& (! $property->getValue()->getUri() || $property->getValue()->getDataObject()->hasChanged())) {
+					&& (! $property->getValue()->getUri() instanceof ObjectUri 
+					  || $property->getValue()->getDataObject()->hasChanged())) {
 		
 				$res = $res && $property->getValue()->save();
 			}

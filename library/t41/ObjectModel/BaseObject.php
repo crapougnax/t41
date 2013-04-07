@@ -487,4 +487,16 @@ abstract class BaseObject extends ObjectModelAbstract {
 	{
 		return sprintf("Redeclare the __toString() method in your '%s' object if you want to display its representation as as string", get_class($this));
 	}
+	
+	
+	/**
+	 * Proxy method for DataObject::populate()
+	 * @param array $data
+	 * @return boolean
+	 */
+	public function populate(array $data)
+	{
+		return $this->_dataObject->populate($data);
+	}
+	
 }

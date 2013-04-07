@@ -269,6 +269,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		/* populate data object */
 		$do->populate($data, $this->_mapper);
+		$do->resetChangedState();
 		
 		return true;
 	}
