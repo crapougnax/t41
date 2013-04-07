@@ -122,7 +122,8 @@ window.t41.view.form = function(id,obj,form) {
 			jQuery('#' + errors[0].field).focus();
 			return false;
 		} else {
-			formdata['uuid'] = this.obj.uuid;
+			formdata['uuid'] = this.form.uuid;
+			//formdata['uuid'] = this.obj.uuid;
 			if (this.form.params.post_ok) {
 				formdata['post_ok'] = this.form.params.post_ok;
 			}
@@ -138,7 +139,7 @@ window.t41.view.form = function(id,obj,form) {
 				this.action.call(this,formdata);
 			} else {
 				// send query to server
-				t41.core.call({action:'object/update', data:formdata, callback:jQuery.proxy(this,'retSave')});
+				t41.core.call({action:'form/save', data:formdata, callback:jQuery.proxy(this,'retSave')});
 			}
 		}
 	};
