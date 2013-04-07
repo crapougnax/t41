@@ -25,6 +25,8 @@ namespace t41\View;
 use t41\View,
 	t41\ObjectModel,
 	t41\View\FormComponent;
+use t41\Core;
+use t41\Core\Status;
 
 /**
  * Class providing form objects
@@ -36,6 +38,8 @@ use t41\View,
  */
 class FormComponent extends View\ViewObject {
 
+	
+	const ACTION_SRC_OBJ	= 'source';
 	
 	const SEARCH_MODE = 'search';
 	
@@ -159,27 +163,42 @@ class FormComponent extends View\ViewObject {
     }
     
     
+    
+    public function save(array $data = null)
+    {
+    	if ($this->_executePreActions($data)) {
+    		$this->getSource()->populate($data);
+    		$res = $this->getSource()->save();
+	    	if ($res === true) {
+    			return $res && $this->_executePostActions($data);
+    		} else {
+    			$this->status = new Status("Error saving object");
+    			return false;
+    		}
+    	} else {
+    		$this->status = new Status("Error executing pre-actions");
+    		return false;
+    	}
+    }
+    
+    
 	/**
      * Define an action to execute after the form has been successfully saved
      *
      * @param string|object $class
      * @param string $method
-     * @param mixed $id
      * @param array $params
      * @param boolean $first
      * @return integer index key of the action
      */
-    public function setPostAction($class, $method, $id = null, array $params = null, $first = false)
+    public function setPostAction($class, $method, array $params = null, $first = false)
     {
     	$array = array(	'class'		=> $class
     				,	'method'	=> $method
-    				,	'id'		=> $id
     				,	'params'	=> $params
       		  		  );
     	if ($first === true) {
-    		
     		array_unshift($this->_postActions, $array);
-    	
     	} else {
 	    	$this->_postActions[] = $array;
     	}
@@ -194,35 +213,45 @@ class FormComponent extends View\ViewObject {
      * @param string|object $class
      * @param string $method
      * @param array $params
+     * @param boolean $first
      * @return integer index key of the action
      */
-    public function setPreAction($class, $method, $id = null, array $params = null)
+    public function setPreAction($class, $method, array $params = null, $first = false)
     {
-    	$this->_preActions[] = array(	'class'		=> $class
-    								,	'method'	=> $method
-    								,	'id' 		=> $id
-    								,	'params'	=> $params
-    						  		 );
+    	$array = array(	'class'		=> $class
+    				,	'method'	=> $method
+    				,	'params'	=> $params
+      		  		  );
+    	if ($first === true) {
+    		array_unshift($this->_preActions, $array);
+    	} else {
+	    	$this->_preActions[] = $array;
+    	}
     						  
     	return count($this->_preActions) - 1;
     }
     
 	
-    protected function _executeAction($class, $method, $id, $data)
+    /**
+     * Execute a defined action 
+     * @param mixed $class
+     * @param string $method
+     * @param array $data ([user] = data coming from user including view (if any), [action] = data coming from action declaration)
+     * @return boolean
+     */
+    protected function _executeAction($class, $method, $data)
     {
     	$result = null;
     	
-    	if (! is_object($class)) {
-
-    		$class = new $class($id == self::USE_ID ? $this->getParameter('rowid') : $id);
+    	if ($class == self::ACTION_SRC_OBJ) {
+    		$class = $this->getSource();
+    	} else if (! is_object($class)) {
+    		$class = new $class();
     	}
     		
 	    try {
-    		
     		$result = $class->$method($data);
-    		
     	} catch (Exception $e) {
-    		
     		var_dump($e);
     		die($e->getMessage());
     	}
@@ -234,27 +263,17 @@ class FormComponent extends View\ViewObject {
     protected function _executePreActions($data)
     {
     	if (count($this->_preActions) == 0) {
-    		
-    		return $data;
+    		return true;
     	}
+    	
+    	$res = true;
     	
         foreach ($this->_preActions as $action) {
-    			
-    		// define action dataset with optional predefined values
-    		$paData = isset($action['params']['values']) ? $action['params']['values'] : $data;
-
-    		foreach ((array) $action['params']['mapping'] as $fromKey => $toKey) {
-    				
-    			if (isset($data[$fromKey])) {
-    					
-    				$paData[$toKey] = $data[$fromKey];
-    			}
-    		}
-    			
-    		$paData = $this->_executeAction($action['class'], $action['method'], $action['id'], $paData);
+        	$pdata = array('user' => $data, 'action' => $action['params']);
+    		$res = $res && $this->_executeAction($action['class'], $action['method'], $pdata);
     	}
     	
-    	return $paData;
+    	return $res;
     }
     
     
@@ -265,30 +284,28 @@ class FormComponent extends View\ViewObject {
      */
     protected function _executePostActions(array $data)
     {
-        foreach ($this->_postActions as $action) {
-    			
-    		// define action dataset with optional predefined values
-    		$paData = isset($action['params']['values']) ? $action['params']['values'] : $data;
-
-    		foreach ((array) $action['params']['mapping'] as $fromKey => $toKey) {
-    				
-    			if (isset($data[$fromKey])) {
-    					
-    				$paData[$toKey] = $data[$fromKey];
-    			}
-    		}
-
-    		$this->_executeAction($action['class'], $action['method'], $action['id'], $paData);
+    	if (count($this->_postActions) == 0) {
+    		return true;
     	}
+    	
+    	$res = true;
+    	
+        foreach ($this->_postActions as $action) {
+        	$pdata = array('user' => $data, 'action' => $action['params']);
+    		$res = $res && $this->_executeAction($action['class'], $action['method'], $pdata);
+    	}
+    	
+    	return $res;
     }
     
     
     public function reduce(array $params = array())
     {
+    	$uuid = Core\Registry::set($this, null, true);
     	$elements = array();
     	foreach ($this->_adapter->getElements() as $element) {
     		$elements[$element->getId()] = $element->reduce();
     	}
-    	return array_merge(parent::reduce($params), array('elements' => $elements));
+    	return array_merge(parent::reduce($params), array('elements' => $elements, 'uuid' => $uuid));
     }
 }
