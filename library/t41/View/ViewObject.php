@@ -22,9 +22,8 @@ namespace t41\View;
  * @version    $Revision: 865 $
  */
 
-use t41\Parameter,
-	t41\View,
-	t41\ObjectModel\ObjectModelAbstract;
+use t41\View;
+use t41\ObjectModel\ObjectModelAbstract;
 
 /**
  * class providing basic methods to every view-related object.
@@ -51,6 +50,13 @@ abstract class ViewObject extends ObjectModelAbstract {
 	
 	protected $_decorator = array('name' => 'default');
 	
+	
+	/**
+	 * Latest call on object's status
+	 * @var t41\Core\Status
+	 */
+	public $status;
+		
 	
 	/**
 	 * Set object title value
