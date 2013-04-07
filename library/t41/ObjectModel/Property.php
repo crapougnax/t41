@@ -163,9 +163,17 @@ class Property {
 	
 	
 
-	static public function parseDisplayProperty(ObjectModelAbstract $object, $display)
+	/**
+	 * Parse given object properties to return a string version
+	 * @param ObjectModelAbstract $object
+	 * @param string $display
+	 * @return mixed|string
+	 */
+	static public function parseDisplayProperty(ObjectModelAbstract $object, $display = null)
 	{
-		if (! $display) return false;
+		if (is_null($display)) {
+			return $object->__toString();
+		}
 		
 		if (substr($display,0,1) == '[') {
 			
@@ -177,17 +185,13 @@ class Property {
 			
 			$displayProps = explode(',', $display);
 			if (count($displayProps) == 1 && $displayProps[0] == '') {
-			
-				return self::UNDEFINED_LABEL;
+				return $object->__toString(); //self::UNDEFINED_LABEL;
 			
 			} else {
-			
 				$displayValue = array();
 				foreach ($displayProps as $disProp) {
-			
 					// display the identifier part of an uri
 					if ($disProp == ObjectUri::IDENTIFIER) {
-						
 						$displayValue[] = $object->getUri()->getIdentifier();
 						
 					} else {
