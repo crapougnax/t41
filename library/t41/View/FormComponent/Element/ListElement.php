@@ -22,13 +22,12 @@ namespace t41\View\FormComponent\Element;
  * @version    $Revision: 876 $
  */
 
-use t41\Parameter;
 use t41\ObjectModel;
 use t41\ObjectModel\Property;
 use t41\Backend;
 
 /**
- * t41 Data Object handling a set of properties tied to an object
+ * List element (based on remote values)
  *
  * @category   t41
  * @package    t41_View
@@ -40,8 +39,8 @@ class ListElement extends AbstractElement {
 	
 	/**
 	 * 
-	 * t41_Object_Collection instance used to query values
-	 * @var t41_Object_Collection
+	 * t41\ObjectModel\Collection instance used to query values
+	 * @var t41\ObjectModel\Collection
 	 */
 	protected $_collection;
 	
@@ -54,9 +53,7 @@ class ListElement extends AbstractElement {
 		$this->_collection = $collection;
 		$this->_collection->setBoundaryBatch($this->getParameter('selectmax')+1);
 		if ($this->getParameter('sorting')) {
-		
 			if (! is_array($this->getParameter('sorting'))) {
-					
 				$sortings = explode(',', $this->getParameter('sorting'));
 				$array = array();
 				foreach ($sortings as $sorting) {
@@ -130,7 +127,7 @@ class ListElement extends AbstractElement {
      		$_do->setUri($uri);
         	Backend::read($_do);
         } else {
-        	$_do = $key->getDataObject();
+        	$_do = $key;//->getDataObject();
         }
 
         return Property::parseDisplayProperty($_do, $this->getParameter('display'));
@@ -158,6 +155,6 @@ class ListElement extends AbstractElement {
 			$class = $this->getCollection()->getClass();
 			$val = new $class($val);
 		}
-		parent::setValue($val);
+		return parent::setValue($val);
 	}
 }
