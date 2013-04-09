@@ -56,4 +56,14 @@ class MediaObject extends BaseObject {
 		}
 		return $this;
 	}
+	
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see \t41\ObjectModel\BaseObject::__toString()
+	 */
+	public function __toString()
+	{
+		return $this->getUri() ? $this->getUri()->__toString() : null;
+	}
 }
