@@ -546,13 +546,28 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
-	
+	/**
+	 * Return the members of the collection in the given format type or as ObjectUri if no type is specified
+	 * @param string $type
+	 * @return array
+	 */
 	public function getMembers($type = ObjectModel::URI)
 	{
 		if (! is_array($this->_members)) {
-			
 			$this->setParameter('memberType', $type);
 			Backend::find($this);
+		} else {
+			$class = $this->getClass();
+			foreach ($this->_members as $key => $member) {
+				if ($type == ObjectModel::MODEL && ! $member instanceof BaseObject) {
+					$this->_members[$key] = new $class($member);
+				} else if($type == ObjectModel::DATA && $member instanceof ObjectUri) {
+					$do = new DataObject($class);
+					$do->setUri($member);
+					Backend::read($do);
+					$this->_members[$key] = $do;
+				}
+			}
 		}
 		
 		return $this->_members;
@@ -581,6 +596,7 @@ class Collection extends ObjectModelAbstract {
 		if (is_null($backend)) $backend = Backend::getDefaultBackend();
 		$this->_max = (integer) Backend::find($this, $backend, true);
 	}
+	
 	
 	public function count(Backend\Adapter\AbstractAdapter $backend = null)
 	{
