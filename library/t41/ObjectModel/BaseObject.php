@@ -485,7 +485,8 @@ abstract class BaseObject extends ObjectModelAbstract {
 	
 	public function __toString()
 	{
-		return sprintf("Redeclare the __toString() method in your '%s' object if you want to display its representation as as string", get_class($this));
+		return $this->getIdentifier();
+		//return sprintf("Redeclare the __toString() method in your '%s' object if you want to display its representation as as string", get_class($this));
 	}
 	
 	
