@@ -325,15 +325,12 @@ HTML;
         $p = '';
         
         // print out rows
-        foreach ($this->_obj->getCollection()->getMembers() as $key => $this->_do) {
-        	
-        	//\Zend_Debug::dump($this->_do); die;
+        foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $key => $this->_do) {
         	$css = $i%2 == 0 ? 'odd' : 'even';
 			$p .= sprintf('<tr data-member="%s" class="%s">', $key, $css);
         	$i++;
 			
 			if ($this->_obj->getParameter('selectable') === true) {
-
 				// make list items selectable
 				$p .= sprintf('<td><input type="checkbox" name="t41_selection[]" value="%s"/></td>'
 							, $this->_do->getUri()->getIdentifier()
@@ -343,18 +340,15 @@ HTML;
 			$altDec = (array) $this->_obj->getParameter('decorators');
 			
             foreach ($this->_obj->getColumns() as $column) {
-
             	if ($column instanceof Element\IdentifierElement) {
             		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
             		continue;
             	}
-            	
             	if ($column instanceof Element\MetaElement) {
             		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
             		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
             		continue;
             	}
-            	
             	$property = $this->_do->getProperty($column->getParameter('property'));
             	$column->setValue($property->getValue());
             	
