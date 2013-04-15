@@ -86,6 +86,9 @@ class CollectionProperty extends AbstractProperty {
 					// @todo also test members not already saved or save before testing !
 				}
 				
+				// $value should contain a property where to store the relation
+				$value->getProperty($this->getParameter('keyprop'))->setValue($this->_parent);
+				
 				$this->_value->addMember($value, $action);
 				break;
 				
@@ -162,7 +165,8 @@ class CollectionProperty extends AbstractProperty {
 			}
 			
 			// query now only if object exists in backend
-			if ($this->_parent->getUri()) $this->_value->find();
+			// populate only with ObjectUri instances for performance sake
+			if ($this->_parent->getUri()) $this->_value->find(ObjectModel::URI);
 		}
 		
 		return parent::getValue();
