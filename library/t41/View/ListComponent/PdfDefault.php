@@ -22,17 +22,11 @@ namespace t41\View\ListComponent;
  * @version    $Revision: 963 $
  */
 
-use t41\View\ListComponent\Element\ColumnElement;
-
+use t41\ObjectModel;
 use t41\ObjectModel\Property\AbstractProperty;
-
-use t41\Core,
-t41\ObjectModel,
-t41\ObjectModel\Property,
-t41\View\Decorator\AbstractPdfDecorator,
-t41\View,
-t41\View\ViewUri,
-t41\View\ListComponent\Element;
+use t41\View\Decorator\AbstractPdfDecorator;
+use t41\View\ViewUri;
+use t41\View\ListComponent\Element;
 
 /**
  * List view object default Web Decorator
@@ -83,7 +77,7 @@ class PdfDefault extends AbstractPdfDecorator {
 	protected $_obj;
 
 	
-    public function render(TCPDF $pdf, $width)
+    public function render(\TCPDF $pdf, $width)
     {
     	// set relevant uri adapter and get some identifiers 
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter) {
@@ -102,11 +96,8 @@ class PdfDefault extends AbstractPdfDecorator {
     	
     	// set query parameters from context
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
-
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			
     			if (! empty($value)) { // @todo also test array values for empty values
-    				
 	    			$this->_obj->setCondition($field, $value);
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
     			}
@@ -115,9 +106,7 @@ class PdfDefault extends AbstractPdfDecorator {
     	
     	// set query sorting from context
         if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
-
         	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			
     			$this->_obj->setSorting($field, $value);
     		}
     	}
@@ -136,7 +125,6 @@ class PdfDefault extends AbstractPdfDecorator {
         //$colsWidth = $colAlignment = array();
         
         foreach ($this->_obj->getColumns() as $key => $column) {
-        	
         	// minimum column width should be based on label width
         	$this->_colsWidth[$key] = strlen($column->getTitle());        	
         	$this->_colsAlignment[$key] = $column->getParameter('align');
@@ -144,9 +132,7 @@ class PdfDefault extends AbstractPdfDecorator {
         
         /* add optional extra columns */
         if ($this->getParameter('extra_cols') > 0) {
-        	
         	for ($i = 0 ; $i < $this->getParameter('extra_cols') ; $i++) {
-        		
         		$this->_colsWidth[] = 10;
         	}
         }
@@ -161,16 +147,13 @@ class PdfDefault extends AbstractPdfDecorator {
         	$rnd = rand(0, $rows->getTotalMembers()-1);
         	
         	// get a random row
-        	if (($data = $rows->getMember($rnd)) === false) continue;
+        	if (($data = $rows->getMember($rnd, ObjectModel::MODEL)) === false) continue;
         		
         	foreach ($this->_obj->getColumns() as $key => $column) {
-                    
         		$property = $data->getProperty($column->getParameter('property'));
         		 
         		if ($column->getParameter('recursion')) {
-        		
         			foreach ($column->getParameter('recursion') as $recursion) {
-        		
         				$property = $property->getValue(ObjectModel::DATA);
         				if ($property) $property = $property->getProperty($recursion);
         			}
@@ -193,7 +176,6 @@ class PdfDefault extends AbstractPdfDecorator {
         
         // adds 50% to cols using less than 5% of total */
         foreach ($this->_colsWidth as $key => $colWidth) {
-        	
         	if ($colWidth > $floor) continue;
         	$this->_colsWidth[$key] = $colWidth * 1.5;
         }
@@ -203,7 +185,6 @@ class PdfDefault extends AbstractPdfDecorator {
         
         // attribute width in percent of total width
         foreach ($this->_colsWidth as $key => $colWidth) {
-        	
         	$this->_colsWidth[$key] = round($width * ($colWidth / $fullLine));
         }
         
@@ -221,7 +202,7 @@ class PdfDefault extends AbstractPdfDecorator {
         //if (! is_null($this->_groups)) $increment += $this->_headerHeight;
         
         /* print data */
-        foreach ($this->_obj->getCollection()->getMembers() as $this->_do) {
+        foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $this->_do) {
         	        
         	/* test if a new page is necessary */
         	if ($pdf->getY() + $increment > $pdf->getPageHeight() - 20) {
@@ -243,7 +224,6 @@ class PdfDefault extends AbstractPdfDecorator {
         		}
         		 
         		if ($column instanceof Element\MetaElement) {
-        	
         			$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
         			$value = $column->getDisplayValue($this->_do);
 
@@ -252,9 +232,7 @@ class PdfDefault extends AbstractPdfDecorator {
         			$property = $this->_do->getProperty($column->getParameter('property'));
         		 
 	        		if ($column->getParameter('recursion')) {
-        	
     	    			foreach ($column->getParameter('recursion') as $recursion) {
-        	
         					$property = $property->getValue(ObjectModel::DATA);
         					if ($property) $property = $property->getProperty($recursion);
         				}
@@ -269,9 +247,7 @@ class PdfDefault extends AbstractPdfDecorator {
         	
             /* display optional extra cols */
         	if ($this->getParameter('extra_cols') > 0) {
-        	
         		for ($i = 0 ; $i < $this->getParameter('extra_cols') ; $i++) {
-
                		$pdf->Cell($this->_colsWidth[$dcols+$i], $this->_cellHeight, null, 1, (int) ($i+$index+1 == $cols));
         		}
         	}
@@ -283,7 +259,7 @@ class PdfDefault extends AbstractPdfDecorator {
      * Draw table header
      * @param TCPDF $pdf
      */
-    protected function _drawHeaderRow(TCPDF $pdf)
+    protected function _drawHeaderRow(\TCPDF $pdf)
     {
 /*    	if (count($this->_obj->getGroups()) > 0) {
     		
@@ -310,12 +286,10 @@ class PdfDefault extends AbstractPdfDecorator {
         
         /* display optional extra cols */
         if ($this->getParameter('extra_cols') > 0) {
-        	
         	/* number of data columns, useful to retrieve extra ones */
        	 	$dcols = count($this->_obj->getColumns());        	
         	
        	 	for ($i = 0 ; $i < $this->getParameter('extra_cols') ; $i++) {
-
         		$pdf->Cell($this->_colsWidth[$dcols+$i], 10, null, 1, (int) ($i+$index+1 == $this->_cols), 'L', 1);
         	}
         }
@@ -328,18 +302,15 @@ class PdfDefault extends AbstractPdfDecorator {
      * Draw groups upper row if groups have been defined
      * @param TCPDF $pdf
      */
-    protected function _drawGroupRow(TCPDF $pdf)
+    protected function _drawGroupRow(\TCPDF $pdf)
     {
     	if (is_null($this->_groups)) {
     	
     		$this->_groups = $this->_obj->getGroups();
     		
     		foreach ($this->_groups as $key => $group) {
-    			
     			foreach ($this->_colsWidth as $col => $width) {
-    				
     				if ($col >= $group['from'] && $col <= $group['to']) {
-    					
     					$this->_groups[$key]['width'] += $width;
     				}
     			}
