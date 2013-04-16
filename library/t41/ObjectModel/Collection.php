@@ -522,27 +522,35 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
-	public function getMember($pos = null)
+	/**
+	 * Return a member from is numeric key
+	 * @param integer $pos
+	 * @param string $type
+	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
+	 */
+	public function getMember($pos = null, $type = null)
 	{
 		if (! is_array($this->_members) || count($this->_members) == 0) {
-
 			return false;
 		}
 		
 		switch ($pos) {
 
 			case self::POS_FIRST:
-				return $this->_members[0];
+				$member = $this->_members[0];
 				break;
 				
 			case self::POS_LAST:
-				return $this->_members[count($this->_members)-1];
+				$member = $this->_members[count($this->_members)-1];
 				break;
 				
 			default:
-				return isset($this->_members[$pos]) ? $this->_members[$pos] : $this->_members[0];
+				// @todo should we return false if member is missing?
+				$member = isset($this->_members[$pos]) ? $this->_members[$pos] : $this->_members[0];
 				break;
 		}
+		
+		return is_null($type) ? $member : $this->_castMember($member, $type);
 	}
 	
 	
@@ -550,6 +558,7 @@ class Collection extends ObjectModelAbstract {
 	 * Return the members of the collection in the given format type or as ObjectUri if no type is specified
 	 * @param string $type
 	 * @return array
+	 * @todo decide wether the member casting is saved in array or not
 	 */
 	public function getMembers($type = ObjectModel::URI)
 	{
@@ -574,6 +583,45 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 
+	/**
+	 * Convert the given member to the given type
+	 * @param object $member
+	 * @param string $toType
+	 * @return \t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
+	 */
+	protected function _castMember($member, $toType)
+	{
+		// Don't cast if it's already done
+		if (($toType == ObjectModel::DATA && $member instanceof DataObject)
+		|| ($toType == ObjectModel::MODEL && $member instanceof BaseObject)
+		|| ($toType == ObjectModel::URI && $member instanceof ObjectUri)) {
+			return $member;
+		}
+		
+		$class = $this->getClass();
+		
+		switch ($toType) {
+			
+			case ObjectModel::DATA:
+				$do = new DataObject($class);
+				$do->setUri($member);
+				Backend::read($do);
+				$member = $do;
+				break;
+				
+			case ObjectModel::MODEL:
+				$member = new $class($member);
+				break;
+				
+			case ObjectModel::URI:
+				$member = $member->getUri();
+				break;
+		}
+		
+		return $member;
+	}
+	
+	
 	public function getTotalMembers()
 	{
 		return is_array($this->_members) ? count($this->_members) : null;
