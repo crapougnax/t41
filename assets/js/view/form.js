@@ -123,7 +123,7 @@ window.t41.view.form = function(id,obj,form) {
 			return false;
 		} else {
 			formdata['uuid'] = this.form.uuid;
-			//formdata['uuid'] = this.obj.uuid;
+			formdata['objuuid'] = this.obj.uuid;
 			if (this.form.params.post_ok) {
 				formdata['post_ok'] = this.form.params.post_ok;
 			}
@@ -149,14 +149,18 @@ window.t41.view.form = function(id,obj,form) {
 		this.redirects.redirect_ok = window.location.href;
 		this.re = true;
 		this.save(obj);
-	}
+	};
 	
 	
+	/**
+	 * This function is call after form was saved and receive a status code and the saved object
+	 * Optional success and failure post actions are then processed and configured redirection is executed
+	 */
 	this.retSave = function(obj) {
 		if (obj.status == t41.core.status.ok) {
 			// if a post function has been declared, execute it
 			if (this.posts.ok && typeof this.posts.ok == 'function') {
-				this.posts.ok.call(obj.data); // pass the server response as context
+				this.posts.ok.call(this, obj.data); // pass the return object as parameter and the form as context
 			}
 			var params = this.redirects && this.redirects.redirect_ok ? {defer:true} : {timer:10};
 			if (this.re == false) {

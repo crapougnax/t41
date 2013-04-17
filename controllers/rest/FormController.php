@@ -7,7 +7,6 @@
  * @version 
  */
 
-use t41\Core;
 use	t41\Backend;
 use t41\View\FormComponent;
 
@@ -34,14 +33,11 @@ class Rest_FormController extends Rest_DefaultController {
 			$result = $this->_obj->save($this->_post);
 
 			if ($result === false) {
-				var_dump($this->_obj->status);
 				$this->context['debug'] = Backend::getLastQuery();
 				$this->_status = 'NOK';
 
 			} else {
-				if (is_array($result)) {
-					$this->_data = $result;
-				}
+				$this->_data = $this->_obj->getSource()->reduce();
 			}
 		
 		} catch (\Exception $e) {
