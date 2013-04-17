@@ -167,7 +167,16 @@ window.t41.view.form = function(id,obj,form) {
 				new t41.view.alert("Sauvegarde effectuée", params);
 			}
 			if (this.redirects && this.redirects.redirect_ok){
-				window.location.href = this.redirects.redirect_ok;
+				if (typeof this.redirects.redirect_ok != 'string') {
+					var baseurl = this.redirects.redirect_ok[0];
+					for (var i in this.redirects.redirect_ok[1]) {
+						baseurl += '/' + this.redirects.redirect_ok[1][i] + '/';
+						baseurl += jQuery('#' + this.redirects.redirect_ok[1][i]).val();
+					}
+					window.location.href = baseurl;
+				} else {
+					window.location.href = this.redirects.redirect_ok;
+				}
 			}
 		} else {
 			var params = this.redirects && this.redirects.redirect_nok ? {defer:true} : {timer:10};
