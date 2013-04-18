@@ -104,7 +104,8 @@ window.t41.view.form = function(id,obj,form) {
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
 			}
 			
-			if (value && field.type == t41.view.currency) {
+			// @todo replace currencyElement with constant
+			if (value && field.type == 'currencyElement') {
 				value = value.replace(',','.');
 			}
 			
