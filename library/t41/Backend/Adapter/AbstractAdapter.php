@@ -57,7 +57,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	
 	/**
-	 * Ressource du backend
+	 * Backend Adapter Resource (typically DB connection)
 	 *
 	 * @var mixed
 	 */
@@ -211,6 +211,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 	{
 		return $this->_uri->getAlias();
 	}
+	
+	
+	public function getResource()
+	{
+		return $this->_ressource;
+	}
 
 	
 	public function find(ObjectModel\Collection $collection, $returnCount = false)
@@ -219,7 +225,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	}
 	
 	
-	public function returnsDistinct(ObjectModel\Collection $collection, PropertyAbstract $property)
+	public function returnsDistinct(ObjectModel\Collection $collection, AbstractProperty $property)
 	{
 		return array();
 	}
@@ -294,18 +300,20 @@ abstract class AbstractAdapter implements AdapterInterface {
 	 */
 	protected function _populateCollection(array $ids, ObjectModel\Collection $collection, ObjectModel\ObjectUri $uriBase)
 	{
+		if (count($ids) == 0) {
+			return array();
+		}
+		
 		$class = $collection->getDataObject()->getClass();
 
 		// populate array with relevant objects type
 		$array = array();
 		
 		if ($collection->getParameter('memberType') != ObjectModel::URI) {
-			
 			$do = clone $collection->getDataObject();
 		}
 
-		foreach ($ids as $id) {
-			
+		foreach ($ids as $key => $id) {
 			$uri = clone $uriBase;
 			$uri->setUrl($uri->getUrl() . $id)->setIdentifier($id);
                 
@@ -331,9 +339,8 @@ abstract class AbstractAdapter implements AdapterInterface {
             		break;
             }
             
-            $array[] = $obj;
+            $array[$key] = $obj;
 		}
-
 		return $array;
 	}
 	
