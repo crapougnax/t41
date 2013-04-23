@@ -215,6 +215,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	public function getResource()
 	{
+		$this->_connect();
 		return $this->_ressource;
 	}
 
@@ -248,6 +249,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 	public function transactionExists()
 	{
 		return $this->_transaction;
+	}
+	
+	
+	protected function _connect()
+	{
+		return true;
 	}
 	
 	
