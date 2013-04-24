@@ -31,6 +31,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 	{
 		try {
 			// test object uri, if empty, object is new or faulty
+			// @todo mix this with ObjectModel::populate()
 				
 				// walk through POST data
 				foreach ($this->_post as $key => $val) {
@@ -218,7 +219,9 @@ class Rest_ObjectController extends Rest_DefaultController {
 			
 			// @todo implement cache mechanism for the following collection
 			$collection = new Collection($property->getParameter('instanceof'));
-			$collection->having($this->_post['srcProperty']['id'])->equals($this->_post['srcProperty']['val']);
+			foreach ($this->_post['srcProperty'] as $key => $val) {
+				$collection->having($key)->equals($val);
+			}
 			$collection->setBoundaryBatch(50);
 			$collection->find(ObjectModel::MODEL);
 			

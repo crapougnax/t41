@@ -207,9 +207,12 @@ window.t41.view.form = function(id,obj,form) {
 window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	
 	/**
-	 * The element to get value from
+	 * The element(s) to get value from
 	 */
-	this.src  = jQuery('#' + src);
+	this.src  = src.split(',');
+	for (var i in this.src) {
+		this.src[i] = this.src[i].split(':'); // extract additional fixed value for query
+	}
 	
 	/**
 	 * The element which values are refreshed
@@ -229,9 +232,17 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	
 	this.refresh = function() {
 		this.prepareDest();
+		var srcProps = {};
+		for (var i in this.src) {
+			var values = {0:jQuery('#' + this.src[i][0]).val()};
+			if (this.src[i][1]) {
+				values[1] = this.src[i][1];
+			}
+			srcProps[this.src[i][0]] = values;
+		}
 		var data = {
 					uuid:this.uuid,
-					srcProperty:{id:this.src.attr('id'),val:this.src.val()},
+					srcProperty:srcProps,
 					destProperty:{id:this.dest.attr('id'),val:this.dest.val()}
 				   };
 		t41.core.call({action:'object/depend', data:data, callback:jQuery.proxy(this,'applyRefresh')});
@@ -256,7 +267,11 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 		} 
 	};
 	
-	t41.view.bindLocal(this.src, 'change', jQuery.proxy(this, 'refresh'));
+	var element = [];
+	for (var i in this.src) {
+		element[i] = this.src[i][0];
+	}
+	t41.view.bindLocal(element, 'change', jQuery.proxy(this, 'refresh'));
 };
 
 
@@ -278,6 +293,7 @@ window.t41.view.form.streetNumber = function(id) {
 			jQuery('#' + this.id + '_ext').prop('disabled',true);
 		}
 		jQuery('#' + this.id).val(value);
+		t41.view.customEvent(this.id, 'change');
 	};
 	
 	

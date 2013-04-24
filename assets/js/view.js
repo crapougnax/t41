@@ -165,7 +165,7 @@ if (! window.t41.view) {
 	
 	
 	/**
-	 * Bind an element to a function or class method
+	 * Bind one or more element(s) to a function or class method
 	 * @param element
 	 * @param event
 	 * @param action
@@ -174,7 +174,7 @@ if (! window.t41.view) {
 	window.t41.view.bindLocal = function(element, event, action, obj) {
 		
 		if (typeof element == 'string' && element.indexOf(',') < 0) {
-			var element = jQuery('#' + element);
+			var element = '#' + element;
 		}
 		
 		if (obj && typeof obj == 'string') {
@@ -185,7 +185,13 @@ if (! window.t41.view) {
 			var action = eval(action);
 		}
 
-		jQuery(element).live(event, {caller:obj}, action);
+		if (Object.prototype.toString.call(element) === '[object Array]') {
+			for (var i in element) {
+				jQuery('#' + element[i]).on(event, {caller:obj}, action);
+			}
+		} else {
+			jQuery(element).on(event, {caller:obj}, action);
+		}
 		return element;
 	};
 	
