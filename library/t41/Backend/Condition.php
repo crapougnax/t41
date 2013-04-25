@@ -22,9 +22,10 @@ namespace t41\Backend;
  * @version    $Revision: 839 $
  */
 
-use t41\ObjectModel,
-	t41\ObjectModel\ObjectUri,
-	t41\ObjectModel\Property;
+use t41\ObjectModel;
+use	t41\ObjectModel\ObjectUri;
+use	t41\ObjectModel\Property;
+use t41\ObjectModel\Property\CollectionProperty;
 
 /**
  * Simple class to handle query conditions on objects collections
@@ -40,8 +41,6 @@ use t41\ObjectModel,
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-use t41\DataObject;
-
 class Condition {
 	
 	
@@ -125,7 +124,7 @@ class Condition {
 	/**
 	 * Recursive condition (condition applied to a property of the condition property)
 	 * 
-	 * @var t41_Condition
+	 * @var \t41\Backend\Condition
 	 */
 	protected $_condition;
 	
@@ -168,16 +167,13 @@ class Condition {
 	public function __construct(ObjectModel\Property\AbstractProperty $property = null, $value = null, $operator = self::OPERATOR_EQUAL)
 	{
 		if (! is_null($property)) {
-
 			$this->setProperty($property);
 		}
 		
 		if (! is_null($value)) {
-
 			$this->setValue($value);
 		
 			if (! is_null($operator)) {
-			
 				$this->setOperator($operator);
 			}
 			
@@ -190,7 +186,7 @@ class Condition {
 	 * Sets the property instance on which to enforce condition
 	 * 
 	 * @param t41_Property_Interface $property
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function setProperty(\t41\ObjectModel\Property\AbstractProperty $property)
 	{
@@ -244,7 +240,7 @@ class Condition {
 		
 	
 	/**
-	 * Returns the current nested t41_Condition child instance
+	 * Returns the current nested \t41\Backend\Condition child instance
 	 * or null
 	 * 
 	 * @return t41\Backend\Condition
@@ -281,7 +277,7 @@ class Condition {
 	 * Set a new condition on property given id or throws an exception if property doesn't exist
 	 *  
 	 * @param string $name
-	 * @param return t41_Condition
+	 * @param return \t41\Backend\Condition
 	 * @throws t41_Exception
 	 */
 	public function having($name)
@@ -293,14 +289,12 @@ class Condition {
 			return $this->_condition;
 			
 		} else if (! $this->_property instanceof Property\ObjectProperty && ! $this->_property instanceof Property\CollectionProperty) {
-
 			throw new Exception("CONDITION_INCORRECT_PROPERTY");
 		}
 		
 		$do = ObjectModel\DataObject::factory($this->_property->getParameter('instanceof'));
 		
 		if (($property = $do->getProperty($name)) !== false) {
-
 			$this->_condition = new self($property);
 			return $this->_condition;
 		}
@@ -314,7 +308,7 @@ class Condition {
 	 * 
 	 * @param mixed $value
 	 * @param mixed $operator
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function where($value, $operator, $mode = self::MODE_AND)
 	{
@@ -329,7 +323,7 @@ class Condition {
 	 * Set a new 'is equal to' clause
 	 * 
 	 * @param mixed $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function equals($value, $mode = self::MODE_AND)
 	{
@@ -340,7 +334,7 @@ class Condition {
 	/**
 	 * Set a new 'is different from' clause 
 	 * @param mixed $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function notEquals($value)
 	{
@@ -352,7 +346,7 @@ class Condition {
 	 * Set a new 'is greater than' clause
 	 * 
 	 * @param mixed $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function greater($value)
 	{
@@ -364,7 +358,7 @@ class Condition {
 	 * Set à new 'is greater than or equal to' clause
 	 * 
 	 * @param mixed $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function greaterOrEquals($value)
 	{
@@ -376,7 +370,7 @@ class Condition {
 	 * Set a new 'is lower than' clause
 	 * 
 	 * @param mixed value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function lower($value)
 	{
@@ -388,7 +382,7 @@ class Condition {
 	 * Set a new 'lower than or equals to' clause
 	 * 
 	 * @param mixed value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function lowerOrEquals($value)
 	{
@@ -401,7 +395,7 @@ class Condition {
 	 * 
 	 * @param integer $floor
 	 * @param integer $ceil
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function between($floor, $ceil)
 	{
@@ -414,7 +408,7 @@ class Condition {
 	 * Set  a new 'begins with' clause
 	 * 
 	 * @param string $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function beginsWith($value)
 	{
@@ -426,7 +420,7 @@ class Condition {
 	 * Set a new 'ends with' clause
 	 * 
 	 * @param string $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function endsWith($value)
 	{
@@ -438,7 +432,7 @@ class Condition {
 	 * Set a new 'contains' clause
 	 * 
 	 * @param string $value
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function contains($value)
 	{
@@ -447,8 +441,27 @@ class Condition {
 	
 	
 	/**
+	 * Set a new 'hasMembers' clause on a collection property
+	 * @param number $value
+	 * @throws Exception
+	 * @return \t41\Backend\Condition>
+	 */
+	public function hasMembers($value = 0)
+	{
+		if (! $this->_property instanceof CollectionProperty) {
+			throw new Exception("hasMembers() condition is only applicable on CollectionProperty object");
+		}
+		$operator = self::OPERATOR_EQUAL;
+		if ($value != 0) {
+			$operator |= self::OPERATOR_GTHAN;
+		}
+		return $this->where($value, $operator);
+	}
+	
+	
+	/**
 	 * Prepare next clause to use OR mode
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function orMode()
 	{
@@ -459,7 +472,7 @@ class Condition {
 	
 	/**
 	 * Prepare next clause to use AND mode (default behavior)
-	 * @return t41_Condition
+	 * @return \t41\Backend\Condition
 	 */
 	public function andMode()
 	{

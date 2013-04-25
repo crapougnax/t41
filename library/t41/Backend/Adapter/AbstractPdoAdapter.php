@@ -71,8 +71,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	 */
 	protected $_database;	
 	
+	
 	// test dataobject
 	protected $_do = array();
+	
 	
 	/**
 	 * Array of joined tables 
@@ -96,7 +98,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		if (isset($url[0])) {
 			$this->_database = $url[0];
-			
 		} else {
 			throw new Exception('MISSING_DBNAME_PARAM');
 		}
@@ -165,7 +166,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			if (true) {
 				throw new Exception("Error Creating Record in $table : " . $e->getMessage());
 			} else {
-				
 				return false;
 			}
 			
@@ -183,11 +183,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// inject new ObjectUri object in data object
 		$do->setUri($uri);
 		
-		
-		
 		/* get collection-handling properties (if any) and process them */
 		foreach ($do->getProperties() as $property) {
-			
 			if (! $property instanceof Property\CollectionProperty) {
 				continue;
 			}
@@ -394,7 +391,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$table = $this->_getTableFromUri($uri);
 		
 		if (! $table) {
-		
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
@@ -443,13 +439,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			/* @var $obj t41_Backend_Key */
 			foreach ($pkey as $obj) {
-				
 				$composite[] = sprintf('TRIM(%s)', $table . '.' . $obj->getName());
 			}
 			$pkey = sprintf("%s", implode(',', $composite));
 			
 		} else {
-			
 			$pkey = $table . '.' . $pkey;
 		}
 		
@@ -558,6 +552,33 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$this->_alreadyJoined[$jtable] = $uniqext;
 				$jtable = $uniqext;
 				
+			} else if ($property instanceof Property\CollectionProperty) {
+				
+				// handling of conditions based on collection limited to hasMembers()
+				// @todo refactor and extend to other possibilities
+				
+				$field = $pkey;
+				$leftkey = $property->getParameter('keyprop');
+				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
+				$uniqext = $jtable . '__joined_for__' . $leftkey;
+				$join = sprintf("%s.%s = %s", $uniqext, $leftkey, $pkey);
+				$select->joinLeft($jtable . " AS $uniqext", $join, array());
+				$this->_alreadyJoined[$jtable] = $uniqext;
+
+				$clause = $conditionArray[0]->getClauses();
+				if ($clause[0]['value'] == Condition::NO_VALUE) {
+					$field = sprintf("%s.%s", $uniqext, 'id');
+					$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
+					$select->where($statement);
+				} else {
+					$field = new \Zend_Db_Expr(sprintf("COUNT(%s.%s)", $uniqext, $leftkey));
+					$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
+					$select->having($statement);
+					$select->group($pkey);
+				}
+				
+				continue;
+			
 			} else {
 				$field = $property->getId();
 			}
@@ -606,65 +627,66 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 		}
 		
-		if ($returnCount != true) {
-			
-			foreach ($collection->getSortings() as $sorting) {
+		// Adjust query based on returnCount
+		if ($returnCount) {
+		
+			if (is_array($returnCount)) {
 
+				// return count on grouped columns
+				foreach ($returnCount as $field) {
+					if ($this->_mapper) {
+						$class = $field->getParent() ? $field->getParent()->getId() : $collection->getDataObject()->getClass();
+						$field = $this->_mapper->propertyToDatastoreName($class, $field->getId());
+					} else {
+						$field = $field->getId();
+					}
+					$select->group($field);
+					$select->columns($field);
+				}
+			} else {
+				$select->reset('group');
+			}
+		} else {
+				
+			foreach ($collection->getSortings() as $sorting) {
 				if ($sorting[0]->getId() == ObjectUri::IDENTIFIER) {
 					$id = Backend::DEFAULT_PKEY;
 					$select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
 					continue;
 				}
-				
+		
 				$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
 				$stable = $this->_getTableFromClass($class);
-				
+		
 				if ($this->_mapper) {
 					$sfield = $this->_mapper->propertyToDatastoreName($class, $sorting[0]->getId());
-			
 				} else {
-					
 					$field = $sorting[0];
 					$sfield = $field->getId();
 				}
-			
+					
 				// add a left join if the sorting field belongs to a table not yet part of the query
 				if ($stable != $table && ! in_array($stable, $this->_alreadyJoined)) {
-					
+						
 					// get the property id from the class name
 					$tfield = $collection->getDataObject()->getObjectPropertyId($class);
-					
+						
 					$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
 					$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
-					
+						
 					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $stable, $rightkey);
 					$select->joinLeft($stable, $join, array());
-					
+						
 					$this->_alreadyJoined[] = $jtable;
 				}
-				
+		
 				$select->order(new \Zend_Db_Expr($stable . '.' . $sfield . ' ' . $sorting[1]));
 			}
 		
 			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
 		}
 		
-		if (is_array($returnCount)) {
-
-			// return count on grouped columns
-			foreach ($returnCount as $field) {
-				if ($this->_mapper) {
-					$class = $field->getParent() ? $field->getParent()->getId() : $collection->getDataObject()->getClass();
-					$field = $this->_mapper->propertyToDatastoreName($class, $field->getId());
-				} else {
-					$field = $field->getId();
-				}
-				$select->group($field);
-				$select->columns($field);
-			}
-		}
-		
-		//echo $select; die;
+		//echo $select;
 
 		$result = array();
 		$context = array('table' => $table);
