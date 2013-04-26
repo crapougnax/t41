@@ -255,16 +255,15 @@ class Collection extends ObjectModelAbstract {
 	{
 		// temp fix - @todo recursion
 		if (strstr($property, '.') !== false) {
-			
 			$parts = explode('.', $property);
 			$property = $parts[0];
 		}
 		
 		foreach ($this->_conditions as $key => $condition) {
-			
 			if ($condition[0]->getProperty()->getId() == $property) {
-				
 				unset($this->_conditions[$key]);
+				$this->setParameter('populated', false);
+				$this->_members = null;
 			}
 		}
 	}
@@ -430,7 +429,7 @@ class Collection extends ObjectModelAbstract {
 			return $returnCount ? 0 : array();
 		}
 		
-		$subArray = $this->_members;
+		$subArray = $this->_castMembers($this->_members, ObjectModel::MODEL);
 		
 		foreach ($conditions as $propertyName => $propertyVal) {
 			if ($propertyVal instanceof ObjectModel\BaseObject || $propertyVal instanceof ObjectModel\DataObject  || $propertyVal instanceof ObjectModel\ObjectUri) {
@@ -622,6 +621,15 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	protected function _castMembers(array $members, $toType)
+	{
+		foreach ($members as $key => $member) {
+			$members[$key] = $this->_castMember($member, $toType);
+		}
+		return $members;
+	}
+	
+	
 	public function getTotalMembers()
 	{
 		return is_array($this->_members) ? count($this->_members) : null;
@@ -782,14 +790,11 @@ class Collection extends ObjectModelAbstract {
 						break;
 				}
 			} else {
-				
 				throw new Exception("Missing mandatory argument for '$m' magic call");
 			}
-			
 			return $calc;
 			
 		} else {
-
 			throw new Exception(array("OBJECT_UNKNOWN METHOD", $m));
 		}
 	}
@@ -808,11 +813,8 @@ class Collection extends ObjectModelAbstract {
 			
 			$res2 = $member->save($backend);
 			if ($res2 === true) {
-				
 				unset($this->_spool['save'][$key]);
-				
 			} else {
-				
 				$res = false;
 			}
 		}
@@ -821,11 +823,8 @@ class Collection extends ObjectModelAbstract {
 				
 			$res2 = $member->delete($backend);
 			if ($res2 === true) {
-		
 				unset($this->_spool['delete'][$key]);
-		
 			} else {
-		
 				$res = false;
 			}
 		}
