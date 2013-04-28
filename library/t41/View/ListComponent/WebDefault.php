@@ -91,11 +91,19 @@ class WebDefault extends AbstractWebDecorator {
 	protected $_do;
 	
 	
+	protected $_key;
+	
+	protected $_uuid;
+	
+	
     public function render()
     {
     	View::addCoreLib(array('style.css','buttons.css','sprites.css'));
     	View::addCoreLib(array('core.js','view.js','view:alert.js'));
     	$this->_collection = $this->_obj->getCollection();
+    	
+    	$tmp = $this->_obj->reduce();
+    	$this->_uuid = $tmp['uuid'];
     	
     	// set relevant uri adapter and get some identifiers 
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter ) {
@@ -182,6 +190,7 @@ class WebDefault extends AbstractWebDecorator {
     {
     	$params = $button->getDecoratorParams();
     	$params['size'] = 'medium';
+    	$params['data'] = array('member' => $this->_key, 'uuid' => $this->_uuid);
     	$deco = View\Decorator::factory($button, $params);
     	return $deco->render();
     }
@@ -325,9 +334,9 @@ HTML;
         $p = '';
         
         // print out rows
-        foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $key => $this->_do) {
+        foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $this->_key => $this->_do) {
         	$css = $i%2 == 0 ? 'odd' : 'even';
-			$p .= sprintf('<tr data-member="%s" class="%s">', $key, $css);
+			$p .= sprintf('<tr data-member="%s" class="%s">', $this->_key, $css);
         	$i++;
 			
 			if ($this->_obj->getParameter('selectable') === true) {

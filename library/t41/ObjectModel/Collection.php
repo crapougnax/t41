@@ -190,20 +190,16 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function removeMember(ObjectModel\BaseObject $object)
 	{
-		$uri = $object->getUri()->__toString();
+		$uri = $object instanceof ObjectUri ? $object->__toString() : $object->getUri()->__toString();
 		
-		foreach ($this->_members as $key => $member) {
-			
-			if ($member == $object || $member->getUri()->__toString() == $uri) {
-				
-				$this->_spool['delete'][] = $this->_members[$key];
-				
+		foreach ($this->getMembers(ObjectModel::MODEL) as $key => $member) {
+			if ($member === $object || $member->getUri()->__toString() == $uri) {
+				$this->_spool['delete'][] = $member;
 				$this->_members[$key] = null;
 				unset($this->_members[$key]);
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
@@ -386,9 +382,6 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function find($memberType = null, Adapter\AbstractAdapter $backend = null)
 	{
-	//	$bt = debug_backtrace();
-	//	\Zend_Debug::dump('find() sur ' . $this->getClass() . ' demandé par ' . $bt[1]['class'] . '::' . $bt[1]['function'] . '() fichier ' . $bt[1]['file'] . ' ligne ' . $bt[1]['line']);
-		
 		if ($memberType) {
 			$prevMemberType = $this->getParameter('memberType');
 			$this->setParameter('memberType', $memberType);
@@ -405,7 +398,6 @@ class Collection extends ObjectModelAbstract {
 		}
 		
 		if ($res === false) {
-			
 			return false;
 		}
 		
@@ -559,12 +551,14 @@ class Collection extends ObjectModelAbstract {
 	 * @return array
 	 * @todo decide wether the member casting is saved in array or not
 	 */
-	public function getMembers($type = ObjectModel::URI)
+	public function getMembers($type = ObjectModel::MODEL)
 	{
+		// if collection has not been populated yet, do it now with $type as param
 		if (! is_array($this->_members)) {
-			$this->setParameter('memberType', $type);
-			Backend::find($this);
+			$this->find($type);
+			return $this->_members;
 		} else {
+			return $this->_castMembers($this->_members, $type);
 			$class = $this->getClass();
 			foreach ($this->_members as $key => $member) {
 				if ($type == ObjectModel::MODEL && ! $member instanceof BaseObject) {
@@ -574,6 +568,8 @@ class Collection extends ObjectModelAbstract {
 					$do->setUri($member);
 					Backend::read($do);
 					$this->_members[$key] = $do;
+				} else {
+					$this->_members[$key] = $member instanceof ObjectUri ? $member : $member->getUri();
 				}
 			}
 		}

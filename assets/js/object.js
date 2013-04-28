@@ -225,4 +225,39 @@ if (! window.t41.object) {
 			this.uuid = param;
 		}
 	};
+	
+	
+	window.t41.object.delete = function() {
+		var src = t41.view.caller;
+		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
+		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
+
+		t41.view._alert = t41.view.alert.confirm("Veuillez confirmer la suppression",{confirm:t41.object.retDelete});
+	};
+	
+	
+	window.t41.object.retDelete = function(obj) {
+		if (obj && obj.status) {
+			switch (obj.status) {
+			
+				case t41.core.status.ok:
+					//new t41.view.alert("Suppression effectuée");
+					jQuery(t41.view._currentDomElem).remove();
+					break;
+				
+				default:
+					new t41.view.alert("Erreur à la suppression");
+					break;
+			}
+			return;
+		}
+		
+		t41.view._alert.hide();
+		
+		t41.core.call({
+						action:'collection/delete', 
+						data:t41.view._data
+					 });
+	};
+
 }

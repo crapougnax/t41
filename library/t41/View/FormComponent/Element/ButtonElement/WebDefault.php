@@ -22,7 +22,6 @@ namespace t41\View\FormComponent\Element\ButtonElement;
  */
 
 use	t41\View,
-	t41\Parameter,
 	t41\View\ViewUri,
 	t41\ObjectModel\ObjectUri,
 	t41\View\Decorator\AbstractWebDecorator;
@@ -70,24 +69,19 @@ class WebDefault extends AbstractWebDecorator {
 			$args = array();
 			
 			foreach ((array) $this->_obj->getParameter('identifiers') as $key => $identifier) {
-				
 				$identifierKey = is_numeric($key) ? $identifier : $key;
 				$args[$identifierKey] = $data[$identifier];
 			}
-			
 			$onclick  = "document.location='" . "/"; //$this->_obj->getUri();
 			$onclick .= (count($args) > 0) ? $adapter->makeUri($args, true) . "'" : "'";
 		}
 		
 		if ($this->_obj->getParameter('disabled')) {
-			
 			$class[] = 'disabled';
 		}
 		
 		if ($this->getParameter('pairs')) {
-			
 			foreach ($this->getParameter('pairs') as $key => $val) {
-				
 				$extraHtml[] = sprintf('%s="%s"', $key, $val);
 			}
 		}
@@ -97,6 +91,10 @@ class WebDefault extends AbstractWebDecorator {
 		}			
 		
 		$value = $this->getParameter('nolabel') ? '' : $this->_escape($this->_obj->getTitle());
+		
+		foreach ((array) $this->getParameter('data') as $key => $val) {
+			$extraHtml[] = sprintf('data-%s="%s"', $key, $val);
+		}
 					
 		$html = sprintf('<a class="%s" id="%s" data-help="%s" %s><span class="%s"></span>%s</a>'
 						, implode(' ', $class)

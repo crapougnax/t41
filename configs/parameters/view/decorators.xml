@@ -75,7 +75,31 @@
 					</parameter>
 					<parameter id="sortable">
 						<type>boolean</type>
-					<defaultvalue>true</defaultvalue>
+						<defaultvalue>true</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
+			<decorator id="WebGrid" extends="\t41\View\Decorator\AbstractWebDecorator">
+				<parameters>
+					<parameter id="paginator">
+						<type>boolean</type>
+						<defaultvalue>true</defaultvalue>
+					</parameter>
+					<parameter id="sortable">
+						<type>boolean</type>
+						<defaultvalue>true</defaultvalue>
+					</parameter>
+					<parameter id="hasupdate">
+						<type>any</type>
+						<defaultvalue>false</defaultvalue>
+					</parameter>
+					<parameter id="hasdelete">
+						<type>any</type>
+						<defaultvalue>false</defaultvalue>
+					</parameter>
+					<parameter id="hascreate">
+						<type>any</type>
+						<defaultvalue>false</defaultvalue>
 					</parameter>
 				</parameters>
 			</decorator>
@@ -108,6 +132,9 @@
 					<parameter id="nolabel">
 						<type>boolean</type>
 						<defaultvalue>false</defaultvalue>
+					</parameter>
+					<parameter id="data">
+						<type>array</type>
 					</parameter>
 				</parameters>
 		</decorator>

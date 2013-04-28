@@ -22,20 +22,15 @@ namespace t41\View;
  * @version    $Revision: 879 $
  */
 
-use t41\ObjectModel\Property\MediaProperty;
-use t41\ObjectModel\Property\IdentifierProperty;
 use t41\ObjectModel\ObjectUri;
-use t41\Backend;
 use t41\ObjectModel\Property\CurrencyProperty;
 use t41\View\ListComponent\Element\MetaElement;
-use t41\View\ListComponent\Element\ColumnElement;
-use t41\View\FormComponent\Element\ListElement;
 
-use t41\View,
-	t41\ObjectModel,
-	t41\ObjectModel\Property,
-	t41\View\ListComponent\Element,
-	t41\View\FormComponent\Element\ButtonElement;
+use t41\ObjectModel;
+use t41\ObjectModel\Property;
+use t41\View\ListComponent\Element;
+use t41\View\FormComponent\Element\ButtonElement;
+use t41\Core\Registry;
 
 /**
  * Class providing data list objects
@@ -202,7 +197,6 @@ class ListComponent extends ViewObject {
     	
     	$button->setLink($link);
     	if (is_array($params)) {
-    		
     		$button->setDecoratorParams($params);
     	}
     	    	
@@ -213,7 +207,6 @@ class ListComponent extends ViewObject {
     protected function _addEvent($scope, $button = null)
     {
     	if (! is_array($this->_events[$scope])) {
-    		
     		$this->_events[$scope] = array();
     	}
     	$this->_events[$scope][] = $button;
@@ -229,6 +222,7 @@ class ListComponent extends ViewObject {
     
     public function reduce(array $params = array(), $cache = true)
     {
-    	return array_merge(parent::reduce($params), array('obj' => $this->_collection->reduce($params, $cache)));
+    	$uuid = Registry::set($this, null, true);
+    	return array_merge(parent::reduce($params), array('uuid' => $uuid, 'obj' => $this->_collection->reduce($params, $cache)));
     }
 }
