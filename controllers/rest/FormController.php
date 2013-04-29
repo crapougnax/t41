@@ -9,6 +9,7 @@
 
 use	t41\Backend;
 use t41\View\FormComponent;
+use t41\ObjectModel\ObjectUri;
 
 
 require_once 'DefaultController.php';
@@ -29,6 +30,10 @@ class Rest_FormController extends Rest_DefaultController {
 		}
 		
 		try {
+			// if record has no uri yet and an identifier value is present, inject it so backend will use it as primary key
+			if (! $this->_obj->getSource()->getUri() && isset($this->_post[ObjectUri::IDENTIFIER])) {
+				$this->_obj->getSource()->setUri($this->_post[ObjectUri::IDENTIFIER]);
+			}
 			// save form
 			$result = $this->_obj->save($this->_post);
 
