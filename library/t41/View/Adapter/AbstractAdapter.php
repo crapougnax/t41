@@ -170,9 +170,16 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
     }
     
     
-    public function loadTemplate($tpl)
+    public function loadTemplate($tpl, $module = null)
     {
     	$paths = Config::getPaths(Config::REALM_TEMPLATES);
+    	if ($module) {
+    		$path = Core::$basePath . 'application/modules/' . $module . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+    		if (is_dir($path)) {
+    			array_unshift($paths, $path);
+    		}   		
+    	}
+    	
     	if (Core\Layout::$module) {
     		$path = Core::$basePath . 'application/modules/' . Core\Layout::$vendor . DIRECTORY_SEPARATOR
     		. Core\Layout::$moduleKey . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
