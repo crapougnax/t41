@@ -269,9 +269,10 @@ class Collection extends ObjectModelAbstract {
 	 * Sets a new sorting rule which is added to the previous, if any 
 	 * @param array|t41\ObjectModel\Property\AbstractProperty $property
 	 * @param string $order
+	 * @param string $modifier
 	 * @throws Exception
 	 */
-	public function setSorting($property, $order = 'ASC')
+	public function setSorting($property, $order = 'ASC', $modifier = null)
 	{
 		if (! $property instanceof Property\PropertyInterface) {
 			
@@ -280,7 +281,8 @@ class Collection extends ObjectModelAbstract {
 			}
 
 			$order = isset($property['mode']) ? $property['mode'] : isset($property[1]) ? $property[1] : 'ASC';
-			
+			$modifier = $property[2];
+				
 			if ($property[0] == ObjectUri::IDENTIFIER) {
 				$property = new IdentifierProperty(ObjectUri::IDENTIFIER);
 			} else {
@@ -291,9 +293,7 @@ class Collection extends ObjectModelAbstract {
 				throw new Exception("PARAM_DOESNT_MATCH_PROPERTY");
 			}
 		}
-		
-		$this->_sortings[] = array($property, $order);
-		
+		$this->_sortings[] = array($property, $order, $modifier);
 		return $this;
 	}
 	
@@ -301,10 +301,8 @@ class Collection extends ObjectModelAbstract {
 	public function setSortings(array $sortings)
 	{
 		foreach ($sortings as $sorting) {
-			
-			$this->setSorting($this->_do->getRecursiveProperty($sorting[0]), $sorting[1]);
+			$this->setSorting($this->_do->getRecursiveProperty($sorting[0]), $sorting[1], isset($sorting[2]) ? $sorting[2] : null);
 		}
-		
 		return $this;
 	}
 	

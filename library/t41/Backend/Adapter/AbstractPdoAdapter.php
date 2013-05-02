@@ -679,10 +679,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 						
 					$this->_alreadyJoined[] = $jtable;
 				}
-		
-				$select->order(new \Zend_Db_Expr($stable . '.' . $sfield . ' ' . $sorting[1]));
+				
+				$sortingExpr = $stable . '.' . $sfield;
+				if (isset($sorting[2]) && !empty($sorting[2])) {
+					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
+				}
+				$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
 			}
-		
 			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
 		}
 		
