@@ -281,7 +281,7 @@ class Collection extends ObjectModelAbstract {
 			}
 
 			$order = isset($property['mode']) ? $property['mode'] : isset($property[1]) ? $property[1] : 'ASC';
-			$modifier = $property[2];
+			$modifier = isset($property[2]) ? $property[2] : null;
 				
 			if ($property[0] == ObjectUri::IDENTIFIER) {
 				$property = new IdentifierProperty(ObjectUri::IDENTIFIER);
@@ -401,7 +401,7 @@ class Collection extends ObjectModelAbstract {
 		
 		$this->_members = $res;
 		$this->setParameter('populated', true);
-		return true;
+		return (integer) $this->_max;
 	}
 	
 	
