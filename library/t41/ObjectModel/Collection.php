@@ -596,11 +596,14 @@ class Collection extends ObjectModelAbstract {
 		switch ($toType) {
 			
 			case ObjectModel::DATA:
-				$do = new DataObject($class);
-				$do->setUri($member);
-				$do->setUri($member instanceof BaseObject ? $member->getUri() : $member);
-				Backend::read($do);
-				$member = $do;
+				if ($member instanceof BaseObject) {
+					$member = $member->getDataObject();
+				} else {
+					$do = new DataObject($class);
+					$do->setUri($member);
+					Backend::read($do);
+					$member = $do;
+				}
 				break;
 				
 			case ObjectModel::MODEL:
