@@ -40,6 +40,10 @@ use t41\ObjectModel\Property\AbstractProperty;
  */
 class DataObject extends ObjectModelAbstract {
 	
+	
+	static protected $_registry = array();
+	
+	
 	/**
 	 * Object URI where data can be found
 	 *
@@ -62,6 +66,9 @@ class DataObject extends ObjectModelAbstract {
 	protected $_data;
 	
 	
+	protected $_dna;
+	
+	
 	/**
 	 * Secret key used to communicate with handling object
 	 *
@@ -81,8 +88,8 @@ class DataObject extends ObjectModelAbstract {
 	public function __construct($class, array $data = null)
 	{
 		$this->_setClass($class);
-		
 		if (! is_null($data)) {
+			$this->_setDna($data);
 			$this->_setProperties($data);
 		}
 		
@@ -189,7 +196,7 @@ class DataObject extends ObjectModelAbstract {
     /**
      * Reset parent object uri
      * 
-     * @return t41_Data_Object
+     * @return t41\ObjectModel\DataObject
      */
     public function clearUri()
     {
@@ -201,7 +208,14 @@ class DataObject extends ObjectModelAbstract {
     protected function _setClass($class)
     {
     	$this->_class = $class;
+    	$this->_setDna($class);
     	$this->_setProperties($class);
+    }
+    
+
+    protected function _setDna($class)
+    {
+    	$this->_dna = ObjectModel::getObjectDna($class);
     }
     
     
@@ -225,7 +239,6 @@ class DataObject extends ObjectModelAbstract {
     			$this->_data[$propertyId] = Property::factory($propertyId, $type, $propertyParams);
     			$this->_data[$propertyId]->setParent($this);
     		}
-    		
     	} else {
     		throw new DataObject\Exception(array("MISSING_DEFINITION", $var));
     	}
@@ -443,6 +456,18 @@ class DataObject extends ObjectModelAbstract {
     	return $array;
     }
     
+    
+    public function getDna($gene = null)
+    {
+    	if ($this->_dna == false) {
+    		return false;
+    	} else if (is_null($gene)) {
+    		return true;
+    	}
+    	
+    	return isset($this->_dna[$gene]);
+    }
+    
 
     /**
      * Populates a data object from a key/value array
@@ -481,8 +506,11 @@ class DataObject extends ObjectModelAbstract {
     						$value = $backend->buildObjectUri($value, $property->getParameter('instanceof'));
     						$property->setValue(new ObjectUri($value));
     					} else {
-    						$class = $property->getParameter('instanceof');
-    						$property->setValue(new $class($value));
+    						//$class = $property->getParameter('instanceof');
+    						$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
+    						$value = $backend->buildObjectUri($value, $property->getParameter('instanceof'));
+    						$property->setValue($value);
+    						//$property->setValue(new $class($value));
     					}
     				} else {
     					$property->resetValue();
@@ -497,6 +525,12 @@ class DataObject extends ObjectModelAbstract {
     	}
     	
     	return $this;
+    }
+    
+    
+    public function populateFromUri(ObjectUri $uri)
+    {
+    	
     }
     
     
@@ -524,7 +558,6 @@ class DataObject extends ObjectModelAbstract {
     		$this->_data[$key] = clone $property;
     		$this->_data[$key]->setParent($this);
     	}
-    	
     	$this->resetUri();
     }
     
@@ -648,11 +681,18 @@ class DataObject extends ObjectModelAbstract {
     
     static public function factory($class)
     {
+    	if (isset(self::$_registry[$class]) && self::$_registry[$class] instanceof self) {
+    		return clone self::$_registry[$class];
+    	}
+    	
     	try {
     		$do = new self($class);
     	} catch (Exception $e) {
     		throw new DataObject\Exception("PROPERTY_ERROR " . $e->getMessage());
     	}
+    	
+    	//self::$_registry[$class] = $do;
+    	
     	return $do;
     }
     
@@ -660,7 +700,6 @@ class DataObject extends ObjectModelAbstract {
     /**
      * Function called to free some object's references memory
      * To be used with caution!
-     * 
      */
     public function reclaimMemory()
     {
