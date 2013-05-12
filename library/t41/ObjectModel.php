@@ -75,16 +75,13 @@ class ObjectModel {
 		$config = Config\Loader::loadConfig($file);
 		
 		if ($config === false) {
-			
 			return false;
 		}
 		
 		if ($add === false) {
-        
 			self::$_config = $config['objects'];
 		
 		} else {
-			
 	        self::$_config = array_merge(self::$_config, $config['objects']);
 		}
 
@@ -138,7 +135,6 @@ class ObjectModel {
 	static public function factory($param)
 	{
 		if ($param instanceof DataObject) {
-			
 			$class = $param->getClass();
 			return new $class($param);
 		}
@@ -146,22 +142,14 @@ class ObjectModel {
 		$class = ($param instanceof ObjectModel\ObjectUri) ? $param->getClass() : $param;
 		
 		if (! array_key_exists($class, self::$_config)) {
-			
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
 		}
 		
 		try {
-			
 			$obj = new $class($param instanceof ObjectModel\ObjectUri ? $param : null);
-			
 		} catch (ObjectModel\Exception $e) {
-			
-			var_dump($e);
 			die($e->getMessage());
-			
 		} catch (ObjectModel\DataObject\Exception $e) {
-			
-			var_dump($e);
 			die($e->getMessage());
 		}
 		
@@ -180,6 +168,12 @@ class ObjectModel {
 		return isset(self::$_config[$key]) ? self::$_config[$key]['properties'] : array();
 	}
 	
+
+	static public function getObjectDna($key)
+	{
+		return isset(self::$_config[$key]) && isset(self::$_config[$key]['dna']) ? self::$_config[$key]['dna'] : false;
+	}
+	
 	
 	/**
 	 * Returns the matching t41_Property_* object instance
@@ -193,19 +187,16 @@ class ObjectModel {
 		list($class, $property) = explode('.', $str);
 		
 		if (! $class || ! $property) {
-			
 			throw new ObjectModel\Exception(array("INCORRECT_PROPERTY_DESCRIPTOR", $str));
 		}
 		
 		$props = self::getObjectProperties($class);
 		
 		if (isset($props[$property])) {
-			
 			require_once 't41/Property.php';
 			return ObjectModel\Property::factory($property, $props[$property]['type'], $props[$property]);
 			
 		} else {
-			
 			require_once 't41/Object/Exception.php';
 			throw new ObjectModel\Exception("NO_SUCH_PROPERTY");
 		}
@@ -223,18 +214,12 @@ class ObjectModel {
 	static public function getObjectBackend($id)
 	{
 		if (! self::definitionExists($id)) {
-			
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $id));
 		}
 		
-//		Zend_Debug::dump(self::$_config[$id]);
-
 		if (isset(self::$_config[$id]['backend'])) {
-			
 			return Backend::getInstance(Backend::PREFIX . self::$_config[$id]['backend']);
-		
 		} else {
-
 			return Backend::getDefaultBackend();
 		}
 	}
@@ -245,19 +230,15 @@ class ObjectModel {
 		$class = get_class($object);
 		
 		if (! self::definitionExists($class)) {
-				
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
 		}
 	
 		if (! isset(self::$_config[$class]['rules'])) {
-				
 			return null;
 		}
-	
 		$rules = array();
 	
 		foreach (self::$_config[$class]['rules'] as $key => $val) {
-	
 			$rule = ObjectModel\Rule::factory($val['type']);
 			$rule->setId($key);
 			$rule->setObject($object);
@@ -273,7 +254,6 @@ class ObjectModel {
 		}
 	
 		ksort($rules);
-	
 		return $rules;
 	}
 	
