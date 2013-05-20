@@ -463,14 +463,10 @@ class Collection extends ObjectModelAbstract {
 		if (! is_array($properties)) $properties = (array) $properties;
 		
 		foreach ($properties as $key => $prop) {
-			
 			// retrieve actual properties from their id
 			if (($prop = $this->_do->getRecursiveProperty($prop)) !== false) {
-				
 				$properties[$key] = $prop;
-				
 			} else {
-				
 				unset($properties[$key]);
 			}
 		}
@@ -481,20 +477,18 @@ class Collection extends ObjectModelAbstract {
 		//\Zend_Debug::dump(Backend::getLastQuery());
 		$this->_latestBackend = $backend;
 		$this->_max = null;
-		
 		$stats = new Collection('t41\ObjectModel\Collection\StatsObject');
 		
 		foreach ($res as $row) {
-			
 			$member = $stats->newMember();
 			$member->setTotal($row[Backend::MAX_ROWS_IDENTIFIER]);
 			$array = array();
 			foreach ($properties as $property) {
-				
 				if ($property instanceof ObjectProperty) {
-					
 					$class = $property->getParameter('instanceof');
 					$array[$property->getId()] = new $class($row[$property->getId()]);
+				} else {
+					$array[$property->getId()] = $row[$property->getId()];
 				}
 			}
 			$member->setGroup($array);
