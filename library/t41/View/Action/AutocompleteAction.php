@@ -2,10 +2,6 @@
 
 namespace t41\View\Action;
 
-use t41\ObjectModel\Property\ObjectProperty;
-
-use t41\ObjectModel\ObjectUri;
-
 /**
  * t41 Toolkit
  *
@@ -27,15 +23,9 @@ use t41\ObjectModel\ObjectUri;
  */
 
 use t41\Core;
-
-use t41\Core\Registry;
-
+use t41\ObjectModel\ObjectUri;
 use t41\Backend\Condition;
-
-use t41\Parameter;
-
 use t41\ObjectModel\Property;
-
 use t41\ObjectModel;
 
 /**
@@ -60,7 +50,7 @@ class AutocompleteAction extends AbstractAction {
 	protected $_callbacks = array();
 	
 	
-	protected $_context = array('minChars' => 3, 'displayMode' => 'list');
+	protected $_context = array('minChars' => 3, 'displayMode' => 'list', 'defaultSelect' => true);
 	
 	
 	/**
@@ -228,7 +218,6 @@ class AutocompleteAction extends AbstractAction {
 				}
 		
 				if (strstr($propId, '.')) {
-						
 					$propId = '_' . $propId;
 				}
 		
