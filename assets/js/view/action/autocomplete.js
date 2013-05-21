@@ -27,8 +27,12 @@ if (! window.t41.view.action.autocomplete) {
 		// real (hidden) field target
 		this.target = obj.data.target;
 
+		/**
+		 * @deprecated use this.options.minChars instead
+		 */
+		this.minChars = obj.data.minChars;
 		
-		this.minChars = 3;
+		this.options = obj.data;
 		
 		/*
 		 * Number of the last server call
@@ -36,8 +40,10 @@ if (! window.t41.view.action.autocomplete) {
 		 */
 		this.sequence = 0;
 		
-		
-		this.displayMode = 'table'; // or 'list';
+		/**
+		 * @deprecated use this.options.displayMode instead
+		 */
+		this.displayMode = obj.data.displayMode;
 		
 		this.previous;
 		
@@ -100,8 +106,10 @@ if (! window.t41.view.action.autocomplete) {
 		
 		
 		this.displaySavedValue = function(obj) {
-			var val = obj.data.collection[obj.data._id];
-			this.setValue(obj.data._id, this.prepareDisplay(val));
+			if (obj.data && obj.data._id) {
+				var val = obj.data.collection[obj.data._id];
+				this.setValue(obj.data._id, this.prepareDisplay(val));
+			}
 		};
 		
 		
@@ -116,13 +124,14 @@ if (! window.t41.view.action.autocomplete) {
 			for (var id in this.currentSuggestions) {
 				if (this.currentSuggestions.hasOwnProperty(id)) size++;
 			}
-			if (size == 1) {
+			if (size == 1 && this.options.defaultSelect == true) {
+				// display directly unique value returned by query
 				for (var id in this.currentSuggestions) {
 					this.defaultSelect(id);
 					return true;
 				}
 			}
-			switch (this.displayMode) {
+			switch (this.options.displayMode) {
 			
 				case 'table':
 					this._displayAsTable();
@@ -398,7 +407,7 @@ if (! window.t41.view.action.autocomplete) {
 		var search = (jQuery(obj.target).val());
 		var ac = obj.data.caller ? obj.data.caller : obj.data;
 
-		if (search.length < ac.minChars || (search == ac.previous)) {
+		if (search.length < ac.options.minChars || (search == ac.previous)) {
 			return;
 		}
 		
