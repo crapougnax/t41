@@ -30,6 +30,7 @@ use t41\ObjectModel;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\IdentifierProperty;
+use t41\ObjectModel\Collection\StatsCollection;
 
 /**
  * Class for a collection of Objects
@@ -454,9 +455,10 @@ class Collection extends ObjectModelAbstract {
 	/**
 	 * Return the total number of members grouped by the given property or properties
 	 * 
+	 * @todo move code below in StatsCollection()
 	 * @param unknown_type $properties
 	 * @param Adapter\AbstractAdapter $backend
-	 * @return t41\ObjectModel\Collection
+	 * @return t41\ObjectModel\StatsCollection
 	 */
 	public function stats($properties, Adapter\AbstractAdapter $backend = null)
 	{
@@ -477,7 +479,9 @@ class Collection extends ObjectModelAbstract {
 		//\Zend_Debug::dump(Backend::getLastQuery());
 		$this->_latestBackend = $backend;
 		$this->_max = null;
-		$stats = new Collection('t41\ObjectModel\Collection\StatsObject');
+		
+		$stats = new StatsCollection();
+		$stats->setStatsProps($properties);
 		
 		foreach ($res as $row) {
 			$member = $stats->newMember();
