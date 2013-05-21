@@ -244,7 +244,7 @@ if (! window['t41']['view']['table']) {
 		this.refreshRow = function(object, uuid, id) {
     	
 			var self = this;
-			jQuery(this.table).find("tr:[data-id="+id+"]")
+			jQuery(this.table).find("[data-id="+id+"]")
 							  .each(function(index,e) { jQuery(e).after(self.row(object.props, uuid, id)).remove(); }
     						   );
 		};
@@ -252,7 +252,7 @@ if (! window['t41']['view']['table']) {
     
 		this.removeRow = function(id) {
     	
-			jQuery(this.table).find("tr:[data-id="+id+"]")
+			jQuery(this.table).find("[data-id="+id+"]")
 			.each(function(index,e) { jQuery(e).fadeOut('slow', function(e) { jQuery(e).remove(); }); }
 			);
 		};
