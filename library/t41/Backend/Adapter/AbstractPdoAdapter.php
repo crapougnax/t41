@@ -554,29 +554,17 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				
 			} else if ($property instanceof Property\CollectionProperty) {
 				
-				// handling of conditions based on collection limited to hasMembers()
-				// @todo refactor and extend to other possibilities
-				
-				$field = $pkey;
+				// handling of conditions based on collection limited to withMembers() and withoutMembers()
 				$leftkey = $property->getParameter('keyprop');
-				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
-				$uniqext = $jtable . '__joined_for__' . $leftkey;
-				$join = sprintf("%s.%s = %s", $uniqext, $leftkey, $pkey);
-				$select->joinLeft($jtable . " AS $uniqext", $join, array());
-				$this->_alreadyJoined[$jtable] = $uniqext;
-
-				$clause = $conditionArray[0]->getClauses();
-				if ($clause[0]['value'] == Condition::NO_VALUE) {
-					$field = sprintf("%s.%s", $uniqext, 'id');
-					$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
-					$select->where($statement);
-				} else {
-					$field = new \Zend_Db_Expr(sprintf("COUNT(%s.%s)", $uniqext, $leftkey));
-					$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
-					$select->having($statement);
-					$select->group($pkey);
-				}
+				$field = $property->getId();
+				$subSelect = $this->_ressource->select();
+				$subseltbl = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
+				$subSelect->from($subseltbl, new \Zend_Db_Expr(sprintf("COUNT(%s)", $leftkey)));
+				$join = sprintf("%s.%s = %s", $subseltbl, $leftkey, $pkey);
+				$subSelect->where($join);
 				
+				$statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
+				$select->where($statement);
 				continue;
 			
 			} else {
@@ -689,7 +677,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
 		}
 		
-		//echo $select;
+// 		if (isset($subSelect)) {
+// 			echo $select; 
+// 			die;
+// 		}
 
 		$result = array();
 		$context = array('table' => $table);

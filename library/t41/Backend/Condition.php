@@ -441,21 +441,30 @@ class Condition {
 	
 	
 	/**
-	 * Set a new 'hasMembers' clause on a collection property
-	 * @param number $value
+	 * Set a new 'withMembers' clause on a collection property
 	 * @throws Exception
 	 * @return \t41\Backend\Condition>
 	 */
-	public function hasMembers($value = 0)
+	public function withMembers()
 	{
 		if (! $this->_property instanceof CollectionProperty) {
 			throw new Exception("hasMembers() condition is only applicable on CollectionProperty object");
 		}
-		$operator = self::OPERATOR_EQUAL;
-		if ($value != 0) {
-			$operator |= self::OPERATOR_GTHAN;
+		return $this->where(1, self::OPERATOR_EQUAL | self::OPERATOR_GTHAN);
+	}
+	
+	
+	/**
+	 * Set a new 'withoutMembers' clause on a collection property
+	 * @throws Exception
+	 * @return \t41\Backend\Condition>
+	 */
+	public function withoutMembers()
+	{
+		if (! $this->_property instanceof CollectionProperty) {
+			throw new Exception("hasMembers() condition is only applicable on CollectionProperty object");
 		}
-		return $this->where($value, $operator);
+		return $this->where(1, self::OPERATOR_LTHAN);
 	}
 	
 	
