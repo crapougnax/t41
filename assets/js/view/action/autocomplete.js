@@ -124,13 +124,16 @@ if (! window.t41.view.action.autocomplete) {
 			for (var id in this.currentSuggestions) {
 				if (this.currentSuggestions.hasOwnProperty(id)) size++;
 			}
+			
 			if (size == 1 && this.options.defaultSelect == true) {
 				// display directly unique value returned by query
+				console.log('coucouc');
 				for (var id in this.currentSuggestions) {
 					this.defaultSelect(id);
 					return true;
 				}
 			}
+			
 			switch (this.options.displayMode) {
 			
 				case 'table':
@@ -236,7 +239,7 @@ if (! window.t41.view.action.autocomplete) {
 			if (! this.currentSuggestions[id]) {
 				console.log('Missing member for key ' + id);
 			}
-
+			
 			this.resetSuggestions();
 			var selected = this.currentSuggestions[id];
 			this.setValue(id, this.prepareDisplay(selected));
@@ -465,17 +468,23 @@ if (! window.t41.view.action.autocomplete) {
 
 		var ac = obj.data.caller;
 		var id = '';
-
+		
 		switch (ac.displayMode) {
 		
 			case 'table':
-				var id = jQuery(obj.target).parent('tr').attr('data-id');
+				var id = jQuery(obj.target).parent('tr').data('id');
 				break;
 				
 			case 'list':
+				var id = jQuery(obj.target).parent('tr').data('id');
 				break;
 		}
-		if (id) ac.defaultSelect(id); //callbacks['select'] + '()');// "(" + obj + ")");
+		
+		if (id) {
+			ac.defaultSelect(id);
+		} else {
+			console.log('selected row id is missing');
+		}
 	};
 	
 	
