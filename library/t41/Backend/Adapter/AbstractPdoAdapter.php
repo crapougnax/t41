@@ -641,6 +641,20 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$id = Backend::DEFAULT_PKEY;
 					$select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
 					continue;
+				} else if ($sorting[0] instanceof Property\CollectionProperty) {
+				
+					// handling of conditions based on collection limited to withMembers() and withoutMembers()
+					$leftkey = $sorting[0]->getParameter('keyprop');
+					$field = $property->getId();
+					$subSelect = $this->_ressource->select();
+					$subseltbl = $this->_mapper ? $this->_mapper->getDatastore($sorting[0]->getParameter('instanceof')) : $this->_getTableFromClass($sorting[0]->getParameter('instanceof'));
+					$subSelect->from($subseltbl, new \Zend_Db_Expr(sprintf("COUNT(%s)", $leftkey)));
+					$join = sprintf("%s.%s = %s", $subseltbl, $leftkey, $pkey);
+					$subSelect->where($join);
+				
+				//	$statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
+					$select->order('(' . $subSelect . ') ' . $sorting[1]);
+					continue;
 				}
 		
 				$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
