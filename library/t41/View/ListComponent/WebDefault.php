@@ -129,7 +129,7 @@ class WebDefault extends AbstractWebDecorator {
     			
     			$field = str_replace("-",".",$field);
 
-    			if (! empty($value)) { // @todo also test array values for empty values
+    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
     				$property = $this->_collection->getDataObject()->getProperty($field);
     				
     				if ($property instanceof MetaProperty) {
@@ -167,7 +167,6 @@ class WebDefault extends AbstractWebDecorator {
         $p .= sprintf('<table class="t41 list" id="%s">', $this->getId());
         $p .= $this->_headlineRendering();
         
-        //if (true) $p .= $this->_quickSearchRendering();
 		$p .= $this->_contentRendering();
         $p .= '</table>';
 
