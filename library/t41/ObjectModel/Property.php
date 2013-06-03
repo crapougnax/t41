@@ -22,10 +22,8 @@ namespace t41\ObjectModel;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel\Property,
-	t41\Parameter,
-	t41\Core\Tag,
-	t41\View\Decorator\AbstractWebDecorator;
+use t41\ObjectModel\Property;
+use t41\Core\Tag;
 
 /**
  * Class for Property.
@@ -39,6 +37,9 @@ class Property {
 
 	
 	const UNDEFINED_LABEL	= "No defined display value";
+	
+	
+	const EMPTY_VALUE		= '_NONE_';
 	
 	
 	/* constraints that can be enforced on a property's value */

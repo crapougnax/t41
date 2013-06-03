@@ -276,7 +276,7 @@ if (! window.t41.view.action.autocomplete) {
 		this.resetValue = function() {
 			var display = jQuery('#' + this.target + '_display');
 			display.hide();
-			jQuery('#' + this.target).val('');
+			jQuery('#' + this.target).val('_NONE_');
 			this.resetSuggestions();
 			this.offset = 0;
 			if (this.callbacks.postReset && typeof this.callbacks.postReset == 'function') {

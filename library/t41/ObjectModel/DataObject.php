@@ -29,6 +29,7 @@ use t41\ObjectModel;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\MetaProperty;
 use t41\ObjectModel\Property\AbstractProperty;
+use t41\Backend\Condition;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -494,7 +495,7 @@ class DataObject extends ObjectModelAbstract {
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
     				}
     				
-    				if ($value) {
+    				if ($value && $value != Property::EMPTY_VALUE) {
     					if (get_class($value) == $property->getParameter('instanceof')) {
     						$property->setValue($value);
     					} else if (substr($value, 0, 4) == 'obj_') {

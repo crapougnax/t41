@@ -100,7 +100,7 @@ window.t41.view.form = function(id,obj,form) {
 			var field = this.fields[i];
 			var value = elements[i];
 
-			if (field.constraints.mandatory && value == "") {
+			if (field.constraints.mandatory && (value == "" || value == '_NONE_')) {
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
 			}
 			
@@ -172,7 +172,11 @@ window.t41.view.form = function(id,obj,form) {
 					var baseurl = this.redirects.redirect_ok[0];
 					for (var i in this.redirects.redirect_ok[1]) {
 						baseurl += '/' + this.redirects.redirect_ok[1][i] + '/';
-						baseurl += jQuery('#' + this.redirects.redirect_ok[1][i]).val();
+						if (this.redirects.redirect_ok[1][i] == 'uuid') {
+							baseurl += obj.data.uuid;
+						} else {
+							baseurl += jQuery('#' + this.redirects.redirect_ok[1][i]).val();
+						}
 					}
 					window.location.href = baseurl;
 				} else {
