@@ -28,6 +28,7 @@ use t41\ObjectModel,
 	t41\View\FormComponent,
 	t41\View\Action\AutocompleteAction,
 	t41\View\Decorator\AbstractWebDecorator;
+use t41\ObjectModel\Property;
 
 /**
  * t41 default web decorator for list elements
@@ -63,7 +64,7 @@ class WebDefault extends AbstractWebDecorator {
 		
 		// display autocompleter field
 		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('selectmax') 
-				&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
+		/*		&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE */) {
 
 			$deco = new WebAutocomplete($this->_obj, array($this->_params));
 			return $deco->render();
@@ -71,7 +72,7 @@ class WebDefault extends AbstractWebDecorator {
 		} else {
 			// display menu list
 			$zv = new \Zend_View();
-			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
+			$options = array(Property::EMPTY_VALUE => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
 			return $zv->formSelect($name, $value, null, $options);
 		}
 	}
