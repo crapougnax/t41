@@ -465,6 +465,7 @@ table.t41.list td.cellcurrency {
 .t41 form fieldset .label {
   width: 25%;
   text-align: right;
+  vertical-align: top;
   font-family: Abel, sans-serif;
 }
 
