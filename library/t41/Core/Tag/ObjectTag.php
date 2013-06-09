@@ -63,7 +63,7 @@ class ObjectTag implements TagInterface {
 			default:
 				$object = (self::$object instanceof BaseObject) ? self::$object->getDataObject() : self::$object;
 				$prop = $object->getRecursiveProperty($tag);
-				return ($prop instanceof AbstractProperty) ? $prop->getDisplayValue(ObjectModel::DATA) : '';
+				return ($prop instanceof AbstractProperty) ? $prop->getDisplayValue() : '';
 				break;
 		}
 	}
