@@ -100,6 +100,11 @@ window.t41.view.form = function(id,obj,form) {
 			var field = this.fields[i];
 			var value = elements[i];
 
+			// don't consider fields with a hidden label
+			if (jQuery('#label_' + i).css('display') == 'none') {
+				continue;
+			}
+			
 			if (field.constraints.mandatory && (value == "" || value == '_NONE_')) {
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
 			}
