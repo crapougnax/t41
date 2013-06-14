@@ -22,12 +22,10 @@ namespace t41\View\Decorator;
  * @version    $Revision: 832 $
  */
 
-use t41\Core,
-	t41\View,
-	t41\View\ViewObject,
-	t41\View\Adapter\PdfAdapter,
-	t41\View\Decorator,
-	t41\View\Decorator\AbstractDecorator;
+use t41\View\ViewObject;
+use t41\View\Adapter\PdfAdapter;
+use t41\View\Decorator;
+use t41\View\Decorator\AbstractDecorator;
 
 /**
  * Class providing basic parameters and methods to PDF decorators.
@@ -47,7 +45,7 @@ abstract class AbstractPdfDecorator extends AbstractDecorator {
 	protected $_pdf;
 	
 	
-	public function render(TCPDF $pdf)
+	public function render(\TCPDF $pdf)
 	{
 		return $pdf;
 	}
@@ -100,14 +98,11 @@ abstract class AbstractPdfDecorator extends AbstractDecorator {
         		
         		// simply ignore objects
         		if ($data[$column->getAltId()] instanceof ViewObject) continue;
-        		
                     $strlen = strlen($column->formatValue($data[$column->getAltId()]));
-
                     if ($strlen > $colsWidth[$key]) {
                         $colsWidth[$key] = $strlen;
                     }                    
         	}
-        	
         	$i++;
         }
 
@@ -116,27 +111,22 @@ abstract class AbstractPdfDecorator extends AbstractDecorator {
         
         // attribute width in percent of total width
         foreach ($colsWidth as $key => $colWidth) {
-        	
         	$colsWidth[$key] = round($this->_width * ($colWidth / $fullLine));
         }
 
         $this->_formattingData['width'] = $colsWidth;
         $this->_formattingData['align'] = $colAlignment;
-        
-        //var_dump($this->_formattingData); die;
 	}
 	
 	
 	protected function _formatValue($field, $value, $width = null)
 	{
 		if ($value instanceof ViewObject) {
-			
 			$deco = Decorator::factory($value);
 			$this->_pdf->setXY($this->_pdf->getX()+1, $this->_pdf->getY()+1);
 			return $deco->render($this->_pdf, $width * .8);
 		
 		} else {
-			
 			return $field->formatValue($value);
 		}
 	}

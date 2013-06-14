@@ -227,8 +227,7 @@ class PdfAdapter extends AbstractAdapter {
 				$object = $elem[0];
     			$params = $elem[1];
 
-    			if ($key == 0 && $this->getParameter('bookmarks') === true) {
-	    					
+    			if ($this->getParameter('bookmarks') === true && ($key == 0 || $object->getParameter('newpage') == 'after') && $object->getTitle()) {
 	    			$this->_document->Bookmark($object->getTitle());
 	    		}
 	    		
@@ -237,7 +236,6 @@ class PdfAdapter extends AbstractAdapter {
     			try {
    					$decorator = \t41\View\Decorator::factory($object, $params);
     				} catch (Exception $e) {
-    						
     					/* @todo create new t41_View_Error object with exception message */
     					$this->_document->Write($e->getMessage());
     				}
@@ -247,7 +245,6 @@ class PdfAdapter extends AbstractAdapter {
     				
 	    				$this->_document->AddPage();
 	    				if ($this->getParameter('bookmarks') === true) {
-	    					
 	    					$this->_document->Bookmark($object->getTitle());
 	    				}
 	    				
@@ -257,12 +254,10 @@ class PdfAdapter extends AbstractAdapter {
     			$decorator->render($this->_document, $this->_width);
  			
     		    if (in_array($decorator->getParameter('newpage'), array('after','both'))) {
-    				
     		    	// new page will be added only if it is necessary (other view elements to print)
     				$newpage = true;
     				
     			} else {
-    				
 	    			// new line
     				$this->_document->Ln();
     			}
@@ -295,7 +290,9 @@ class PdfAdapter extends AbstractAdapter {
     			unset($tag[$key]);
     		}
     		
-       		$template = str_replace($tag[0], $content, $template);
+       		if (isset($tag[0])) {
+       			$template = str_replace($tag[0], $content, $template);
+       		}
     	}
     	
     	$this->_document->writeHTML($template);

@@ -120,10 +120,10 @@ class CsvAdapter extends AbstractAdapter {
     			    					
     			if (! is_object($object)) continue;
     			
-    			/* @var $object t41_Form_Abstract */ 
+    			/* @var $object t41\View\ViewObject */ 
     			switch (get_class($object)) {
     				
-    				case 't41\View\TableComponent':
+    				case 't41\View\ListComponent':
     					$object->setDecorator();
     					$decorator = Decorator::factory($object);
     					$content .= $decorator->render();
