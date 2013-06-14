@@ -22,12 +22,9 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 876 $
  */
 
-use t41\ObjectModel\BaseObject;
-
 use t41\ObjectModel;
-
-use t41\ObjectModel\DataObject,
-	t41\ObjectModel\Property\CurrencyProperty;
+use t41\ObjectModel\BaseObject;
+use t41\ObjectModel\Property\CurrencyProperty;
 
 /**
  * Meta property, value is calculated upon getValue() or getDisplayValue() call
@@ -47,35 +44,28 @@ class MetaProperty extends AbstractProperty {
 		}
 		
 		if (! $this->getParent()) {
-			
 			throw new Exception(sprintf("Meta property '%s' missing a parent reference", $this->_id));
 		}
 		
-		$property = $this->getParent()->getProperty($this->getParameter('property'));
+		$property = $this->getParent()->getRecursiveProperty($this->getParameter('property'));
 		
 		if ($property instanceof CollectionProperty) {
-				
 			$subParts = explode('.', $this->getParameter('action'));
 			$collection = $property->getValue();
 			return $collection->{$subParts[0]}(isset($subParts[1]) ? $subParts[1] : null);
 			
 		} else if ($property instanceof ObjectProperty) {
-
 			$subParts = explode('.', $this->getParameter('action'));
 			$object = $property->getValue(ObjectModel::MODEL);
 			return $object instanceof BaseObject ? $object->{$subParts[0]}(isset($subParts[1]) ? $subParts[1] : null) : null;
 				
 		} else {
-			
 			$class = $this->_parent->getClass();
 			$action = $this->getParameter('action');
 			$array = array($this->_parent->getClass(), $this->getParameter('action'));
-			//var_dump(is_callable($array)); die;
 			try {
-				//$val = call_user_func($array, $this->_parent);
 				$val = forward_static_call($array, $this->_parent);
 			} catch (\Exception $e) {
-				
 				throw new Exception($e->getMessage());
 			}
 			
