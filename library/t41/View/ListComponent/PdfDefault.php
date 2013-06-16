@@ -98,7 +98,7 @@ class PdfDefault extends AbstractPdfDecorator {
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
     			if (! empty($value)) { // @todo also test array values for empty values
-	    			$this->_obj->setCondition($field, $value);
+	    			//$this->_obj->setCondition($field, $value);
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
     			}
     		}
@@ -122,8 +122,6 @@ class PdfDefault extends AbstractPdfDecorator {
         $this->_obj->query();
 
         // calculate columns & alignment for each column
-        //$colsWidth = $colAlignment = array();
-        
         foreach ($this->_obj->getColumns() as $key => $column) {
         	// minimum column width should be based on label width
         	$this->_colsWidth[$key] = strlen($column->getTitle());        	
