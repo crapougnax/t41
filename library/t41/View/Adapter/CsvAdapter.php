@@ -24,6 +24,7 @@ namespace t41\View\Adapter;
 
 use t41\View,
 	t41\View\Decorator;
+use t41\Parameter;
 
 /**
  * Class providing the view engine with a CSV-context adapter.
@@ -51,6 +52,16 @@ class CsvAdapter extends AbstractAdapter {
 	protected $_displayContexts = array();
 	
 	protected $_componentsBasePath;
+	
+	
+	public function __construct(array $parameters = null)
+	{
+		$params = array();
+		$params['title'] = new Parameter(Parameter::STRING);
+		$this->_setParameterObjects($params);
+		
+		parent::__construct($parameters);
+	}
 	
 	
 	/**
@@ -96,7 +107,7 @@ class CsvAdapter extends AbstractAdapter {
     
     public function display()
     {
-    	$filename = $this->_title ? $this->_title : 'Export';
+    	$filename = $this->getParameter('title') ? $this->getParameter('title') : 'Export';
     	$filename .= '.csv';
     	
         header("Content-type: text/x-csv");

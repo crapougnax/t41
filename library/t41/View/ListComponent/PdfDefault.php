@@ -27,6 +27,11 @@ use t41\ObjectModel\Property\AbstractProperty;
 use t41\View\Decorator\AbstractPdfDecorator;
 use t41\View\ViewUri;
 use t41\View\ListComponent\Element;
+use t41\ObjectModel\Property\MetaProperty;
+use t41\ObjectModel\Property;
+use t41\ObjectModel\Property\ObjectProperty;
+use t41\ObjectModel\DataObject;
+use t41\View\Decorator;
 
 /**
  * List view object default Web Decorator
@@ -77,8 +82,18 @@ class PdfDefault extends AbstractPdfDecorator {
 	protected $_obj;
 
 	
+	/**
+	 * t41\ObjectModel\Collection instance
+	 *
+	 * @var t41\ObjectModel\Collection
+	 */
+	protected $_collection;
+	
+	
     public function render(\TCPDF $pdf, $width)
     {
+    	$this->_collection = $this->_obj->getCollection();
+    	 
     	// set relevant uri adapter and get some identifiers 
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter) {
     		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
@@ -96,9 +111,23 @@ class PdfDefault extends AbstractPdfDecorator {
     	
     	// set query parameters from context
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
+
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			if (! empty($value)) { // @todo also test array values for empty values
-	    			//$this->_obj->setCondition($field, $value);
+    			
+    			$field = str_replace("-",".",$field);
+
+    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
+    				$property = $this->_collection->getDataObject()->getProperty($field);
+    				
+    				if ($property instanceof MetaProperty) {
+    					$this->_collection->having($property->getParameter('property'))->contains($value);
+    				} else if ($property instanceof ObjectProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->equals($value);
+    				} else if ($property instanceof AbstractProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->contains($value);
+    				}
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
     			}
     		}
@@ -107,17 +136,15 @@ class PdfDefault extends AbstractPdfDecorator {
     	// set query sorting from context
         if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
         	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			$this->_obj->setSorting($field, $value);
+    			$this->_collection->setSorting(array($field, $value));
     		}
     	}
 
     	// define offset parameter value from context
     	if (isset($this->_env[$this->_offsetIdentifier])) {
-    		$this->_obj->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
+    		$this->_obj->setParameter('offset', (int) $this->_env[$this->_offsetIdentifier]);
+    		$this->_collection->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
     	}
-    	
-    	// export all relevant data (no limit)
-    	//$this->_obj->setBoundaryBatch(0);
     	
         $this->_obj->query();
 
@@ -150,12 +177,16 @@ class PdfDefault extends AbstractPdfDecorator {
         	foreach ($this->_obj->getColumns() as $key => $column) {
         		$property = $data->getProperty($column->getParameter('property'));
         		 
-        		if ($column->getParameter('recursion')) {
-        			foreach ($column->getParameter('recursion') as $recursion) {
-        				$property = $property->getValue(ObjectModel::DATA);
-        				if ($property) $property = $property->getProperty($recursion);
-        			}
-        		}
+        	    if ($column->getParameter('recursion')) {
+					foreach ($column->getParameter('recursion') as $recursion) {
+						if ($property instanceof AbstractProperty) {
+							$property = $property->getValue(ObjectModel::DATA);
+						}
+						if ($property instanceof ObjectModel || $property instanceof DataObject) {
+							$property = $property->getProperty($recursion);
+						}
+					}
+            	}
         		 
         		$value = ($property instanceof AbstractProperty) ? $property->getDisplayValue() : null;
         		$content = explode("\n", $value);
@@ -204,7 +235,6 @@ class PdfDefault extends AbstractPdfDecorator {
         	        
         	/* test if a new page is necessary */
         	if ($pdf->getY() + $increment > $pdf->getPageHeight() - 20) {
-
         		$pdf->AddPage();
 		        $this->_drawHeaderRow($pdf);
         	}
@@ -221,23 +251,34 @@ class PdfDefault extends AbstractPdfDecorator {
         			$index++;
         		}
         		 
-        		if ($column instanceof Element\MetaElement) {
-        			$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
-        			$value = $column->getDisplayValue($this->_do);
-
-        		} else {
-        		 
-        			$property = $this->_do->getProperty($column->getParameter('property'));
-        		 
-	        		if ($column->getParameter('recursion')) {
-    	    			foreach ($column->getParameter('recursion') as $recursion) {
-        					$property = $property->getValue(ObjectModel::DATA);
-        					if ($property) $property = $property->getProperty($recursion);
-        				}
-        			}
-        		 
-        			$value = ($property instanceof AbstractProperty) ? $property->getDisplayValue(): null;
-        		}
+        	    if ($column instanceof Element\IdentifierElement) {
+            		$value = $this->_do->getUri()->getIdentifier();
+            	} else if ($column instanceof Element\MetaElement) {
+            		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
+            		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
+            	} else {
+	            	$property = $this->_do->getProperty($column->getParameter('property'));
+    	        	$column->setValue($property->getValue());
+            	            	 
+            		if ($column->getParameter('recursion')) {
+						foreach ($column->getParameter('recursion') as $recursion) {
+							if ($property instanceof AbstractProperty) {
+								$property = $property->getValue(ObjectModel::DATA);
+							}
+							if ($property instanceof ObjectModel || $property instanceof DataObject) {
+								$property = $property->getProperty($recursion);
+							}
+						}
+            		}
+            	
+            		if ($property instanceof Property\MediaProperty) {
+            			$column->setValue($property->getDisplayValue());
+            			$deco = Decorator::factory($column);
+            			$value = $deco->render();
+            		} else {
+	  					$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
+            		}
+            	}
         		
 	            // put value in cell
     	        $pdf->Multicell($this->_colsWidth[$key], $this->_cellHeight, $value, 1, $this->_colsAlignment[$key], 0, $nextPos);

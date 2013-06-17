@@ -34,6 +34,8 @@ use t41\ObjectModel,
 	t41\View\FormComponent,
 	t41\View\FormComponent\Element\ButtonElement,
 	t41\View\ListComponent\Element;
+use t41\ObjectModel\Property\AbstractProperty;
+use t41\ObjectModel\DataObject;
 
 /**
  * List view object default Web Decorator
@@ -77,7 +79,7 @@ class WebDefault extends AbstractWebDecorator {
 
 	
 	/**
-	 * t41_Object_Collection instance
+	 * t41\ObjectModel\Collection instance
 	 * 
 	 * @var t41\ObjectModel\Collection
 	 */
@@ -137,7 +139,7 @@ class WebDefault extends AbstractWebDecorator {
     				} else if ($property instanceof ObjectProperty) {
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->equals($value);
-    				} else {
+    				} else if ($property instanceof AbstractProperty) {
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->contains($value);
     				}
@@ -346,7 +348,6 @@ HTML;
 			}
 			
 			$altDec = (array) $this->_obj->getParameter('decorators');
-			
             foreach ($this->_obj->getColumns() as $column) {
             	if ($column instanceof Element\IdentifierElement) {
             		$p .= sprintf('<td>%s</td>', $this->_do->getUri()->getIdentifier());
@@ -372,8 +373,12 @@ HTML;
             	 
             	if ($column->getParameter('recursion')) {
 					foreach ($column->getParameter('recursion') as $recursion) {
+						if ($property instanceof AbstractProperty) {
 							$property = $property->getValue(ObjectModel::DATA);
-							if ($property) $property = $property->getProperty($recursion);
+						}
+						if ($property instanceof ObjectModel || $property instanceof DataObject) {
+							$property = $property->getProperty($recursion);
+						}
 					}
             	}
             	

@@ -136,7 +136,7 @@ class ListComponent extends ViewObject {
     			
 	    		$obj = new Element\ColumnElement($column);
     						
-/*    			if (count($parts) > 1) {
+    			if (count($parts) > 1) {
     				$obj->setParameter('recursion', array_slice($parts, 1));
     				
     				foreach (array_slice($parts, 1) as $recursion) {
@@ -152,7 +152,7 @@ class ListComponent extends ViewObject {
     					}
     				}
     			}
-    			*/
+    			
     			
     			$obj->setParameter('property', $parts[0]);
     			$obj->setTitle(isset($alt[$column]) ? $alt[$column] : $property->getLabel());

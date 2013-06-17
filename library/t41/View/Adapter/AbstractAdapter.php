@@ -115,7 +115,6 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
         }
         
         if (is_array($parameters)) {
-        	
         	$this->_setParameters($parameters);
         }
     }
