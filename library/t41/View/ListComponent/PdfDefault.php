@@ -117,7 +117,7 @@ class PdfDefault extends AbstractPdfDecorator {
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_collection->getDataObject()->getProperty($field);
+    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				
     				if ($property instanceof MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);

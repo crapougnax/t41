@@ -99,12 +99,12 @@ class CsvDefault extends AbstractCsvDecorator {
         	// set query parameters from context
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
 
-    		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
+    	    foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
     			
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_collection->getDataObject()->getProperty($field);
+    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				
     				if ($property instanceof MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
@@ -112,7 +112,7 @@ class CsvDefault extends AbstractCsvDecorator {
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof AbstractProperty) {
-       					$this->_collection->resetConditions($field);
+    					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->contains($value);
     				}
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
@@ -154,8 +154,7 @@ class CsvDefault extends AbstractCsvDecorator {
 	            if ($column instanceof Element\IdentifierElement) {
             		$value = $this->_do->getUri()->getIdentifier();
             	} else if ($column instanceof Element\MetaElement) {
-            		$attrib = ($column->getParameter('type') == 'currency') ? ' class="cellcurrency"' : null;
-            		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
+            		$value = $column->getDisplayValue($this->_do);
             	} else {
 	            	$property = $this->_do->getProperty($column->getParameter('property'));
     	        	$column->setValue($property->getValue());

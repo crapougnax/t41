@@ -36,6 +36,7 @@ use t41\ObjectModel,
 	t41\View\ListComponent\Element;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\DataObject;
+use t41\Backend;
 
 /**
  * List view object default Web Decorator
@@ -132,7 +133,7 @@ class WebDefault extends AbstractWebDecorator {
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_collection->getDataObject()->getProperty($field);
+    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				
     				if ($property instanceof MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
