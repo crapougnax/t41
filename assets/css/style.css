@@ -91,22 +91,7 @@ textarea{
 
 }
 /* -- END COMPONENT -- */
-/* -- BEGIN CONNECTION INFORMATION -- */
-#absheader{
-    background-color: #DDDDDD;
-    clear: both;
-    margin: 15px auto 0;
-    max-height: 60px;
-    max-width: 1200px;
-    padding: 5px 5px 25px 5px;
-}
-#absheader span.version {
-    float:left;
-}
-#absheader span.connection{
-    float:right;
-}
-/* -- END CONNECTION INFORMATION -- */
+
 /* -- BEGIN TOPMENU -- */
 #header .t41.menu {
   float: left;
@@ -480,7 +465,6 @@ table.t41.list td.cellcurrency {
 .t41 form fieldset .label {
   width: 25%;
   text-align: right;
-  vertical-align: top;
   font-family: Abel, sans-serif;
 }
 
@@ -657,3 +641,12 @@ h1,h2,h3,h4,h5 {
   float: none !important;
   clear: both !important;
 }
+
+/* -- BEGIN DATE BUTTON -- */
+
+#elem_debut a span,#elem_fin span{
+    position:relative;
+    top:8px;
+}
+
+/* -- END DATE BUTTON -- */

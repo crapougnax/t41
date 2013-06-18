@@ -293,7 +293,7 @@
 }
 
 .t41 a.element.medium.icon span.right-arrow,.t41.medium span.right-arrow{
-	background-position: -72px 0;
+	background-position: -72px 0 ;
 }
 
 .t41 a.element.medium.icon span.right-arrow-blue,.t41.medium span.right-arrow-blue{
@@ -329,7 +329,7 @@
 }
 
 .t41 a.element.medium.icon span.pdf,.t41.medium span.pdf{
-	background-position: -120px -24px; 
+	background-position: -120px -24px;
 }
 
 .t41 a.element.medium.icon span.xml,.t41.medium span.xml{
@@ -377,7 +377,7 @@
 }
 
 .t41 a.element.medium.icon span.search-blue,.t41.medium span.search-blue{
-	background-position: -360px -24px; 
+	background-position: -360px -24px;
 }
 
 .t41 a.element.medium.icon span.calc,.t41.medium span.calc{
@@ -451,7 +451,7 @@
 /*SMALL 16PX*/
 
 /*cart 16px small*/
- 
+
 .t41 a.element.small.icon span.help,.t41.small span.help{
 	background-position: 0 0;
 }
@@ -472,8 +472,8 @@
 	background-position: -32px -16px;
 }
 
-.t41 a.element.small.icon span span.right-arrow,.t41.small span.right-arrow{
-	background-position: -48px -16px;
+.t41 a.element.small.icon span.right-arrow,.t41.small span.right-arrow{
+	background-position: -48px -16px ;
 }
 
 .t41 a.element.small.icon span span.right-arrow-blue,.t41.small span.right-arrow-blue{
@@ -621,7 +621,7 @@
 /*Couleurs*/
 
 
-.t41 a.element.white.button, .t41.white a.button, a.element.white.button.t41 {			
+.t41 a.element.white.button, .t41.white a.button, a.element.white.button.t41 {
 	background-color: #FFFFFF;
 	color: #666666;
 	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
@@ -637,7 +637,7 @@
 	background-color: #333333;
 }
 
-.t41 a.element.grey.button, .t41.grey a.button, a.element.grey.button .t41 /*.t41.grey a.button*/{						
+.t41 a.element.grey.button, .t41.grey a.button, a.element.grey.button .t41 /*.t41.grey a.button*/{
 	background-color: #666666;
 }
 
