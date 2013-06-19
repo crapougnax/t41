@@ -31,6 +31,7 @@ use t41\ObjectModel\Property;
 use t41\View\ListComponent\Element;
 use t41\View\FormComponent\Element\ButtonElement;
 use t41\Core\Registry;
+use t41\ObjectModel\Property\AbstractProperty;
 
 /**
  * Class providing data list objects
@@ -63,6 +64,9 @@ class ListComponent extends ViewObject {
 	
 	
 	protected $_columns;
+	
+	
+	protected $_groups = array();
 	
 	
 	/**
@@ -153,7 +157,6 @@ class ListComponent extends ViewObject {
     				}
     			}
     			
-    			
     			$obj->setParameter('property', $parts[0]);
     			$obj->setTitle(isset($alt[$column]) ? $alt[$column] : $property->getLabel());
     			$obj->setParameter('align', $property instanceof CurrencyProperty ? 'R' : 'L');
@@ -169,6 +172,22 @@ class ListComponent extends ViewObject {
     public function getRows()
     {
     	return $this->_collection->getMembers();
+    }
+    
+    
+    public function addGroup($name, $from, $to)
+    {
+    	$this->_groups[] = array('name'		=> $name
+    						   , 'from'		=> $from
+    						   , 'to' 		=> $to
+    	);
+    	return $this;
+    }
+    
+    
+    public function getGroups()
+    {
+    	return $this->_groups;
     }
     
     

@@ -300,12 +300,11 @@ class PdfDefault extends AbstractPdfDecorator {
      */
     protected function _drawHeaderRow(\TCPDF $pdf)
     {
-/*    	if (count($this->_obj->getGroups()) > 0) {
-    		
+    	if (count($this->_obj->getGroups()) > 0) {
     		$this->_drawGroupRow($pdf);
     	}
-*/    	
-        $currentStyle = $pdf->getFontStyle();
+
+    	$currentStyle = $pdf->getFontStyle();
         $pdf->SetFont($pdf->getFontFamily(), 'B');
         
         $index = 0;
@@ -344,10 +343,9 @@ class PdfDefault extends AbstractPdfDecorator {
     protected function _drawGroupRow(\TCPDF $pdf)
     {
     	if (is_null($this->_groups)) {
-    	
     		$this->_groups = $this->_obj->getGroups();
-    		
     		foreach ($this->_groups as $key => $group) {
+    			$this->_groups[$key]['width'] = 0;
     			foreach ($this->_colsWidth as $col => $width) {
     				if ($col >= $group['from'] && $col <= $group['to']) {
     					$this->_groups[$key]['width'] += $width;
