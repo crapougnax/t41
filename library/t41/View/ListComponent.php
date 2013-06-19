@@ -31,7 +31,6 @@ use t41\ObjectModel\Property;
 use t41\View\ListComponent\Element;
 use t41\View\FormComponent\Element\ButtonElement;
 use t41\Core\Registry;
-use t41\ObjectModel\Property\AbstractProperty;
 
 /**
  * Class providing data list objects
