@@ -193,8 +193,7 @@ class Property {
 				foreach ($displayProps as $disProp) {
 					// display the identifier part of an uri
 					if ($disProp == ObjectUri::IDENTIFIER) {
-						$displayValue[] = $object->getUri()->getIdentifier();
-						
+						$displayValue[] = $object->getUri() ? $object->getUri()->getIdentifier() : '';
 					} else {
 						// display property value, if property exists!
 						if (($prop = $object->getProperty($disProp)) !== false) {
