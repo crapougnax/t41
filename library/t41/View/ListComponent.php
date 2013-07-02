@@ -145,15 +145,16 @@ class ListComponent extends ViewObject {
     				foreach (array_slice($parts, 1) as $recursion) {
     					// recursion to find the related property
     					if ($property instanceof Property\ObjectProperty) {
-    						
     						$do2 = ObjectModel\DataObject::factory($property->getParameter('instanceof'));
-    						$property = $do2->getProperty($recursion);
-    						
-    						if (! $property instanceof Property\AbstractProperty) {
-    							continue;
+    						if (($nproperty = $do2->getProperty($recursion)) !== false) {
+    							$property = $nproperty;
     						}
     					}
     				}
+    			}
+    			
+    			if (! is_object($property)) {
+    				$alt[$column] = 'Erreur';
     			}
     			
     			$obj->setParameter('property', $parts[0]);
