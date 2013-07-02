@@ -186,7 +186,7 @@ class Property {
 			
 			$displayProps = explode(',', $display);
 			if (count($displayProps) == 1 && $displayProps[0] == '') {
-				return $object->__toString(); //self::UNDEFINED_LABEL;
+				return $object instanceof BaseObject ? $object->__toString() : null; //self::UNDEFINED_LABEL;
 			
 			} else {
 				$displayValue = array();
