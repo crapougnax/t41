@@ -172,7 +172,7 @@ class Property {
 	 */
 	static public function parseDisplayProperty(ObjectModelAbstract $object, $display = null)
 	{
-		if (is_null($display)) {
+		if (is_null($display) && $object instanceof BaseObject) {
 			return $object->__toString();
 		}
 		
