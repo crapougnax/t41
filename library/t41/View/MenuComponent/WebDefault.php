@@ -110,7 +110,7 @@ class WebDefault extends AbstractWebDecorator {
 	protected function _makeJsId($item, $module = null)
 	{
 		$rsc = ($item->fullRes != true) ? $module . '/' . $item->getId() : $item->getId(); 
-		return str_replace('/','-', $item->getId());
+		return 'menu-' . str_replace('/','-', $item->getId());
 	}
 	
 	
