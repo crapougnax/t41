@@ -222,7 +222,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 			foreach ($this->_post['srcProperty'] as $key => $val) {
 				$collection->having($key)->equals($val);
 			}
-			$collection->setBoundaryBatch(50);
+			$collection->setBoundaryBatch(50000);
 			$collection->find(ObjectModel::MODEL);
 			
 			$data = array();
