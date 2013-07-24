@@ -119,6 +119,7 @@ window.t41.view.form = function(id,obj,form) {
 		}
 		
 		if (errors.length > 0) {
+			jQuery('span.error').remove();
 			for (var i in errors) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
