@@ -41,7 +41,7 @@ class Core {
 	 * Current version
 	 *
 	 */
-	const VERSION = '1.0.0 alpha';
+	const VERSION = '1.0';
 	
 	
 	const ENV_PROD	= 'prod';
@@ -200,7 +200,7 @@ class Core {
      *
      * @var array
      */
-    static protected $_adaptersList = array('session', 'registry', 'cache', 'backend');
+    static protected $_adaptersList = array('session', 'registry', 'cache', 'backend', 'logger');
     
     
     /**
@@ -212,12 +212,19 @@ class Core {
     public static function setAdapter($key, $adapter)
     {
     	if (! in_array($key, self::$_adaptersList)) {
-    		
     		throw new Exception("$key is not a valid adapter type");
     	}
-    	
     	self::$_adapters[$key] = $adapter;
     }
+    
+    
+    public static function getAdapter($key)
+    {
+    	if (! in_array($key, self::$_adaptersList)) {
+    		throw new Exception("$key is not a valid adapter type");
+    	}
+    	return self::$_adapters[$key];    	
+    } 
     
     
     /**
@@ -483,7 +490,6 @@ class Core {
 				//var_dump($opts->params); die;
 				
 			} catch (\Zend_Console_GetOpt_Exception $e) {
-				
 				die($e->getUsageMessage());
 			}
 			
@@ -551,7 +557,6 @@ class Core {
     	self::$_env += self::$_config['environments'][$envKey];
     	
     	if (self::getEnvData('cache_backend')) {
-    	
     		self::$cache = self::getEnvData('cache_backend');
     	}
     	 
@@ -567,12 +572,16 @@ class Core {
 		date_default_timezone_set(isset(self::$_env['version']['timezone']) ? self::$_env['version']['timezone'] : 'Europe/Paris');
 
 		if (isset(self::$_env['php'])) {
-			
 			foreach (self::$_env['php'] as $directive => $value) {
-				
 				ini_set($directive, $value);
 			}
 		}
+
+		// define logger
+		if (isset(self::$_env['log']) && self::$_env['log'] != false) {
+			self::enableLogger(self::$_env['log']);
+		}
+
 		
 		/* define lang - can be overwritten anywhere */
 		self::$lang = self::$_config['versions']['default'];
@@ -610,7 +619,7 @@ class Core {
 
 		// define some basic view data
 		View::setEnvData('t41.version', self::VERSION);
-//		if (class_exists('Zend_Version')) View::setEnvData('zf.version', \Zend_Version::VERSION);
+		if (class_exists('Zend_Version')) View::setEnvData('zf.version', \Zend_Version::VERSION);
 		View::setEnvData('app.name', self::$_config['name']);
 		View::setEnvData('app.version', self::getVersion());
 		
@@ -629,6 +638,24 @@ class Core {
 	        //set_exception_handler(array('t41\Core', 'exceptionHandler'));
         } 
     }
+    
+    
+    static public function enableLogger()
+    {
+    	self::$_adapters['logger'] = new \Zend_Log();
+    	$writer = new \Zend_Log_Writer_Firebug();
+    	self::$_adapters['logger']->addWriter($writer);
+    }
+    
+    
+    static public function log($message, $level = \Zend_Log::INFO)
+    {
+    	if (isset(self::$_adapters['logger'])) {
+    		$date = date_create();
+    		$message = microtime(true) . "\t" . $message;
+    		self::$_adapters['logger']->log($message, $level);
+    	}
+    }
 
     
     /**
@@ -643,12 +670,9 @@ class Core {
     	if (is_null($store)) {
 	        return isset(self::$_env[$key]) ? self::$_env[$key] : null;
     	} else {
-    		
     		if (isset(self::$_env[$store]) && isset(self::$_env[$store][$key])) {
-    			
     			return self::$_env[$store][$key];
     		} else {
-    			
     			return null;
     		}
     	}
@@ -803,8 +827,9 @@ class Core {
     	
     	$cached = $cache->load($key);
     	
+    	Core::log(sprintf('[Cache] Retrieved %s as %s', $key, gettype($cached)));
+    	 
         if (is_array($cached)) {
-        	
         	if (isset($cached['_class'])) {
         		try {
                        \Zend_Loader::loadClass($cached['_class']);
@@ -977,6 +1002,5 @@ class Core {
 	
 	static public function processMemUsage()
 	{
-		
 	}
 }
