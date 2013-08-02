@@ -63,12 +63,14 @@ class Loader {
 		if (Core::getEnvData('cache_configs') === true) {
 			$ckey = self::getCacheKey($file, $realm);
 			if (($cached = Core::cacheGet($ckey)) !== false) {
+				Core::log(sprintf('[Config] Retrieved %s config file from cache', $file));
 				return $cached;
 			}
 		}
 		
 		if (($filePath = self::findFile($file, $realm)) == null) {
 			/* no matching file name in paths */
+			Core::log(sprintf('[Config] Failed loading %s config file', $file), \Zend_Log::ERR);
 			return false;
 		}
 
@@ -92,6 +94,7 @@ class Loader {
 		}
 
 		$config = self::$_adapters[$type]->load();
+		Core::log(sprintf('[Config] Successfully loaded %s config file', $file));
 		
 		/* if ckey is set, cache is activated but empty */
 		if (isset($ckey)) {
