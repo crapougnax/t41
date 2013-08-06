@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<objects>
-	
+		<object id="t41\Core\BaseUser">
+			<properties>
+				<property id="label" type="string">
+					<label>Name</label>
+				</property>
+			</properties>
+		</object>
+			
+		<object id="t41\Core\Session">
+			<parameters>
+				<parameter id="latency">
+					<type>integer</type>
+					<defaultvalue>3600</defaultvalue>
+				</parameter>
+			</parameters>
+			<properties>
+				<property id="key" type="string">
+					<label>Identifiant</label>
+				</property>
+				<property id="start" type="date">
+					<label>Début</label>
+				</property>
+				<property id="latest" type="date">
+					<label>Dernier accès</label>
+				</property>
+				<property id="ip" type="string">
+					<label>IP</label>
+				</property>
+				<property id="host" type="string">
+					<label>Hôte</label>
+				</property>
+				<property id="browser" type="string">
+					<label>Navigateur</label>
+				</property>
+				<property id="action" type="string">
+					<label>Dernière action</label>
+				</property>
+				<property id="user" type="object">
+					<label>User</label>
+					<display>label</display>
+					<instanceof>t41\Core\BaseUser</instanceof>
+				</property>
+				<property id="role" type="object">
+					<label>Role</label>
+					<display>label</display>
+					<instanceof>t41\Core\Acl\Role</instanceof>
+				</property>
+				<property id="data" type="array">
+					<label>Data</label>
+				</property>
+			</properties>
+		</object>
+		
 		<object id="t41\ObjectModel\HybridObject">
 			<properties>
 				<none/>
