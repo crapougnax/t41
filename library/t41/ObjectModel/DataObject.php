@@ -490,6 +490,11 @@ class DataObject extends ObjectModelAbstract {
 			// don't use empty() to check $value to avoid zero being ignored
     		if (($property = $this->getProperty($key)) !== false && $value != '') {
     			
+    			if ($value == Property::EMPTY_VALUE) {
+    				$property->resetValue();
+    				continue;
+    			}
+    			
     			if ($property instanceof Property\ObjectProperty) {
     				if ($property->getParameter('instanceof') == null) {
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
