@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<decorators>
-		<object id="\t41\View\SimpleComponent">
+		<object id="t41\View\SimpleComponent">
 			<decorator id="WebDefault">
 				<parameters>
 					<parameter id="theme">
@@ -24,16 +24,16 @@
 				</parameters>
 			</decorator>
 		</object>
-		<object id="\t41\View\FormComponent">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<bogus/>
 				</parameters>
 			</decorator>
 		</object>
 
-		<object id="\t41\View\TableComponent">
-			<decorator id="PdfDefault" extends="\t41\View\Decorator\AbstractPdfDecorator">
+		<object id="t41\View\TableComponent">
+			<decorator id="PdfDefault" extends="t41\View\Decorator\AbstractPdfDecorator">
 				<parameters>
 					<parameter id="newpage">
 						<type>string</type>
@@ -49,8 +49,8 @@
 			</decorator>
 		</object>
 	
-		<object id="\t41\View\TemplateComponent">
-			<decorator id="PdfDefault" extends="\t41\View\Decorator\AbstractPdfDecorator">
+		<object id="t41\View\TemplateComponent">
+			<decorator id="PdfDefault" extends="t41\View\Decorator\AbstractPdfDecorator">
 				<parameters>
 					<parameter id="newpage">
 						<type>string</type>
@@ -66,8 +66,8 @@
 			</decorator>
 		</object>
 			
-		<object id="\t41\View\ListComponent">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\ListComponent">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="paginator">
 						<type>boolean</type>
@@ -79,7 +79,7 @@
 					</parameter>
 				</parameters>
 			</decorator>
-			<decorator id="WebGrid" extends="\t41\View\Decorator\AbstractWebDecorator">
+			<decorator id="WebGrid" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="paginator">
 						<type>boolean</type>
@@ -103,7 +103,7 @@
 					</parameter>
 				</parameters>
 			</decorator>
-			<decorator id="PdfDefault" extends="\t41\View\Decorator\AbstractPdfDecorator">
+			<decorator id="PdfDefault" extends="t41\View\Decorator\AbstractPdfDecorator">
 				<parameters>
 					<parameter id="newpage">
 						<type>string</type>
@@ -119,8 +119,8 @@
 			</decorator>
 		</object>
 				
-		<object id="\t41\View\FormComponent\Element\ButtonElement">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent\Element\ButtonElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="size">
 						<type>string</type>
@@ -140,8 +140,8 @@
 		</decorator>
 		</object>
 		
-		<object id="\t41\View\FormComponent\Element\FieldElement">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent\Element\FieldElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="mode">
 						<type>string</type>
@@ -154,8 +154,8 @@
 		</decorator>
 		</object>
 
-		<object id="\t41\View\FormComponent\Element\ListElement">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent\Element\ListElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="name">
 						<type>string</type>
@@ -172,7 +172,7 @@
 					</parameter>
 				</parameters>
 			</decorator>
-			<decorator id="WebAutocomplete" extends="\t41\View\Decorator\AbstractWebDecorator">
+			<decorator id="WebAutocomplete" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="name">
 						<type>string</type>
@@ -191,8 +191,8 @@
 			</decorator>
 		</object>
 		
-		<object id="\t41\View\FormComponent\Element\EnumElement">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent\Element\EnumElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="mode">
 						<type>string</type>
@@ -208,11 +208,22 @@
 		</decorator>
 		</object>
 		
-		<object id="\t41\View\FormComponent\Element\DateElement">
-			<decorator id="WebDefault" extends="\t41\View\Decorator\AbstractWebDecorator">
+		<object id="t41\View\FormComponent\Element\DateElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
 					<parameter id="mode">
 						<type>string</type>
+					</parameter>
+				</parameters>
+			</decorator>
+		</object>
+	
+		<object id="t41\View\FormComponent\Element\TimeElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
+				<parameters>
+					<parameter id="defaultlabel">
+						<type>string</type>
+						<defaultvalue>--</defaultvalue>
 					</parameter>
 				</parameters>
 			</decorator>
