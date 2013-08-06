@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<view>
-		<object id="\t41\View\ViewObject">
+		<object id="t41\View\ViewObject">
 			<parameters>
 				<parameter id="open_default" type="boolean">
 					<defaultvalue>true</defaultvalue>
@@ -14,7 +14,7 @@
 				</parameter>
 			</parameters>
 		</object>
-		<object id="\t41\View\ListComponent" extends="\t41\View\ViewObjectModel">
+		<object id="t41\View\ListComponent" extends="t41\View\ViewObjectModel">
 			<parameters>
 				<parameter id="selectable" type="boolean">
 					<defaultvalue>false</defaultvalue>
@@ -39,7 +39,7 @@
 				</parameter>
 			</parameters>
 		</object>
-		<object id="\t41\View\FormComponent" extends="\t41\View\ViewObjectModel">
+		<object id="t41\View\FormComponent" extends="t41\View\ViewObjectModel">
 			<parameters>
 				<parameter id="identifier">
 					<type>boolean</type>
@@ -77,7 +77,7 @@
 			</parameters>
 		</object>
 		
-		<object id="\t41\View\ImageComponent" extends="\t41\View\ViewObject">
+		<object id="t41\View\ImageComponent" extends="t41\View\ViewObject">
 			<parameters>
 				<parameter id="ratio">
 					<type>float</type>
@@ -93,7 +93,7 @@
 			</parameters>
 		</object>
 
-		<object id="\t41\View\FormComponent\Element\ButtonElement" extends="\t41\View\ViewObject">
+		<object id="t41\View\FormComponent\Element\ButtonElement" extends="t41\View\ViewObject">
 			<parameters>
 				<parameter id="uri" type="object">
 				<bogus/>
@@ -107,7 +107,7 @@
 			</parameters>
 		</object>
 
-		<object id="\t41\View\ListComponent\Element\ColumnElement" extends="\t41\View\ViewObject">
+		<object id="t41\View\ListComponent\Element\ColumnElement" extends="t41\View\ViewObject">
 			<parameters>
 				<parameter id="property" type="string">
 					<bogus/>
@@ -121,7 +121,7 @@
 			</parameters>
 		</object>
 		
-		<object id="\t41\View\ListComponent\Element\MetaElement" extends="\t41\View\ViewObject">
+		<object id="t41\View\ListComponent\Element\MetaElement" extends="t41\View\ViewObject">
 			<parameters>
 				<parameter id="property" type="string">
 					<bogus/>
@@ -135,7 +135,7 @@
 			</parameters>
 		</object>
 
-		<object id="\t41\View\FormComponent\Element\ListElement" extends="\t41\View\ViewObject">
+		<object id="t41\View\FormComponent\Element\ListElement" extends="t41\View\ViewObject">
 			<parameters>
 				<parameter id="search" type="string">
 					<bogus/>
@@ -161,11 +161,15 @@
 			</parameters>
 		</object>
 		
-		<object id="\t41\View\FormComponent\Element\DateElement" extends="\t41\View\ViewObject">
+		<object id="t41\View\FormComponent\Element\DateElement" extends="t41\View\ViewObject">
 			<empty/>
 		</object>
-					
-		<object id="\t41\View\Action\AbstractAction">
+
+		<object id="t41\View\FormComponent\Element\TimeElement" extends="t41\View\ViewObject">
+			<empty/>
+		</object>
+							
+		<object id="t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="event" type="string">
 					<defaultvalue>click</defaultvalue>
@@ -185,12 +189,12 @@
 			</parameters>
 		</object>
 
-		<object id="\t41\View\Action\ObjectAction" extends="\t41\View\Action\AbstractAction">
+		<object id="t41\View\Action\ObjectAction" extends="t41\View\Action\AbstractAction">
 			<parameters>
 			</parameters>
 		</object>
 		
-		<object id="\t41\View\Action\AutocompleteAction" extends="\t41\View\Action\AbstractAction">
+		<object id="t41\View\Action\AutocompleteAction" extends="t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="search" type="array">
 				<bogus/>

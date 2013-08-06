@@ -109,23 +109,17 @@ class Parameter implements Core\ClientSideInterface {
 		$this->_setProtected($protected);
 
 		if (is_array($values)) {
-			
 			$this->_setValues($values);
 		}
-		
 		$this->setValue($value);
-		
 	}
 	
 	
 	protected function _setType($type)
 	{
 		if (in_array($type, array(self::ANY, self::BOOLEAN, self::INTEGER, self::FLOAT, self::STRING, self::MULTIPLE, self::OBJECT))) {
-			
 			$this->_type = $type;
-			
 		} else {
-			
 			throw new Exception("Le type '$type' n'est pas un type acceptable");
 		}		
 	}
@@ -146,11 +140,8 @@ class Parameter implements Core\ClientSideInterface {
 	protected function _setValue($value)
 	{
 		if (is_object($value) && count($this->_values) != 0 && !in_array(get_class($value), $this->_values)) {
-				
 			throw new Exception(array("OBJECT_NOT_INSTANCEOF", array((string) $value, implode(',', $this->_values))));
-
 		} else if (count($this->_values) > 0 && !in_array($value, $this->_values)) {
-				
 			throw new Exception(array("VALUE_NOT_IN_ENUMERATION", array($value, implode(',', $this->_values))));
 		}
 		
@@ -168,7 +159,6 @@ class Parameter implements Core\ClientSideInterface {
 	public function setValue($value = null)
 	{
 		if ($this->_protected && $this->_value != null) {
-			
 			throw new Exception("VALUE_PROTECTED_FROM_CHANGE");
 		}
 		
@@ -268,9 +258,6 @@ class Parameter implements Core\ClientSideInterface {
 	{
 		$class = get_class($object);
 		
-		// Sometimes, namespaced-class comes without its initial ns separator
-		if (substr($class, 0, 1) != '\\') $class = '\\' . $class;
-
 		if ($object instanceof ObjectModel\BaseObject) {
 			$params = self::getObjectParameters($class);
 			
@@ -312,8 +299,8 @@ class Parameter implements Core\ClientSideInterface {
 			self::loadConfig('objects.xml');
 		}
 		$array = self::_compileFragments($objectClass);
-
-		// transform each array value into t41_Parameter
+		
+		// transform each array value into t41\Parameter
 		return (count($array) != 0) ? self::_arrayToParameters($array) : $array;
 	}
 	
@@ -368,7 +355,6 @@ class Parameter implements Core\ClientSideInterface {
 	static protected function _compileFragments($objectClass, $objectType = 'objects', $subLevel = null)
 	{
 		$array = array();
-		
 		if (isset(self::$_config[$objectType][$objectClass])) {
 			$sub = self::$_config[$objectType][$objectClass];
 			
@@ -400,7 +386,6 @@ class Parameter implements Core\ClientSideInterface {
 	static protected function _arrayToParameters(array $array)
 	{
 		foreach ($array as $key => $value) {
-				
 			/* ignore parameter without any given type */
 			if (! isset($value['type']) || empty($value['type'])) continue;
 				

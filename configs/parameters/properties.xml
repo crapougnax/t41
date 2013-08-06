@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<properties>
-		<property id="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="label">
 					<type>any</type>
@@ -20,7 +20,7 @@
 				</parameter>
 			</parameters>
 		</property>
-		<property id="\t41\ObjectModel\Property\StringProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\StringProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="multilines">
 					<type>boolean</type>
@@ -33,7 +33,7 @@
 				</parameter>
 			</parameters>
 		</property>
-		<property id="\t41\ObjectModel\Property\ObjectProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\ObjectProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 					<parameter id="instanceof">
 						<type>string</type>
@@ -62,7 +62,7 @@
 					</parameter>
 			</parameters>
 		</property>
-		<property id="\t41\ObjectModel\Property\CollectionProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\CollectionProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 					<parameter id="instanceof">
 						<type>string</type>
@@ -97,7 +97,7 @@
 					</parameter>
 			</parameters>
 		</property>
-		<property id="\t41\ObjectModel\Property\DateProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\DateProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="format">
 					<type>string</type>
@@ -105,7 +105,15 @@
 				</parameter>
 			</parameters>
 		</property>
-		<property id="\t41\ObjectModel\Property\EnumProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\TimeProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+			<parameters>
+				<parameter id="format">
+					<type>string</type>
+					<value>HH:MM</value>
+				</parameter>
+			</parameters>
+		</property>
+		<property id="t41\ObjectModel\Property\EnumProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="values">
 					<type>array</type>
@@ -113,7 +121,7 @@
 			</parameters>
 		</property>
 
-		<property id="\t41\ObjectModel\Property\IntegerProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\IntegerProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="unsigned">
 					<type>boolean</type>
@@ -122,7 +130,7 @@
 			</parameters>
 		</property>
 				
-		<property id="\t41\ObjectModel\Property\CurrencyProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\CurrencyProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="currency">
 					<type>string</type>
@@ -130,12 +138,12 @@
 			</parameters>
 		</property>
 
-		<property id="\t41\ObjectModel\Property\ArrayProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\ArrayProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 			</parameters>
 		</property>
 
-		<property id="\t41\ObjectModel\Property\FloatProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\FloatProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="unsigned">
 					<type>boolean</type>
@@ -144,7 +152,7 @@
 			</parameters>
 		</property>
 		
-		<property id="\t41\ObjectModel\Property\MetaProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\MetaProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="property">
 					<type>string</type>
@@ -158,7 +166,7 @@
 			</parameters>
 		</property>
 		
-		<property id="\t41\ObjectModel\Property\MediaProperty" extends="\t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\MediaProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="maxsize">
 					<type>any</type>

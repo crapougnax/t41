@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config><!-- xmlns="http://www.w3.org/2001/XMLSchema-instance" xmlns:t41="http://www.t41.org/xml/1.0" -->
 	<core>
-		<object id="\t41\ObjectModel\Collection">
+		<object id="t41\ObjectModel\Collection">
 			<parameters>
 				<parameter id="offset" type="integer">
 					<defaultvalue>0</defaultvalue>
@@ -29,7 +29,7 @@
 			</parameters>
 		</object>
 
-		<object id="\t41\Acl\Role">
+		<object id="t41\Acl\Role">
 			<parameters>
 				<parameter id="privileges" type="array">
 					<label>Privileges</label>
