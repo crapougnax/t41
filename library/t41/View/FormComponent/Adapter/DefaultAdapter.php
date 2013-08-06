@@ -54,7 +54,11 @@ class DefaultAdapter extends AbstractAdapter {
 			case 'DateProperty':
 				$element = new Element\DateElement();
 				break;
-				
+
+			case 'TimeProperty':
+				$element = new Element\TimeElement();
+				break;
+									
 			case 'CurrencyProperty':
 				$element = new Element\CurrencyElement();
 				break;
@@ -158,6 +162,9 @@ class DefaultAdapter extends AbstractAdapter {
 								, Property::CONSTRAINT_HASLETTERS
 								, Property::CONSTRAINT_UPPERCASE
 								, Property::CONSTRAINT_LOWERCASE
+								, Property::CONSTRAINT_HOURMIN
+								, Property::CONSTRAINT_HOURMAX
+								, Property::CONSTRAINT_MINUTERANGE
 								);
 
 		foreach ($constraintsList as $key) {
