@@ -319,3 +319,41 @@ window.t41.view.form.streetNumber = function(id) {
 	this.initValue();
 };
 
+
+/**
+ * UI controls for the Time field format
+ */
+window.t41.view.form.timeElement = function(id) {
+
+	this.id = id;
+	
+	this.updateValue = function() {
+		var value = jQuery('#' + this.id + '_hour').val();
+		if (value) {
+			if (jQuery('#' + this.id + '_minute').prop('selectedIndex') == 0) {
+				jQuery('#' + this.id + '_minute').prop('selectedIndex', 1);
+			}
+			value += ':' + jQuery('#' + this.id + '_minute').val();
+		} else {
+			value = '_NONE_';
+			jQuery('#' + this.id + '_hour').prop('selectedIndex', 0);
+			jQuery('#' + this.id + '_minute').prop('selectedIndex', 0);
+		}
+			
+		jQuery('#' + this.id).val(value);
+		t41.view.customEvent(this.id, 'change');
+	};
+	
+	
+	this.initValue = function() {
+		var parts = jQuery('#' + this.id).val().split(':');
+		jQuery('#' + this.id + '_hour').val(parts[0] || '');
+		jQuery('#' + this.id + '_minute').val(parts[1] || '');
+		this.updateValue();
+	}
+	
+	var selector = '#' + this.id + '_hour,#' + this.id + '_minute';
+	t41.view.bindLocal(selector, 'change', jQuery.proxy(this,'updateValue'));
+	this.initValue();
+};
+
