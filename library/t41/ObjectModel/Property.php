@@ -120,6 +120,12 @@ class Property {
 	
 	const CONSTRAINT_LOWERCASE		= 'lowercase';
 
+
+	const CONSTRAINT_HOURMIN		= 'hourmin';
+	
+	const CONSTRAINT_HOURMAX		= 'hourmax';
+	
+	const CONSTRAINT_MINUTERANGE	= 'minuterange';
 	
 	/* available options to get a t41_Property_Object stored value */
 	
