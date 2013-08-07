@@ -26,6 +26,7 @@ use t41\View\SimpleComponent;
 
 use t41\Core,
 	t41\Config;
+use t41\View\Decorator;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -465,7 +466,10 @@ class Core {
     	/* register default REST controllers path */
     	/* @todo allow override in config file or even later */
     	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
-    	 
+    	
+    	/* register default path where to find view objects decorators */
+    	Decorator::addPath(self::$basePath . 'vendor/quatrain/t41/library/t41'); // without 'View'
+    	
     	// never cached, shall it be ?
     	$config = Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
@@ -529,7 +533,6 @@ class Core {
     				if (! is_array($value)) continue;
     				
     				if ($key == $match) {
-    					
     					$envKey = self::$env = $key;
     					break;
     				}
@@ -603,12 +606,10 @@ class Core {
     	
     		// get object model configuration
     		ObjectModel::loadConfig();
-    		
 		}
 		
         // configure error reporting according to env
         if (in_array(self::$env, array(self::ENV_STAGE, self::ENV_PROD))) {
-        	
         	error_reporting(E_ERROR); //(E_ALL | E_STRICT) ^ E_NOTICE);
         	ini_set('display_errors', 1);
         	

@@ -36,7 +36,27 @@ class Decorator {
 
 	
 	/**
-	 * Factory pattern used to instanciate a proper decorator for the given object extended from t41_Object_Abstract
+	 * Array of path where to search for decorators in order
+	 * @var array
+	 */
+	static protected $_paths = array();
+	
+	
+	public static function addPath($path, $ns = 't41')
+	{
+		if (is_dir($path)) {
+			if (substr($path,-1) != DIRECTORY_SEPARATOR) {
+				$path .= DIRECTORY_SEPARATOR;
+			}
+			array_unshift(self::$_paths, array('path' => $path, 'ns' => $ns));
+		} else {
+			throw new Exception("'$path' is not a directory");
+		}
+	}
+	
+	
+	/**
+	 * Factory pattern used to instanciate a proper decorator for the given object extended from t41\View\ViewObject
 	 *
 	 * @param t41\View\ViewObject $object disabled for now because of legacy problems
 	 * @param array $params
@@ -51,46 +71,36 @@ class Decorator {
     		$params = array_merge($params, $decoratorData['params']);
     	}
     	
-
-		/* if an alternative decorator library is indicated, we use is to build the class name */
-    	if (isset($decoratorData['class'])) {
-    								
-    		$decoratorClass = $decoratorData['class'];
-    		
-    	} else if (isset($decoratorData['lib'])) {
-
-    		$decoratorClass = str_replace('t41', $decoratorData['lib'], get_class($object));
-    		
-    	} else {
-    							
-	    	$decoratorClass = get_class($object);
-    	}
-
+    	// class name without the first component of the namespace
+    	$class = substr(get_class($object), strpos(get_class($object),'\\')+1);
+    	
     	if (View::getViewType() != Adapter\WebAdapter::ID) {
-    		
-    		$decoratorData['name'] = 'Default';
+	    	$decoratorData['name'] = 'Default';
     	}
     	
-    	if (! isset($decoratorData['name']) || trim($decoratorData['name'])=='') {
-    		
-    		$decoratorData['name'] = 'Default';
+    	if (! isset($decoratorData['name']) || trim($decoratorData['name']) == '') {
+	    	$decoratorData['name'] = 'Default';
     	}
     	
-    	$decoratorClass .= '\\' . View::getContext() . ucfirst($decoratorData['name']);
-								
-    	if (! class_exists($decoratorClass)) {
-
-    		throw new Exception("The decorator class '$decoratorClass' doesn't exist or was not found");
+    	// decorator name
+    	$deconame = View::getContext() . ucfirst($decoratorData['name']);
+    	 
+    	foreach (self::$_paths as $library) {
+    		$file = $library['path'] . str_replace('\\','/', $class) . '/' . $deconame . '.php';
+    		if (file_exists($file)) {
+	    		require_once $file;
+	    		$fullclassname = '\\' . $library['ns'] . '\\' . $class . '\\' . $deconame;
+	    		 
+	    		if (class_exists($fullclassname)) {
+	    		    try {
+    					$decorator = new $fullclassname($object, $params);
+			    	} catch (Exception $e) {
+    					throw new Exception("Error instanciating '$fullclassname' decorator.", $e->getCode(), $e);
+    				}
+    				return $decorator;
+	    		}
+	    	}
     	}
-
-    	try {
-    			$decorator = new $decoratorClass($object, $params);
-    			
-    	} catch (Exception $e) {
-
-    			throw new Exception("Error instanciating '$decoratorClass' decorator.", $e->getCode(), $e);
-    	}
-    	
-    	return $decorator;
+    	throw new Exception("The decorator class '$class' doesn't exist or was not found");
 	}
 }
