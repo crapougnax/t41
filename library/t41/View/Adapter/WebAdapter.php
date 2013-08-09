@@ -150,11 +150,15 @@ class WebAdapter extends AbstractAdapter {
         $eventHash = md5($event);
         if (array_key_exists($eventHash, $this->_event)) return false;
 
-        if ($isFile) {
-        	$event = @file_get_contents(Core::$basePath . $event);
+        if ($isFile != false) {
+        	$path = Core::$basePath;
+        	if (is_string($isFile)) {
+        		$path .= $isFile;
+        		if (substr($path,-1) != '/') $path .= '/';
+        	}
+        	$event = file_get_contents($path . $event);
         }
         $this->_event[$type][$eventHash] = $event;
-        
         return true;
     }
 
