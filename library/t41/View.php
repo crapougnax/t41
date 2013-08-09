@@ -243,7 +243,7 @@ class View {
 		if (self::_isInstanciated ()) {
 			$type = substr($lib, strrpos($lib, '.')+1);
 			$file = '/t41/' . $module . '/' . $lib;
-			return self::$_display->componentAdd ($file, $type);
+			return self::$_display->componentAdd($file, $type);
 		}
 	}
 
@@ -318,14 +318,22 @@ class View {
 	 */
 	static public function addJsEvent($event, $isFile = false) {
 		if (self::_isInstanciated ()) {
-			return self::$_display->eventAdd ( $event, 'js', $isFile );
+			return self::$_display->eventAdd($event, 'js', $isFile);
 		}
 	}
 	
 
 	static public function addEvent($event, $type, $isFile = false) {
 		if (self::_isInstanciated ()) {
-			return self::$_display->eventAdd ( $event, $type, $isFile );
+			if ($isFile != false) {
+				if (is_string($isFile)) {
+					$isFile = str_replace('app/', 'application/modules/', $isFile);
+					$isFile .= '/assets/' . $type . '/';
+				} else {
+					$isFile = 'html/' . $type . '/';
+				}
+			}
+			return self::$_display->eventAdd($event, $type, $isFile);
 		}
 	}
 	
