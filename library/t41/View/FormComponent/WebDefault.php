@@ -184,7 +184,7 @@ class WebDefault extends SimpleComponent\WebDefault {
     	/**
     	 * Buttons are displayed by t41.view.form.js
     	 */    	
-    	return sprintf('<fieldset id="form_actions"></fieldset>');
+    	return sprintf('<fieldset id="form_actions" class="t41"></fieldset>');
     }
     
     
