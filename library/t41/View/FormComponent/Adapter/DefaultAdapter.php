@@ -39,6 +39,26 @@ use t41\ObjectModel\Property\AbstractProperty;
 class DefaultAdapter extends AbstractAdapter {
 
 	
+	static public $constraintsList = array(Property::CONSTRAINT_MANDATORY
+										 , Property::CONSTRAINT_UNIQUE
+										 , Property::CONSTRAINT_PROTECTED
+										 , Property::CONSTRAINT_ENCRYPTED
+										 , Property::CONSTRAINT_EMAILADDRESS
+										 , Property::CONSTRAINT_URLSCHEME
+										 , Property::CONSTRAINT_MINLENGTH
+										 , Property::CONSTRAINT_MAXLENGTH
+										 , Property::CONSTRAINT_HASDIGITS
+										 , Property::CONSTRAINT_HASLETTERS
+										 , Property::CONSTRAINT_UPPERCASE
+										 , Property::CONSTRAINT_LOWERCASE
+										 , Property::CONSTRAINT_DATEMIN
+										 , Property::CONSTRAINT_DATEMAX
+										 , Property::CONSTRAINT_HOURMIN
+										 , Property::CONSTRAINT_HOURMAX
+										 , Property::CONSTRAINT_MINUTERANGE
+										);
+
+	
 	public function addElementFromProperty(AbstractProperty $property, $fname, $position = null)
 	{
 		$class = get_class($property);
@@ -119,9 +139,6 @@ class DefaultAdapter extends AbstractAdapter {
 				}
 
 				$element->setCollection($collection);
-				
-				//$collection->find();
-				//\Zend_Debug::dump(\t41\Backend::getLastQuery());
 				break;
 			
 			case 'CollectionProperty':
@@ -149,27 +166,8 @@ class DefaultAdapter extends AbstractAdapter {
 		$element->setValue($value);
 		
 		$constraints = $property->getParameter('constraints');
-		
-		$constraintsList = array( Property::CONSTRAINT_MANDATORY
-								, Property::CONSTRAINT_UNIQUE
-								, Property::CONSTRAINT_PROTECTED
-								, Property::CONSTRAINT_ENCRYPTED
-								, Property::CONSTRAINT_EMAILADDRESS
-								, Property::CONSTRAINT_URLSCHEME
-								, Property::CONSTRAINT_MINLENGTH
-								, Property::CONSTRAINT_MAXLENGTH
-								, Property::CONSTRAINT_HASDIGITS
-								, Property::CONSTRAINT_HASLETTERS
-								, Property::CONSTRAINT_UPPERCASE
-								, Property::CONSTRAINT_LOWERCASE
-								, Property::CONSTRAINT_DATEMIN
-								, Property::CONSTRAINT_DATEMAX
-								, Property::CONSTRAINT_HOURMIN
-								, Property::CONSTRAINT_HOURMAX
-								, Property::CONSTRAINT_MINUTERANGE
-								);
 
-		foreach ($constraintsList as $key) {
+		foreach (self::$constraintsList as $key) {
 			if (isset($constraints[$key])) {
 				$element->setConstraint($key, empty($constraints[$key]) ? true : $constraints[$key]);
 			}
