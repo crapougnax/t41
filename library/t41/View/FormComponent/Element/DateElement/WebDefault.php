@@ -24,8 +24,7 @@ class WebDefault extends AbstractWebDecorator {
 		
 		switch ($this->getParameter('mode')) {
 
-			case 'rttr': //t41_Form::SEARCH:
-				
+			case View\FormComponent::SEARCH_MODE:
 				$so = ViewUri::getUriAdapter()->getIdentifier('search');
 				
 				$dataArray = isset($_GET[$so][$this->_obj->getAltId()]) ? $_GET[$so][$this->_obj->getAltId()] : array();
@@ -67,7 +66,14 @@ class WebDefault extends AbstractWebDecorator {
 							,'dayNames'		=> array('Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi')
 							,'dayNamesMin'	=> array('Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam')	
 						   );
-						   
+		if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN) != '') {
+			$pickerArgs['minDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN);
+		}
+
+		if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX) != '') {
+			$pickerArgs['maxDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX);
+		}
+		
 		View::addEvent(sprintf('jQuery(function() { jQuery("#%s").datepicker(%s); });'
 									, $dispField
 									, \Zend_Json::encode($pickerArgs)

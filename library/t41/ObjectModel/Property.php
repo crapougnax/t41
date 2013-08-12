@@ -120,7 +120,10 @@ class Property {
 	
 	const CONSTRAINT_LOWERCASE		= 'lowercase';
 
-
+	const CONSTRAINT_DATEMIN		= 'datemin';
+	
+	const CONSTRAINT_DATEMAX		= 'datemax';
+	
 	const CONSTRAINT_HOURMIN		= 'hourmin';
 	
 	const CONSTRAINT_HOURMAX		= 'hourmax';
