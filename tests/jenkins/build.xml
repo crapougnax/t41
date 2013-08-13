@@ -47,7 +47,7 @@
 				sourcecode="false"
 				output="HTML:Smarty:PHP">
 			<fileset dir="${project.basedir}/../../library">
-				<include name="*/*.php"/>
+				<include name="**/*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
 				<include name="README"/>
