@@ -11,8 +11,8 @@
 		 <delete dir="${project.basedir}/../phpdoc" />
 		 <delete dir="${project.basedir}/../phpcs" />
 		 
-		 <mkdir dir="${project.basedir}/../phpdoc" />
-		 <mkdir dir="${project.basedir}/../phpcs" />
+		 <mkdir dir="${project.basedir}/../rapports/phpdoc" />
+		 <mkdir dir="${project.basedir}/../rapports/phpcs" />
     </target>
 	
 	<!-- DEROULEMENT DES TESTS -->
@@ -27,7 +27,7 @@
 	
 
 	<target name="phploc">
-		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/../phploc.csv' '${project.basedir}/../../library'" escape="false" />
+		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/../rapports/phploc.csv' '${project.basedir}/../../library'" escape="false" />
 	</target>
 
 	
@@ -35,7 +35,7 @@
 
 	
 	<target name="phpcs">
-		<exec command="phpcs --standard=ZEND --report=checkstyle ${project.basedir}/../../library > ${project.basedir}/../phpcs/phpcs.xml" escape="false" />
+		<exec command="phpcs --standard=ZEND --report=checkstyle ${project.basedir}/../../library > ${project.basedir}/../rapports/phpcs/phpcs.xml" escape="false" />
 	</target>
 
 	
@@ -43,7 +43,7 @@
 	
 	<target name="phpdoc">
 		<phpdoc title="API Documentation"
-				destdir="${project.basedir}/../phpdoc"
+				destdir="${project.basedir}/../rapports/phpdoc"
 				sourcecode="false"
 				output="HTML:Smarty:PHP">
 			<fileset dir="${project.basedir}/../../library">
