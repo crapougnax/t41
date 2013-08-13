@@ -27,7 +27,7 @@
 	
 
 	<target name="phploc">
-		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/../phploc.csv' '${project.basedir}/library'" escape="false" />
+		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/../phploc.csv' '${project.basedir}/../../library'" escape="false" />
 	</target>
 
 	
@@ -46,7 +46,7 @@
 				destdir="${project.basedir}/../phpdoc"
 				sourcecode="false"
 				output="HTML:Smarty:PHP">
-			<fileset dir="${project.basedir}/library">
+			<fileset dir="${project.basedir}/../../library">
 				<include name="*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
