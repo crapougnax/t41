@@ -8,11 +8,11 @@
 
 	<!-- CLEAN EN CAS DE REPERTOIRES TEMPORAIRES-->
     <target name="clean" description="Vide les répertoires d'artefacts">
-		 <delete dir="${project.basedir}/phpdoc" />
-		 <delete dir="${project.basedir}/phpcs" />
+		 <delete dir="${project.basedir}/../phpdoc" />
+		 <delete dir="${project.basedir}/../phpcs" />
 		 
-		 <mkdir dir="${project.basedir}/phpdoc" />
-		 <mkdir dir="${project.basedir}/phpcs" />
+		 <mkdir dir="${project.basedir}/../phpdoc" />
+		 <mkdir dir="${project.basedir}/../phpcs" />
     </target>
 	
 	<!-- DEROULEMENT DES TESTS -->
@@ -27,7 +27,7 @@
 	
 
 	<target name="phploc">
-		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/phploc.csv' '${project.basedir}/../../vendor/quatrain/t41/library'" escape="false" />
+		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/../phploc.csv' '${project.basedir}/library'" escape="false" />
 	</target>
 
 	
@@ -35,7 +35,7 @@
 
 	
 	<target name="phpcs">
-		<exec command="phpcs --standard=PEAR --report=checkstyle ${project.basedir}/../../vendor/quatrain/t41/library > ${project.basedir}/phpcs/phpcs.xml" escape="false" />
+		<exec command="phpcs --standard=ZEND --report=checkstyle ${project.basedir}/library > ${project.basedir}/../phpcs/phpcs.xml" escape="false" />
 	</target>
 
 	
@@ -43,10 +43,10 @@
 	
 	<target name="phpdoc">
 		<phpdoc title="API Documentation"
-				destdir="${project.basedir}/phpdoc"
+				destdir="${project.basedir}/../phpdoc"
 				sourcecode="false"
 				output="HTML:Smarty:PHP">
-			<fileset dir="${project.basedir}/../../vendor/quatrain/t41/library">
+			<fileset dir="${project.basedir}/library">
 				<include name="*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
