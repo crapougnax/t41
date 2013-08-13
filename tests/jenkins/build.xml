@@ -3,7 +3,7 @@
 
     <target name="ci"
         description="Tâche principale d'intégration continue"
-        depends="qa"
+        depends="clean,qa"
     />
 
 	<!-- CLEAN EN CAS DE REPERTOIRES TEMPORAIRES-->
