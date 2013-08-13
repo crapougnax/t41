@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TestsItalic" default="ci">
+
+    <target name="ci"
+        description="Tâche principale d'intégration continue"
+        depends="qa"
+    />
+
+	<!-- CLEAN EN CAS DE REPERTOIRES TEMPORAIRES-->
+    <target name="clean" description="Vide les répertoires d'artefacts">
+		 <delete dir="${project.basedir}/phpdoc" />
+		 <delete dir="${project.basedir}/phpcs" />
+		 
+		 <mkdir dir="${project.basedir}/phpdoc" />
+		 <mkdir dir="${project.basedir}/phpcs" />
+    </target>
+	
+	<!-- DEROULEMENT DES TESTS -->
+    <target name="qa" description="Lance les outils d'analyse">
+    	<phingcall target="phploc" />
+    	<phingcall target="phpcs" />
+    	<phingcall target="phpdoc"/>
+    </target>
+ 
+	
+	<!--  STATISTIQUE DU CODE PHP, NOMBRES CLASSES etc -->
+	
+
+	<target name="phploc">
+		<exec logoutput="true" dir="${project.basedir}" command="phploc --log-csv '${project.basedir}/phploc.csv' '${project.basedir}/../../vendor/quatrain/t41/library'" escape="false" />
+	</target>
+
+	
+	<!-- CODESNIFFER POUR LE RESPECT DES NORMES -->
+
+	
+	<target name="phpcs">
+		<exec command="phpcs --standard=PEAR --report=checkstyle ${project.basedir}/../../vendor/quatrain/t41/library > ${project.basedir}/phpcs/phpcs.xml" escape="false" />
+	</target>
+
+	
+	<!-- DOCUMENTATION API -->
+	
+	<target name="phpdoc">
+		<phpdoc title="API Documentation"
+				destdir="${project.basedir}/phpdoc"
+				sourcecode="false"
+				output="HTML:Smarty:PHP">
+			<fileset dir="${project.basedir}/../../vendor/quatrain/t41/library">
+				<include name="*.php"/>
+			</fileset>
+			<projdocfileset dir=".">
+				<include name="README"/>
+				<include name="INSTALL"/>
+				<include name="CHANGELOG"/>
+			</projdocfileset>
+		</phpdoc>
+	</target>
+	
+	  
+
+</project>
