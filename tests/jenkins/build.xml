@@ -35,7 +35,7 @@
 
 	
 	<target name="phpcs">
-		<exec command="phpcs --standard=ZEND --report=checkstyle ${project.basedir}/library > ${project.basedir}/../phpcs/phpcs.xml" escape="false" />
+		<exec command="phpcs --standard=ZEND --report=checkstyle ${project.basedir}/../../library > ${project.basedir}/../phpcs/phpcs.xml" escape="false" />
 	</target>
 
 	
