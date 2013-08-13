@@ -209,7 +209,7 @@ class WebDefault extends AbstractWebDecorator {
 
 		$status = ($this->_obj->getParameter('open_default') == true) ? 'open' : 'close';
     	$html_head = <<<HTML
-<div class="t41 component list" id="{$this->_instanceof}_{$this->_obj->getId()}">
+<div class="t41 component list white medium" id="{$this->_instanceof}_{$this->_obj->getId()}">
 <h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 <div class="content">
 HTML;
