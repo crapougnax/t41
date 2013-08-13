@@ -48,6 +48,8 @@
 				output="HTML:Smarty:PHP">
 			<fileset dir="${project.basedir}/../../library">
 				<include name="backend/*.php"/>
+				<include name="Config/*.php"/>
+				<include name="Controller/*.php"/>
 				<include name="*/*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
