@@ -120,62 +120,49 @@ abstract class AbstractAdapter implements AdapterInterface {
 	}
 	
 	
+	/**
+	 * Return the table (datastore) matching the given object class
+	 * @param string $class Class name
+	 * @return string
+	 */
 	protected function _getTableFromClass($class)
 	{
-		// get table to use
 		if (! empty($this->_table)) {
-			
 			$table = $this->_table;
-		
 		} else if ($class && $this->_mapper instanceof Backend\Mapper) {
-			
-			$table = strtolower($this->_mapper->getDatastore($class));
-			
+			$table = $this->_mapper->getDatastore($class);
 		} else {
-			
+			$class= strtolower($class);
 			if (strpos($class, '\\') !== false) {
-				
 				if ($this->_tableNameFromClassSegments == 0) {
-					
 					$table = str_replace('\\','_', $class);
-					
 				} else {
-				
 					$table = '';
 					$parts = explode('\\', strtolower($class));
 					array_reverse($parts);
 					
 					for ($i = 0 ; $i < $this->_tableNameFromClassSegments ; $i++) {
-						
 						if (strlen($table) > 0) $table .= '_';
 						$table = $parts[$i] . $table;
 					}
 				}
 			} else {
-			
 				$table = $class;
 			}
 		}
-
-		return strtolower($table);
+		return $table;
 	}
 	
 	
 	protected function _getTableFromUri(ObjectModel\ObjectUri $uri)
 	{
 		if ($uri instanceof ObjectModel\ObjectUri && $uri->getUrl()) {
-			
 			$els = explode('/', $uri->getUrl());
-			
 			if (count($els) > 1 && $els[count($els)-2] != $this->_database) {
-				
 				return $els[count($els)-2];
-				
 			} else {
-				
 				return $this->_getTableFromClass($uri->getClass());
 			}
-			
 		} else {
 			return $this->_getTableFromClass($uri->getClass());
 		}
