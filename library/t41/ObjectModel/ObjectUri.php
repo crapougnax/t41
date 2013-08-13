@@ -84,11 +84,10 @@ class ObjectUri implements Core\ClientSideInterface {
 			
 			$parts = explode('/', $str);
 			
-			// we only got one identifier, use default backend
+			// we only got one identifier, use default backend or passed one
 			if (count($parts) == 1) {
 				$this->_backendUri = $backendUri ? $backendUri->getUri() : Backend::getDefaultBackend()->getUri();
 				$this->_identifier = $str;
-			
 			} else {
 				if (substr($parts[0], 0, 1) == Backend::PREFIX) {
 					$this->_backendUri = $backendUri ? $backendUri : Backend::getBackendUri($parts[0]);

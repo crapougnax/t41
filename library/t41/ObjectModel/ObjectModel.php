@@ -61,15 +61,12 @@ abstract class ObjectModel extends ObjectModelAbstract {
 		$this->_setParameterObjects();
 		
 		if (is_array($params)) {
-			
 			$this->_setParameters($params);
 		}
 
 		/* build data object and populate it if possible */
 		if ($val instanceof DataObject) {
-
 			if ($val->getClass() != get_class($this)) {
-				
 				throw new Exception("Provided Data Object is not build on class definition");
 			}
 			
