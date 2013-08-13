@@ -8,8 +8,8 @@
 
 	<!-- CLEAN EN CAS DE REPERTOIRES TEMPORAIRES-->
     <target name="clean" description="Vide les répertoires d'artefacts">
-		 <delete dir="${project.basedir}/../phpdoc" />
-		 <delete dir="${project.basedir}/../phpcs" />
+		 <delete dir="${project.basedir}/../rapports/phpdoc" />
+		 <delete dir="${project.basedir}/../rapports/phpcs" />
 		 
 		 <mkdir dir="${project.basedir}/../rapports/phpdoc" />
 		 <mkdir dir="${project.basedir}/../rapports/phpcs" />
