@@ -42,7 +42,7 @@
 	<!-- DOCUMENTATION API -->
 	
 	<target name="phpdoc">
-		<phpdoc2 title="API Documentation"
+		<phpdoc2 
 				destdir="${project.basedir}/../rapports/phpdoc"
 				output="HTML:Smarty:PHP"
 				  >
