@@ -52,7 +52,6 @@
 				<include name="Controller/*.php"/>
 				<include name="Core/*.php"/>
 				<include name="ObjectModel/*.php"/>
-				<include name="*/*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
 				<include name="README"/>
