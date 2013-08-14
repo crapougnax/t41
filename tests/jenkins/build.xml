@@ -46,7 +46,7 @@
 				destdir="${project.basedir}/../rapports/phpdoc"
 				sourcecode="false"
 				output="HTML:Smarty:PHP"
-				template="zend">
+				template="zend" >
 			<fileset dir="${project.basedir}/../../library">
 				<include name="t41/backend/*.php"/>
 				<include name="t41/Config/*.php"/>
