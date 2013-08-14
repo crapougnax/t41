@@ -41,12 +41,9 @@
 	
 	<!-- DOCUMENTATION API -->
 	
-	<target name="phpdoc">
-		<phpdoc title="API Documentation"
-				destdir="${project.basedir}/../rapports/phpdoc"
-				sourcecode="false"
-				output="HTML:Smarty:PHP">
-			<fileset dir="${project.basedir}/../../library">
+	<target name="phpdoc" description="Generates API documentation">
+        <docblox destDir="${project.basedir}/build/api">
+          <fileset dir="${project.basedir}/../../library">
 				<include name="t41/backend/*.php"/>
 				<include name="t41/Config/*.php"/>
 				<include name="t41/Controller/*.php"/>
@@ -55,14 +52,9 @@
 				<include name="t41/View/*.php"/>
 				<include name="t41/ObjectModel/*.php"/>
 			</fileset>
-			<projdocfileset dir=".">
-				<include name="README"/>
-				<include name="INSTALL"/>
-				<include name="CHANGELOG"/>
-			</projdocfileset>
-		</phpdoc>
-	</target>
-	
+        </docblox>
+    </target>
+
 	  
 
 </project>
