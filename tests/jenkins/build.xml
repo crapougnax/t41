@@ -55,11 +55,6 @@
 				<include name="t41/View/*.php"/>
 				<include name="t41/*.php"/>
 			</fileset>
-			<projdocfileset dir=".">
-				<include name="README"/>
-				<include name="INSTALL"/>
-				<include name="CHANGELOG"/>
-			</projdocfileset>
 		</phpdoc>
 	</target>
 	
