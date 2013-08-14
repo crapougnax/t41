@@ -80,12 +80,9 @@ class ObjectModel {
 		
 		if ($add === false) {
 			self::$_config = $config['objects'];
-		
 		} else {
 	        self::$_config = array_merge(self::$_config, $config['objects']);
 		}
-
-//		\Zend_Debug::dump(self::$_config); die;
 		return true;
 	}
 	
@@ -102,7 +99,6 @@ class ObjectModel {
 	static public function addDefinition($id, array $array, $force = false)
 	{
 		if (self::definitionExists($id) === true && $force !== true) {
-
 			return false;
 		}
 		
@@ -205,10 +201,10 @@ class ObjectModel {
 	
 	/**
 	 * Tests if a definition exists for given $id
-	 * Returns a t41_Backend_Adapter_Interface instance if object definition includes a default backend value
+	 * Returns a t41\Backend\Adapter\AbstractAdapter instance if object definition includes a default backend value
 	 * 
 	 * @param string $id
-	 * @return t41_Backend_Adapter_Interface
+	 * @return t41\Backend\Adapter\AbstractAdapter
 	 * @throws ObjectModel\Exception
 	 */
 	static public function getObjectBackend($id)
