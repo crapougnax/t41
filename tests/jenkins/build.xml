@@ -55,7 +55,7 @@
 				<include name="t41/View/*.php"/>
 				<include name="t41/*.php"/>
 			</fileset>
-		</phpdoc>
+		</phpdoc2>
 	</target>
 	
 	  
