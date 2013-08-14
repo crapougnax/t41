@@ -43,9 +43,7 @@
 	
 	<target name="phpdoc">
 		<phpdoc2 title="API Documentation"
-				destdir="${project.basedir}/../rapports/phpdoc"
-				output="HTML:Smarty:PHP"
-				template="zend">
+				>
 			<fileset dir="${project.basedir}/../../library">
 				<include name="t41/backend/*.php"/>
 				<include name="t41/Config/*.php"/>
