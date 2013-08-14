@@ -47,8 +47,12 @@
 				sourcecode="false"
 				output="HTML:Smarty:PHP">
 			<fileset dir="${project.basedir}/../../library">
-				<include name="t41/**/.php"/>
-				
+				<include name="t41/backend/*.php"/>
+				<include name="t41/Config/*.php"/>
+				<include name="t41/Controller/*.php"/>
+				<include name="t41/Core/*.php"/>
+				<include name="t41/ObjectModel/*.php"/>
+				<include name="t41/View/*.php"/>
 			</fileset>
 			<projdocfileset dir=".">
 				<include name="README"/>
