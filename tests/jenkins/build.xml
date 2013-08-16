@@ -68,12 +68,12 @@
 	 <!--  GENERATION DU .PHAR  -->
 	<target name="generatingPhar" >
 	    <pharpackage
-	      destfile="/var/lib/jenkins/jobs/t41/workspace/tests/rapports/myproject.phar"
+	      destfile="${project.basedir}/../rapports/myproject.phar"
 	      basedir="${project.basedir}"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
 	      signature="sha1">
-	      <fileset dir="${project.basedir}/../rapports/myproject.phar">
+	      <fileset dir="${project.basedir}/../../library">
 	        <include name="**/**" />
 	      </fileset>
 	      <metadata>
