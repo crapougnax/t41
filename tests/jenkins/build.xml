@@ -10,6 +10,7 @@
     <target name="clean" description="Vide les répertoires d'artefacts">
 		 <delete dir="${project.basedir}/../rapports/phpdoc" />
 		 <delete dir="${project.basedir}/../rapports/phpcs" />
+		  <delete file="${project.basedir}/../rapports/myproject.phar" />
 		 
 		 <mkdir dir="${project.basedir}/../rapports/phpdoc" />
 		 <mkdir dir="${project.basedir}/../rapports/phpcs" />
@@ -66,14 +67,13 @@
 
 	 <!--  GENERATION DU .PHAR  -->
 	<target name="generatingPhar" >
-	    <delete file="${project.basedir}/../rapports/myproject.phar" />
 	    <pharpackage
 	      destfile="${project.basedir}/../rapports/myproject.phar"
 	      basedir="${project.basedir}"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
 	      signature="sha1">
-	      <fileset dir="myproject.phar">
+	      <fileset dir="${project.basedir}/../rapports/myproject.phar">
 	        <include name="**/**" />
 	      </fileset>
 	      <metadata>
