@@ -1,5 +1,5 @@
 <?php
-Phar::mapPhar('myproject.phar');
+Phar::mapPhar('/var/lib/jenkins/jobs/t41/workspace/tests/rapports/myproject.phar');
 spl_autoload_register(function ($className) {
 	$libPath = 'phar://myproject.phar/lib/';
 	$classFile = str_replace('\\',DIRECTORY_SEPARATOR,$className).'.php';
