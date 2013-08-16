@@ -68,7 +68,7 @@
 	<target name="generatingPhar" >
 	    <delete file="${project.basedir}/../rapports/myproject.phar" />
 	    <pharpackage
-	      destfile="${project.basedir}/../rapports/"
+	      destfile="${project.basedir}/../rapports/myproject.phar"
 	      basedir="${project.basedir}"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
