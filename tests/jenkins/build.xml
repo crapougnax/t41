@@ -73,7 +73,7 @@
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
 	      signature="sha1">
-	      <fileset dir="$${project.basedir}/../../library">
+	      <fileset dir="../../library">
 	        <include name="**/**" />
 	      </fileset>
 	      <metadata>
