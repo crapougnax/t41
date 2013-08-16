@@ -68,7 +68,7 @@
 	 <!--  GENERATION DU .PHAR  -->
 	<target name="generatingPhar" >
 	    <pharpackage
-	      destfile="/var/lib/jenkins/jobs/t41/workspace/tests/jenkins/../rapports/myproject.phar"
+	      destfile="/var/lib/jenkins/jobs/t41/workspace/tests/rapports/myproject.phar"
 	      basedir="${project.basedir}"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
