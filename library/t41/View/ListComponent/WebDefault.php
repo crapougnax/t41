@@ -37,6 +37,7 @@ use t41\ObjectModel,
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\DataObject;
 use t41\Backend;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * List view object default Web Decorator
@@ -162,7 +163,7 @@ class WebDefault extends AbstractWebDecorator {
     		$this->_collection->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
     	}
     	
-        $this->_obj->query();
+        $this->_collection->find(ObjectModel::DATA);
         
         $p = '';
         
@@ -203,7 +204,6 @@ class WebDefault extends AbstractWebDecorator {
 		if (trim($this->_obj->getTitle()) == '') {
 			$title = 'List';
 		} else {
-			
 			$title = $this->_escape($this->_obj->getTitle());
 		}
 
@@ -374,13 +374,19 @@ HTML;
             	 
             	if ($column->getParameter('recursion')) {
 					foreach ($column->getParameter('recursion') as $recursion) {
-						if ($property instanceof AbstractProperty) {
-							$property = $property->getValue(ObjectModel::DATA);
+						// property is an object property
+						if ($property instanceof AbstractProperty && $property->getValue()) {
+							$property = $property->getValue(ObjectModel::DATA)->getProperty($recursion);
 						}
+						
 						if ($property instanceof ObjectModel || $property instanceof DataObject) {
 							$property = $property->getProperty($recursion);
+						} else if ($property instanceof ObjectUri) {
+							$property = ObjectModel::factory($property)->getProperty($recursion);
 						}
 					}
+					
+					//\Zend_Debug::dump($property->getDisplayValue());
             	}
             	
             	if ($property instanceof Property\MediaProperty) {
