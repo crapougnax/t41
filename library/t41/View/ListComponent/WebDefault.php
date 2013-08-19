@@ -104,7 +104,6 @@ class WebDefault extends AbstractWebDecorator {
     {
     	View::addCoreLib(array('style.css','buttons.css','sprites.css'));
     	View::addCoreLib(array('core.js','view.js','view:alert.js'));
-    	$this->_collection = $this->_obj->getCollection();
     	
     	$tmp = $this->_obj->reduce();
     	$this->_uuid = $tmp['uuid'];
@@ -134,16 +133,16 @@ class WebDefault extends AbstractWebDecorator {
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
+    				$property = $this->_obj->getCollection()->getDataObject()->getRecursiveProperty($field);
     				
     				if ($property instanceof MetaProperty) {
-    					$this->_collection->having($property->getParameter('property'))->contains($value);
+    					$this->_obj->getCollection()->having($property->getParameter('property'))->contains($value);
     				} else if ($property instanceof ObjectProperty) {
-    					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->equals($value);
+    					$this->_obj->getCollection()->resetConditions($field);
+    					$this->_obj->getCollection()->having($field)->equals($value);
     				} else if ($property instanceof AbstractProperty) {
-    					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->contains($value);
+    					$this->_obj->getCollection()->resetConditions($field);
+    					$this->_obj->getCollection()->having($field)->contains($value);
     				}
 	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
     			}
@@ -153,17 +152,17 @@ class WebDefault extends AbstractWebDecorator {
     	// set query sorting from context
         if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
         	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			$this->_collection->setSorting(array($field, $value));
+    			$this->_obj->getCollection()->setSorting(array($field, $value));
     		}
     	}
 
     	// define offset parameter value from context
     	if (isset($this->_env[$this->_offsetIdentifier])) {
     		$this->_obj->setParameter('offset', (int) $this->_env[$this->_offsetIdentifier]);
-    		$this->_collection->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
+    		$this->_obj->getCollection()->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
     	}
     	
-        $this->_collection->find(ObjectModel::DATA);
+        $this->_obj->query();
         
         $p = '';
         
@@ -239,7 +238,6 @@ HTML;
         					), 'js');
         }
         
-        /* @var $val t41_View_Property_Abstract */
         foreach ($this->_obj->getColumns() as $val) {
         	
         	$line .= '<th><strong>';
@@ -294,10 +292,7 @@ HTML;
     	/* @var $val t41_View_Property_Abstract */
     	foreach ($this->_obj->getColumns() as $val) {
     		 
-    		//\Zend_Debug::dump($val); die;
-    		
-    		$prop = $this->_collection->getDataObject()->getRecursiveProperty($val->getParameter('property'));
-    		//\Zend_Debug::dump($prop); die;
+    		$prop = $this->_obj->getCollection()->getDataObject()->getRecursiveProperty($val->getParameter('property'));
     		
     		if ($prop instanceof Property\MetaProperty) {
     			
