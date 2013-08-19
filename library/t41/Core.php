@@ -284,17 +284,23 @@ class Core {
      */
 	public static function addAutoloaderPrefix($prefix, $path = null)
 	{
-		set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-		
+		if ($path) {
+			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+		}
+			
 		if (is_array($prefix)) {
 
 			foreach ($prefix as $key => $val) {
+				
+				/**
+				 * @since ZF 1.12 registerNamespace() doesn't support second argument (path) any more
+				 * @todo switch to another Autoloader
+				 */
+				set_include_path(get_include_path() . PATH_SEPARATOR . $val);
 			
 				self::$autoloaderPrefixes[$key] = $val;	
 				if (is_object(self::$_autoloaderInstance)) {
-
 					if (substr($key, -1) == '_') {
-						
 						self::$_autoloaderInstance->registerPrefix($key, $val);
 					} else {
 						self::$_autoloaderInstance->registerNamespace($key, $val);
@@ -303,22 +309,15 @@ class Core {
 			}
 			
 		} else {
-			
 			self::$autoloaderPrefixes[$prefix] = $path;	
 			if (is_object(self::$_autoloaderInstance)) {
 				if (substr($prefix, -1) == '_') {
-				
 					self::$_autoloaderInstance->registerPrefix($prefix, $path);
 				} else {
 					self::$_autoloaderInstance->registerNamespace($prefix, $path);
 				}
 			}
 		}
-		
-/*		if (self::$_autoloaderInstance) {
-			\Zend_Debug::dump(self::$_autoloaderInstance->getRegisteredNamespaces());
-		}
-*/
 	}
 	
 	
@@ -328,28 +327,14 @@ class Core {
 			self::addAutoloaderPrefix($prefix);
 		}
 		
-		//self::$_autoloaderInstance = new \Zend\Loader\StandardAutoloader();
 		require_once 'Zend/Loader/Autoloader.php';
 		self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
 		
 		self::$autoloaderPrefixes['t41'] = self::$basePath . 'vendor/quatrain/t41/library/t41';
-		
 		foreach (self::$autoloaderPrefixes as $prefix => $path) {
-		
-			if (substr($prefix, -1) == '_') {
-				
-				self::$_autoloaderInstance->registerNamespace($prefix, $path);
-//				self::$_autoloaderInstance->registerPrefix($prefix, $path);
-				
-			} else {
-				
-				self::$_autoloaderInstance->registerNamespace($prefix, $path);
-			}
-
-//			self::$_autoloaderInstance->register();
+			self::$_autoloaderInstance->registerNamespace($prefix, $path);
 		}
 		
-   		//\Zend\Debug::dump(self::$_autoloaderInstance);
     	self::$autoloaded = true;
 	}
 	
