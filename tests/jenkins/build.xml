@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="TestsItalic" default="ci">
 
+	<!-- APPEL DE LA TARGET PRINCIPALE -->
     <target name="ci"
         description="Tâche principale d'intégration continue"
         depends="clean,qa"
@@ -10,7 +11,7 @@
     <target name="clean" description="Vide les répertoires d'artefacts">
 		 <delete dir="${project.basedir}/../rapports/phpdoc" />
 		 <delete dir="${project.basedir}/../rapports/phpcs" />
-		  <delete file="${project.basedir}/../rapports/myproject.phar" />
+		 <delete file="${project.basedir}/../rapports/T41.phar" />
 		 
 		 <mkdir dir="${project.basedir}/../rapports/phpdoc" />
 		 <mkdir dir="${project.basedir}/../rapports/phpcs" />
@@ -68,7 +69,7 @@
 	 <!--  GENERATION DU .PHAR  -->
 	<target name="generatingPhar" >
 	    <pharpackage
-	      destfile="${project.basedir}/../rapports/myproject.phar"
+	      destfile="${project.basedir}/../rapports/T41.phar"
 	      basedir="${project.basedir}/../../library"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
@@ -79,7 +80,7 @@
 	      <metadata>
 	        <element name="version" value="1.2.3" />
 	        <element name="authors">
-	          <element name="Joe Developer">
+	          <element name="Quatrain Technologies">
 	            <element name="email" value="titouan@quatrain.com" />
 	          </element>
 	        </element>
