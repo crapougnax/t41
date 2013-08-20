@@ -236,7 +236,7 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	
 
 	this.prepareDest = function() {
-		this.dest.empty().append(new Option('--',''));
+		this.dest.empty().append(new Option('--','_NONE_'));
 	};
 	
 	
