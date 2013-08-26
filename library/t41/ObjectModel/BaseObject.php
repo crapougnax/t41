@@ -88,21 +88,18 @@ abstract class BaseObject extends ObjectModelAbstract {
 			$this->setRules();
 						
 		} else {
-			
-			// @todo cache here
 			$this->_dataObject = DataObject::factory(get_class($this));
 			
 			/* get object rules from config */
 			$this->setRules();
 			
 			if (! is_null($val)) {
-			
 				if (! $val instanceof ObjectUri) {
-					
-					$val = new ObjectUri($val);
+					// provide backend if uri is partial
+					$backendUri = substr($val,0,1) != Backend::PREFIX ? ObjectModel::getObjectBackend(get_class($this)) : null;
+					$val = new ObjectUri($val, $backendUri);
 					$val->setClass(get_class($this));
 				}
-		
 				$this->_dataObject->setUri($val);
 				$this->read();
 			}
@@ -113,14 +110,13 @@ abstract class BaseObject extends ObjectModelAbstract {
 	/**
 	 * Data Object URI Accessor
 	 * 
-	 * @return t41_Object_Uri
+	 * @return t41\ObjectModel\ObjectUri
 	 */
 	public function getUri()
 	{
 		/* @todo check wether the object has been saved */
 		/* @todo check wether the object is EMBEDDED save it in memory and generate a memory uri ? */
 		if ($this->_dataObject->getUri() == null) {
-			
 			//$this->save();
 		}
 		
