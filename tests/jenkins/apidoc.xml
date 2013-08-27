@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="TestsItalic" default="ci">
+<project name="TestsItalic" default="apidoc">
 
 	<!-- APPEL DE LA TARGET PRINCIPALE -->
-    <target name="ci"
+    <target name="apidoc"
         description="Tâche principale de génération de .phar"
         depends="clean,qa"
     />
