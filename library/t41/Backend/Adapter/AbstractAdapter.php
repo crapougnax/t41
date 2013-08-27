@@ -335,6 +335,7 @@ abstract class AbstractAdapter implements AdapterInterface {
             
             $array[$key] = $obj;
 		}
+		
 		return $array;
 	}
 	
@@ -382,7 +383,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	protected function _preparePrimaryKeyClauses(DataObject $do)
 	{
 		/* no mapper or no pkey definition in mapper */
-		if (! $this->_mapper || ! $this->_mapper->getPrimaryKey($do->getUri()->getClass())) {
+		if (! $this->_mapper || $this->_mapper->getPrimaryKey($do->getUri()->getClass()) == Backend::DEFAULT_PKEY) {
 			return array(Backend::DEFAULT_PKEY => $do->getUri()->getIdentifier());
 		}
 		
@@ -396,7 +397,6 @@ abstract class AbstractAdapter implements AdapterInterface {
 			if (! isset($pkeyVals[$key])) continue;
 			$array[$obj->getName()] = $obj->castValue($pkeyVals[$key]);
 		}
-		
 		return $array;
 	}
 	
