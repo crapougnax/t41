@@ -1,41 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="TestsItalic" default="phar_generating">
 
-	<!-- APPEL DE LA TARGET PRINCIPALE -->
-    <target name="phar_generating"
-        description="Tâche principale de génération de .phar"
-        depends="clean,qa"
-    />
-
-	<!-- CLEAN EN CAS DE REPERTOIRES TEMPORAIRES-->
-    <target name="clean" description="Vide les répertoires d'artefacts">
-		 <delete file="${project.basedir}/../rapports/T41.phar" />
-    </target>
-	
-	<!-- DEROULEMENT DES TESTS -->
-    <target name="qa" description="Lance les outils d'analyse">
-    	<phingcall target="generatingPhar"/>
-    </target>
-
-	<target name="generatingPhar" >
-	    <pharpackage
-	      destfile="${project.basedir}/../rapports/T41-${BUILD_NUMBER}.phar"
-	      basedir="${project.basedir}/../../library"
-	      compression="gzip"
-	      stub="${project.basedir}/../jenkins/stub.php"
-	      signature="sha1">
-	      <fileset dir="${project.basedir}/../../library">
-	        <include name="**/**" />
-	      </fileset>
-	      <metadata>
-	        <element name="version" value="1.2.3" />
-	        <element name="authors">
-	          <element name="Quatrain Technologies">
-	            <element name="email" value="titouan@quatrain.com" />
-	          </element>
-	        </element>
-	      </metadata>
-	    </pharpackage>
-	  </target>
 	  
 </project>

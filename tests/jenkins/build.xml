@@ -62,7 +62,7 @@
 
 	<target name="generatingPhar" >
 	    <pharpackage
-	      destfile="${project.basedir}/../rapports/T41-${BUILD_NUMBER}.phar"
+	      destfile="${project.basedir}/../rapports/T41.phar"
 	      basedir="${project.basedir}/../../library"
 	      compression="gzip"
 	      stub="${project.basedir}/../jenkins/stub.php"
