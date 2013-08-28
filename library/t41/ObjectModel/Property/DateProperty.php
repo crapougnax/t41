@@ -35,12 +35,15 @@ use t41\ObjectModel\Property\Exception;
 class DateProperty extends AbstractProperty {
 
 	
-	const TODAY		= 'TODAY';
+	const TODAY			= 'TODAY';
 	
 	const TODAY_DATE	= 'STODAY';
 
 	const TODAY_TIME	= 'TTODAY';
-
+	
+	const TOMORROW		= '+1';
+	
+	
 	public function setValue($value)
 	{
 		switch ($value) {
@@ -48,7 +51,11 @@ class DateProperty extends AbstractProperty {
 			case self::TODAY:
 				$value = date('Y-m-d H:i:s');
 				break;
-
+				
+			case self::TOMORROW:
+				$value = date('Y-m-d H:i:s', time()+86400);
+				break;
+			
 			case self::TODAY_DATE:
 				$value = date('Y-m-d');
 				break;
