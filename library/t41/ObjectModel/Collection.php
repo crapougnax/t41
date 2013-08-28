@@ -31,6 +31,7 @@ use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\IdentifierProperty;
 use t41\ObjectModel\Collection\StatsCollection;
+use t41\Backend\Condition\Combo;
 
 /**
  * Class for a collection of Objects
@@ -240,6 +241,11 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Return a new Combo object bound to the current collection
+	 * @param string $mode
+	 * @return \t41\Backend\Condition\Combo
+	 */
 	public function setConditionCombo($mode)
 	{
 		$combo = new Condition\Combo($this);
@@ -248,6 +254,11 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Reset all conditions matching the given property id
+	 * @param string $property
+	 * @return t41\ObjectModel\Collection current instance
+	 */
 	public function resetConditions($property)
 	{
 		// temp fix - @todo recursion
@@ -257,12 +268,13 @@ class Collection extends ObjectModelAbstract {
 		}
 		
 		foreach ($this->_conditions as $key => $condition) {
-			if ($condition[0]->getProperty()->getId() == $property) {
+			if (! $condition[0] instanceof Combo && $condition[0]->getProperty()->getId() == $property) {
 				unset($this->_conditions[$key]);
 				$this->setParameter('populated', false);
 				$this->_members = null;
 			}
 		}
+		return $this;
 	}
 	
 	
