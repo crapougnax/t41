@@ -46,6 +46,8 @@ class WebSearch extends SimpleComponent\WebDefault {
 	
     public function render()
     {
+    	View::addCoreLib(array('style.css','buttons.css','sprites.css'));
+    	 
     	// set relevant uri adapter and get some identifiers
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter ) {
     		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
@@ -72,7 +74,7 @@ class WebSearch extends SimpleComponent\WebDefault {
 		
 
 		$html_head = <<<HTML
-	<div class="t41 component white medium" id="{$this->_instanceof}_{$this->_obj->getId()}">
+	<div class="t41 component white medium" id="{$this->getId()}">
 		<h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 		<div class="content">
 HTML;
@@ -130,10 +132,12 @@ HTML;
             $p .= '</span>';
         }
         
-        View::addCoreLib(array('buttons.css','sprites.css'));
-        $p .= sprintf('<div class="clear"><a class="element button medium icon" onclick="jQuery(\'#t41sf\').submit()"><span class="search-blue"></span>Rechercher</a>'
-        			. '<a class="element button medium icon" onclick="jQuery(\'#t41sf\').find(\':input\').each(function() {jQuery(this).val(null)})"><span class="refresh"></span>RAZ</a></div>'
-        			, $this->_obj->getParameter('baseurl'));
+        if ($this->_obj->getParameter('buttons') != false) {
+	        View::addCoreLib(array('buttons.css','sprites.css'));
+    	    $p .= sprintf('<div class="clear"><a class="element button medium icon" onclick="jQuery(\'#t41sf\').submit()"><span class="search-blue"></span>Rechercher</a>'
+        				. '<a class="element button medium icon" onclick="jQuery(\'#t41sf\').find(\':input\').each(function() {jQuery(this).val(null)})"><span class="refresh"></span>RAZ</a></div>'
+        				, $this->_obj->getParameter('baseurl'));
+        }
         $p .= '</fieldset></form>';
         			       
         return $p;
