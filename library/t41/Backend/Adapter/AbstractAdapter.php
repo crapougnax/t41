@@ -132,7 +132,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 		} else if ($class && $this->_mapper instanceof Backend\Mapper) {
 			$table = $this->_mapper->getDatastore($class);
 		} else {
-			$class= strtolower($class);
+			$class = strtolower($class);
 			if (strpos($class, '\\') !== false) {
 				if ($this->_tableNameFromClassSegments == 0) {
 					$table = str_replace('\\','_', $class);

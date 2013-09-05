@@ -242,7 +242,7 @@ class BackendUri {
 	 * @param Zend_Config $config
 	 * @return t41_Uri
 	 */
-	static public function backendConfigToUri(SimpleXMLElement $config)
+	static public function backendConfigToUri(\SimpleXMLElement $config)
 	{
 		$params = array();
 		$attributes = (array) $config->attributes();

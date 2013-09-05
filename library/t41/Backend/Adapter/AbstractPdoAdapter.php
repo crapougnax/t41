@@ -668,21 +668,28 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 					
 				// add a left join if the sorting field belongs to a table not yet part of the query
-				if ($stable != $table && ! in_array($stable, $this->_alreadyJoined)) {
+				if ($stable != $table) {
+					if ( ! array_key_exists($stable, $this->_alreadyJoined)) {
 						
-					// get the property id from the class name
-					$tfield = $collection->getDataObject()->getObjectPropertyId($class);
+						// get the property id from the class name
+						$tfield = $collection->getDataObject()->getObjectPropertyId($class);
 						
-					$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
-					$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
+						$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
+						$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 						
-					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $stable, $rightkey);
-					$select->joinLeft($stable, $join, array());
+						$uniqext = $stable . '__joined_for__' . $leftkey;
 						
-					$this->_alreadyJoined[] = $jtable;
-				}
+						$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+						$select->joinLeft("$stable AS $uniqext", $join, array());
+						
+						$this->_alreadyJoined[$stable] = $uniqext;
+					}
+					
+					$sortingExpr = $this->_alreadyJoined[$stable] . '.' . $sfield;
 				
-				$sortingExpr = $stable . '.' . $sfield;
+				} else {
+					$sortingExpr = $stable . '.' . $sfield;
+				}
 				if (isset($sorting[2]) && !empty($sorting[2])) {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
@@ -864,20 +871,15 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		if ($condition->isRecursive()) {
 		
 			while ($condition->isRecursive()) {
-		
 				$property = $condition->getProperty();
 				$parent	  = $property->getParent() ? $property->getParent()->getId() : $table;
 				$condition = $condition->getCondition();
 		
 				if ($jtable) {
-		
 					$parentTable = $jtable;
-		
 				} else if ($parent) {
-		
 					$parentTable = $this->_mapper ? $this->_mapper->getDatastore($parent) : $parent;
 				} else {
-		
 					$parentTable = $table;
 				}
 		
@@ -896,7 +898,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				/* pkey name in joined table */
 				$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 					
-				$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $jtable, $jpkey);
+				$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $uniqext, $jpkey);
 				$select->joinLeft("$jtable AS $uniqext", $join, array());
 				$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 				$class = $property->getParameter('instanceof');
