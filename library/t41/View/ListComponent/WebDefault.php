@@ -38,6 +38,7 @@ use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\DataObject;
 use t41\Backend;
 use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\Property\DateProperty;
 
 /**
  * List view object default Web Decorator
@@ -140,6 +141,17 @@ class WebDefault extends AbstractWebDecorator {
     				} else if ($property instanceof ObjectProperty) {
     					$this->_obj->getCollection()->resetConditions($field);
     					$this->_obj->getCollection()->having($field)->equals($value);
+    				} else if ($property instanceof DateProperty) {
+    					if (is_array($value)) {
+    						if (isset($value['from']) && ! empty($value['from'])) {
+    							$this->_obj->getCollection()->having($field)->greaterOrEquals($value['from']);
+    						}
+    						if (isset($value['to']) && ! empty($value['to'])) {
+    							$this->_obj->getCollection()->having($field)->lowerOrEquals($value['to']);
+    						}
+    					} else {
+    						$this->_obj->getCollection()->having($field)->equals($value);
+    					}
     				} else if ($property instanceof AbstractProperty) {
     					$this->_obj->getCollection()->resetConditions($field);
     					$this->_obj->getCollection()->having($field)->contains($value);
