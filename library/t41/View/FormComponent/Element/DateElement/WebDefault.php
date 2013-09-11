@@ -93,7 +93,7 @@ class WebDefault extends AbstractWebDecorator {
 						, $dispValue
 						);
 
-			if ($this->_obj->getParameter('enable_quickset')) {
+		if ($this->_obj->getParameter('enable_quickset') && $this->getParameter('mode') != View\FormComponent::SEARCH_MODE) {
 			$buttons = array(
 				array('title' => 'Hier', 			'value' => '-1', 	'icon'=>'left-arrow'),
 				array('title' => 'Aujourd\'hui', 	'value' => '+0d',	'icon'=>'valid'),
