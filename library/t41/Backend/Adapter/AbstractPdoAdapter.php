@@ -569,6 +569,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			} else {
 				$field = $property->getId();
+				if ($this->_mapper) {
+					$field = $this->_mapper->propertyToDatastoreName($class, $field);
+				}
 			}
 			
 			/* convert identifier tag to the valid primary key */
@@ -930,13 +933,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		} else {
 		
 			$field = $property->getId();
-		
 			if ($this->_mapper) {
 				$field = $this->_mapper->propertyToDatastoreName($class, $field);
 			}
 		}
 		
-		/* convert identifier tag to tha valid primary key */
+		/* convert identifier tag to the valid primary key */
 		if ($field == ObjectUri::IDENTIFIER) {
 			// @todo handle multiple keys from mapper
 			$field = $table . '.';
