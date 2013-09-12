@@ -36,7 +36,6 @@ class CurrencyProperty extends AbstractProperty {
 	public function setValue($value)
 	{
 		if (! is_numeric($value) && ! is_float($value) && ! is_integer($value)) {
-			
 			throw new Exception(array("VALUE_NOT_INTEGER_OR_FLOAT", $value));
 		}
 		
@@ -52,7 +51,7 @@ class CurrencyProperty extends AbstractProperty {
 	
 	static public function format($value)
 	{
-		setlocale(LC_ALL, 'fr_FR.UTF-8');
+		setlocale(LC_MONETARY, 'fr_FR.UTF-8');
 		return money_format('%n', $value);		
 	}
 }
