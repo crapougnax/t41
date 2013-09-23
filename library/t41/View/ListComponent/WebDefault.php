@@ -36,7 +36,6 @@ use t41\ObjectModel,
 	t41\View\ListComponent\Element;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\DataObject;
-use t41\Backend;
 use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property\DateProperty;
 
@@ -105,6 +104,12 @@ class WebDefault extends AbstractWebDecorator {
     {
     	View::addCoreLib(array('style.css','buttons.css','sprites.css'));
     	View::addCoreLib(array('core.js','view.js','view:alert.js'));
+    	
+    	
+    	// @todo temp fix, sorting by headers is only available on page refresh
+    	if ($this->getParameter('paginator') == false) {
+    		$this->setParameter('sortable', false);
+    	}
     	
     	$tmp = $this->_obj->reduce();
     	$this->_uuid = $tmp['uuid'];
@@ -239,7 +244,6 @@ HTML;
         $sortIdentifiers = (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) ? $this->_env[$this->_sortIdentifier] : array();
         
         if ($this->_obj->getParameter('selectable') !== false) {
-        	
         	$cbid = 'toggler_' . $this->_id;
         	$line .= sprintf('<td><input type="checkbox" id="%s"/></td>', $cbid);
         	
@@ -251,7 +255,6 @@ HTML;
         }
         
         foreach ($this->_obj->getColumns() as $val) {
-        	
         	$line .= '<th><strong>';
         	if ($this->getParameter('sortable') == false) {
         		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
@@ -259,7 +262,6 @@ HTML;
         	}
         	
         	if (is_object($val) && array_key_exists($val->getId(), $sortIdentifiers)) {
-        		
         		$by = ($sortIdentifiers[$val->getId()] == 'ASC') ? 'DESC' : 'ASC';
         		
         		// save correct sorting field reference to re-inject in uri after column construction
@@ -307,7 +309,6 @@ HTML;
     		$prop = $this->_obj->getCollection()->getDataObject()->getRecursiveProperty($val->getParameter('property'));
     		
     		if ($prop instanceof Property\MetaProperty) {
-    			
     			$line .= '<th></th>';
     			continue;
     		}
@@ -315,12 +316,10 @@ HTML;
     		$id = sprintf('%s[%s]', $this->_searchIdentifier, $val->getId());
     		
     		if ($prop instanceof Property\ObjectProperty) {
-    			
     			$sf = new FormComponent\Element\ListElement($id);
     			$deco = Decorator::factory($sf);
     			 
     		} else {
-    			
     			$sf = new FormComponent\Element\FieldElement($id);
     			$deco = Decorator::factory($sf, array('length' => 10));
     			$line .= sprintf('<th>%s</th>', $deco->render());
@@ -463,7 +462,6 @@ HTML;
 	   }
 
     	while ($i+($premier * $batch) < $max) {
-    		
 		  $p .= $this->_navigationLink($i + ($premier * $batch), ($premier + $j + 1));
 		  $i += $batch;
 		  if (++$j > $sbatch-1) break;
@@ -486,12 +484,10 @@ HTML;
     protected function _navigationLink($offset, $page)
     {
 	   if ($offset != $this->_obj->getParameter('offset')) {
-	   	
 	   	  $this->_uriAdapter->setArgument($this->_offsetIdentifier, $offset);
 	   	  return sprintf('<a href="%s" class="t41 paginator">%s</a> ', $this->_uriAdapter->makeUri(), $page);
 
 	   } else {
-	   	
 		  return '<span class="t41 paginator current">' . $this->_escape($page) . '</span> ';
 	   }
     }
