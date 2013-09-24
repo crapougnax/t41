@@ -205,7 +205,11 @@ class Parameter implements Core\ClientSideInterface {
 	 */
 	public function getValue($key = null)
 	{
-		return ($key && $this->_type == self::MULTIPLE) ? $this->_value[$key] : $this->_value;
+		if ($key && $this->_type == self::MULTIPLE) {
+			return isset($this->_value[$key]) ? $this->_value[$key] : false;
+		} else {
+			return $this->_value;
+		}
 	}
 	
 	
