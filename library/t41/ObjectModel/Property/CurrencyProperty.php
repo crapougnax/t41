@@ -49,9 +49,10 @@ class CurrencyProperty extends AbstractProperty {
 	}
 	
 	
-	static public function format($value)
+	static public function format($value, $precision = 2)
 	{
 		setlocale(LC_MONETARY, 'fr_FR.UTF-8');
-		return money_format('%n', $value);		
+		$format = '%.' . $precision . 'n';
+		return money_format($format, $value);		
 	}
 }

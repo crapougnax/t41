@@ -24,6 +24,7 @@ namespace t41\ObjectModel;
 
 use t41\Core,
 	t41\Parameter;
+use t41\ObjectModel\Rule\AbstractRule;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -87,7 +88,6 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	public function setId($id)
 	{
 		if (! is_null($this->_id)) {
-			
 			throw new Exception(array("OBJECT_CANNOT_CHANGE_VALUE", '$id'));
 		}
 		
@@ -122,15 +122,10 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 		
 		if (isset($this->_params[$key]) && $this->_params[$key] instanceof Parameter) {
 			return $this->_params[$key]->getValue($arraykey);
-		
 		} else {
-			
 			if ($strict === false) {
-				
 				return null;
-			
 			} else {
-			
 				throw new Exception(array("NO_SUCH_PARAMETER", $key));
 			}
 		}
@@ -178,7 +173,6 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	final protected function _setParameters(array $params)
 	{
 		foreach ($params as $key => $value) {
-			
 			$this->setParameter($key, $value);
 		}
 	}
@@ -193,20 +187,17 @@ abstract class ObjectModelAbstract implements Core\ClientSideInterface {
 	final protected function _setParameterObjects(array $objects = null, $replace = false)
 	{
 		if (count($objects) == 0) {
-			
 			$objects = (array) Parameter::getParameters($this);
 		}
-		
+				
 		if ($replace === true) {
 			$this->_params = array();
 		}
 		
 		foreach ($objects as $key => $object) {
-			
-			if (! $object instanceof Parameter ) {
+			if (! $object instanceof Parameter) {
 				continue;
 			}
-			
 			$this->_params[$key] = $object;
 		}
 	}

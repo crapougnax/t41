@@ -42,4 +42,24 @@ class FloatProperty extends AbstractProperty {
 		
 		parent::setValue((float) $value);
 	}
+	
+	
+	public function getDisplayValue()
+	{
+		return self::format($this->_value, $this->getParameter('constraints.precision'), $this->getParameter('constraints.percentage'));
+	}
+	
+	
+	static public function format($value, $precision = 2, $ispercentage = false)
+	{
+		if (! is_numeric($precision)) {
+			$precision = 2;
+		}
+		setlocale(LC_NUMERIC, 'fr_FR.UTF-8');
+		$lc = localeconv();
+		$ret = number_format($value, $precision, $lc['decimal_point'], $lc['thousands_sep']);
+		if ($ispercentage !== false) $ret .= '%';
+		
+		return $ret;
+	}
 }

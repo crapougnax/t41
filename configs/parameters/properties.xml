@@ -10,7 +10,7 @@
 					<type>any</type>
 				</parameter>
 				<parameter id="constraints">
-					<type>any</type>
+					<type>array</type>
 				</parameter>
 				<parameter id="validators">
 					<type>array</type>
