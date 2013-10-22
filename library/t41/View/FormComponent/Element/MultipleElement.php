@@ -35,20 +35,27 @@ use t41\Core;
 class MultipleElement extends AbstractElement {
 	
 
+	public function setValue($val)
+	{
+		$this->_value = explode('|',$val);
+		return $this;
+	}
+	
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see \t41\View\FormComponent\Element\AbstractElement::formatValue()
 	 */
 	public function formatValue($val = null)
 	{
-		$values = explode('|', $val);
-		$val = '';
+		$formatted = '';
 		
-		foreach ($values as $value) {
-			if (isset($this->_enumValues[$value])) {
-				$val .= is_array($this->_enumValues[$value]) ? $this->_enumValues[$value][Core::$lang] : $this->_enumValues[$value];
+		foreach ($val as $v) {
+			if (isset($this->_enumValues[$v])) {
+				if ($formatted) $formatted .= ', ';
+				$formatted .= is_array($this->_enumValues[$v]) ? $this->_enumValues[$v][Core::$lang] : $this->_enumValues[$v];
 			}
 		}
-		return $val;
+		return $formatted;
 	}
 }

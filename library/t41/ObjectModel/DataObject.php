@@ -525,6 +525,11 @@ class DataObject extends ObjectModelAbstract {
     			} else if ($property instanceof Property\CollectionProperty) {
     				// @todo handle collection populating here 
     			} else {
+    				
+    				// if value is an array, it is most likely a set of multiple options
+    				if (is_array($value)) {
+    					$value = implode('|', $value);
+    				}
 	    			$property->setValue($value);
     			}
     		}

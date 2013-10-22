@@ -46,28 +46,19 @@ class WebDefault extends AbstractWebDecorator {
 			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
 			$this->setParameter('radiomax',0);
 		}
-
-/*		if (count($this->_obj->getEnumValues()) > $this->getParameter('checkmax')) {
-			// display menu list
-			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
-			$zv = new \Zend_View();
-			return $zv->formSelect($name, $this->_obj->getValue(), null, $options);
 		
-		} else {
-*/			$html = '';
-			foreach ($this->_obj->getEnumValues() as $key => $val) {
-				$html .= sprintf('<input type="checkbox" name="%s[]" id="%s_%s" value="%s"%s/>&nbsp;<label for="%s_%s">%s</label> '
-								, $name
-								, $name
-								, $key
-								, $key
-								, ($key == $this->_obj->getValue()) ? ' checked="checked"': null
-								, $name
-								, $key
-								, $this->_escape($val)
-								);
-			}
-			return $html;
-//		}
+		$html = '';
+		foreach ($this->_obj->getEnumValues() as $key => $val) {
+			$uniqid = sprintf('%s_%s', $name, $key);
+			$html .= sprintf('<input type="checkbox" name="%s[]" id="%s" value="%s"%s/>&nbsp;<label for="%s">%s</label> '
+							, $name
+							, $uniqid
+							, $key
+							, in_array($key, $this->_obj->getValue()) ? ' checked="checked"': null
+							, $uniqid
+							, $this->_escape($val)
+							);
+		}
+		return $html;
 	}
 }
