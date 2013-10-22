@@ -90,22 +90,47 @@ window.t41.view.form = function(id,obj,form) {
 		
 		// get form elements in an key/value array
 		var elements = {};
-		jQuery.map(jQuery(this.formId).serializeArray(), function(e) { elements[e.name] = e.value;});
+		
+		for (var i in this.fields) {
+			
+			switch (this.fields[i].type) {
+			
+				case 'multipleElement':
+					var values = [];
+					jQuery('[name="' + i + '\[\]"]:checked').each(function() { 
+						values[values.length] = this.value; });
+					elements[i] = values;
+					break;
+					
+				case 'enumElement':
+					var elem = jQuery('[name="' + i + '"]');
+					elements[i] = elem[0].type == 'select-one' ? jQuery('[name="' + i + '"]').val() : jQuery('[name="' + i + '"]:checked').val()
+					break;
+				
+				default:
+					elements[i] = jQuery('[name="' + i + '"]').val();
+					break;
+			}
+		}
 		
 		var errors = [];
 		var formdata = {};
 		
 		// control elements
+		
+		// remove all previous errors blocks
+		jQuery('span.error').remove();
+		
 		for (var i in this.fields) {
 			var field = this.fields[i];
 			var value = elements[i];
 
 			// don't consider fields with a hidden label
-			if (jQuery('#label_' + i).css('display') == 'none') {
+			if (jQuery('#label_' + i).css('display') == 'none' || (field.constraints.protected && field.value != null)) {
 				continue;
 			}
 			
-			if (field.constraints.mandatory && (value == "" || value == '_NONE_')) {
+			if (field.constraints.mandatory && (value == "" || value == '_NONE_' || value == null)) {
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
 			}
 			
@@ -118,8 +143,9 @@ window.t41.view.form = function(id,obj,form) {
 			formdata[i] = value;
 		}
 		
+		console.log(errors);
+		
 		if (errors.length > 0) {
-			jQuery('span.error').remove();
 			for (var i in errors) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
