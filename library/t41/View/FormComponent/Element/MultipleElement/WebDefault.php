@@ -1,6 +1,6 @@
 <?php
 
-namespace t41\View\FormComponent\Element\EnumElement;
+namespace t41\View\FormComponent\Element\MultipleElement;
 
 /**
  * t41 Toolkit
@@ -47,16 +47,16 @@ class WebDefault extends AbstractWebDecorator {
 			$this->setParameter('radiomax',0);
 		}
 
-		if (count($this->_obj->getEnumValues()) > $this->getParameter('radiomax')) {
+/*		if (count($this->_obj->getEnumValues()) > $this->getParameter('checkmax')) {
 			// display menu list
 			$options = array(null => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();
 			$zv = new \Zend_View();
 			return $zv->formSelect($name, $this->_obj->getValue(), null, $options);
 		
 		} else {
-			$html = '';
+*/			$html = '';
 			foreach ($this->_obj->getEnumValues() as $key => $val) {
-				$html .= sprintf('<input type="radio" name="%s" id="%s_%s" value="%s"%s/>&nbsp;<label for="%s_%s">%s</label> '
+				$html .= sprintf('<input type="checkbox" name="%s[]" id="%s_%s" value="%s"%s/>&nbsp;<label for="%s_%s">%s</label> '
 								, $name
 								, $name
 								, $key
@@ -68,6 +68,6 @@ class WebDefault extends AbstractWebDecorator {
 								);
 			}
 			return $html;
-		}
+//		}
 	}
 }

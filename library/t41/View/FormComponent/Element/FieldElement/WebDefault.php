@@ -63,9 +63,10 @@ class WebDefault extends AbstractWebDecorator {
 
 		$size = $this->getParameter('length');
 		$max = $this->_obj->getConstraint(Property::CONSTRAINT_MAXLENGTH);
-		$html  = sprintf('<input type="text" name="%s" id="%s" size="%s"%s value="%s"%s/>'
+		$html  = sprintf('<input type="text" name="%s" id="%s" placeholder="%s" size="%s"%s value="%s"%s/>'
 							, $name
 							, $this->_obj->getId()
+							, $this->_obj->getHelp()
 							, ($max > $size || $max == 0) ? $size : $max
 							, $max ? ' maxlength="' . $max . '"' : null
 							, $this->_obj->getValue()

@@ -51,6 +51,7 @@ class DefaultAdapter extends AbstractAdapter {
 										 , Property::CONSTRAINT_HASLETTERS
 										 , Property::CONSTRAINT_UPPERCASE
 										 , Property::CONSTRAINT_LOWERCASE
+										// , Property::CONSTRAINT_MULTIPLE
 										 , Property::CONSTRAINT_DATEMIN
 										 , Property::CONSTRAINT_DATEMAX
 										 , Property::CONSTRAINT_HOURMIN
@@ -67,7 +68,11 @@ class DefaultAdapter extends AbstractAdapter {
 		switch ($class) {
 			
 			case 'EnumProperty':
-				$element = new Element\EnumElement();
+				if ($property->getParameter('constraints.multiple') !== false) {
+					$element = new Element\MultipleElement();
+				} else {
+					$element = new Element\EnumElement();
+				}
 				$element->setEnumValues($property->getValues());
 				break;
 				
