@@ -68,7 +68,7 @@ class ObjectProperty extends AbstractProperty {
 			
 		   	$type = is_object($value) ? get_class($value) : gettype($value);
 		   	throw new Exception(array("VALUE_MUST_BE_INSTANCEOF"
-		   					  , array($this->getParameter('instanceof'), $value, $type)));
+		   					  , array($this->getParameter('instanceof'), $value, $type, $this->_parent->getClass() . '::' . $this->_id)));
 		}
 		
 		parent::setValue($value);

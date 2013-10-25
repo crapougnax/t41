@@ -8,8 +8,8 @@
 		</exception>
 		<exception id="VALUE_MUST_BE_INSTANCEOF">
 			<labels>
-				<label lang="en">Value must be an instance of class '%0', 't41\ObjectModel\DataObject' or 't41\ObjectModel\ObjectUri'. Given value was of type '%1'.</label>
-				<label lang="fr">La valeur passée doit être une instance des classes '%0', 't41\ObjectModel\DataObject' ou 't41\ObjectModel\ObjectUri'. Valeur transmise '%1' de type '%2'.</label>
+				<label lang="en">Value passed to %3 must be an instance of class '%0', 't41\ObjectModel\DataObject' or 't41\ObjectModel\ObjectUri'. Given value was of type '%1'.</label>
+				<label lang="fr">La valeur passée pour %3 doit être une instance des classes '%0', 't41\ObjectModel\DataObject' ou 't41\ObjectModel\ObjectUri'. Valeur transmise '%1' de type '%2'.</label>
 				</labels>
 		</exception>
 		<exception id="VALUE_NOT_IN_ENUMERATION">
