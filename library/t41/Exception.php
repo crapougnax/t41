@@ -52,9 +52,7 @@ class Exception extends \Exception {
 	public function __construct($message, $code = 0, Exception $previous = null)
 	{
 		if (is_array($message)) {
-				
 			if (count($message) != 2) {
-	
 				throw new \Exception('Array argument should contain exactly two values');
 			}
 				
@@ -62,7 +60,6 @@ class Exception extends \Exception {
 			$key = $message[0];
 				
 		} else {
-				
 			$key = $message;
 		}
 	
@@ -73,35 +70,31 @@ class Exception extends \Exception {
 		//\Zend_Debug::dump($res); die;
 		$this->_messages = $res['exceptions'];
 		if (isset($this->_messages[$key])) {
-
 			$messages = isset($this->_messages[$key]['labels']) ? $this->_messages[$key]['labels'] : array();
 			
 			if ($lang != 'en' && isset($messages[$lang])) {
-				
 				$str = $messages[$lang];
-	
 			} else {
-	
 				/* english version should always be available either under the 'en' key or in the parent-level 'label' key */ 
 				$str = isset($messages['en']) ? $messages['en'] : $this->_messages[$key]['label'];
 			}
 	
 			if ($str !== false && is_array($message)) {
-					
 				foreach ( (array) $message[1] as $key => $val) {
-	
 					$str = str_replace('%' . $key, is_object($val) ? get_class($val) : $val, $str);
 				}
 			}
-				
 		} else {
-				
 			$str = $key;
 		}
 	
+		$str .= sprintf("\n(file: %s, line: %d", $this->getFile(), $this->getLine());
+		if (Core::$env != Core::ENV_PROD) {
+			$str .= "\n" . $this->getTraceAsString();
+		}
+		
 		// if a previously caught exception is passed as parameter, its message is postfixed to current message
 		if ($previous instanceof Exception) {
-				
 			$str .= "\n" . $previous->getMessage();
 		}
 	
