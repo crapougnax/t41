@@ -143,8 +143,6 @@ window.t41.view.form = function(id,obj,form) {
 			formdata[i] = value;
 		}
 		
-		console.log(errors);
-		
 		if (errors.length > 0) {
 			for (var i in errors) {
 				var span = document.createElement('span');
@@ -155,6 +153,10 @@ window.t41.view.form = function(id,obj,form) {
 			jQuery('#' + errors[0].field).focus();
 			return false;
 		} else {
+			
+			// deactivate buttons
+			jQuery('#form_actions').fadeOut();
+			
 			formdata['uuid'] = this.form.uuid;
 			formdata['objuuid'] = this.obj.uuid;
 			if (this.form.params.post_ok) {
@@ -220,6 +222,9 @@ window.t41.view.form = function(id,obj,form) {
 			new t41.view.alert("Erreur lors de la sauvegarde", params);
 			if (this.redirects && this.redirects.redirect_nok){
 				window.location.href = this.redirects.redirect_nok;
+			} else {
+				// reactivate buttons
+				jQuery('#form_actions').fadeIn();
 			}
 		}
 	};
