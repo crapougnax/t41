@@ -488,8 +488,7 @@ class DataObject extends ObjectModelAbstract {
     	foreach ($data as $key => $value) {
     		
 			// don't use empty() to check $value to avoid zero being ignored
-    		if (($property = $this->getProperty($key)) !== false && $value != '') {
-    			
+    		if (($property = $this->getProperty($key)) !== false && ! is_null($value)) {
     			if ($value == Property::EMPTY_VALUE) {
     				$property->resetValue();
     				continue;

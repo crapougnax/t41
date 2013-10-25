@@ -320,13 +320,18 @@ window.t41.view.form.streetNumber = function(id) {
 	
 	this.updateValue = function() {
 		var value = jQuery('#' + this.id + '_number').val();
+		if (value == 0) {
+			value = null;
+		}
 		if (value) {
 			jQuery('#' + this.id + '_ext').prop('disabled',false);
 			if (jQuery('#' + this.id + '_ext').val()) {
 				value += '.' + jQuery('#' + this.id + '_ext').val();
 			}
 		} else {
-			jQuery('#' + this.id + '_ext').prop('disabled',true);
+			jQuery('#' + this.id + '_number').val('');
+			jQuery('#' + this.id + '_ext').prop('disabled',true).prop('selectedIndex',0);
+			value = '_NONE_';
 		}
 		jQuery('#' + this.id).val(value);
 		t41.view.customEvent(this.id, 'change');
