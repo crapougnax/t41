@@ -29,6 +29,7 @@ use t41\Backend\Condition;
 use t41\ObjectModel;
 use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property;
+use t41\ObjectModel\Property\DateProperty;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters
@@ -144,8 +145,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		}
 		
 		// Look for unsaved object in properties and save them @todo throw Exception in case of failure
-		$res = $this->_saveNewObjects($do);
-		
+		if (self::$recursionSave === true) {
+			try {
+				$res = $this->_saveNewObjects($do);
+			} catch (\Exception $e) {
+				throw new Exception("Error Creating recursive record in $table : " . $e->getMessage());
+			}
+		}
+			
 		// get a valid data array passing mapper if any
 		$recordSet = $this->_mapper ? $do->map($this->_mapper, $this) : $do->toArray($this);
 
@@ -566,7 +573,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
 				$select->where($statement);
 				continue;
-			
 			} else {
 				$field = $property->getId();
 				if ($this->_mapper) {
@@ -603,6 +609,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$field = $table . '.' . $field->getName();
 			}
 
+			if ($property instanceof DateProperty) {
+				$field = "DATE($field)";
+			}
+			
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
 
 			switch ($conditionArray[1]) {
@@ -620,24 +630,31 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		// Adjust query based on returnCount
 		if ($returnCount) {
-		
 			if (is_array($returnCount)) {
-
 				// return count on grouped columns
-				foreach ($returnCount as $field) {
+				foreach ($returnCount as $property) {
+					$fieldmodifier = null;
 					if ($this->_mapper) {
-						$class = $field->getParent() ? $field->getParent()->getId() : $collection->getDataObject()->getClass();
-						$field = $this->_mapper->propertyToDatastoreName($class, $field->getId());
+						$class = $property->getParent() ? $property->getParent()->getId() : $collection->getDataObject()->getClass();
+						$field = $this->_mapper->propertyToDatastoreName($class, $property->getId());
 					} else {
-						$field = $field->getId();
+						$field = $property->getId();
 					}
-					$select->group($field);
-					$select->columns($field);
+					
+					// limit date grouping to date part, omitting possible hour part
+					if ($property instanceof DateProperty) {
+						$fieldmodifier = "DATE($field)";
+					}
+					
+					$select->group($fieldmodifier);
+					$select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
 				}
 			} else {
 				$select->reset('group');
 			}
 		} else {
+			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
+		}
 				
 			foreach ($collection->getSortings() as $sorting) {
 				if ($sorting[0]->getId() == ObjectUri::IDENTIFIER) {
@@ -697,12 +714,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
 				$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
-			}
-			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
+			//}
 		}
 		
 // 		if (isset($subSelect)) {
-// 			echo $select; 
+//			echo $select; 
 // 			die;
 // 		}
 
@@ -931,7 +947,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 		
 		} else {
-		
 			$field = $property->getId();
 			if ($this->_mapper) {
 				$field = $this->_mapper->propertyToDatastoreName($class, $field);
