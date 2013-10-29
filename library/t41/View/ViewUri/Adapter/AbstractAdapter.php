@@ -110,7 +110,6 @@ abstract class AbstractAdapter {
 	public function setArguments(array $args, $set = null)
 	{
 		foreach ($args as $key => $val) {
-			
 			$this->setArgument($key, $val, $set);
 		}
 	}
@@ -211,23 +210,16 @@ abstract class AbstractAdapter {
 	 */
 	protected function _collateArguments(array $arguments = null)
 	{
-		
 		if (is_null($arguments)) {
 			$arguments = $this->_arguments;
 		}
-		
 		$args = array();
-		
 		foreach ($arguments as $key => $val) {
-			
 			if (is_array($val)) {
-				
 				foreach ($val as $valKey => $valValue) {
-					
 					$args[] = $this->_collateKeyVal($valKey, $valValue, $key);
 				}
 			} else {
-				
 				$args[] = $this->_collateKeyVal($key, $val);
 			}
 		}
@@ -263,10 +255,8 @@ abstract class AbstractAdapter {
 	public function getIdentifier($identifierName)
 	{
 		if (isset($this->_identifiers[$identifierName])) {
-			
 			return $this->_identifiers[$identifierName];
 		} else {
-			
 			return false;
 		}
 	}
@@ -282,12 +272,9 @@ abstract class AbstractAdapter {
 	public function setIdentifier($identifierName, $newName)
 	{
 		if (isset($this->_identifiers[$identifierName]) && is_string($newName)) {
-			
 			$this->_identifiers[$identifierName] = $newName;
 			return true;
-		
 		} else {
-			
 			return false;
 		}		
 	}
@@ -308,10 +295,12 @@ abstract class AbstractAdapter {
 	 * Set $_env value
 	 * 
 	 * @param array $env
+	 * @return t41\View\ViewUri\AbstractAdapter
 	 */
 	public function setEnv(array $env)
 	{
 		$this->_env = $env;
+		return $this;
 	}
 	
 	
@@ -328,14 +317,13 @@ abstract class AbstractAdapter {
 	
 	
 	/**
-	 * Save current environment array in session with given key
+	 * Save current environment array
 	 * 
-	 * @param string $sessionKey
 	 * @return boolean
 	 */
-	public function saveSearchTerms($sessionKey)
+	public function saveSearchTerms()
 	{
-    	return Core::sessionAdd($sessionKey, $this->getEnv());
+		return Core::sessionAdd('uri' . str_replace('/', '_', $this->_uriBase), $this->getEnv());
 	}
 	
 	
@@ -343,21 +331,17 @@ abstract class AbstractAdapter {
 	 * Gets the latest session-saved environment and inject it in $_env
 	 * Returns true if $_env was modified, false otherwise
 	 * 
-	 * @param string $sessionKey
 	 * @return boolean
 	 */
-	public function restoreSearchTerms($sessionKey)
-	{
+	public function restoreSearchTerms()
+	{		
     	if (count($this->getEnv()) == 0) {
-    		
-    		$env = Core::sessionGet($sessionKey);
+    		$env = Core::sessionGet('uri' . str_replace('/', '_', $this->_uriBase));
 	    	if (is_array($env)) {
-	    		
 	    		$this->setEnv($env);
 	    		return true;
 	    	}
     	}
-    	
     	return false;
 	}
 }

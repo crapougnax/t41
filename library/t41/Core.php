@@ -27,6 +27,7 @@ use t41\View\SimpleComponent;
 use t41\Core,
 	t41\Config;
 use t41\View\Decorator;
+use t41\Core\Session;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -614,9 +615,9 @@ class Core {
     		self::$_adapters['registry'] = new \Zend_Registry();
     	}
     	        
-        // (re-)init session 
+        // (re-)init data session 
         if (! isset(self::$_adapters['session'])) {
-    		self::$_adapters['session'] = '';//new t41_Session_Default();
+    		self::$_adapters['session'] = new \Zend_Session_Namespace('data');
     	}
 
         // to be done at the very end to avoid empty stack on exception
@@ -704,18 +705,10 @@ class Core {
      */
     public static function sessionAdd($key, $val)
     {
-		if (! self::$_adapters['session'] instanceof t41_Session_Abstract) {
-			
+		if (! self::$_adapters['session'] instanceof \Zend_Session_Namespace) {
 			throw new Exception("No session adapter declared");
 		}
-		/*
-		
-		if (is_object($val)) {
-		
-            $val = array('_class' => get_class($val), 'content' => gzcompress(serialize($val)));
-        }
-        */
-		return self::$_adapters['session']->set($key, $val);
+		return self::$_adapters['session']->$key = $val;
     }
 
     /**
@@ -727,12 +720,10 @@ class Core {
      */
     public static function sessionGet($key = null)
     {
-		if (! self::$_adapters['session'] instanceof t41_Session_Abstract) {
-			
+		if (! self::$_adapters['session'] instanceof \Zend_Session_Namespace) {
 			throw new Exception("No session adapter declared");
 		}
-		
-		return self::$_adapters['session']->get($key);
+		return self::$_adapters['session']->$key;
     }
     
     
@@ -791,7 +782,6 @@ class Core {
     public static function cacheSet($val, $key = null, $force = false, array $options = array())
     {
     	$cache = self::cacheGetAdapter();
-
     	if (is_null($key)) $key = md5(microtime() . $_SERVER['REMOTE_ADDR']);
     	 
         if (is_object($val)) {
@@ -812,7 +802,6 @@ class Core {
     	$cache = self::cacheGetAdapter();
     	
     	$cached = $cache->load($key);
-    	
     	Core::log(sprintf('[Cache] Retrieved %s as %s', $key, gettype($cached)));
     	 
         if (is_array($cached)) {
@@ -836,16 +825,16 @@ class Core {
     
     /**
      * REGISTRY GLOBAL ACCESS METHODS
+     * 
+     * @var self::$_adapters['registry'] \Zend_Registry
      */
     
     
     public static function registrySet($key, $val = null)
     {
     	if (! isset(self::$_adapters['registry'])) {
-    		
     		self::setAdapter('registry', \Zend_Registry::getInstance());
     	}
-    	
     	return self::$_adapters['registry']->set($key, $val);
     }
     
@@ -853,21 +842,17 @@ class Core {
     public static function registryGet($key)
     {
         if (! isset(self::$_adapters['registry'])) {
-    		
-    		self::setAdapter('registry', \Zend_Registry::getInstance());
+    		return null;
     	}
-    	
-    	return self::$_adapters['registry']->get($key);
+    	return self::$_adapters['registry']->isRegistered($key) ? self::$_adapters['registry']->get($key) : null;
     }
     
     
     public static function registryHasObject($key)
     {
         if (! isset(self::$_adapters['registry'])) {
-    		
     		self::setAdapter('registry', \Zend_Registry::getInstance());
     	}
-    	    
     	return self::$_adapters['registry']->isRegistered($key);
     }
     
@@ -893,19 +878,14 @@ class Core {
     	
     	// first have a look at the file loaded status
     	if (! isset(self::$_messages[$store]) || ! isset(self::$_loaded[$store . '_' . $lang])) {
-    		
     		if (($config = Config\Loader::loadConfig(self::$basePath . 'configs/messages/' . $store . '.' . $lang . '.xml')) === false) {
-
     			if (($config = Config\Loader::loadConfig(self::$basePath . 'configs/messages/' . $store . '.xml')) === false) {
-    			
     				return $key;
     			}
     		} else {
-    			
     			// set file as loaded
     			self::$_loaded[$store . '_' .  $lang] = true; 
     		}
-    		
     		self::$_messages = array_merge_recursive(self::$_messages, $config);
     	}
 
@@ -936,7 +916,6 @@ class Core {
     	$string = urldecode($string);
     	
     	if ($utf8 == false && mb_detect_encoding($string, 'UTF-8') !== false) {
-    		
     		$string = utf8_decode($string);
     	}
     	
@@ -949,20 +928,17 @@ class Core {
 
 			/* try to convert meta string to array on the fly */
 			if (substr($elem[1],0,7) == 'ARRAY:[' && substr($elem[1],-1) == ']') {
-				
 				$tmp = substr($elem[1], 7, strlen($elem[1]) -8);
 				$tmp = explode(',', $tmp);
 				if (is_array($tmp)) $elem[1] = $tmp;
 			}
 							
 			if (substr($elem[0], -2) == '[]') {
-				
 				$elem[0] = str_replace('[]', '', $elem[0]);
 				if (! isset($data[$elem[0]])) $data[$elem[0]] = array();
 				$data[$elem[0]][] = $elem[1];
 				
 			} else {
-			
 				$data[$elem[0]] = $elem[1];
 			}
 		}

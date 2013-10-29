@@ -22,8 +22,6 @@ namespace t41\View\ViewUri\Adapter;
  * @version    $Revision: 832 $
  */
 
-use t41\View\ViewUri\Adapter;
-
 
 /**
  * Adapter for URI manipulation in GET context.

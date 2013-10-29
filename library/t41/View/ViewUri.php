@@ -22,7 +22,7 @@ namespace t41\View;
  * @version    $Revision: 832 $
  */
 
-use t41\View\ViewUri;
+use t41\View\ViewUri\Adapter\AbstractAdapter;
 
 /**
  * Class providing basic URI manipulation methods.
@@ -37,7 +37,7 @@ class ViewUri {
 	/**
 	 * Instance of Uri builder class
 	 *
-	 * @var t41_View_Uri_Adapter_Abstract
+	 * @var t41\View\ViewUri\AbstractAdapter
 	 */
 	static protected $_uriAdapter;
 	
@@ -45,28 +45,20 @@ class ViewUri {
 	public static function setUriAdapter($adapter = 'default', array $params = null)
 	{
 		$className = sprintf('\t41\View\ViewUri\Adapter\%sAdapter', ucfirst(strtolower($adapter)));
-		
 		try {
-
 			self::$_uriAdapter = new $className(null, $params);
-			
 		} catch (Exception $e) {
-			
 			throw new Exception("Unable to instanciate $className uri adapter: " . $e->getMessage());
 		}
-		
 		return self::$_uriAdapter;
 	}
 	
 	
 	public static function getUriAdapter()
 	{
-		if (self::$_uriAdapter instanceof ViewUri\AbstractAdapter) {
-			
+		if (self::$_uriAdapter instanceof AbstractAdapter) {
 			return self::$_uriAdapter;
-
 		} else {
-			
 			return self::setUriAdapter();
 		}
 	}
@@ -99,5 +91,4 @@ class ViewUri {
 		self::getUriAdapter();
 		return self::$_uriAdapter->getEnv();
 	}
-	
 }

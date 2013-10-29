@@ -31,7 +31,6 @@ use t41\ObjectModel,
 	t41\View,
 	t41\View\ViewUri,
 	t41\View\Decorator,
-	t41\View\FormComponent,
 	t41\View\FormComponent\Element\ButtonElement,
 	t41\View\ListComponent\Element;
 use t41\ObjectModel\Property\AbstractProperty;
@@ -114,7 +113,8 @@ class WebDefault extends AbstractWebDecorator {
     	$tmp = $this->_obj->reduce();
     	$this->_uuid = $tmp['uuid'];
     	
-    	// set relevant uri adapter and get some identifiers 
+    	// set relevant uri adapter and get some identifiers
+    	/* @var $_uriAdapter t41\View\ViewUri\AbstractAdapter */
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter ) {
     		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
     	} else {
@@ -122,20 +122,25 @@ class WebDefault extends AbstractWebDecorator {
     	}
     	
     	// set url base
-    	$this->_uriAdapter->setUriBase(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
+    	$tmp = explode('?', $_SERVER['REQUEST_URI']);
+    	$this->_uriAdapter->setUriBase($tmp[0]);
 
     	$this->_offsetIdentifier	= $this->_uriAdapter->getIdentifier('offset');
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
     	
-    	// set data source for environment
+/*     	if (count($this->_uriAdapter->getEnv()) != 0) {
+    		$this->_uriAdapter->saveSearchTerms();
+    	} else { */
+    		// try and restore cached search terms for the current uri
+    		$this->_uriAdapter->restoreSearchTerms();
+//    	}
+
     	$this->_env = $this->_uriAdapter->getEnv();
     	
     	// set query parameters from context
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
-
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
@@ -295,47 +300,7 @@ HTML;
         return $line . "</tr>\n";
     }
 
-    
-    protected function _quickSearchRendering()
-    {
-    	$sort = null;
-    	 
-    	// build header line
-    	$line = '<tr>';
-    
-    	/* @var $val t41_View_Property_Abstract */
-    	foreach ($this->_obj->getColumns() as $val) {
-    		 
-    		$prop = $this->_obj->getCollection()->getDataObject()->getRecursiveProperty($val->getParameter('property'));
-    		
-    		if ($prop instanceof Property\MetaProperty) {
-    			$line .= '<th></th>';
-    			continue;
-    		}
-    		
-    		$id = sprintf('%s[%s]', $this->_searchIdentifier, $val->getId());
-    		
-    		if ($prop instanceof Property\ObjectProperty) {
-    			$sf = new FormComponent\Element\ListElement($id);
-    			$deco = Decorator::factory($sf);
-    			 
-    		} else {
-    			$sf = new FormComponent\Element\FieldElement($id);
-    			$deco = Decorator::factory($sf, array('length' => 10));
-    			$line .= sprintf('<th>%s</th>', $deco->render());
-    		}
-    	}
-    
-    	if (count($this->_obj->getEvents('row')) > 0) {
-    		$line .= '<th>&nbsp;</th>';
-    	} else {
-    		$line .= '<th>&nbsp;</th>';
-    	}
-    
-    	return $line . "</tr>\n";
-    }
-    
-    
+       
     protected function _contentRendering()
     {
         $i = 0;

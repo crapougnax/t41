@@ -56,12 +56,20 @@ class WebSearch extends SimpleComponent\WebDefault {
     	}
     	 
     	// set url base
-    	$this->_uriAdapter->setUriBase(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')));
-    	
+    	$tmp = explode('?', $_SERVER['REQUEST_URI']);
+    	$this->_uriAdapter->setUriBase($tmp[0]);
+    	    	
     	$this->_offsetIdentifier	= $this->_uriAdapter->getIdentifier('offset');
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
     	 
+    	if (count($this->_uriAdapter->getEnv()) != 0) {
+    		$this->_uriAdapter->saveSearchTerms();
+    	} else {
+    		// try and restore cached search terms for the current uri
+    		$this->_uriAdapter->restoreSearchTerms();
+    	}
+    	
     	// set data source for environment
     	$this->_env = $this->_uriAdapter->getEnv();
     	 
@@ -89,18 +97,6 @@ HTML;
     protected function _headerRendering()
     {
         $p = sprintf('<form method="get" action="%s" id="t41sf">', $this->_obj->getParameter('baseurl'));
-        
-        /**
-         * Preserve the view uri arguments by injecting them in the code
-         */
-/*        if ($this->_uriAdapter->getArguments()) {
-        	
-        	foreach ($this->_uriAdapter->getArguments() as $key => $val) {
-        		
-        		$p .= sprintf('<input type="hidden" name="%s" value="%s" />' . "\n", $key, $val);
-        	}
-        }
-*/    	
         return $p;
     }
 
