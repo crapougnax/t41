@@ -50,15 +50,13 @@ class WebSearch extends SimpleComponent\WebDefault {
     	 
     	// set relevant uri adapter and get some identifiers
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter ) {
-    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
+    		// set url base
+    		$tmp = explode('?', $_SERVER['REQUEST_URI']);
+    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter($tmp[0]);
     	} else {
     		$this->_uriAdapter = ViewUri::getUriAdapter();
     	}
     	 
-    	// set url base
-    	$tmp = explode('?', $_SERVER['REQUEST_URI']);
-    	$this->_uriAdapter->setUriBase($tmp[0]);
-    	    	
     	$this->_offsetIdentifier	= $this->_uriAdapter->getIdentifier('offset');
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');

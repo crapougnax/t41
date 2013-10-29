@@ -44,6 +44,11 @@ class ViewUri {
 	
 	public static function setUriAdapter($adapter = 'default', array $params = null)
 	{
+		if ($adapter instanceof AbstractAdapter) {
+			self::$_uriAdapter = $adapter;
+			return self::$_uriAdapter;
+		}
+		
 		$className = sprintf('\t41\View\ViewUri\Adapter\%sAdapter', ucfirst(strtolower($adapter)));
 		try {
 			self::$_uriAdapter = new $className(null, $params);

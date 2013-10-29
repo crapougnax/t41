@@ -96,7 +96,8 @@ class PdfDefault extends AbstractPdfDecorator {
     	 
     	// set relevant uri adapter and get some identifiers 
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter) {
-    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
+    		$tmp = explode('?', $_SERVER['REQUEST_URI']);
+    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter($tmp[0]);
     	} else {
     		$this->_uriAdapter = ViewUri::getUriAdapter();
     	}
@@ -104,16 +105,16 @@ class PdfDefault extends AbstractPdfDecorator {
     	$this->_offsetIdentifier	= $this->_uriAdapter->getIdentifier('offset');
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
-    	
+    	 
+    	// try and restore cached search terms for the current uri
+    	$this->_uriAdapter->restoreSearchTerms();
     	
     	// set data source for environment
     	$this->_env = $this->_uriAdapter->getEnv();
     	
     	// set query parameters from context
     	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
-
     		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			
     			$field = str_replace("-",".",$field);
 
     			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
