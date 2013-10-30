@@ -41,9 +41,16 @@ abstract class AbstractAdapter implements AdapterInterface {
 
 	
 	/**
+	 * Enable or disable saving object recursively
+	 * @var boolean
+	 */
+	public static $recursionSave = true;
+	
+	
+	/**
 	 * Backend Uri
 	 *
-	 * @var t41_Backend_Uri
+	 * @var t41\Backend\BackendUri
 	 */
 	protected $_uri;
 	

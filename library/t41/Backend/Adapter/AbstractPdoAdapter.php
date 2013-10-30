@@ -144,14 +144,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
-		// Look for unsaved object in properties and save them @todo throw Exception in case of failure
-//		if (self::$recursionSave === true) {
+		// Look for unsaved object in properties and save them
+		if (self::$recursionSave === true) {
 			try {
 				$res = $this->_saveNewObjects($do);
 			} catch (\Exception $e) {
 				throw new Exception("Error Creating recursive record in $table : " . $e->getMessage());
 			}
-//		}
+		}
 			
 		// get a valid data array passing mapper if any
 		$recordSet = $this->_mapper ? $do->map($this->_mapper, $this) : $do->toArray($this);
