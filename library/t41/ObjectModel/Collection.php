@@ -516,7 +516,7 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Return a member from is numeric key
+	 * Return a member from its numeric key
 	 * @param integer $pos
 	 * @param string $type
 	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
@@ -544,6 +544,40 @@ class Collection extends ObjectModelAbstract {
 		}
 		
 		return is_null($type) ? $member : $this->_castMember($member, $type);
+	}
+	
+	
+	/**
+	 * Return a member from its uri (or part of it)
+	 * @param string $uri
+	 * @param string $type
+	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
+	 */
+	public function getMemberFromUri($uri, $type = null)
+	{
+		if (! is_array($this->_members) || count($this->_members) == 0) {
+			return false;
+		}
+		
+		$matching = null;
+		
+		foreach ($this->_members as $member) {
+			if ($member instanceof ObjectUri) {
+				if ($member->getIdentifier() == $uri) {
+					$matching = $member;
+					break;
+				}
+			} else if ($member->getUri()->getIdentifier() == $uri) {
+				$matching = $member;
+				break;				
+			}
+		}
+		
+		if (! is_null($matching)) {
+			return is_null($type) ? $matching : $this->_castMember($matching, $type);
+		} else {
+			return false;
+		}
 	}
 	
 	
