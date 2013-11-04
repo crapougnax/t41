@@ -280,7 +280,12 @@ abstract class AbstractElement extends View\ViewObject {
     {
     	$type = get_class($this);
     	$type = lcfirst(substr($type, strrpos($type,'\\')+1));
-    	$array = array('type' => $type, 'label' => $this->_title, 'value' => $this->_value, 'constraints' => $this->_is);
+    	$array = array(
+    					'type' => $type, 
+    					'label' => $this->_title, 
+    					'value' => is_object($this->_value) && $this->_value->getIdentifier() ? $this->_value->getIdentifier() : null, 
+    					'constraints' => $this->_is
+    				 );
     	
     	return array_merge($array, parent::reduce($params));
     }
