@@ -302,7 +302,13 @@ HTML;
         // print out rows
         foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $this->_key => $this->_do) {
         	$css = $i%2 == 0 ? 'odd' : 'even';
-			$p .= sprintf('<tr data-member="%s" class="%s">', $this->_key, $css);
+        	
+        	// @todo handle objects coming from different backends
+			$p .= sprintf('<tr data-member="%s" data-id="%s" class="%s">'
+					, $this->_key
+					, $this->_do->getUri()->getIdentifier()
+					, $css
+        		  );
         	$i++;
 			
 			if ($this->_obj->getParameter('selectable') === true) {
