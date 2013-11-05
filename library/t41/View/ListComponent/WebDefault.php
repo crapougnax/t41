@@ -37,6 +37,9 @@ use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\DataObject;
 use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property\DateProperty;
+use t41\ObjectModel\Collection\StatsCollection;
+use t41\ObjectModel\Property\ArrayProperty;
+use t41\ObjectModel\BaseObject;
 
 /**
  * List view object default Web Decorator
@@ -177,8 +180,10 @@ class WebDefault extends AbstractWebDecorator {
     		$this->_obj->getCollection()->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
     	}
     	
-        $this->_obj->query();
-        
+        if (! $this->_obj->getCollection() instanceof StatsCollection) {
+	    	$this->_obj->query();
+        }
+            
         $p = '';
         
         $p = $this->_headerRendering();
@@ -306,7 +311,7 @@ HTML;
         	// @todo handle objects coming from different backends
 			$p .= sprintf('<tr data-member="%s" data-id="%s" class="%s">'
 					, $this->_key
-					, $this->_do->getUri()->getIdentifier()
+					, $this->_do->getUri() ? $this->_do->getUri()->getIdentifier() : $this->_key
 					, $css
         		  );
         	$i++;
@@ -343,7 +348,19 @@ HTML;
             	$attrib = ($property instanceof Property\CurrencyProperty) ? ' class="cellcurrency"' : null;
             	 
             	if ($column->getParameter('recursion')) {
-					foreach ($column->getParameter('recursion') as $recursion) {
+            		$parts = $column->getParameter('recursion');
+					foreach ($parts as $rkey => $recursion) {
+						
+						if ($property instanceof ArrayProperty) {
+							// property won't be a property here !
+							$property = $property->getValue();
+							$property = $property[$recursion];
+							if ($property instanceof BaseObject && isset($parts[$rkey+1])) {
+								$property = $property->{$parts[$rkey+1]};
+							}
+							break;
+						}
+						
 						// property is an object property
 						if ($property instanceof AbstractProperty && $property->getValue()) {
 							$property = $property->getValue(ObjectModel::DATA)->getProperty($recursion);
@@ -364,7 +381,7 @@ HTML;
             		$deco = Decorator::factory($column);
             		$value = $deco->render();
             	} else {
-	  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
+	  				$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : $property;
             	}
             	//$p .= "<td$attrib>" . $this->_escape($value) . '</td>';
             	$p .= "<td$attrib>" . $value . '</td>';

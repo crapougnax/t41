@@ -30,6 +30,7 @@ use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\MetaProperty;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\Backend\Condition;
+use t41\ObjectModel\Property\ArrayProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -411,6 +412,11 @@ class DataObject extends ObjectModelAbstract {
     	
     	foreach ($parts as $part) {
 	    	$property = $data->getProperty($part);
+	    	
+	    	// stop recursion if property is an ArrayProperty because recursion is not possible in do's property
+	    	if ($property instanceof ArrayProperty) {
+	    		return $property;
+	    	}
     			 
     		if ($property instanceof Property\ObjectProperty) {
    				if ($property->getValue() instanceof ObjectModel\DataObject) {
