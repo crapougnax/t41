@@ -646,7 +646,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 						$fieldmodifier = "DATE($field)";
 					}
 					
-					$select->group($fieldmodifier);
+					$select->group($fieldmodifier ? $fieldmodifier : $field);
 					$select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
 				}
 			} else {
