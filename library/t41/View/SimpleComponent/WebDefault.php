@@ -63,7 +63,7 @@ class WebDefault extends AbstractWebDecorator {
 		$title = $this->_obj->getTitle() ? $this->_escape($this->_obj->getTitle()) : 'Component';
 		
 		$html = <<<HTML
-<div class="t41 component" id="{$this->getId()}">
+<div class="{$this->getParameter('css')}" id="{$this->getId()}">
 <h4 class="title slide_toggle {$status}"><div class="icon"></div>{$title}</h4>
 <div class="content">
 

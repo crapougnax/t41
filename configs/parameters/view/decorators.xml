@@ -4,11 +4,9 @@
 		<object id="t41\View\SimpleComponent">
 			<decorator id="WebDefault">
 				<parameters>
-					<parameter id="theme">
+					<parameter id="css">
 						<type>string</type>
-					</parameter>
-					<parameter id="color">
-						<type>string</type>
+						<defaultvalue>t41 component</defaultvalue>
 					</parameter>
 					<parameter id="open_default">
 						<type>boolean</type>
@@ -69,6 +67,10 @@
 		<object id="t41\View\ListComponent">
 			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
+					<parameter id="css">
+						<type>string</type>
+						<defaultvalue>t41 component list white medium</defaultvalue>
+					</parameter>
 					<parameter id="paginator">
 						<type>boolean</type>
 						<defaultvalue>true</defaultvalue>
