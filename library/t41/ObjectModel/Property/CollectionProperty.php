@@ -27,6 +27,7 @@ use t41\Backend;
 use t41\ObjectModel,
 	t41\ObjectModel\Collection,
 	t41\Backend\Condition;
+use t41\Core;
 
 /**
  * Property class to manipulate collections of objects
@@ -124,11 +125,8 @@ class CollectionProperty extends AbstractProperty {
 			
 			/* inject any other defined condition */
 			if ($this->getParameter('morekeyprop')) {
-				
 				foreach ($this->getParameter('morekeyprop') as $value) {
-					
 					if (strstr($value, ' ') !== false) {
-						
 						// if value contains spaces, it's a pattern
 						$parts = explode(' ', $value);
 						if (count($parts) == 3) {
@@ -144,7 +142,6 @@ class CollectionProperty extends AbstractProperty {
 						}
 						
 					} else {
-						
 						// default case, we expect the member to hold a property
 						// with the same name and value as the current object
 						if (($property = $this->_parent->getProperty($value)) === false) {
@@ -157,10 +154,12 @@ class CollectionProperty extends AbstractProperty {
 			
 			// set sorting
 			if ($this->getParameter('sorting')) {
-				
-				foreach ($this->getParameter('sorting') as $pair) {
-					
-					$this->_value->setSorting(array($pair['property'],$pair['mode']));
+				foreach ($this->getParameter('sorting') as $key => $val) {
+					if ($this->getParent()->getRecursiveProperty($key) !== false) {
+						$this->_value->setSorting(array($key, $val));
+					} else {
+						Core::log(sprintf("Can't sort %s property with unknown property %s", $this->_id, $key), \Zend_Log::WARN);
+					}
 				}
 			}
 			
@@ -168,7 +167,6 @@ class CollectionProperty extends AbstractProperty {
 			// populate only with ObjectUri instances for performance sake
 			if ($this->_parent->getUri()) $this->_value->find(ObjectModel::URI);
 		}
-		
 		return parent::getValue();
 	}
 	
