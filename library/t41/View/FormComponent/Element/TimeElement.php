@@ -121,11 +121,8 @@ class TimeElement extends AbstractElement {
 	public function formatValue($str = null, $fancy = false)
 	{
 		 if (! is_null($str)) {
-		 	$date = new \Zend_Date($str);
-		 	return $fancy ? $date->toString(\Zend_Date::DATE_LONG) : $date->toString('dd/MM/yyyy');
-			
+		 	return str_replace(':','h', $str);
 		} else {
-			
 			return $str;
 		}
 	}
