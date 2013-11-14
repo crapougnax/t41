@@ -31,6 +31,22 @@
 					</parameter>
 				</parameters>
 			</decorator>
+			<decorator id="WebView" extends="t41\View\Decorator\AbstractWebDecorator">
+				<parameters>
+					<parameter id="css">
+						<type>string</type>
+						<defaultvalue>t41 component</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
+			<decorator id="WebSearch" extends="t41\View\Decorator\AbstractWebDecorator">
+				<parameters>
+					<parameter id="css">
+						<type>string</type>
+						<defaultvalue>t41 component</defaultvalue>
+					</parameter>
+				</parameters>
+			</decorator>
 		</object>
 
 		<object id="t41\View\TableComponent">
