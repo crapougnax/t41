@@ -5,6 +5,7 @@ namespace t41\Core\Layout;
 use t41\ObjectModel\ObjectModelAbstract,
 	t41\Core\Layout\Menu,
 	t41\Core\Layout\Menu\MenuItem;
+use t41\Core\Layout;
 
 
 class Menu extends ObjectModelAbstract {
@@ -178,6 +179,28 @@ class Menu extends ObjectModelAbstract {
 		}
 		
 		//\Zend_Debug::dump($this->_items); die;
+	}
+	
+	
+	/**
+	 * Return current active menu item or false if no match found
+	 * @return MenuItem
+	 */
+	public function getActiveItem()
+	{
+		if (Layout::$module && isset($this->_items[Layout::$module])) {
+			$items = $this->_items[Layout::$module]->getItems();
+			$key = Layout::$controller . '/' . Layout::$action;
+			foreach ($items as $itemkey => $item) {
+				if ($itemkey == $key) {
+					return $item;
+				} else if ($item->getItem($key)) {
+					return $item->getItem($key);
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	
