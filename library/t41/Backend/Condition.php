@@ -261,7 +261,20 @@ class Condition {
 		return $this->_clauses;
 	}
 	
+	
+	/**
+	 * set clauses value from passed array
+	 * No control is made, be cautious!
+	 * @param array $clauses
+	 */
+	public function setClauses(array $clauses)
+	{
+		$this->_clauses = $clauses;
+		$this->_current = count($clauses);
+		return $this;
+	}
 
+	
 	/**
 	 * Returns true if the current instance contains a child instance
 	 * 
