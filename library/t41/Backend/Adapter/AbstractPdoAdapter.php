@@ -78,6 +78,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	
 	
 	/**
+	 * Current class being queried
+	 * @var string
+	 */
+	protected $_class;
+	
+	
+	/**
 	 * Array of joined tables 
 	 * @var array
 	 */
@@ -430,7 +437,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	 */
 	public function find(ObjectModel\Collection $collection, $returnCount = false)
 	{
-		$class = $collection->getDataObject()->getClass();
+		$this->_class = $class = $collection->getDataObject()->getClass();
 		$table = $this->_getTableFromClass($class);
 		
 		if (! $table) {
@@ -612,9 +619,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			if ($property instanceof DateProperty) {
 				$field = "DATE($field)";
 			}
-			
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
-
+//var_dump($statement); die;
 			switch ($conditionArray[1]) {
 				
 				case Condition::MODE_OR:
@@ -901,7 +907,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				} else {
 					$parentTable = $table;
 				}
-		
+
 				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
 					
 				if (array_key_exists($jtable, (array) $this->_alreadyJoined)) {
@@ -949,7 +955,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		} else {
 			$field = $property->getId();
 			if ($this->_mapper) {
-				$field = $this->_mapper->propertyToDatastoreName($class, $field);
+				$field = $this->_mapper->propertyToDatastoreName($property->getParameter('instanceof'), $field);
 			}
 		}
 		
@@ -957,7 +963,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		if ($field == ObjectUri::IDENTIFIER) {
 			// @todo handle multiple keys from mapper
 			$field = $table . '.';
-			$key = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
+			$key = $this->_mapper ? $this->_mapper->getPrimaryKey($this->_class) : Backend::DEFAULT_PKEY;
 			$field = is_array($key) ? $key[0] : $key;
 		}
 		
