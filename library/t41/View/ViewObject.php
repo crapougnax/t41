@@ -86,7 +86,7 @@ abstract class ViewObject extends ObjectModelAbstract {
 	 * @param mixed $str
 	 * @return $this
 	 */
-	public function setContent($str)
+	public function setContent($str = null)
 	{
 		$this->_content[] = $str;
 		return $this;
