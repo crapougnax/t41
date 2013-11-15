@@ -150,4 +150,10 @@ class GridElement extends AbstractElement {
     		return $this->_enumValues;
     	}
     }
+    
+    
+    public function reduce(array $params = array())
+    {
+    	return null;
+    }
 }
