@@ -515,7 +515,7 @@ class DataObject extends ObjectModelAbstract {
     						/* get & call object's backend to get a full configured object uri */
     						$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
     						$value = $backend->buildObjectUri($value, $property->getParameter('instanceof'));
-    						$property->setValue(new ObjectUri($value));
+    						$property->setValue($value instanceof ObjectUri ? $value : new ObjectUri($value));
     					} else {
     						//$class = $property->getParameter('instanceof');
     						$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
