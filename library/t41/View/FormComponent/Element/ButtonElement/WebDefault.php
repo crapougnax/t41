@@ -58,7 +58,7 @@ class WebDefault extends AbstractWebDecorator {
 			$link = $this->_obj->getLink();
 
 			$uri = $this->_obj->getParameter('uri');
-			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') $link .= '/id/' . $uri->getIdentifier();
+			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') $link .= '/id/' . rawurlencode($uri->getIdentifier());
 			
 			$extraHtml[] = sprintf("onclick=\"t41.view.link('%s', jQuery('#%s'))\"", $link, $this->getId());
 			
