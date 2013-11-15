@@ -94,9 +94,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	/**
 	 * Instanciate a PDO-based backend from a t41_Backend_Uri object 
 	 *
-	 * @param t41_Backend_Uri $uri
+	 * @param t41\Backend\BackendUri $uri
 	 * @param string $alias
-	 * @throws t41_Backend_Exception
+	 * @throws t41\Backend\Exception
 	 */
 	public function __construct(Backend\BackendUri $uri, $alias = null)
 	{
@@ -501,8 +501,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			// optional table where the column may be
 			$jtable = '';
 			
-			$class = $collection->getDataObject()->getClass();
-			
 			// condition object is in the first key
 			$condition = $conditionArray[0];
 
@@ -549,23 +547,32 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$property = $condition->getProperty();
 			
 			if ($property instanceof Property\ObjectProperty) {
-				// which table to join with ? (in case of condition is last element of a recursion)
-				$jtable2 = $jtable ? $jtable : $table;
 				
-				$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
+				// no join if object is stored in a different backend !
+				// @todo improve this part 
+				if (ObjectModel::getObjectBackend($property->getParameter('instanceof'))->getAlias() != $this->_uri->getAlias()) {
+					$clauses = $condition->getClauses();
+					$clauses[0]['operator'] = Condition::OPERATOR_ENDSWITH | Condition::OPERATOR_EQUAL;
+					$condition->setClauses($clauses);
+					$field = $this->_mapper ? $this->_mapper->propertyToDatastoreName($this->_class, $property->getId()) : $property->getId();
+				} else {
+					// which table to join with ? (in case of condition is last element of a recursion)
+					$jtable2 = $jtable ? $jtable : $table;
 				
-				$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
-				$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
+					$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
+				
+					$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
+					$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 
-				$uniqext = $jtable . '__joined_for__' . $leftkey;
-				if (in_array($uniqext, $this->_alreadyJoined)) {
-					continue;
+					$uniqext = $jtable . '__joined_for__' . $leftkey;
+					if (in_array($uniqext, $this->_alreadyJoined)) {
+						continue;
+					}
+					$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
+					$select->joinLeft($jtable . " AS $uniqext", $join, array());
+					$this->_alreadyJoined[$jtable] = $uniqext;
+					$jtable = $uniqext;
 				}
-				$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
-				$select->joinLeft($jtable . " AS $uniqext", $join, array());
-				$this->_alreadyJoined[$jtable] = $uniqext;
-				$jtable = $uniqext;
-				
 			} else if ($property instanceof Property\CollectionProperty) {
 				
 				// handling of conditions based on collection limited to withMembers() and withoutMembers()
@@ -620,7 +627,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$field = "DATE($field)";
 			}
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
+
 //var_dump($statement); die;
+
 			switch ($conditionArray[1]) {
 				
 				case Condition::MODE_OR:
