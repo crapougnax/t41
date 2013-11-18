@@ -291,7 +291,6 @@ class DataObject extends ObjectModelAbstract {
     	
     	/* @var $value t41\ObjectModel\Property\AbstractProperty */
     	foreach ($this->_data as $key => $value) {
-    		
     		// meta properties are ignored
     		if ($value instanceof MetaProperty) continue;
     		
@@ -322,8 +321,7 @@ class DataObject extends ObjectModelAbstract {
     				continue;
     			}
     			
-    		} else if ($value instanceof Property\ObjectProperty) {
-    			
+    		} else if ($value instanceof Property\ObjectProperty || $value instanceof Property\MediaProperty) {
     			$value = $value->getValue();
     			$doBackend = ($this->_uri instanceof ObjectUri) ? $this->_uri->getBackendUri() : ObjectModel::getObjectBackend($this->_class);
 				$doBackend = $doBackend->getAlias();
@@ -332,7 +330,6 @@ class DataObject extends ObjectModelAbstract {
     				if (! $value->getUri()) {
     					// object has not been saved yet
     					$value = $value->getDataObject()->toArray($backend, $changed, $display);
-
     				} else {
 	    				$value = $value->getUri();
 		    			/* check backends if they're identical, just keep identifier value*/
@@ -379,7 +376,6 @@ class DataObject extends ObjectModelAbstract {
     			$result['data'][$key] = $value;
     		}
     	}
-    	
     	return $result;
     }
     
@@ -500,7 +496,26 @@ class DataObject extends ObjectModelAbstract {
     				continue;
     			}
     			
-    			if ($property instanceof Property\ObjectProperty) {
+    			if ($property instanceof Property\MediaProperty) {
+    				// new file case : value is a string prepended by  'tmp:'
+    				if ($value && substr($value,0,4) == Property\MediaProperty::TMP_PREFIX) {
+    					$parts = explode('|', substr($value,4)); // 0 => hash, 1 => original file name
+    					$file =  '/tmp/' . $parts[0];
+    						
+    					if (file_exists($file)) {
+    						$media = new MediaObject();
+    						$media->setLabel($parts[1]);
+    						$finfo = finfo_open(FILEINFO_MIME_TYPE);
+    						$mime = finfo_file($finfo,$file);
+    						$media->setMedia($file);
+    						$media->setSize(strlen($file));
+    						$media->setMime($mime);
+    						$media->save(); // should not be necessary
+    						
+    						$property->setValue($media);
+    					}
+    				}
+    			} else if ($property instanceof Property\ObjectProperty) {
     				if ($property->getParameter('instanceof') == null) {
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
     				}
@@ -530,7 +545,6 @@ class DataObject extends ObjectModelAbstract {
     			} else if ($property instanceof Property\CollectionProperty) {
     				// @todo handle collection populating here 
     			} else {
-    				
     				// if value is an array, it is most likely a set of multiple options
     				if (is_array($value)) {
     					$value = implode('|', $value);
@@ -539,7 +553,6 @@ class DataObject extends ObjectModelAbstract {
     			}
     		}
     	}
-    	
     	return $this;
     }
     

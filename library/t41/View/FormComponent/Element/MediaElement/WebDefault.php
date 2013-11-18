@@ -2,8 +2,6 @@
 
 namespace t41\View\FormComponent\Element\MediaElement;
 
-use t41\ObjectModel\Property;
-
 /**
  * t41 Toolkit
  *
@@ -24,12 +22,12 @@ use t41\ObjectModel\Property;
  * @version    $Revision: 876 $
  */
 
-use t41\View\Decorator\AbstractWebDecorator,
-	t41\View,
-	t41\View\ViewUri;
+use t41\View\Decorator\AbstractWebDecorator;
+use t41\View\Action\UploadAction;
+use t41\View;
 
 /**
- * Web decorator for the FieldElement class
+ * t41 default web decorator for list elements
  *
  * @category   t41
  * @package    t41_View
@@ -41,9 +39,33 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
-
-		// champ upload ou lien vers rendu document (et suppression)
+		// set correct name for field name value depending on 'mode' parameter value
+		$name = $this->_obj->getId();
 		
-		return '';
+		View::addCoreLib(array('core.js','locale.js','view.js','uploader.css','view:action:upload.js'));
+		
+		
+		View::addEvent(sprintf("new italic.upload(jQuery('#%s_ul'), 0)", $name), 'js');
+		
+		$html  = sprintf('<div id="%s_ul" class="qq-upload-list"></div>', $this->_nametoDomId($name));
+		$html .= sprintf('<input type="hidden" name="%s" id="%s" value="" class="hiddenfilename"/>', $name, $this->_nametoDomId($name));
+		
+		return $html;
+		
+		
+		
+		$action = new UploadAction($this->_obj);
+		
+		$action->setParameter('searchmode', $this->getParameter('searchmode'));
+		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
+		$action->setParameter('event', 'keyup');
+		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
+		$action->setContextData('target', $this->_nametoDomId($name));
+		//$action->bind($acfield);
+		
+		$deco = View\Decorator::factory($action);
+		$deco->render();
+		
+		return $html . "\n";
 	}
 }

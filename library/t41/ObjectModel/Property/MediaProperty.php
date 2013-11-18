@@ -36,6 +36,8 @@ use t41\ObjectModel,
 class MediaProperty extends AbstractProperty {
 
 	
+	const TMP_PREFIX = 'tmp:';
+	
 	protected $_displayValue;
 	
 	protected $_filename;

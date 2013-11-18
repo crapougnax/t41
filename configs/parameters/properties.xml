@@ -168,9 +168,12 @@
 		
 		<property id="t41\ObjectModel\Property\MediaProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
-				<parameter id="maxsize">
-					<type>any</type>
-					<defaultvalue>0</defaultvalue>
+				<parameter id="types">
+					<type>array</type>
+				</parameter>
+				<parameter id="backend">
+					<type>string</type>
+					<defaultvalue>@default</defaultvalue>
 				</parameter>
 			</parameters>
 		</property>

@@ -130,6 +130,15 @@ class Property {
 	
 	const CONSTRAINT_MINUTERANGE	= 'minuterange';
 	
+	
+	/**
+	 * Value represents the maximum acceptable size
+	 * for a media
+	 * @var string
+	 */
+	const CONSTRAINT_MAXSIZE		= 'maxsize';
+	
+	
 	/* available options to get a t41_Property_Object stored value */
 	
 	const URI		= 'uri';
