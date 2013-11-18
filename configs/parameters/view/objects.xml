@@ -168,7 +168,18 @@
 		<object id="t41\View\FormComponent\Element\TimeElement" extends="t41\View\ViewObject">
 			<empty/>
 		</object>
-							
+
+		<object id="t41\View\FormComponent\Element\MediaElement" extends="t41\View\ViewObject">
+			<parameters>
+				<parameter id="types" type="array">
+					<bogus/>
+				</parameter>
+				<parameter id="storage" type="string">
+					<defaultvalue>@default</defaultvalue>
+				</parameter>
+			</parameters>
+		</object>
+									
 		<object id="t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="event" type="string">

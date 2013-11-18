@@ -57,6 +57,7 @@ class DefaultAdapter extends AbstractAdapter {
 										 , Property::CONSTRAINT_HOURMIN
 										 , Property::CONSTRAINT_HOURMAX
 										 , Property::CONSTRAINT_MINUTERANGE
+										 , Property::CONSTRAINT_MAXSIZE
 										);
 
 	
@@ -150,6 +151,11 @@ class DefaultAdapter extends AbstractAdapter {
 				$element = new Element\GridElement();
 				$element->setCollection($property->getValue());
 				break;
+				
+			case 'MediaProperty':
+				$element = new Element\MediaElement();
+				break;
+					
 				
 			default:
 				$element = new Element\FieldElement();
