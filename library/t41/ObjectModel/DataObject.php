@@ -485,10 +485,9 @@ class DataObject extends ObjectModelAbstract {
     		// @todo fix compatibility with metakeys in array
     		$data = $mapper->toDataObject($data, $this->_class);
     	}
-
+    	
     	// then sent to data object properties
     	foreach ($data as $key => $value) {
-    		
 			// don't use empty() to check $value to avoid zero being ignored
     		if (($property = $this->getProperty($key)) !== false && ! is_null($value)) {
     			if ($value == Property::EMPTY_VALUE) {
@@ -510,10 +509,11 @@ class DataObject extends ObjectModelAbstract {
     						$media->setMedia($file);
     						$media->setSize(strlen($file));
     						$media->setMime($mime);
-    						$media->save(); // should not be necessary
-    						
     						$property->setValue($media);
     					}
+    				} else {
+    					$property->setValue($value);
+    					continue;
     				}
     			} else if ($property instanceof Property\ObjectProperty) {
     				if ($property->getParameter('instanceof') == null) {
@@ -541,7 +541,7 @@ class DataObject extends ObjectModelAbstract {
     				} else {
     					$property->resetValue();
     				}
-    				
+
     			} else if ($property instanceof Property\CollectionProperty) {
     				// @todo handle collection populating here 
     			} else {

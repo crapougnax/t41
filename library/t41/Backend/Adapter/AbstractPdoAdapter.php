@@ -238,6 +238,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// get table to use
 		$table = $this->_getTableFromUri($do->getUri());
 				
+		
 		if (! $table) {
 			\Zend_Debug::dump($do->getUri());
 			throw new Exception('MISSING_DBTABLE_PARAM');
@@ -246,8 +247,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// get properties name
 		$columns = array();
 		foreach ($do->getProperties() as $property) {
-			if ($property instanceof Property\MediaProperty 
-					|| $property instanceof Property\CollectionProperty
+			if (/*$property instanceof Property\MediaProperty 
+					|| */$property instanceof Property\CollectionProperty
 						|| $property instanceof Property\MetaProperty) {
 				continue;
 			}
@@ -267,8 +268,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		foreach ($this->_preparePrimaryKeyClauses($do) as $key => $val) {
 			$select->where("$key = ?", $val);
 		}
-		
-		$data = $this->_ressource->fetchRow($select);
+		try {
+			$data = $this->_ressource->fetchRow($select);
+		} catch (\Exception $e) {
+			\Zend_Debug::dump($e->getTrace());
+			die;
+		}
 		
 		if (empty($data)) {
 			$do->resetUri();
@@ -276,7 +281,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		}
 		
 		/* complete url part of the object uri */
-		$do->getUri()->setUrl($this->_database . '/' . $table . '/' . $do->getUri()->getIdentifier());
+		$do->getUri()->setUrl($table . '/' . $do->getUri()->getIdentifier());
 		
 		/* populate data object */
 		$do->populate($data, $this->_mapper);

@@ -43,25 +43,20 @@ class WebDefault extends AbstractWebDecorator {
 		$name = $this->_obj->getId();
 		
 		View::addCoreLib(array('core.js','locale.js','view.js','uploader.css','view:action:upload.js'));
+		View::addEvent(sprintf("new t41.view.action.upload(jQuery('#%s_ul'))", $name), 'js');
 		
-		
-		View::addEvent(sprintf("new italic.upload(jQuery('#%s_ul'), 0)", $name), 'js');
-		
-		$html  = sprintf('<div id="%s_ul" class="qq-upload-list"></div>', $this->_nametoDomId($name));
+		$html = '';
+		if (($this->_obj->getValue()) != null) {
+			$html .= sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s %s</a>'
+					, rawurlencode(base64_encode($this->_obj->getValue()->getUri()))
+					, 'Télécharger', $this->_obj->getValue()->getLabel());
+		}
+		$html .= sprintf('<div id="%s_ul" class="qq-upload-list"></div>', $this->_nametoDomId($name));
 		$html .= sprintf('<input type="hidden" name="%s" id="%s" value="" class="hiddenfilename"/>', $name, $this->_nametoDomId($name));
 		
 		return $html;
 		
-		
-		
 		$action = new UploadAction($this->_obj);
-		
-		$action->setParameter('searchmode', $this->getParameter('searchmode'));
-		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
-		$action->setParameter('event', 'keyup');
-		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
-		$action->setContextData('target', $this->_nametoDomId($name));
-		//$action->bind($acfield);
 		
 		$deco = View\Decorator::factory($action);
 		$deco->render();

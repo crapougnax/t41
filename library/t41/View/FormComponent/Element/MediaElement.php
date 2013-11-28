@@ -23,6 +23,8 @@ namespace t41\View\FormComponent\Element;
  */
 
 use t41\View\FormComponent\Element\AbstractElement;
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\MediaObject;
 
 /**
  * Form field element for handling medias
@@ -34,4 +36,12 @@ use t41\View\FormComponent\Element\AbstractElement;
  */
 class MediaElement extends AbstractElement {
 
+	
+	public function setValue($val)
+	{
+		if ( ! is_null($val) && ! $val instanceof ObjectUri && ! $val instanceof MediaObject) {
+			$val = new MediaObject($val);
+		}
+		return parent::setValue($val);
+	}
 }
