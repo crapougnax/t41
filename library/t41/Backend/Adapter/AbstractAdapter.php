@@ -178,7 +178,8 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	public function buildObjectUri($url, $class)
 	{
-		$url = $this->_database . '/' . $this->_getTableFromClass($class) . '/' . $url;
+		$tmp = explode('/',$url);
+		$url = $this->_database . '/' . $this->_getTableFromClass($class) . '/' . $tmp[count($tmp)-1];
 		$uri = new ObjectModel\ObjectUri($url, $this->getUri());
 		$uri->setClass($class);
 		
@@ -419,7 +420,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 		$res = true;
 		
 		foreach ($do->getProperties() as $key => $property) {
-			if ($property instanceof Property\ObjectProperty
+			if (($property instanceof Property\ObjectProperty || $property instanceof Property\MediaProperty)
 					&& $property->getValue() instanceof ObjectModel\BaseObject // if value is not a base object, it is impossible is has been changed 
 					&& (! $property->getValue()->getUri() instanceof ObjectUri 
 					  || $property->getValue()->getDataObject()->hasChanged())) {
