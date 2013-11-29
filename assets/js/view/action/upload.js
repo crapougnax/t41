@@ -65,12 +65,7 @@ if (! window.t41.view.action.uploader) {
 }
 
 
-
-if (! window.italic) {
-	window.italic = {};
-}
-
-italic.upload = function(element, doc_id) {
+window.t41.view.action.upload = function(element) {
 	
 	this.element = element;
 	this.field = this.element.parents('div.field').first();
@@ -79,8 +74,6 @@ italic.upload = function(element, doc_id) {
 	this._default = {
 		action: '/t41/medias/upload'
 	};
-	
-	
 	
 	this.init = function() {
 		var id = jQuery(this.element).attr('id');
@@ -97,9 +90,7 @@ italic.upload = function(element, doc_id) {
 	            responseProperty: 'error',
 	            enableTooltip: true
 	        },
-	        params: {
-	        	doc_id: doc_id
-	        },
+	        //params: {},
 	        onSubmit: jQuery.proxy(this, 'onSubmit'),
 	        onComplete: jQuery.proxy(this, 'onComplete'),
 			onError: jQuery.proxy(this, 'onError'),
