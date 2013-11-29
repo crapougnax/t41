@@ -151,7 +151,7 @@ class ListElement extends AbstractElement {
     
 	public function setValue($val)
 	{
-		if (! $val instanceof ObjectModel\ObjectUri && ! $val instanceof ObjectModel\BaseObject) {
+		if ($val && ! $val instanceof ObjectModel\ObjectUri && ! $val instanceof ObjectModel\BaseObject) {
 			$class = $this->getCollection()->getClass();
 			$val = new $class($val);
 		}
