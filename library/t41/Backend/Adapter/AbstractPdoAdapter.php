@@ -271,6 +271,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		try {
 			$data = $this->_ressource->fetchRow($select);
 		} catch (\Exception $e) {
+			echo $e->getMessage();
 			\Zend_Debug::dump($e->getTrace());
 			die;
 		}
