@@ -36,11 +36,6 @@ class MediaObject extends BaseObject {
 	
 	public function defineMimeAndExtensionFromData()
 	{
-		if ($this->getData()) {
-			
-			// @todo code this
-		}
-		
 		return true;
 	}
 	
