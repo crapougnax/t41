@@ -38,7 +38,7 @@ use t41\ObjectModel\Property\DateProperty;
  *
  * @category   t41
  * @package    t41_Backend
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 abstract class AbstractPdoAdapter extends AbstractAdapter {
@@ -629,9 +629,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$field = $table . '.' . $field->getName();
 			}
 
-			if ($property instanceof DateProperty) {
+			// protect DateProperty() with setted timepart parameter from misuse
+			if ($property instanceof DateProperty && $property->getParameter('timepart') == true) {
 				$field = "DATE($field)";
 			}
+			
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
 
 //var_dump($statement); die;

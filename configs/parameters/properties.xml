@@ -103,6 +103,10 @@
 					<type>string</type>
 					<value>yyyy-mm-dd</value>
 				</parameter>
+				<parameter id="timepart">
+					<type>boolean</type>
+					<value>false</value>
+				</parameter>
 			</parameters>
 		</property>
 		<property id="t41\ObjectModel\Property\TimeProperty" extends="t41\ObjectModel\Property\AbstractProperty">
