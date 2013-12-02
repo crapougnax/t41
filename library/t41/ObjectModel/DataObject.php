@@ -495,29 +495,31 @@ class DataObject extends ObjectModelAbstract {
     				continue;
     			}
     			
-    			if ($property instanceof Property\MediaProperty) {
-    				// new file case : value is a string prepended by  'tmp:'
-    				if ($value && substr($value,0,4) == Property\MediaProperty::TMP_PREFIX) {
-    					$parts = explode('|', substr($value,4)); // 0 => hash, 1 => original file name
-    					$file =  '/tmp/' . $parts[0];
-    						
-    					if (file_exists($file)) {
-    						$media = new MediaObject();
-    						$media->setLabel($parts[1]);
-    						$finfo = finfo_open(FILEINFO_MIME_TYPE);
-    						$mime = finfo_file($finfo,$file);
-    						$media->setMedia($file);
-    						$media->setSize(strlen($file));
-    						$media->setMime($mime);
-    						$property->setValue($media);
-    					}
-    				} else {
-    					$property->setValue($value);
-    					continue;
-    				}
-    			} else if ($property instanceof Property\ObjectProperty) {
+    			if ($property instanceof Property\ObjectProperty) {
     				if ($property->getParameter('instanceof') == null) {
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
+    				}
+    				
+    				// Specific case of MediaObject()
+    				if ($property->getParameter('instanceof') == 't41\ObjectModel\MediaObject') {
+    					// new file case : value is a string prepended by  'tmp:'
+    					if ($value && substr($value,0,4) == Property\MediaProperty::TMP_PREFIX) {
+    						$parts = explode('|', substr($value,4)); // 0 => hash, 1 => original file name
+    						$file =  '/tmp/' . $parts[0];
+    				
+    						if (file_exists($file)) {
+    							$media = new MediaObject();
+    							$media->setLabel($parts[1]);
+    							$finfo = finfo_open(FILEINFO_MIME_TYPE);
+    							$mime = finfo_file($finfo,$file);
+    							$media->setMedia($file);
+    							$media->setSize(0);
+    							$media->setMime($mime);
+    							$property->setValue($media);
+    						}
+    						
+    						continue; // don't go further in this case
+    					}
     				}
     				
     				if ($value && $value != Property::EMPTY_VALUE) {
@@ -536,7 +538,6 @@ class DataObject extends ObjectModelAbstract {
     						$backend = ObjectModel::getObjectBackend($property->getParameter('instanceof'));
     						$value = $backend->buildObjectUri($value, $property->getParameter('instanceof'));
     						$property->setValue($value);
-    						//$property->setValue(new $class($value));
     					}
     				} else {
     					$property->resetValue();

@@ -25,6 +25,7 @@ namespace t41\View\FormComponent\Element\MediaElement;
 use t41\View\Decorator\AbstractWebDecorator;
 use t41\View\Action\UploadAction;
 use t41\View;
+use t41\View\FormComponent\Element\MediaElement;
 
 /**
  * t41 default web decorator for list elements
@@ -48,8 +49,8 @@ class WebDefault extends AbstractWebDecorator {
 		$html = '';
 		// @todo code media deletion JS
 		if (($this->_obj->getValue()) != null) {
-			$html .= sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s %s</a> | <a href="#" onclick="">%s</a>'
-					, rawurlencode(base64_encode($this->_obj->getValue()->getUri()))
+			$html .= sprintf('<a href="%s" target="_blank">%s %s</a> | <a href="#" onclick="">%s</a>'
+					, MediaElement::getDownloadUrl($this->_obj->getValue()->getUri())
 					, 'Télécharger'
 					, $this->_obj->getValue()->getLabel()
 					, 'Supprimer'

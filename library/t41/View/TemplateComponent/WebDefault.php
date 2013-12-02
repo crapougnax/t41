@@ -35,6 +35,8 @@ use t41\ObjectModel\Property\AbstractProperty;
 use t41\Core,
 	t41\View,
 	t41\View\Decorator\AbstractWebDecorator;
+use t41\ObjectModel\MediaObject;
+use t41\View\FormComponent\Element\MediaElement;
 
 /**
  * Decorator class for template objects in a web context.
@@ -128,11 +130,35 @@ class WebDefault extends AbstractWebDecorator {
    				default: // obj:
    					$tmp = explode('.', $tag[2]);
    					$obj = $this->_obj->getVariable($tmp[0]);
-   					if ($obj instanceof BaseObject) {
-	   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
-   						$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
-   					} else {
-   						$value = Core::$env == Core::ENV_DEV ? sprintf("Can't substitute any value to '%s'", $tag[0]) : null;
+   					if ($obj instanceof MediaObject) {
+   						// meta properties handling
+   						switch ($tmp[1]) {
+   							
+   							case '_embed':
+   								break;
+   								
+   							case '_icon':
+   								$value = 'file-' . $obj->getExtension();
+   								break;
+   								
+   							case '_size':
+   								$value = $obj->getSize();
+   								break;
+   								
+   							case '_url':
+   								$value = MediaElement::getDownloadUrl($obj->getUri());
+   							default:
+   								break;
+   						}
+   					}
+   					
+   					if (! $value) {
+	   					if ($obj instanceof BaseObject) {
+		   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
+   							$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
+   						} else {
+   							$value = Core::$env == Core::ENV_DEV ? sprintf("Can't substitute any value to '%s'", $tag[0]) : null;
+   						}
    					}
    					break;
    			}

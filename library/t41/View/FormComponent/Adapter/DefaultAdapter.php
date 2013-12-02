@@ -99,52 +99,54 @@ class DefaultAdapter extends AbstractAdapter {
 					
 			case 'ObjectProperty':
 				// @todo join this code and the one in CollectionProperty::getValue
-				$element = new Element\ListElement();
-				$element->setParameter('display', $property->getParameter('display'));
+				if ($property->getParameter('instanceof') == 't41\ObjectModel\MediaObject') {
+					$element = new Element\MediaElement();
+				} else {
+					$element = new Element\ListElement();
+					$element->setParameter('display', $property->getParameter('display'));
 				
-				$collection = new ObjectModel\Collection($property->getParameter('instanceof'));
+					$collection = new ObjectModel\Collection($property->getParameter('instanceof'));
 				
-				/* inject the condition that allows to find collection members */
-				if ($property->getParameter('keyprop')) {
-					$collection->having($property->getParameter('keyprop'))->equals($property->getParent());
-				}
+					/* inject the condition that allows to find collection members */
+					if ($property->getParameter('keyprop')) {
+						$collection->having($property->getParameter('keyprop'))->equals($property->getParent());
+					}
 				
-				if ($property->getParameter('depends')) {
-					$element->setParameter('dependency',$property->getParameter('depends'));
-				}
+					if ($property->getParameter('depends')) {
+						$element->setParameter('dependency',$property->getParameter('depends'));
+					}
 				
-				if ($property->getParameter('morekeyprop')) {
-					foreach ($property->getParameter('morekeyprop') as $value) {
-						if (strstr($value, ' ') !== false) {
+					if ($property->getParameter('morekeyprop')) {
+						foreach ($property->getParameter('morekeyprop') as $value) {
+							if (strstr($value, ' ') !== false) {
 				
-							// if value contains spaces, it's a pattern
-							$parts = explode(' ', $value);
-							if (count($parts) == 3) {
-								if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
-								$collection->having($parts[0])->$parts[1]($parts[2]);
-				
+								// if value contains spaces, it's a pattern
+								$parts = explode(' ', $value);
+								if (count($parts) == 3) {
+									if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
+									$collection->having($parts[0])->$parts[1]($parts[2]);
+								} else {
+									if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
+									$collection->having($parts[0])->equals($parts[1]);
+								}
 							} else {
-								if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
-								$collection->having($parts[0])->equals($parts[1]);
+								// default case, we expect the member to hold a property
+								// with the same name and value as the current object
+								$collection->having($value)->equals($property->getParent()->getProperty($value)->getValue());
 							}
-				
-						} else {
-							// default case, we expect the member to hold a property
-							// with the same name and value as the current object
-							$collection->having($value)->equals($property->getParent()->getProperty($value)->getValue());
 						}
 					}
-				}
 				
-				if ($property->getParameter('sorting')) {
-					$element->setParameter('sorting', $property->getParameter('sorting'));
-				}
+					if ($property->getParameter('sorting')) {
+						$element->setParameter('sorting', $property->getParameter('sorting'));
+					}
 				
-				if ($property->getParameter('search')) {
-					$element->setParameter('search', $property->getParameter('search'));
-				}
+					if ($property->getParameter('search')) {
+						$element->setParameter('search', $property->getParameter('search'));
+					}
 
-				$element->setCollection($collection);
+					$element->setCollection($collection);
+				}
 				break;
 			
 			case 'CollectionProperty':

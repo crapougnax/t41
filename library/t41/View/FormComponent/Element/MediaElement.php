@@ -44,4 +44,10 @@ class MediaElement extends AbstractElement {
 		}
 		return parent::setValue($val);
 	}
+	
+	
+	static public function getDownloadUrl(ObjectUri $uri)
+	{
+		return '/t41/medias/download/obj/' . rawurlencode(base64_encode($uri->__toString()));
+	}
 }
