@@ -16,7 +16,7 @@ namespace t41\ObjectModel;
  * to license@t41.org so we can send you a copy immediately.
  *
  * @category   t41
- * @package    t41_ObjectModel
+ * @package    t41_Core
  * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
@@ -24,20 +24,20 @@ namespace t41\ObjectModel;
 use t41\Backend;
 use t41\Backend\Adapter;
 use t41\Backend\Condition;
-use t41\Backend\Condition\Combo;
 
 use t41\ObjectModel;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\IdentifierProperty;
 use t41\ObjectModel\Collection\StatsCollection;
+use t41\Backend\Condition\Combo;
 
 /**
  * Class for a collection of Objects
  *
  * @category   t41
  * @package    t41_ObjectModel
- * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class Collection extends ObjectModelAbstract {
@@ -53,11 +53,6 @@ class Collection extends ObjectModelAbstract {
 	const POS_FIRST	= 'first';
 	
 	const POS_LAST	= 'last';
-	
-	
-	const SORT_ASC = 'ASC';
-	
-	const SORT_DESC = 'DESC';
 	
 	
 	/**
@@ -95,7 +90,7 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Array of t41\Backend\Condition objects
+	 * Array of t41_Condition objects
 	 * 
 	 * @var array
 	 */
@@ -103,8 +98,8 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Array of sorting arrays (index 0: t41\ObjectModel\Property\AbstractProperty object, index 1: ASC or DESC)
-	 * @var array
+	 * Array of sorting arrays (index 0: t41_Property_Interface object, index 1: ASC or DESC)
+	 * @var unknown_type
 	 */
 	protected $_sortings = array();
 	
@@ -115,9 +110,9 @@ class Collection extends ObjectModelAbstract {
 	 * Possible parameters are:
 	 * - memberType: [uri|data|model] 
 	 *   Defines which type of members we expect to get returned from backend.
-	 *   uri:   returns t41\ObjectModel\ObjectUri references
-	 *   data:  returns populated t41\ObjectModel\DataObject instances
-	 *   model: returns populated t41\ObjectModel\BaseObject-based instances
+	 *   uri:   returns t41_Object_Uri references
+	 *   data:  returns populated t41_Data_Object instances
+	 *   model: returns populated t41_Object_Model-based instances
 	 *   default value is data
 	 * 
 	 * @param \t41\ObjectModel\DataObject|string $do
@@ -126,17 +121,24 @@ class Collection extends ObjectModelAbstract {
 	public function __construct($do, array $params = null)
 	{
 		if ($do instanceof ObjectModel\DataObject) {
+			
 			$this->_do = $do;
+			
 		} else if (is_string ($do)) {
+			
 			$this->_do = ObjectModel\DataObject::factory($do);
+				
 		} else {
+			
 			throw new Exception("Collection must be instanced from data object or class name");
 		}
+		
 		
 		/* deal with class parameters first */
 		$this->_setParameterObjects();
 		
 		if (is_array($params)) {
+			
 			$this->_setParameters($params);
 		}
 	}
@@ -146,6 +148,7 @@ class Collection extends ObjectModelAbstract {
 	{
 		$str = '';
 		foreach ($this->_conditions as $condition) {
+			
 			$str .= '-' . print_r($condition, true);
 		}
 		return md5($this->_do->getClass() . $str);
@@ -180,9 +183,8 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Prepare the removing of the given member from the collection
+	 * Remove the given member from the collection
 	 * Returns true if success, false otherwise
-	 * The actual removing happens when/if save() is called
 	 * 
 	 * @param ObjectModel\BaseObject $object
 	 * @return boolean
@@ -282,7 +284,7 @@ class Collection extends ObjectModelAbstract {
 	 * @param string $modifier
 	 * @throws Exception
 	 */
-	public function setSorting($property, $order = self::SORT_ASC, $modifier = null)
+	public function setSorting($property, $order = 'ASC', $modifier = null)
 	{
 		if (! $property instanceof Property\PropertyInterface) {
 			
@@ -290,7 +292,7 @@ class Collection extends ObjectModelAbstract {
 				throw new Exception('First parameter must be either a t41\ObjectModel\Property\AbstractProperty-derived instance or an array');
 			}
 
-			$order = isset($property['mode']) ? $property['mode'] : isset($property[1]) ? $property[1] : self::SORT_ASC;
+			$order = isset($property['mode']) ? $property['mode'] : isset($property[1]) ? $property[1] : 'ASC';
 			$modifier = isset($property[2]) ? $property[2] : null;
 				
 			if ($property[0] == ObjectUri::IDENTIFIER) {
@@ -320,6 +322,7 @@ class Collection extends ObjectModelAbstract {
 	public function setBoundaryOffset($offset)
 	{
 		$this->_offset = $offset;
+		
 		return $this;
 	}
 	
@@ -336,6 +339,7 @@ class Collection extends ObjectModelAbstract {
 		if (is_null($this->_max)) {
 			$this->_count($this->_latestBackend);
 		}
+		
 		return $this->_max;
 	}
 	
@@ -505,6 +509,7 @@ class Collection extends ObjectModelAbstract {
 			$member->setGroup($array);
 			$stats->addMember($member);
 		}
+
 		return $stats;
 	}
 	
@@ -516,7 +521,7 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Return a member from its numeric key
+	 * Return a member from is numeric key
 	 * @param integer $pos
 	 * @param string $type
 	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
@@ -548,69 +553,19 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Return a member from its uri (or part of it)
-	 * @param string $uri
-	 * @param string $type
-	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
-	 */
-	public function getMemberFromUri($uri, $type = null)
-	{
-		if (! is_array($this->_members) || count($this->_members) == 0) {
-			return false;
-		}
-		
-		$matching = null;
-		
-		foreach ($this->_members as $member) {
-			if ($member instanceof ObjectUri) {
-				if ($member->getIdentifier() == $uri) {
-					$matching = $member;
-					break;
-				}
-			} else if ($member->getUri()->getIdentifier() == $uri) {
-				$matching = $member;
-				break;				
-			}
-		}
-		
-		if (! is_null($matching)) {
-			return is_null($type) ? $matching : $this->_castMember($matching, $type);
-		} else {
-			return false;
-		}
-	}
-	
-	
-	/**
-	 * Return the members of the collection in the given format type or as ObjectUri if no type is specified
+	 * Return the members of the collection in the given format type or as ObjectModel if no type is specified
+	 * Execute an implicit find() if collection is not populated yet
 	 * @param string $type
 	 * @return array
-	 * @todo decide wether the member casting is saved in array or not
 	 */
 	public function getMembers($type = ObjectModel::MODEL)
 	{
 		// if collection has not been populated yet, do it now with $type as param
-		if (! is_array($this->_members)) {
+		if (! $this->getParameter('populated')) {
 			$this->find($type);
 			return $this->_members;
-		} else {
-			return $this->_castMembers($this->_members, $type);
-			$class = $this->getClass();
-			foreach ($this->_members as $key => $member) {
-				if ($type == ObjectModel::MODEL && ! $member instanceof BaseObject) {
-					$this->_members[$key] = new $class($member);
-				} else if($type == ObjectModel::DATA && $member instanceof ObjectUri) {
-					$do = new DataObject($class);
-					$do->setUri($member);
-					Backend::read($do);
-					$this->_members[$key] = $do;
-				} else {
-					$this->_members[$key] = $member instanceof ObjectUri ? $member : $member->getUri();
-				}
-			}
 		}
-		
-		return $this->_members;
+		return $this->_castMembers($this->_members, $type);
 	}
 	
 
@@ -767,28 +722,37 @@ class Collection extends ObjectModelAbstract {
 	public function __call($m, $a)
 	{
 		if (substr($m, 0, 6) == 'having') {
+		
 			/* set a new condition with a call to having<<PropertyId>>() */
 			$prop = strtolower(substr($m, 6));
+		
 			return $this->having( empty($a) ? $prop : $prop . '.' . $a);
 		
 		} else if (substr($m, 0, 4) == 'stat') {
+			
 			$calc = 0;
+				
 			// populate or refresh collection, only if there is no member to save or delete
 			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
+			
 				$this->find();
 			}
 
 			switch (substr($m,4)) {
+
 				case 'total':
 					return count($this->_members);
 					break;
 			}
+			
 		} else if (substr($m, 0, 4) == 'calc') {
+			
 			$prop = strtolower(substr($m, 4));
 			$calc = 0;
 			
 			// populate or refresh collection, only if there is no member to save or delete
 			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
+
 				$this->find();
 			}
 
@@ -829,7 +793,6 @@ class Collection extends ObjectModelAbstract {
 	
 	/**
 	 * Save all members marked as unsaved in given or default backend
-	 * Remove all members marked as deleted
 	 * @param t41\Backend\Adapter\AbstractAdapter $backend
 	 * @return boolean
 	 */
@@ -838,6 +801,7 @@ class Collection extends ObjectModelAbstract {
 		$res = true;
 		
 		foreach ($this->_spool['save'] as $key => $member) {
+			
 			$res2 = $member->save($backend);
 			if ($res2 === true) {
 				unset($this->_spool['save'][$key]);
@@ -845,7 +809,9 @@ class Collection extends ObjectModelAbstract {
 				$res = false;
 			}
 		}
+
 		foreach ($this->_spool['delete'] as $key => $member) {
+				
 			$res2 = $member->delete($backend);
 			if ($res2 === true) {
 				unset($this->_spool['delete'][$key]);
@@ -853,13 +819,22 @@ class Collection extends ObjectModelAbstract {
 				$res = false;
 			}
 		}
+		
 		return $res;
+	}
+	
+	
+	public function debug()
+	{
+		$this->find();
+		$this->setParameter('populated', false);
+		\Zend_Debug::dump(Backend::getLastQuery());
 	}
 	
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see t41\ObjectModel\ObjectModelAbstract::reduce()
+	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
 	 */
 	public function reduce(array $params = array(), $cache = true)
 	{
@@ -867,12 +842,15 @@ class Collection extends ObjectModelAbstract {
 		
 		// populate only collections if params is set
 		if (isset($params['collections']) && $params['collections'] > 0) {
+			
 			$params['collections']--;
 			foreach ($this->getMembers() as $member) {
+			
 				// but prevent too-costly any deeper recursion
 				$data[] = $member->reduce($params, $cache);
 			}
 		}
+		
 		return array_merge(parent::reduce($params), array('collection' => $data));
 	}
 }
