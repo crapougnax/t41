@@ -46,13 +46,21 @@ class WebDefault extends AbstractWebDecorator {
 		View::addEvent(sprintf("new t41.view.action.upload(jQuery('#%s_ul'))", $name), 'js');
 		
 		$html = '';
+		// @todo code media deletion JS
 		if (($this->_obj->getValue()) != null) {
-			$html .= sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s %s</a>'
+			$html .= sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s %s</a> | <a href="#" onclick="">%s</a>'
 					, rawurlencode(base64_encode($this->_obj->getValue()->getUri()))
-					, 'Télécharger', $this->_obj->getValue()->getLabel());
+					, 'Télécharger'
+					, $this->_obj->getValue()->getLabel()
+					, 'Supprimer'
+			);
 		}
 		$html .= sprintf('<div id="%s_ul" class="qq-upload-list"></div>', $this->_nametoDomId($name));
-		$html .= sprintf('<input type="hidden" name="%s" id="%s" value="" class="hiddenfilename"/>', $name, $this->_nametoDomId($name));
+		$html .= sprintf('<input type="hidden" name="%s" id="%s" value="%s" class="hiddenfilename"/>'
+				, $name
+				, $this->_nametoDomId($name)
+				, $this->_obj->getValue() ? $this->_obj->getValue()->getIdentifier() : null
+		);
 		
 		return $html;
 		
