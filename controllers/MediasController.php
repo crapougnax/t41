@@ -249,10 +249,10 @@ class qqFileUploader {
 		$hash = md5(uniqid());
 		$ext = @$pathinfo['extension'];		// hide notices if extension is empty
 
-		if($this->allowedExtensions && !in_array(strtolower($ext), $this->allowedExtensions)){
+/* 		if($this->allowedExtensions && !in_array(strtolower($ext), $this->allowedExtensions)){
 			$these = implode(', ', $this->allowedExtensions);
 			return array('error' => 'Ce type de fichier n\'est pas autorisé ('.$these.').');
-		}
+		} */
 
 		$ext = ($ext == '') ? $ext : '.' . $ext;
 
