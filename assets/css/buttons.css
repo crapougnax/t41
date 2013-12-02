@@ -160,6 +160,10 @@
 	background-position:  -160px -32px;
 }
 
+.t41 a.element.large.icon span.file-pdf,.t41.large span.file-pdf{
+	background-position:  -160px -32px;
+}
+
 .t41 a.element.large.icon span.xml,.t41.large span.xml{
 	background-position:-128px -32px;
 }
@@ -328,11 +332,23 @@
 	background-position: -72px -24px;
 }
 
+.t41 a.element.medium.icon span.file-csv,.t41.medium span.file-csv {
+	background-position: -72px -24px;
+}
+
 .t41 a.element.medium.icon span.pdf,.t41.medium span.pdf{
 	background-position: -120px -24px;
 }
 
+.t41 a.element.medium.icon span.file-pdf,.t41.medium span.file-pdf{
+	background-position: -120px -24px;
+}
+
 .t41 a.element.medium.icon span.xml,.t41.medium span.xml{
+	background-position: -96px -24px;
+}
+
+.t41 a.element.medium.icon span.file-xml,.t41.medium span.file-xml{
 	background-position: -96px -24px;
 }
 
@@ -504,11 +520,19 @@
 	background-position: -176px 0;
 }
 
+.t41 a.element.small.icon span.file-csv,.t41.small span.file-csv{
+	background-position: -176px 0;
+}
+
 .t41 a.element.small.icon span.pdf,.t41.small span.pdf{
 	background-position: -192px 0;
 }
 
 .t41 a.element.small.icon span.xml,.t41.small span.xml{
+	background-position: -208px 0;
+}
+
+.t41 a.element.small.icon span.file-xml,.t41.small span.file-xml{
 	background-position: -208px 0;
 }
 
