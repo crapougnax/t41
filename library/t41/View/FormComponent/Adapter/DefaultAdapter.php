@@ -182,7 +182,7 @@ class DefaultAdapter extends AbstractAdapter {
 
 		foreach (self::$constraintsList as $key) {
 			if (isset($constraints[$key])) {
-				$element->setConstraint($key, empty($constraints[$key]) ? true : $constraints[$key]);
+				$element->setConstraint($key, empty($constraints[$key]) && $constraints[$key] != 0 ? true : $constraints[$key]);
 			}
 		}
 		
