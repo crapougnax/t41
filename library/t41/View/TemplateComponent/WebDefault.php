@@ -134,15 +134,12 @@ class WebDefault extends AbstractWebDecorator {
    						// meta properties handling
    						switch ($tmp[1]) {
    							
-   							case '_embed':
-   								break;
-   								
    							case '_icon':
    								$value = 'file-' . $obj->getExtension();
    								break;
    								
    							case '_size':
-   								$value = $obj->getSize();
+   								$value = MediaElement::getDisplaySize($obj->getSize());
    								break;
    								
    							case '_url':

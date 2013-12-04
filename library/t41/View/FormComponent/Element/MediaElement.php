@@ -50,4 +50,21 @@ class MediaElement extends AbstractElement {
 	{
 		return '/t41/medias/download/obj/' . rawurlencode(base64_encode($uri->__toString()));
 	}
+	
+	
+	static public function getDisplaySize($bytes)
+	{
+		if ($bytes >= 1073741824) {
+			return number_format($bytes / 1073741824, 2) . ' GB';
+		} else if ($bytes >= 1048576) {
+			return number_format($bytes / 1048576, 2) . ' MB';
+		} else if ($bytes >= 1024) {
+			return number_format($bytes / 1024, 2) . ' KB';
+		} else if ($bytes > 1) {
+			return $bytes . ' octets';
+		}
+		else {
+			return $bytes . ' octet';
+		}
+	}
 }
