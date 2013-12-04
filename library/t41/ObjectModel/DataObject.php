@@ -513,9 +513,10 @@ class DataObject extends ObjectModelAbstract {
     							$finfo = finfo_open(FILEINFO_MIME_TYPE);
     							$mime = finfo_file($finfo,$file);
     							$media->setMedia($file);
-    							$media->setSize(0);
+    							$media->setSize(filesize($file));
     							$media->setMime($mime);
     							$property->setValue($media);
+    							unlink($file);
     						}
     						
     						continue; // don't go further in this case
