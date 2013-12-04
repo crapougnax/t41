@@ -30,10 +30,10 @@ class WebDefault extends AbstractWebDecorator {
 				$dataArray = isset($_GET[$so][$this->_obj->getAltId()]) ? $_GET[$so][$this->_obj->getAltId()] : array();
 				$html	= $this->_renderField($so . '[' . $this->_obj->getAltId() . '][from]'
 											, isset($dataArray['from']) ? $dataArray['from'] : NULL
-											, 'du')
+											, 'du', false)
 					  	. $this->_renderField($so . '[' . $this->_obj->getAltId() . '][to]'
 					  						, isset($dataArray['to']) ? $dataArray['to'] : NULL
-					  						, 'au');
+					  						, 'au', false);
 				break;
 				
 			default:
@@ -51,7 +51,7 @@ class WebDefault extends AbstractWebDecorator {
 	}
 	
 	
-	protected function _renderField($name, $value = null, $prefix = null)
+	protected function _renderField($name, $value = null, $prefix = null, $boundaries = true)
 	{
 		$id = 't41_' . md5($name);
 		$dispField = 'disp_' . $id;
@@ -66,12 +66,15 @@ class WebDefault extends AbstractWebDecorator {
 							,'dayNames'		=> array('Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi')
 							,'dayNamesMin'	=> array('Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam')	
 						   );
-		if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN) != '') {
-			$pickerArgs['minDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN);
-		}
+		
+		if ($boundaries) {
+			if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN) != '') {
+				$pickerArgs['minDate'] = (int) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN);
+			}
 
-		if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX) != '') {
-			$pickerArgs['maxDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX);
+			if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX) != '') {
+				$pickerArgs['maxDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX);
+			}
 		}
 		
 		View::addEvent(sprintf('jQuery(function() { jQuery("#%s").datepicker(%s); });'
