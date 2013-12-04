@@ -193,6 +193,9 @@ class WebDefault extends AbstractWebDecorator {
 		$p .= $this->_contentRendering();
         $p .= '</table>';
 
+        // inject extra content
+        $p .= '<div class="actions">' . parent::_contentRendering() . '</div>';
+        
         if ($this->getParameter('paginator') !== false) {
         	$p .= $this->_footerRendering();
         } else {
