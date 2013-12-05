@@ -176,7 +176,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$do->resetChangedState();
 				
 		} catch (\Exception $e) {
-			
 			if (true) {
 				throw new Exception("Error Creating Record in $table : " . $e->getMessage());
 			} else {
@@ -185,7 +184,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			return true;
 		}
-		
 		
 		// Build new object URI
 		
@@ -196,7 +194,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 
 		// inject new ObjectUri object in data object
 		$do->setUri($uri);
-		
+
 		/* get collection-handling properties (if any) and process them */
 		foreach ($do->getProperties() as $property) {
 			if (! $property instanceof Property\CollectionProperty) {
@@ -204,10 +202,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 			
 			$collection = $property->getValue();
-			
 			/* @var $member t41\ObjectModel\BaseObject */
 			foreach ($collection->getMembers() as $member) {
-
 				// @todo check that keyprop is set before
 				if (($prop = $member->getProperty($property->getParameter('keyprop'))) !== false) {
 					$prop->setValue($uri);
@@ -247,8 +243,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// get properties name
 		$columns = array();
 		foreach ($do->getProperties() as $property) {
-			if (/*$property instanceof Property\MediaProperty 
-					|| */$property instanceof Property\CollectionProperty
+			if ($property instanceof Property\MediaProperty 
+					|| $property instanceof Property\CollectionProperty
 						|| $property instanceof Property\MetaProperty) {
 				continue;
 			}
@@ -761,7 +757,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		if ($returnCount !== false) {
 			return is_array($returnCount) ? $result : $result[0][Backend::MAX_ROWS_IDENTIFIER];
 		}
-		
 		
 		// convert array of primary keys to strings
 		foreach ($result as $key => $val) {
