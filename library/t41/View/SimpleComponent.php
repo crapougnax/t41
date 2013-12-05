@@ -17,20 +17,18 @@ namespace t41\View;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
-use t41\View,
-	t41\Parameter;
+use t41\Parameter;
 
 /**
  * Class providing methods and parameters to component objects.
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2013 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 
@@ -46,6 +44,21 @@ class SimpleComponent extends ViewObject {
 							  ));
 		parent::__construct($id, $params);
 	}
+	
+	
+	/**
+	 * Add a template component to the current object content
+	 * @param string $template
+	 * @return SimpleComponent
+	 */
+	public function setTemplate($template)
+	{
+		$tpl = new TemplateComponent();
+		$tpl->load($template);
+		$this->_content[] = $tpl;
+		return $this;
+	}
+	
 	
 	/**
 	 * Returns the number of lines depending on Parameter 'columns'
@@ -66,5 +79,4 @@ class SimpleComponent extends ViewObject {
 		
 		return $lines;
 	}
-	
 }
