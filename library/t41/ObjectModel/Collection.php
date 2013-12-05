@@ -121,24 +121,17 @@ class Collection extends ObjectModelAbstract {
 	public function __construct($do, array $params = null)
 	{
 		if ($do instanceof ObjectModel\DataObject) {
-			
 			$this->_do = $do;
-			
 		} else if (is_string ($do)) {
-			
 			$this->_do = ObjectModel\DataObject::factory($do);
-				
 		} else {
-			
 			throw new Exception("Collection must be instanced from data object or class name");
 		}
-		
 		
 		/* deal with class parameters first */
 		$this->_setParameterObjects();
 		
 		if (is_array($params)) {
-			
 			$this->_setParameters($params);
 		}
 	}
@@ -148,7 +141,6 @@ class Collection extends ObjectModelAbstract {
 	{
 		$str = '';
 		foreach ($this->_conditions as $condition) {
-			
 			$str .= '-' . print_r($condition, true);
 		}
 		return md5($this->_do->getClass() . $str);
@@ -177,6 +169,10 @@ class Collection extends ObjectModelAbstract {
 			// @todo add instant saving of unsaved members before any find()
 			$this->_members[] = $this->_spool['save'][] = $object;
 		}
+		
+		// protect against any find() call before members are saved
+		$this->setParameter('populated', true);
+		$this->_max = count($this->_members);
 		
 		return $this;
 	}
@@ -322,7 +318,6 @@ class Collection extends ObjectModelAbstract {
 	public function setBoundaryOffset($offset)
 	{
 		$this->_offset = $offset;
-		
 		return $this;
 	}
 	
@@ -339,7 +334,6 @@ class Collection extends ObjectModelAbstract {
 		if (is_null($this->_max)) {
 			$this->_count($this->_latestBackend);
 		}
-		
 		return $this->_max;
 	}
 	
@@ -734,7 +728,6 @@ class Collection extends ObjectModelAbstract {
 				
 			// populate or refresh collection, only if there is no member to save or delete
 			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
-			
 				$this->find();
 			}
 
@@ -752,7 +745,6 @@ class Collection extends ObjectModelAbstract {
 			
 			// populate or refresh collection, only if there is no member to save or delete
 			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
-
 				$this->find();
 			}
 
@@ -764,12 +756,10 @@ class Collection extends ObjectModelAbstract {
 					/* sum up the values of all members $prop property */
 					case ObjectModel::CALC_SUM:
 						foreach ($this->_members as $member) {
-							
 							$property = $member->getProperty($prop);
 							if (! $property instanceof Property\AbstractProperty) {
 								continue;
 							}
-							
 							$calc += (float) $property->getValue();
 						}
 						break;
@@ -801,7 +791,6 @@ class Collection extends ObjectModelAbstract {
 		$res = true;
 		
 		foreach ($this->_spool['save'] as $key => $member) {
-			
 			$res2 = $member->save($backend);
 			if ($res2 === true) {
 				unset($this->_spool['save'][$key]);
@@ -811,7 +800,6 @@ class Collection extends ObjectModelAbstract {
 		}
 
 		foreach ($this->_spool['delete'] as $key => $member) {
-				
 			$res2 = $member->delete($backend);
 			if ($res2 === true) {
 				unset($this->_spool['delete'][$key]);
@@ -845,12 +833,10 @@ class Collection extends ObjectModelAbstract {
 			
 			$params['collections']--;
 			foreach ($this->getMembers() as $member) {
-			
 				// but prevent too-costly any deeper recursion
 				$data[] = $member->reduce($params, $cache);
 			}
 		}
-		
 		return array_merge(parent::reduce($params), array('collection' => $data));
 	}
 }
