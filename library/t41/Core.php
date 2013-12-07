@@ -789,8 +789,14 @@ class Core {
         }
         
         // don't re-cache already cached-content, except if force is set to true
-        if ($cache->load($key) !== false && $force == false) {
+        if (($current = $cache->load($key)) !== false && $force == false) {
         	return $key;
+        }
+
+        // if object already exists, get previous tags if none are provided
+        if ($current && ! isset($options['tags'])) {
+        	$metadatas = $cache->getMetadatas($key);
+        	$options['tags'] = $metadatas['tags'];
         }
         
     	return $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : array()) ? $key : false;
