@@ -132,6 +132,7 @@ window.t41.view.form = function(id,obj,form) {
 			
 			if (field.constraints.mandatory && (value == "" || value == '_NONE_' || value == null)) {
 				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
+				continue;
 			}
 			
 			// @todo replace currencyElement with constant
@@ -155,7 +156,7 @@ window.t41.view.form = function(id,obj,form) {
 		} else {
 			
 			// deactivate buttons
-			jQuery('#form_actions').fadeOut();
+			jQuery('#' + id + '.form_actions').fadeOut();
 			
 			formdata['uuid'] = this.form.uuid;
 			formdata['objuuid'] = this.obj.uuid;
@@ -201,8 +202,10 @@ window.t41.view.form = function(id,obj,form) {
 			if (this.re == false) {
 				new t41.view.alert("Sauvegarde effectuée", params);
 			}
-			if (this.redirects && this.redirects.redirect_ok){
-				if (typeof this.redirects.redirect_ok != 'string') {
+			if (this.redirects && this.redirects.redirect_ok) {
+				if (typeof this.redirects.redirect_ok == 'function') {
+					this.redirects.redirect_ok.call(this, obj.data);
+				} else if (typeof this.redirects.redirect_ok != 'string') {
 					var baseurl = this.redirects.redirect_ok[0];
 					for (var i in this.redirects.redirect_ok[1]) {
 						baseurl += '/' + this.redirects.redirect_ok[1][i] + '/';
@@ -224,9 +227,14 @@ window.t41.view.form = function(id,obj,form) {
 				window.location.href = this.redirects.redirect_nok;
 			} else {
 				// reactivate buttons
-				jQuery('#form_actions').fadeIn();
+				jQuery('#' + this.id + '.form_actions').fadeIn();
 			}
 		}
+	};
+	
+	
+	this.reset = function() {
+		jQuery('#' + this.id).get(0).reset();
 	};
 	
 	
@@ -238,7 +246,9 @@ window.t41.view.form = function(id,obj,form) {
 		if (form.params.action) this.action = eval(form.params.action);
 		if (form.params.labels) this.labels = form.params.labels;
 	}
-	if (this.form.params && this.form.params.buttons != false) this.addButtons(jQuery('#form_actions'));
+	if (this.form.params && this.form.params.buttons != false) {
+		this.addButtons(jQuery('#' + this.id + ' .form_actions'));
+	}
 };
 
 
@@ -315,6 +325,28 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	t41.view.bindLocal(element, 'change', jQuery.proxy(this, 'refresh'));
 };
 
+
+window.t41.view.form.toggler = function(id, action) {
+    var ids = id ? id.split(',') : this.options;
+    for (var id in ids) {
+            var elems = jQuery("[id$='" + ids[id] + "']");
+
+            switch (action) {
+                    case 'show':
+                            elems.show();
+                            break;
+                            
+                    case 'hide':
+                            elems.hide();
+                            elems.val('');
+                            break;
+                            
+                    default:
+                            elems.toggle(); 
+                            break;
+            }
+    }
+};
 
 /**
  * UI controls for the Street Number field format

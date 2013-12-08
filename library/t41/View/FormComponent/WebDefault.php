@@ -130,20 +130,7 @@ class WebDefault extends SimpleComponent\WebDefault {
             }
             
             $deco = View\Decorator::factory($element);
-
-            if ($element instanceof t41_View_Form_Element_Multiplekey) {
-            	
-            	$line = sprintf('<p>%s</p>'
-            					, $deco->render()
-            				 );
-            } else {
-            	
-	            $line .= sprintf('<div class="field" id="elem_%s">%s</div>'
-    	        				, $element->getId()
-        	    				, $deco->render()
-            				 );
-            }
-            
+	        $line .= sprintf('<div class="field" id="elem_%s">%s</div>', $element->getId(), $deco->render());
             $p .= $line . "\n";
         }
 
@@ -184,7 +171,7 @@ class WebDefault extends SimpleComponent\WebDefault {
     	/**
     	 * Buttons are displayed by t41.view.form.js
     	 */    	
-    	return sprintf('<fieldset id="form_actions" class="t41"></fieldset>');
+    	return sprintf('<fieldset class="t41 form_actions"></fieldset></form>');
     }
     
     
