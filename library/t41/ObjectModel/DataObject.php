@@ -155,7 +155,8 @@ class DataObject extends ObjectModelAbstract {
     	if ($recursion === false) {	
 	    	foreach ($this->_data as $property) {
     			if ($property->getParent()) {
-    				$property->getParent()->setUri($uri, true);
+    				//$property->getParent()->setUri($uri, true);
+    				$property->setParent($this);
     			} else {
     				//var_dump($property->getParent()); die;
     				throw new Exception(sprintf('Property %s in %s object is missing a parent reference'
@@ -509,12 +510,14 @@ class DataObject extends ObjectModelAbstract {
     				
     						if (file_exists($file)) {
     							$media = new MediaObject();
+    							$media->setUri(md5(rand()*microtime()));
     							$media->setLabel($parts[1]);
     							$finfo = finfo_open(FILEINFO_MIME_TYPE);
     							$mime = finfo_file($finfo,$file);
     							$media->setMedia($file);
     							$media->setSize(filesize($file));
     							$media->setMime($mime);
+    							$media->save();
     							$property->setValue($media);
     							unlink($file);
     						}

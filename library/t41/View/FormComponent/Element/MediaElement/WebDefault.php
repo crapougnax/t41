@@ -26,6 +26,7 @@ use t41\View\Decorator\AbstractWebDecorator;
 use t41\View\Action\UploadAction;
 use t41\View;
 use t41\View\FormComponent\Element\MediaElement;
+use t41\Core;
 
 /**
  * t41 default web decorator for list elements
@@ -42,9 +43,13 @@ class WebDefault extends AbstractWebDecorator {
 	{
 		// set correct name for field name value depending on 'mode' parameter value
 		$name = $this->_obj->getId();
-		
+		$prefix = Core::getController('medias');
+		if (! $prefix) {
+			$prefix = '/t41/medias/';
+		}
+		$uri = $prefix . 'upload';
 		View::addCoreLib(array('core.js','locale.js','view.js','uploader.css','view:action:upload.js'));
-		View::addEvent(sprintf("new t41.view.action.upload(jQuery('#%s_ul'))", $name), 'js');
+		View::addEvent(sprintf("new t41.view.action.upload(jQuery('#%s_ul'),'%s')", $name, $uri), 'js');
 		
 		$html = '';
 		// @todo code media deletion JS

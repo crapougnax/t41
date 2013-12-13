@@ -971,4 +971,20 @@ class Core {
 	static public function processMemUsage()
 	{
 	}
+	
+	
+	/**
+	 * Return the alternate controller path matching the given type
+	 * Only medias is supported right now
+	 * @param string $type
+	 * @return string
+	 */
+	static public function getController($type)
+	{
+		if (isset(self::$_env['controllers']) && isset(self::$_env['controllers'][$type])) {
+			return self::$_env['controllers'][$type];
+		} else {
+			return false;
+		}
+	}
 }

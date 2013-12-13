@@ -19,7 +19,12 @@ class MediaObject extends BaseObject {
 			'ttf'   => 'application/octet-stream',
 			'doc'	=> 'application/msword',
 			'pdf'	=> 'application/pdf',
+			'zip'	=> 'application/zip',
+			'xml'	=> 'application/xml',
+				
+			'odt'	=> 'application/vnd.oasis.opendocument.text',
 			
+			'xls'	=> 'application/vnd.ms-excel',
 			'xlsx'	=> 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 			'xltx'	=> 'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
 			'potx'	=> 'application/vnd.openxmlformats-officedocument.presentationml.template',

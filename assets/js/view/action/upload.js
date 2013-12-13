@@ -9,70 +9,15 @@ if (! window.t41.view.action) {
 	window.t41.view.action = {registry:{}};
 }
 
-if (! window.t41.view.action.uploader) {
 
-	/**
-	 * Autocompleter object
-	 * @param obj
-	 * @param element
-	 * @returns {window.t41.view.action.autocomplete}
-	 */
-	window.t41.view.action.uploader = function(obj,element) {
-	
-		// callbacks
-		this.callbacks = obj.callbacks || {};
-		
-		if (! this.callbacks['display']) this.callbacks['display'] = 't41.view.action.autocomplete.display';
-		if (! this.callbacks['select'])  this.callbacks['select']  = 't41.view.action.autocomplete.select';
-		if (! this.callbacks['extend'])  this.callbacks['extend']  = 't41.view.action.autocomplete.extendSuggestions';
-
-		
-		// server-side action uuid 
-		this.uuid = obj.data.uuid;
-
-		// DOM element where autocomplete action occurs
-		this.element = jQuery('#' + element);
-		this.props = element + '_ul';
-		
-		// Server Uri
-		this.action = obj.data.action || 'action/upload';
-		
-		this.init = function() {
-			
-			// add accessories DOM elements
-			var span = document.createElement('SPAN');
-			span.setAttribute('id', this.target + '_display');
-			span.setAttribute('title', 'cliquez pour modifier');
-			t41.view.bindLocal(span, 'click', t41.view.action.uploader.reset, this);
-			this.element.after(span);
-			
-			// bind observer
-			t41.view.bindLocal(this.element, 'click', t41.view.action.uploader.observer, this);
-		};
-
-		
-		/**
-		 * trigger a 'change' event upon value setting so external observers can catch it
-		 */
-		this.triggerChangeEvent = function() {
-			t41.view.customEvent(this.target, 'change');
-		};
-	};
-
-	
-	window.t41.view.action.uploader.reset = function(obj) {
-	};
-}
-
-
-window.t41.view.action.upload = function(element) {
+window.t41.view.action.upload = function(element, uri) {
 	
 	this.element = element;
 	this.field = this.element.parents('div.field').first();
 	this.qq = null;
 	this.lastevent = null;
 	this._default = {
-		action: '/t41/medias/upload'
+		action: uri
 	};
 	
 	this.init = function() {

@@ -25,6 +25,7 @@ namespace t41\View\FormComponent\Element;
 use t41\View\FormComponent\Element\AbstractElement;
 use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\MediaObject;
+use t41\Core;
 
 /**
  * Form field element for handling medias
@@ -48,7 +49,11 @@ class MediaElement extends AbstractElement {
 	
 	static public function getDownloadUrl(ObjectUri $uri)
 	{
-		return '/t41/medias/download/obj/' . rawurlencode(base64_encode($uri->__toString()));
+		$prefix = Core::getController('medias');
+		if (! $prefix) {
+			$prefix = '/t41/medias/';
+		}
+		return $prefix . 'download/obj/' . rawurlencode(base64_encode($uri->__toString()));
 	}
 	
 	
