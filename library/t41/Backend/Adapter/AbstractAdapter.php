@@ -179,7 +179,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	public function buildObjectUri($url, $class)
 	{
 		$tmp = explode('/',$url);
-		$url = $this->_database . '/' . $this->_getTableFromClass($class) . '/' . $tmp[count($tmp)-1];
+		$url = /*$this->_database . '/' . */ $this->_getTableFromClass($class) . '/' . $tmp[count($tmp)-1];
 		$uri = new ObjectModel\ObjectUri($url, $this->getUri());
 		$uri->setClass($class);
 		
