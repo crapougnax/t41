@@ -37,10 +37,6 @@ class Pdf2Adapter extends WebAdapter {
 	const ID = 'Pdf2';
 	
 	
-	protected $_context = 'Pdf2';
-	
-	
-	
 	public function __construct(array $parameters = array())
 	{
 		$parameters['orientation'] 	= new Parameter(Parameter::STRING, PdfAdapter::ORIENTATION_PORTRAIT, false, array(PdfAdapter::ORIENTATION_PORTRAIT, PdfAdapter::ORIENTATION_LANDSCAPE));
@@ -50,16 +46,17 @@ class Pdf2Adapter extends WebAdapter {
 		parent::__construct($parameters);
 	}
 	
+	
+	public function display($content = null, $error = false)
+	{
+		$html = parent::display($content, $error);
 
-    protected function _render()
-    {
-    	$command = 'wkhtmltopdf ';
-    	if ($this->getParameter('orientation') == PdfAdapter::ORIENTATION_LANDSCAPE) {
+        $command = 'xvfb-run --server-args="-screen 0, 1280x1024x24" /usr/bin/wkhtmltopdf '; 
+        if ($this->getParameter('orientation') == PdfAdapter::ORIENTATION_LANDSCAPE) {
     		$command .= '-O Landscape';
     	}
     	
     	$dir = '/dev/shm/';
-    	$html = parent::_render();
     	
     	$key = hash('md5', $html);
     	
@@ -67,16 +64,18 @@ class Pdf2Adapter extends WebAdapter {
     	
     	exec(sprintf("%s %s%s.html %s%s.pdf", $command, $dir, $key, $dir, $key));
     	
+    	$doc = $this->getParameter('title') ? str_replace('/', '-', $this->getParameter('title')) . '.pdf' : 'Export.pdf';
+
     	header('Content-Type: application/pdf');
     	header('Cache-Control: private, must-revalidate, post-check=0, pre-check=0, max-age=1');
     	header('Pragma: public');
     	header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
     	header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-    	
-    	$doc = $this->getParameter('title') ? str_replace('/', '-', $this->getParameter('title')) . '.pdf' : 'Export.pdf';
-    	 
     	header('Content-Disposition: inline; filename="' . $doc . '";');
+    	header('Content-Length: ' . filesize($dir . $key . '.pdf'));
     	echo file_get_contents($dir . $key . '.pdf');
-    	unlink($dir . $key . '.*');
-    }
+    	
+    	unlink($dir . $key . '.html');
+    	unlink($dir . $key . '.pdf');
+	}
 }
