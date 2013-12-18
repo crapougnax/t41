@@ -39,10 +39,12 @@ class Pdf2Adapter extends WebAdapter {
 	
 	public function __construct(array $parameters = array())
 	{
-		$parameters['orientation'] 	= new Parameter(Parameter::STRING, PdfAdapter::ORIENTATION_PORTRAIT, false, array(PdfAdapter::ORIENTATION_PORTRAIT, PdfAdapter::ORIENTATION_LANDSCAPE));
-		$parameters['copies']		= new Parameter(Parameter::INTEGER, 1);
-		$parameters['title'] 		= new Parameter(Parameter::STRING);
-		
+		$this->_setParameterObjects(array(
+					'orientation' 	=> new Parameter(Parameter::STRING, PdfAdapter::ORIENTATION_PORTRAIT, false, array(PdfAdapter::ORIENTATION_PORTRAIT, PdfAdapter::ORIENTATION_LANDSCAPE)),
+					'copies'		=> new Parameter(Parameter::INTEGER, 1),
+					'title' 		=> new Parameter(Parameter::STRING)
+				));
+
 		parent::__construct($parameters);
 	}
 	
@@ -50,7 +52,7 @@ class Pdf2Adapter extends WebAdapter {
 	public function display($content = null, $error = false)
 	{
 		$html = parent::display($content, $error);
-
+		
         $command = 'xvfb-run --server-args="-screen 0, 1280x1024x24" /usr/bin/wkhtmltopdf '; 
         if ($this->getParameter('orientation') == PdfAdapter::ORIENTATION_LANDSCAPE) {
     		$command .= '-O Landscape';
