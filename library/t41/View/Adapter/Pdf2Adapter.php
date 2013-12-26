@@ -22,6 +22,8 @@ namespace t41\View\Adapter;
  */
 
 use t41\Parameter;
+use t41\Core;
+use Dispam\Exception;
 
 /**
  * Class providing the view engine with a Pdf context adapter.
@@ -48,14 +50,26 @@ class Pdf2Adapter extends WebAdapter {
 		parent::__construct($parameters);
 	}
 	
-	
+
+	/**
+	 * wkhtmltopdf command should be available in the vendor/bin/ folder
+	 * if composer is used to get the sources from message/wkhtmltopdf in the project vendor/ folder
+	 * @see \t41\View\Adapter\WebAdapter::display()
+	 */
 	public function display($content = null, $error = false)
 	{
+		error_reporting(0);
 		$html = parent::display($content, $error);
-		
-        $command = 'xvfb-run --server-args="-screen 0, 1280x1024x24" /usr/bin/wkhtmltopdf '; 
+		$unames = posix_uname();
+		$ext = $unames['machine'] == 'x86_64' ? 'amd64' : 'i386';
+		$bin = Core::$basePath . 'vendor/bin/wkhtmltopdf-' . $ext;
+        if (! is_executable($bin)) {
+        	throw new Exception("Missing or not executable $command");
+        }
+//        $command = sprintf('xvfb-run --server-args="-screen 0, 1280x1024x24" %s ', $bin);
+        $commande = $bin;
         if ($this->getParameter('orientation') == PdfAdapter::ORIENTATION_LANDSCAPE) {
-    		$command .= '-O Landscape';
+    		$command .=  '-O Landscape';
     	}
     	
     	$dir = '/dev/shm/';
