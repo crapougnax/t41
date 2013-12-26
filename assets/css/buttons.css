@@ -280,6 +280,84 @@
 }
 
 
+.t41 a.element.large.icon span.buoy, .t41.large span.buoy{
+	background-position: -192px -65px;
+}
+
+.t41 a.element.large.icon span.graph-color, .t41.large span.graph-color{
+	background-position: -225px -65px;
+}
+
+.t41 a.element.large.icon span.graph-green, .t41.large span.graph-green{
+	background-position: -257px -66px;
+}
+
+.t41 a.element.large.icon span.speaker, .t41.large span.speaker{
+	background-position: -288px -65px;
+}
+
+.t41 a.element.large.icon span.file, .t41.large span.file{
+	background-position: -321px -66px;
+}
+
+.t41 a.element.large.icon span.folder-green, .t41.large span.folder-green{
+	background-position: -352px -66px;
+}
+
+.t41 a.element.large.icon span.folder-blue, .t41.large span.folder-blue{
+	background-position: -383px -66px;
+}
+
+.t41 a.element.large.icon span.file-doc, .t41.large span.file-doc,
+.t41 a.element.large.icon span.file-docx, .t41.large span.file-docx{
+	background-position: -416px -66px;
+}
+
+.t41 a.element.large.icon span.file-xls, .t41.large span.file-xls,
+.t41 a.element.large.icon span.file-xlsx, .t41.large span.file-xlsx{
+	background-position: -448px -66px;
+}
+
+.t41 a.element.large.icon span.file-ppt, .t41.large span.file-ppt,
+.t41 a.element.large.icon span.file-pptx, .t41.large span.file-pptx{
+	background-position: -481px -66px;
+}
+
+.t41 a.element.large.icon span.file-zip, .t41.large span.file-zip{
+	background-position: -513px -65px;
+}
+
+.t41 a.element.large.icon span.file-video, .t41.large span.file-video{
+	background-position: -33px -96px;
+}
+
+.t41 a.element.large.icon span.file-jpg, .t41.large span.file-jpg,
+.t41 a.element.large.icon span.file-png, .t41.large span.file-png {
+	background-position: -1px -97px;
+}
+
+.t41 a.element.large.icon span.pie-chart, .t41.large span.pie-chart{
+	background-position: -65px -65px;
+}
+
+.t41 a.element.large.icon span.file-sound, .t41.large span.file-sound{
+	background-position: -64px -96px;
+}
+
+.t41 a.element.large.icon span.file-odt,.t41.large span.file-odt{
+	background-position: -128px -96px;
+}
+
+.t41 a.element.large.icon span.file-ods,.t41.large span.file-ods{
+	background-position: -158px -96px;
+}
+
+.t41 a.element.large.icon span.aid,.t41.large span.aid{
+	background-position: -192px -96px;
+}
+
+
+
 /*MEDIUM 24PX*/
 
 /*cart 24px medium*/
@@ -464,6 +542,83 @@
 	background-position: -360px 0;
 }
 
+.t41 a.element.medium.icon span.buoy, .t41.medium span.buoy{
+	background-position: -144px -49px;
+}
+
+.t41 a.element.medium.icon span.graph-color, .t41.medium span.graph-color{
+	background-position: -169px -49px;
+}
+
+.t41 a.element.medium.icon span.graph-green, .t41.medium span.graph-green{
+	background-position: -193px -48px;
+}
+
+.t41 a.element.medium.icon span.file, .t41.medium span.file{
+	background-position: -241px -49px;
+}
+
+.t41 a.element.medium.icon span.file-xls, .t41.medium span.file-xls,
+.t41 a.element.medium.icon span.file-xlsx, .t41.medium span.file-xlsx{
+	background-position: -336px -48px;
+}
+
+.t41 a.element.medium.icon span.file-jpg, .t41.medium span.file-jpg,
+.t41 a.element.medium.icon span.file-png, .t41.medium span.file-png {
+	background-position: -1px -73px;
+}
+
+.t41 a.element.medium.icon span.file-ppt, .t41.medium span.file-ppt,
+.t41 a.element.medium.icon span.file-pptx, .t41.medium span.file-pptx{
+	background-position: -360px -48px;
+}
+
+.t41 a.element.medium.icon span.file-video, .t41.medium span.file-video{
+	background-position: -24px -73px;
+}
+
+.t41 a.element.medium.icon span.file-doc, .t41.medium span.file-doc,
+.t41 a.element.medium.icon span.file-docx, .t41.medium span.file-docx{
+	background-position: -311px -48px;
+}
+
+.t41 a.element.medium.icon span.file-zip, .t41.medium span.file-zip{
+	background-position: -385px -48px;
+}
+
+.t41 a.element.medium.icon span.folder-blue, .t41.medium span.folder-blue{
+	background-position: -288px -48px;
+}
+
+.t41 a.element.medium.icon span.folder-green, .t41.medium span.folder-green{
+	background-position: -264px -48px;
+}
+
+.t41 a.element.medium.icon span.speaker, .t41.medium span.speaker{
+	background-position: -216px -48px;
+}
+
+.t41 a.element.medium.icon span.pie-chart, .t41.medium span.pie-chart{
+	background-position: -48px -48px;
+}
+
+.t41 a.element.medium.icon span.file-sound, .t41.medium span.file-sound{
+	background-position: -49px -73px;
+}
+
+.t41 a.element.medium.icon span.file-odt,.t41.medium span.file-odt{
+	background-position: -120px -73px;
+}
+
+.t41 a.element.medium.icon span.file-ods,.t41.medium span.file-ods{
+	background-position: -99px -73px;
+}
+
+.t41 a.element.medium.icon span.aid,.t41.medium span.aid{
+	background-position: -144px -73px;
+}
+
+
 /*SMALL 16PX*/
 
 /*cart 16px small*/
@@ -638,6 +793,83 @@
 
 .t41 a.element.small.icon span.stock-not-ok, .t41.small span.stock-not-ok{
 	background-position: -144px 0;
+}
+
+
+.t41 a.element.small.icon span.buoy, .t41.small span.buoy{
+	background-position: -208px -32px;
+}
+
+.t41 a.element.small.icon span.graph-green, .t41.small span.graph-green{
+	background-position: -17px -49px;
+}
+
+.t41 a.element.small.icon span.graph-color, .t41.small span.graph-color{
+	background-position: 0px -49px;
+}
+
+.t41 a.element.small.icon span.file, .t41.small span.file{
+	background-position: -48px -49px;
+}
+
+.t41 a.element.small.icon span.file-xls, .t41.small span.file-xls,
+.t41 a.element.small.icon span.file-xlsx, .t41.small span.file-xlsx{
+	background-position: -112px -49px;
+}
+
+.t41 a.element.small.icon span.file-jpg, .t41.small span.file-png,
+.t41 a.element.small.icon span.file-png, .t41.small span.file-png {
+	background-position: -161px -49px;
+}
+
+.t41 a.element.small.icon span.file-ppt, .t41.small span.file-ppt,
+.t41 a.element.small.icon span.file-pptx, .t41.small span.file-pptxt{
+	background-position: -129px -49px;
+}
+
+.t41 a.element.small.icon span.file-video, .t41.small span.file-video{
+	background-position: -176px -49px;
+}
+
+.t41 a.element.small.icon span.file-doc, .t41.small span.file-doc,
+.t41 a.element.small.icon span.file-docx, .t41.small span.file-docx{
+	background-position: -96px -49px;
+}
+
+.t41 a.element.small.icon span.file-zip, .t41.small span.file-zip{
+	background-position: -144px -49px;
+}
+
+.t41 a.element.small.icon span.folder-blue, .t41.small span.folder-blue{
+	background-position: -80px -49px;
+}
+
+.t41 a.element.small.icon span.folder-green, .t41.small span.folder-green{
+	background-position: -63px -49px;
+}
+
+.t41 a.element.small.icon span.speaker, .t41.small span.speaker{
+	background-position: -33px -49px;
+}
+
+.t41 a.element.small.icon span.pie-chart, .t41.small span.pie-chart{
+	background-position: -144px -32px;
+}
+
+.t41 a.element.small.icon span.file-sound, .t41.small span.file-sound{
+	background-position: -193px -49px;
+}
+
+.t41 a.element.small.icon span.file-odt,.t41.small span.file-odt{
+	background-position: -1px -63px;
+}
+
+.t41 a.element.small.icon span.file-ods,.t41.small span.file-ods{
+	background-position: -16px -64px;
+}
+
+.t41 a.element.small.icon span.aid,.t41.small span.aid{
+	background-position: -32px -64px;
 }
 
 
