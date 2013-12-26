@@ -81,7 +81,45 @@ class MediaProperty extends AbstractProperty {
 	 */
 	public function getValue($param = null)
 	{
-		return $this->_value;
+		if (is_null($this->_value)) return null;
+	
+		/* if param is null, return the value in its current format */
+		if (is_null($param)) return $this->_value;
+	
+		switch ($param) {
+			case ObjectModel::MODEL:
+				if ($this->_value instanceof ObjectModel\DataObject) {
+					$this->_value = ObjectModel::factory($this->_value);
+					return $this->_value;
+				} else if ($this->_value instanceof ObjectUri) {
+					/* object uri */
+					$this->_value = ObjectModel::factory($this->_value);
+				}
+				return $this->_value;
+				break;
+	
+			case ObjectModel::DATA:
+				if ($this->_value instanceof ObjectUri) {
+					$this->_value = ObjectModel::factory($this->_value);
+					return $this->_value->getDataObject();
+				} else if ($this->_value instanceof DataObject) {
+					return $this->_value;
+				} else {
+					return $this->_value->getDataObject();
+				}
+				break;
+	
+			case ObjectModel::URI:
+			default:
+				if ($this->_value instanceof ObjectUri) {
+					return $this->_value;
+				} else if ($this->_value instanceof DataObject) {
+					return $this->_value->getUri();
+				} else {
+					return $this->_value->getDataObject()->getUri();
+				}
+				break;
+		}
 	}
 	
 	
