@@ -243,7 +243,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// get properties name
 		$columns = array();
 		foreach ($do->getProperties() as $property) {
-			if ($property instanceof Property\MediaProperty 
+			if ($property instanceof Property\BlobProperty 
 					|| $property instanceof Property\CollectionProperty
 						|| $property instanceof Property\MetaProperty) {
 				continue;
@@ -849,7 +849,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				} else {
 					$value = $value->getUri();
 				}
-				
 			} else if ($value instanceof ObjectModel\ObjectUri) {
 				if ($value->getBackendUri()->getAlias() == $this->_uri->getAlias()) {
 					$value = $value->getIdentifier();

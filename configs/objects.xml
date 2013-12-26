@@ -70,11 +70,14 @@
 				</property>
 				<property id="extension" type="string">
 					<label>Extension</label>
+					<minlength>3</minlength>
+					<maxlength>3</maxlength>
 				</property>
 				<property id="size" type="integer">
 					<label>Size</label>
+					<unit>Bytes</unit>
 				</property>
-				<property id="media" type="media">
+				<property id="media" type="blob">
 					<label>Binary Data</label>
 				</property>
 			</properties>
