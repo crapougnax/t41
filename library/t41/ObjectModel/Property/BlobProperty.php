@@ -31,4 +31,9 @@ namespace t41\ObjectModel\Property;
  */
 class BlobProperty extends AbstractProperty {
 
+
+	public function getValue()
+	{
+		return Backend::loadBlob($this->_parent, $this);
+	}
 }
