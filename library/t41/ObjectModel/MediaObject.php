@@ -6,11 +6,16 @@ use t41\ObjectModel\BaseObject;
 
 class MediaObject extends BaseObject {
 
+	
+	const TMP_PREFIX = 'tmp:';
+	
+	
 	/**
 	 * Array of acceptable mime types
 	 * @var array
 	 */
 	protected $_mimetypes = array(
+			'txt'	=> 'text/plain',
 			'js'	=> 'application/javascript',
 			'css'	=> 'text/css',
 			'png'	=> 'image/png',
@@ -23,6 +28,7 @@ class MediaObject extends BaseObject {
 			'xml'	=> 'application/xml',
 				
 			'odt'	=> 'application/vnd.oasis.opendocument.text',
+			'ods'	=> 'application/vnd.oasis.opendocument.spreadsheet',
 			
 			'xls'	=> 'application/vnd.ms-excel',
 			'xlsx'	=> 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

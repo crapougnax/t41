@@ -2,6 +2,7 @@
 
 namespace t41\ObjectModel\Property;
 
+use t41\Backend;
 /**
  * t41 Toolkit
  *
@@ -31,9 +32,43 @@ namespace t41\ObjectModel\Property;
  */
 class BlobProperty extends AbstractProperty {
 
-
-	public function getValue($param = null)
+	
+	protected $_filename;
+	
+	
+	/**
+	 * Set a value for the property
+	 *
+	 * Value can be either:
+	 * the full path to a file
+	 * the binary content of the file
+	 *
+	 * @param string $value
+	 */
+	public function setValue($value)
 	{
-		return Backend::loadBlob($this->_parent, $this);
+		// @todo implement constraints
+	
+		if (substr($value, 0, 1) == DIRECTORY_SEPARATOR) {
+			return $this->setValueFromFile($value);
+		} else {
+			return parent::setValue($value);
+		}
+	}
+	
+
+/* 	public function getValue($param = null)
+	{
+	//	return $this->_value ? Backend::loadBlob($this->_parent, $this) : null;
+	}
+	 */
+
+	public function setValueFromFile($file)
+	{
+		if (is_readable($file)) {
+			$this->_value = file_get_contents($file);
+			$this->_filename = $file;
+		}
+		return $this;
 	}
 }

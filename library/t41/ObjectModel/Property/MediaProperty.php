@@ -64,16 +64,6 @@ class MediaProperty extends AbstractProperty {
 	}
 	
 	
-	public function setValueFromFile($file)
-	{
-		if (is_readable($file)) {
-			$this->_value = file_get_contents($file);
-			$this->_filename = $file;
-		}
-		return $this;
-	}
-	
-	
 	/**
 	 * Return the current value in the $param form
 	 * @see t41\ObjectModel\Property.AbstractProperty::getValue()

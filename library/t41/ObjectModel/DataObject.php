@@ -507,7 +507,7 @@ class DataObject extends ObjectModelAbstract {
     				// Specific case of MediaObject()
     				if ($property->getParameter('instanceof') == 't41\ObjectModel\MediaObject') {
     					// new file case : value is a string prepended by  'tmp:'
-    					if ($value && substr($value,0,4) == Property\MediaProperty::TMP_PREFIX) {
+    					if ($value && substr($value, 0, strlen(MediaObject::TMP_PREFIX)) == MediaObject::TMP_PREFIX) {
     						$parts = explode('|', substr($value,4)); // 0 => hash, 1 => original file name
     						$file =  '/tmp/' . $parts[0];
     						if (file_exists($file)) {
@@ -516,11 +516,11 @@ class DataObject extends ObjectModelAbstract {
     							$media->setLabel($parts[1]);
     							$finfo = finfo_open(FILEINFO_MIME_TYPE);
     							$mime = finfo_file($finfo,$file);
-    							$media->setMedia($file);
+    							$media->setMedia($file); // blob property
     							$media->setSize(filesize($file));
     							$media->setMime($mime);
     							$media->save();
-    							$property->setValue($media);
+    							$property->setValue($media); // media property
     							unlink($file);
     						}
     						continue; // don't go further in this case
