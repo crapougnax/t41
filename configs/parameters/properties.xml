@@ -20,7 +20,8 @@
 				</parameter>
 			</parameters>
 		</property>
-		<property id="t41\ObjectModel\Property\StringProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\StringProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="multilines">
 					<type>boolean</type>
@@ -33,68 +34,71 @@
 				</parameter>
 			</parameters>
 		</property>
-		<property id="t41\ObjectModel\Property\ObjectProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\ObjectProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
-					<parameter id="instanceof">
-						<type>string</type>
-						<protected>true</protected>
-					</parameter>
-					<parameter id="search">
-						<type>string</type>
-						<protected>false</protected>
-					</parameter>
-					<parameter id="display">
-						<type>string</type>
-						<protected>false</protected>
-					</parameter>
-					<parameter id="keyprop">
-						<type>string</type>
-						<protected>true</protected>
-					</parameter>
-					<parameter id="morekeyprop">
-						<type>array</type>
-					</parameter>
-					<parameter id="sorting">
-						<type>any</type>
-					</parameter>
-					<parameter id="depends">
-						<type>string</type>
-					</parameter>
+				<parameter id="instanceof">
+					<type>string</type>
+					<protected>true</protected>
+				</parameter>
+				<parameter id="search">
+					<type>string</type>
+					<protected>false</protected>
+				</parameter>
+				<parameter id="display">
+					<type>string</type>
+					<protected>false</protected>
+				</parameter>
+				<parameter id="keyprop">
+					<type>string</type>
+					<protected>true</protected>
+				</parameter>
+				<parameter id="morekeyprop">
+					<type>array</type>
+				</parameter>
+				<parameter id="sorting">
+					<type>any</type>
+				</parameter>
+				<parameter id="depends">
+					<type>string</type>
+				</parameter>
 			</parameters>
 		</property>
-		<property id="t41\ObjectModel\Property\CollectionProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\CollectionProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
-					<parameter id="instanceof">
-						<type>string</type>
-						<protected>true</protected>
-					</parameter>
-					<parameter id="display">
-						<type>string</type>
-						<protected>false</protected>
-					</parameter>s
-					<parameter id="keyprop">
-						<type>string</type>
-						<protected>true</protected>
-					</parameter>
-					<parameter id="morekeyprop">
-						<type>array</type>
-					</parameter>
-					<parameter id="sorting">
-						<type>any</type>
-					</parameter>
-					<parameter id="max">
-						<type>integer</type>
-						<value>0</value>
-					</parameter>
-					<parameter id="relation">
-						<type>string</type>
-					</parameter>
-					<parameter id="unique">
-						<type>string</type>
-					</parameter>
-					<parameter id="sorting">
-						<type>any</type>
-					</parameter>
+				<parameter id="instanceof">
+					<type>string</type>
+					<protected>true</protected>
+				</parameter>
+				<parameter id="display">
+					<type>string</type>
+					<protected>false</protected>
+				</parameter>
+				s
+				<parameter id="keyprop">
+					<type>string</type>
+					<protected>true</protected>
+				</parameter>
+				<parameter id="morekeyprop">
+					<type>array</type>
+				</parameter>
+				<parameter id="sorting">
+					<type>any</type>
+				</parameter>
+				<parameter id="max">
+					<type>integer</type>
+					<value>0</value>
+				</parameter>
+				<parameter id="relation">
+					<type>string</type>
+				</parameter>
+				<parameter id="unique">
+					<type>string</type>
+				</parameter>
+				<parameter id="sorting">
+					<type>any</type>
+				</parameter>
 			</parameters>
 		</property>
 		<property id="t41\ObjectModel\Property\DateProperty" extends="t41\ObjectModel\Property\AbstractProperty">
@@ -125,7 +129,8 @@
 			</parameters>
 		</property>
 
-		<property id="t41\ObjectModel\Property\IntegerProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\IntegerProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="unsigned">
 					<type>boolean</type>
@@ -133,8 +138,9 @@
 				</parameter>
 			</parameters>
 		</property>
-				
-		<property id="t41\ObjectModel\Property\CurrencyProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+
+		<property id="t41\ObjectModel\Property\CurrencyProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="currency">
 					<type>string</type>
@@ -142,12 +148,14 @@
 			</parameters>
 		</property>
 
-		<property id="t41\ObjectModel\Property\ArrayProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\ArrayProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 			</parameters>
 		</property>
 
-		<property id="t41\ObjectModel\Property\FloatProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+		<property id="t41\ObjectModel\Property\FloatProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="unsigned">
 					<type>boolean</type>
@@ -155,7 +163,7 @@
 				</parameter>
 			</parameters>
 		</property>
-		
+
 		<property id="t41\ObjectModel\Property\MetaProperty" extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
 				<parameter id="property">
@@ -169,9 +177,14 @@
 				</parameter>
 			</parameters>
 		</property>
-		
-		<property id="t41\ObjectModel\Property\MediaProperty" extends="t41\ObjectModel\Property\AbstractProperty">
+
+		<property id="t41\ObjectModel\Property\MediaProperty"
+			extends="t41\ObjectModel\Property\AbstractProperty">
 			<parameters>
+				<parameter id="instanceof">
+					<type>string</type>
+					<protected>true</protected>
+				</parameter>
 				<parameter id="types">
 					<type>array</type>
 				</parameter>

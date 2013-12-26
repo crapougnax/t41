@@ -31,6 +31,8 @@ use t41\ObjectModel\Property\MetaProperty;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\Backend\Condition;
 use t41\ObjectModel\Property\ArrayProperty;
+use t41\ObjectModel\Property\ObjectProperty;
+use t41\ObjectModel\Property\MediaProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -496,7 +498,8 @@ class DataObject extends ObjectModelAbstract {
     				continue;
     			}
     			
-    			if ($property instanceof Property\ObjectProperty) {
+    			if ($property instanceof ObjectProperty || $property instanceof MediaProperty) {
+    				
     				if ($property->getParameter('instanceof') == null) {
     					throw new DataObject\Exception("Parameter 'instanceof' for '$key' in class should contain a class name");
     				}
@@ -507,7 +510,6 @@ class DataObject extends ObjectModelAbstract {
     					if ($value && substr($value,0,4) == Property\MediaProperty::TMP_PREFIX) {
     						$parts = explode('|', substr($value,4)); // 0 => hash, 1 => original file name
     						$file =  '/tmp/' . $parts[0];
-    				
     						if (file_exists($file)) {
     							$media = new MediaObject();
     							$media->setUri(md5(rand()*microtime()));
@@ -521,7 +523,6 @@ class DataObject extends ObjectModelAbstract {
     							$property->setValue($media);
     							unlink($file);
     						}
-    						
     						continue; // don't go further in this case
     					}
     				}
