@@ -15,6 +15,7 @@ class MediaObject extends BaseObject {
 	 * @var array
 	 */
 	protected $_mimetypes = array(
+			
 			'txt'	=> 'text/plain',
 			'js'	=> 'application/javascript',
 			'css'	=> 'text/css',
