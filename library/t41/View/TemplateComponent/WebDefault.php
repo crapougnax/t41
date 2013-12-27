@@ -130,7 +130,7 @@ class WebDefault extends AbstractWebDecorator {
    				default: // obj:
    					$tmp = explode('.', $tag[2]);
    					$obj = $this->_obj->getVariable($tmp[0]);
-   					if ($obj instanceof MediaObject) {
+   					if ($obj instanceof MediaObject && isset($tmp[1])) {
    						// meta properties handling
    						switch ($tmp[1]) {
    							
@@ -155,7 +155,7 @@ class WebDefault extends AbstractWebDecorator {
    					
    					if (! $value) {
 	   					if ($obj instanceof BaseObject) {
-		   					$value = $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
+		   					$value = isset($tmp[1]) && $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
    							$value = ($value instanceof AbstractProperty)  ? $value->getDisplayValue() : $value;
    						} else {
    							$value = Core::$env == Core::ENV_DEV ? sprintf("Can't substitute any value to '%s'", $tag[0]) : null;
