@@ -63,13 +63,17 @@ class Pdf2Adapter extends WebAdapter {
 		$unames = posix_uname();
 		$ext = $unames['machine'] == 'x86_64' ? 'amd64' : 'i386';
 		$bin = Core::$basePath . 'vendor/bin/wkhtmltopdf-' . $ext;
+        
         if (! is_executable($bin)) {
-        	throw new Exception("Missing or not executable $command");
+        	throw new Exception("Missing or not executable $bin");
         }
-//        $command = sprintf('xvfb-run --server-args="-screen 0, 1280x1024x24" %s ', $bin);
-        $commande = $bin;
+        
         if ($this->getParameter('orientation') == PdfAdapter::ORIENTATION_LANDSCAPE) {
-    		$command .=  '-O Landscape';
+    		$bin .=  ' --orientation Landscape';
+    	}
+
+    	if ($this->getParameter('copies') > 1) {
+    		$bin .=  ' --copies ' . $this->getParameter('copies');
     	}
     	
     	$dir = '/dev/shm/';
@@ -78,7 +82,7 @@ class Pdf2Adapter extends WebAdapter {
     	
     	file_put_contents($dir . $key . '.html', $html);
     	
-    	exec(sprintf("%s %s%s.html %s%s.pdf", $command, $dir, $key, $dir, $key));
+    	exec(sprintf("%s %s%s.html %s%s.pdf", $bin, $dir, $key, $dir, $key));
     	
     	$doc = $this->getParameter('title') ? str_replace('/', '-', $this->getParameter('title')) . '.pdf' : 'Export.pdf';
 
