@@ -134,6 +134,10 @@ class WebDefault extends AbstractWebDecorator {
    						// meta properties handling
    						switch ($tmp[1]) {
    							
+   							case '_base64':
+   								$value = 'data:image/jpeg;base64,' . base64_encode($obj->loadBlob('media'));
+   								break;
+   								
    							case '_icon':
    								$value = 'file-' . $obj->getExtension();
    								break;
