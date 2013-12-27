@@ -22,8 +22,8 @@ namespace t41\ObjectModel\Property;
  * @version    $Revision: 865 $
  */
 
-use t41\ObjectModel,
-	t41\Core;
+use t41\ObjectModel;
+use t41\Core;
 
 /**
  * Property class to use for object values
