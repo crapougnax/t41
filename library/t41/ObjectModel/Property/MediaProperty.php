@@ -24,6 +24,7 @@ namespace t41\ObjectModel\Property;
 
 use t41\ObjectModel;
 use t41\Core;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * Property class to use for object values
