@@ -179,10 +179,9 @@ class DefaultAdapter extends AbstractAdapter {
 		$element->setValue($value);
 		
 		$constraints = $property->getParameter('constraints');
-
 		foreach (self::$constraintsList as $key) {
 			if (isset($constraints[$key])) {
-				$element->setConstraint($key, (empty($constraints[$key]) && $constraints[$key] != 0) || $constraints[$key] == "" ? true : $constraints[$key]);
+				$element->setConstraint($key, $constraints[$key] != '0' && empty($constraints[$key]) ? true : $constraints[$key]);
 			}
 		}
 		

@@ -68,11 +68,11 @@ class WebDefault extends AbstractWebDecorator {
 						   );
 		
 		if ($boundaries) {
-			if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN) != '') {
-				$pickerArgs['minDate'] = (int) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN);
+			if (is_numeric($this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN))) {
+				$pickerArgs['minDate'] = $this->_obj->getConstraint(Property::CONSTRAINT_DATEMIN);
 			}
 
-			if ($this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX) != '') {
+			if (is_numeric($this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX))) {
 				$pickerArgs['maxDate'] = (string) $this->_obj->getConstraint(Property::CONSTRAINT_DATEMAX);
 			}
 		}
