@@ -29,7 +29,7 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.action;
 	
-	this.labels = {submit:"Sauver"};
+	this.labels = {submit:t41.lget('save')};
 	
 	/**
 	 * List of redirection URL
@@ -43,12 +43,12 @@ window.t41.view.form = function(id,obj,form) {
 		container.append(submit);
 
 		if (this.form.params.buttons == 'all') {
-			var submit = new t41.view.button("Sauver & Nouveau", {id:'form_submit', size:'medium', icon:'valid'});
+			var submit = new t41.view.button(t41.lget('form:savenew'), {id:'form_submit', size:'medium', icon:'valid'});
 			t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save2'), this.id);
 			container.append(submit);
 		}
 		
-		var back = new t41.view.button("Annuler", {id:'form_reset', size:'medium', icon:'alert'});
+		var back = new t41.view.button(t41.lget('cancel'), {id:'form_reset', size:'medium', icon:'alert'});
 		t41.view.bindLocal(back, 'click', function() { history.back(); }, this.id);
 		container.append(back);
 	};
@@ -130,8 +130,8 @@ window.t41.view.form = function(id,obj,form) {
 				continue;
 			}
 			
-			if (field.constraints.mandatory && (value == "" || value == '_NONE_' || value == null)) {
-				errors[errors.length] = {msg:'Valeur requise pour le champ "' + field.label + '"',field:i};
+			if (field.constraints.mandatory && (value == "" || value == t41.core.none || value == null)) {
+				errors[errors.length] = {msg:t41.lget('form:fielderr') + ' "' + field.label + '"',field:i};
 				continue;
 			}
 			
@@ -145,6 +145,7 @@ window.t41.view.form = function(id,obj,form) {
 		}
 		
 		if (errors.length > 0) {
+			//console.log(errors); return false;
 			for (var i in errors) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
@@ -200,12 +201,14 @@ window.t41.view.form = function(id,obj,form) {
 			}
 			var params = this.redirects && this.redirects.redirect_ok ? {defer:true} : {timer:10};
 			if (this.re == false) {
-				new t41.view.alert("Sauvegarde effectuée", params);
+				new t41.view.alert(t41.locale.get('form:saveok'), params);
 			}
 			if (this.redirects && this.redirects.redirect_ok) {
 				if (typeof this.redirects.redirect_ok == 'function') {
 					this.redirects.redirect_ok.call(this, obj.data);
 				} else if (typeof this.redirects.redirect_ok != 'string') {
+					console.log(this.redirects.redirect_ok);
+					return;
 					var baseurl = this.redirects.redirect_ok[0];
 					for (var i in this.redirects.redirect_ok[1]) {
 						baseurl += '/' + this.redirects.redirect_ok[1][i] + '/';
@@ -217,7 +220,11 @@ window.t41.view.form = function(id,obj,form) {
 					}
 					window.location.href = baseurl;
 				} else {
-					window.location.href = this.redirects.redirect_ok;
+					if (this.redirects.redirect_ok == t41.core.none) {
+						new t41.view.alert(t41.locale.get('form:saveok'), {timer:3});
+					} else {
+						window.location.href = this.redirects.redirect_ok;
+					}
 				}
 			}
 		} else {
@@ -241,11 +248,13 @@ window.t41.view.form = function(id,obj,form) {
 	// constructor
 	jQuery('#actions').attr('style','text-align:center');
 	this.convert();
+
 	if (form.params) {
 		if (form.params.redirect_ok) this.redirects.redirect_ok = form.params.redirect_ok;
 		if (form.params.action) this.action = eval(form.params.action);
 		if (form.params.labels) this.labels = form.params.labels;
 	}
+
 	if (this.form.params && this.form.params.buttons != false) {
 		this.addButtons(jQuery('#' + this.id + ' .form_actions'));
 	}
@@ -277,7 +286,7 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	
 
 	this.prepareDest = function() {
-		this.dest.empty().append(new Option('--','_NONE_'));
+		this.dest.empty().append(new Option('--',t41.core.none));
 	};
 	
 	
@@ -403,7 +412,7 @@ window.t41.view.form.timeElement = function(id) {
 			}
 			value += ':' + jQuery('#' + this.id + '_minute').val();
 		} else {
-			value = '_NONE_';
+			value = t41.core.none;
 			jQuery('#' + this.id + '_hour').prop('selectedIndex', 0);
 			jQuery('#' + this.id + '_minute').prop('selectedIndex', 0);
 		}

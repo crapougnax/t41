@@ -70,6 +70,7 @@ if (! window.t41.locale) {
 		no:'no',
 		cancel:'Cancel',
 		back:'Back',
+		save:'Save',
 		confirm:{
 			button:'Confirm',
 			title:'Confirmation Request',
@@ -93,7 +94,12 @@ if (! window.t41.locale) {
 		},
 		err:{
 			lbl_srv:'Server Error',
-			bkd:'Server error, plrease refresh the page'
+			bkd:'Server error, please refresh the page'
+		},
+		form:{
+			saveok:"Successfully saved",
+			fielderr:"Required value for",
+			savenew:"Save & New"
 		}
 	};
 	
@@ -107,6 +113,7 @@ if (! window.t41.locale) {
 		no:'non',
 		cancel:'Annuler',
 		back:'Retour',
+		save:'Sauver',
 		confirm:{
 			button:'Confirmer',
 			title:'Demande de confirmation',
@@ -131,6 +138,11 @@ if (! window.t41.locale) {
 		err:{
 			lbl_srv:'Une erreur a été signalée par le serveur',
 			bkd:'Erreur serveur, veuillez rafraîchir la page'
+		},
+		form:{
+			saveok:"Sauvegarde effectuée",
+			fielderr:"Valeur requise pour le champ",
+			savenew:"Sauvez & Nouveau"
 		}
 	};
 }
