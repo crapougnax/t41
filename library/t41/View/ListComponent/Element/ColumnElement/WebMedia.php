@@ -27,6 +27,7 @@ use t41\View\Decorator\AbstractWebDecorator,
 	t41\View,
 	t41\View\ViewUri,
 	t41\Core;
+use t41\View\FormComponent\Element\MediaElement;
 
 /**
  * Web decorator for the FieldElement class
@@ -42,8 +43,8 @@ class WebMedia extends AbstractWebDecorator {
 	public function render()
 	{
 		if (! is_null($uri = $this->_obj->getValue())) {
-			return sprintf('<a href="/t41/medias/download/obj/%s" target="_blank">%s</a>'
-				, rawurlencode(base64_encode($uri))
+			return sprintf('<a href="%s" target="_blank">%s</a>'
+				, MediaElement::getDownloadUrl($uri)
 				, 'Télécharger'
 				);
 		} else {
