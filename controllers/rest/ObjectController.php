@@ -20,6 +20,7 @@ use t41\Core,
 	t41\Backend,
 	t41\View,
 	t41\View\Action;
+use t41\Core\Status;
 
 
 require_once 'DefaultController.php';
@@ -30,6 +31,11 @@ class Rest_ObjectController extends Rest_DefaultController {
 	public function updateAction()
 	{
 		try {
+			// populate status message if provided
+			if (isset($this->_post['_status'])) {
+				$this->_obj->status = new Status($this->_post['_status']);
+			}
+			
 			// test object uri, if empty, object is new or faulty
 			// @todo mix this with ObjectModel::populate()
 				
