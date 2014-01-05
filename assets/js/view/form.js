@@ -6,7 +6,7 @@ if (! window.t41.view) {
 }
 
 window.t41.view.form = function(id,obj,form) {
-	
+
 	this.formId = '#' + id;
 	
 	this.id = id;
@@ -106,6 +106,9 @@ window.t41.view.form = function(id,obj,form) {
 				case 'enumElement':
 					var elem = jQuery('[name="' + i + '"]');
 					elements[i] = elem[0].type == 'select-one' ? jQuery('[name="' + i + '"]').val() : jQuery('[name="' + i + '"]:checked').val()
+					// @todo find a better way to address radio sets with none checked
+					// undefined should only be found when element is missing because already defined & protected
+					if (elements[i] == undefined) elements[i] = "";
 					break;
 				
 				default:
@@ -148,7 +151,7 @@ window.t41.view.form = function(id,obj,form) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
 				span.innerHTML = errors[i].msg;
-				jQuery('#elem_' + errors[i].field).attr('style','border:1px solid red;min-width:50%').prepend(span);
+				jQuery('#elem_' + errors[i].field).attr('style','border:1px solid red;min-width:50%;margin:1px').prepend(span);
 			}
 			jQuery('#' + errors[0].field).focus();
 			return false;
