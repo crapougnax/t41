@@ -29,7 +29,7 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.action;
 	
-	this.labels = {submit:t41.lget('save')};
+	this.labels = {submit:t41.lget('save'), cancel:t41.lget('cancel'), savenew:t41.lget('form:savenew')};
 	
 	/**
 	 * List of redirection URL
@@ -43,12 +43,12 @@ window.t41.view.form = function(id,obj,form) {
 		container.append(submit);
 
 		if (this.form.params.buttons == 'all') {
-			var submit = new t41.view.button(t41.lget('form:savenew'), {id:'form_submit', size:'medium', icon:'valid'});
+			var submit = new t41.view.button(this.labels.savenew, {id:'form_submit', size:'medium', icon:'valid'});
 			t41.view.bindLocal(submit, 'click', jQuery.proxy(this,'save2'), this.id);
 			container.append(submit);
 		}
 		
-		var back = new t41.view.button(t41.lget('cancel'), {id:'form_reset', size:'medium', icon:'alert'});
+		var back = new t41.view.button(this.labels.cancel, {id:'form_reset', size:'medium', icon:'alert'});
 		t41.view.bindLocal(back, 'click', function() { history.back(); }, this.id);
 		container.append(back);
 	};
@@ -86,7 +86,8 @@ window.t41.view.form = function(id,obj,form) {
 	this.save = function(obj) {
 		
 		// remove all error spans
-		jQuery('#' + this.id + '_form span.error').remove();
+		jQuery('#' + this.id + ' span.error').remove();
+		jQuery('#' + this.id + ' div.field').attr('style','');
 		
 		// get form elements in an key/value array
 		var elements = {};
@@ -117,10 +118,6 @@ window.t41.view.form = function(id,obj,form) {
 		var formdata = {};
 		
 		// control elements
-		
-		// remove all previous errors blocks
-		jQuery('span.error').remove();
-		
 		for (var i in this.fields) {
 			var field = this.fields[i];
 			var value = elements[i];
@@ -130,7 +127,8 @@ window.t41.view.form = function(id,obj,form) {
 				continue;
 			}
 			
-			if (field.constraints.mandatory && (value == "" || value == t41.core.none || value == null)) {
+			// test mandatory fields for value except if value is undefined (field is in this case not present)
+			if (field.constraints.mandatory && value != undefined && (value == "" || value == t41.core.none || value == null)) {
 				errors[errors.length] = {msg:t41.lget('form:fielderr') + ' "' + field.label + '"',field:i};
 				continue;
 			}
@@ -150,7 +148,7 @@ window.t41.view.form = function(id,obj,form) {
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
 				span.innerHTML = errors[i].msg;
-				jQuery('#elem_' + errors[i].field).append(span);
+				jQuery('#elem_' + errors[i].field).attr('style','border:1px solid red;min-width:50%').prepend(span);
 			}
 			jQuery('#' + errors[0].field).focus();
 			return false;
@@ -207,8 +205,6 @@ window.t41.view.form = function(id,obj,form) {
 				if (typeof this.redirects.redirect_ok == 'function') {
 					this.redirects.redirect_ok.call(this, obj.data);
 				} else if (typeof this.redirects.redirect_ok != 'string') {
-					console.log(this.redirects.redirect_ok);
-					return;
 					var baseurl = this.redirects.redirect_ok[0];
 					for (var i in this.redirects.redirect_ok[1]) {
 						baseurl += '/' + this.redirects.redirect_ok[1][i] + '/';
