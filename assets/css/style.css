@@ -49,6 +49,7 @@ a[href],a:hover, input[type='submit'], input[type='image'], label[for], select, 
 
 textarea{
 	overflow:auto;
+	height:100px;
 }
 
  body {
@@ -446,6 +447,7 @@ table.t41.list td.cellcurrency {
   padding: 1px 8px;
   font-size: 16px;
   color: #444;
+  vertical-align:middle;
 }
 
 .t41 form fieldset .error, .t41 form fieldset .error {
@@ -454,6 +456,7 @@ table.t41.list td.cellcurrency {
   height: 24px;
   font-size: 12px;
   color: red;
+  display:block;
 }
 
 #left .t41 form fieldset .label {
