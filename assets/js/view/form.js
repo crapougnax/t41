@@ -87,7 +87,7 @@ window.t41.view.form = function(id,obj,form) {
 		
 		// remove all error spans
 		jQuery('#' + this.id + ' span.error').remove();
-		jQuery('#' + this.id + ' div.field').attr('style','');
+		jQuery('#' + this.id + ' div.field').removeClass('errorfield');
 		
 		// get form elements in an key/value array
 		var elements = {};
@@ -146,12 +146,14 @@ window.t41.view.form = function(id,obj,form) {
 		}
 		
 		if (errors.length > 0) {
-			//console.log(errors); return false;
+			console.log(errors);// return false;
 			for (var i in errors) {
+				var _element = jQuery('#elem_' + errors[i].field);
+				console.log(_element);
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
 				span.innerHTML = errors[i].msg;
-				jQuery('#elem_' + errors[i].field).attr('style','border:1px solid red;min-width:50%;margin:1px').prepend(span);
+				_element.addClass('errorfield').prepend(span);
 			}
 			jQuery('#' + errors[0].field).focus();
 			return false;

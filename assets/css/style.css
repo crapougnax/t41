@@ -459,6 +459,11 @@ table.t41.list td.cellcurrency {
   display:block;
 }
 
+.t41 form fieldset .errorfield, .t41 form fieldset .errorfield {
+  border: 1px solid red;
+  min-width:50px;
+}
+
 #left .t41 form fieldset .label {
     text-align: left;
     width: 100%;
