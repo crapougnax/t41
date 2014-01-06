@@ -58,7 +58,8 @@ window.t41.view.form = function(id,obj,form) {
 	 * Convert t41 properties into JS fields
 	 */
 	this.convert = function() {
-	
+		
+		//console.log(this.form.elements);
 		// walk through all properties
 		for (var i in this.form.elements) {
 			var prop = this.form.elements[i];
@@ -82,6 +83,7 @@ window.t41.view.form = function(id,obj,form) {
 			}
 		}
 	};
+	
 	
 	this.save = function(obj) {
 		
@@ -146,7 +148,6 @@ window.t41.view.form = function(id,obj,form) {
 		}
 		
 		if (errors.length > 0) {
-			console.log(errors);// return false;
 			for (var i in errors) {
 				var _element = jQuery('#elem_' + errors[i].field);
 				console.log(_element);
@@ -160,7 +161,7 @@ window.t41.view.form = function(id,obj,form) {
 		} else {
 			
 			// deactivate buttons
-			jQuery('#' + id + '.form_actions').fadeOut();
+			jQuery('#' + id + ' .form_actions').fadeOut();
 			
 			formdata['uuid'] = this.form.uuid;
 			formdata['objuuid'] = this.obj.uuid;
@@ -279,6 +280,7 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	 * The element which values are refreshed
 	 */
 	this.dest = jQuery('#' + dest);
+	console.log(dest);
 	
 	/**
 	 * Remote object UUID
