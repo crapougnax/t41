@@ -188,7 +188,6 @@ class Collection extends ObjectModelAbstract {
 	public function removeMember(ObjectModel\BaseObject $object)
 	{
 		$uri = $object instanceof ObjectUri ? $object->__toString() : $object->getUri()->__toString();
-		
 		foreach ($this->getMembers(ObjectModel::MODEL) as $key => $member) {
 			if ($member === $object || $member->getUri()->__toString() == $uri) {
 				$this->_spool['delete'][] = $member;
@@ -545,6 +544,16 @@ class Collection extends ObjectModelAbstract {
 		return is_null($type) ? $member : $this->_castMember($member, $type);
 	}
 	
+	
+	public function getMemberFromUri($uri)
+	{
+		foreach ($this->_members as $member) {
+			if ($member->getIdentifier() && $member->getIdentifier() == $uri) {
+				return $this->_castMember($member, ObjectModel::MODEL);
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Return the members of the collection in the given format type or as ObjectModel if no type is specified
