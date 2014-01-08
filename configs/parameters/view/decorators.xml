@@ -65,7 +65,24 @@
 				</parameters>
 			</decorator>
 		</object>
-	
+
+		<object id="t41\View\ImageComponent">
+			<decorator id="PdfDefault" extends="t41\View\Decorator\AbstractPdfDecorator">
+				<parameters>
+					<parameter id="newpage">
+						<type>string</type>
+						<defaultvalue>no</defaultvalue>
+						<values>
+							<value id="no">no</value>
+							<value id="before">before</value>
+							<value id="after">after</value>
+							<value id="both">both</value>
+						</values>
+					</parameter>
+				</parameters>
+			</decorator>
+		</object>
+			
 		<object id="t41\View\TemplateComponent">
 			<decorator id="PdfDefault" extends="t41\View\Decorator\AbstractPdfDecorator">
 				<parameters>
