@@ -59,7 +59,7 @@ class WebDefault extends SimpleComponent\WebDefault {
     	$this->_id = $this->_obj->getId() ? $this->_obj->getId() : 't41_' . md5(time());
     	
     	View::addCoreLib(array('buttons.css','sprites.css'));
-		View::addEvent(sprintf("%s_obj = new t41.view.form('%s_form',%s,%s)"
+		View::addEvent(sprintf("t41.view.register('%s', new t41.view.form('%s',%s,%s))"
 									, $this->_id
 									, $this->_id
 									, \Zend_Json::encode($reduced)

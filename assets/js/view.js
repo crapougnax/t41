@@ -12,6 +12,20 @@ if (! window.t41.view) {
 					  };
 
 
+	window.t41.view.register = function(id, obj) {
+		t41.view.registry[id] = obj;
+	};
+
+	
+	window.t41.view.get = function(id) {
+		if (t41.view.registry[id]) {
+			return t41.view.registry[id];
+		} else {
+			return false;
+		}
+	};
+	
+	
 	/**
 	 *  button generation function
 	 *  
