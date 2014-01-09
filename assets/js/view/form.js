@@ -5,9 +5,14 @@ if (! window.t41.view) {
 	window.t41.view = [];
 }
 
+/**
+ * @param string id 	div id
+ * @param object obj	source object
+ * @param object form	form object
+ */
 window.t41.view.form = function(id,obj,form) {
 
-	this.formId = '#' + id;
+	this.formId = '#' + id + '_form';
 	
 	this.id = id;
 	
@@ -34,7 +39,8 @@ window.t41.view.form = function(id,obj,form) {
 	/**
 	 * List of redirection URL
 	 */
-	this.redirects = {redirect_ok:document.referrer};
+	this.redirects = {redirect_ok:document.referrer,redirect_abort:document.referrer};
+	
 	
 	this.addButtons = function(container) {
 
@@ -49,8 +55,28 @@ window.t41.view.form = function(id,obj,form) {
 		}
 		
 		var back = new t41.view.button(this.labels.cancel, {id:'form_reset', size:'medium', icon:'alert'});
-		t41.view.bindLocal(back, 'click', function() { history.back(); }, this.id);
+		t41.view.bindLocal(back, 'click', jQuery.proxy(this,'redirector',t41.core.status.abort), this.id);
 		container.append(back);
+	};
+	
+	
+	this.redirector = function(status) {
+		switch (status) {
+		
+			case t41.core.status.ok:
+				if (typeof this.redirects.redirect_ok == 'string') {
+					window.location.href = this.redirects.redirect_ok;
+				}
+				break;
+				
+			case t41.core.status.abort:
+				if (typeof this.redirects.redirect_abort == 'function') {
+					this.redirects.redirect_abort.call();
+				} else if (typeof this.redirects.redirect_abort == 'string') {
+					window.location.href = this.redirects.redirect_abort;
+				}
+				break;
+		}
 	};
 	
 	
@@ -247,18 +273,49 @@ window.t41.view.form = function(id,obj,form) {
 	};
 	
 	
+	/**
+	 * Give focus to the first visible element of the form
+	 */
+	this.focus = function() {
+		jQuery(this.formId + ' :input[type="text"]:first').focus();
+	};
+	
+	
+	this.show = function() {
+		jQuery('#'+this.id).show();
+		this.focus();
+	}
+	
+	
+	this.hide = function() {
+		jQuery('#'+this.id).hide();
+	};
+	
+	
 	// constructor
 	jQuery('#actions').attr('style','text-align:center');
 	this.convert();
 
 	if (form.params) {
-		if (form.params.redirect_ok) this.redirects.redirect_ok = form.params.redirect_ok;
+		if (form.params.redirect_ok) {
+			this.redirects.redirect_ok = form.params.redirect_ok;
+			if (typeof form.params.redirect_ok == 'string') {
+				// if redirect is an uri, use it also for cancel button
+				this.redirects.redirect_abort = form.params.redirect_ok;
+			}
+		}
+		if (form.params.redirect_nok) {
+			this.redirects.redirect_nok = form.params.redirect_nok;
+		}
+		if (form.params.redirect_abort) {
+			this.redirects.redirect_abort = form.params.redirect_abort;
+		}
 		if (form.params.action) this.action = eval(form.params.action);
 		if (form.params.labels) this.labels = form.params.labels;
 	}
 
 	if (this.form.params && this.form.params.buttons != false) {
-		this.addButtons(jQuery('#' + this.id + ' .form_actions'));
+		this.addButtons(jQuery(this.formId + ' .form_actions'));
 	}
 };
 
@@ -280,7 +337,6 @@ window.t41.view.form.elementUpdater = function(uuid,dest,src) {
 	 * The element which values are refreshed
 	 */
 	this.dest = jQuery('#' + dest);
-	console.log(dest);
 	
 	/**
 	 * Remote object UUID
@@ -350,7 +406,7 @@ window.t41.view.form.toggler = function(id, action) {
                             
                     case 'hide':
                             elems.hide();
-                            elems.val('');
+                            //elems.val('');
                             break;
                             
                     default:
