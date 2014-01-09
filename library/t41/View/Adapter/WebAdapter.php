@@ -136,15 +136,17 @@ class WebAdapter extends AbstractAdapter {
 	 * @param string $event
 	 * @param string $type
 	 * @param boolean $isFile
+	 * @param boolean $bottom
 	 * @return boolean
 	 */
-    public function eventAdd($event, $type, $isFile = false)
+    public function eventAdd($event, $type, $isFile = false, $bottom = false)
     {
         if (!in_array($type, $this->_allowedEvents)) return false;
     	
+        $store = $bottom ? 'bottom' : 'default';
+        
     	if (! isset($this->_event[$type])) {
-    		
-    		$this->_event[$type] = array();
+    		$this->_event[$type] = array('default' => array(), 'bottom' => array());
     	}
     	
         $eventHash = md5($event);
@@ -158,7 +160,7 @@ class WebAdapter extends AbstractAdapter {
         	}
         	$event = file_get_contents($path . $event);
         }
-        $this->_event[$type][$eventHash] = $event;
+        $this->_event[$type][$store][$eventHash] = $event;
         return true;
     }
 
@@ -179,21 +181,20 @@ class WebAdapter extends AbstractAdapter {
     	
     	$code = '';
     	
-        foreach($this->_event as $type => $events) {
-        	
+        foreach($this->_event as $type => $stores) {
         	$str = '';
-        	foreach ($events as $event) {
-
-	            $str .= $event;
-
-	            if ($type == 'js' && substr($str, -1)!=';') { $str .= ';'; }
-	            $str .= "\n";
-        	}
+        	foreach ($stores as $events) {
         	
-
-        	switch ($type) {
+    	    	foreach ($events as $event) {
+	    	        $str .= $event;
+	        	    if ($type == 'js' && substr($str, -1)!=';') { $str .= ';'; }
+	        	    $str .= "\n";
+        		}
+        	}
+	        	
+	        switch ($type) {
         		
-        		case 'js':
+    	    	case 'js':
         			if (strstr(implode(' ', $this->_component['js']), 'jquery') !== false && $this->getParameter('js_documentready') === true) {
         				$str = "jQuery(document).ready(function() {\n" . $str . "\n});";
         			}

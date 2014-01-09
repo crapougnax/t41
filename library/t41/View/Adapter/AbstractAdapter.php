@@ -244,9 +244,10 @@ abstract class AbstractAdapter extends ObjectModelAbstract implements AdapterInt
 	 * @param string $event
 	 * @param string $type
 	 * @param boolean $isFile
+	 * @param boolean $bottom
 	 * @return boolean
 	 */
-    public function eventAdd($event, $type, $isFile = false) { }
+    public function eventAdd($event, $type, $isFile = false, $bottom = false) { }
 
     
     public function eventAttach() { }

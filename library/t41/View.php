@@ -323,7 +323,7 @@ class View {
 	}
 	
 
-	static public function addEvent($event, $type, $isFile = false) {
+	static public function addEvent($event, $type, $isFile = false, $bottom = false) {
 		if (self::_isInstanciated ()) {
 			if ($isFile != false) {
 				if (is_string($isFile)) {
@@ -333,7 +333,7 @@ class View {
 					$isFile = 'html/' . $type . '/';
 				}
 			}
-			return self::$_display->eventAdd($event, $type, $isFile);
+			return self::$_display->eventAdd($event, $type, $isFile, $bottom);
 		}
 	}
 	
@@ -349,7 +349,6 @@ class View {
 		Core::setFancyExceptions(false);
 		
 		if (self::_isInstanciated()) {
-			
 			return self::$_display->display($content, $error);
 		}
 	}
@@ -358,7 +357,6 @@ class View {
 	static public function setPageTitle($title)
 	{
 		if (self::_isInstanciated ()) {
-			
 			self::$_display->setTitle($title);
 		}
 	}
