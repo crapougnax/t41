@@ -124,9 +124,10 @@ class TimeProperty extends AbstractProperty {
 		return $array;
 	}
 	
+	
 	static public function format($str)
 	{
-		if (is_null($str)) {
+		if (is_null($str) || $str == '') {
 			return '';
 		}
 		$hour = explode(':', $str);
