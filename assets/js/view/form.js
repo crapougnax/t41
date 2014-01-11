@@ -249,6 +249,7 @@ window.t41.view.form = function(id,obj,form) {
 					window.location.href = baseurl;
 				} else {
 					if (this.redirects.redirect_ok == t41.core.none) {
+						jQuery('#' + id + ' .form_actions').fadeIn();
 						new t41.view.alert(t41.locale.get('form:saveok'), {timer:3});
 					} else {
 						window.location.href = this.redirects.redirect_ok;
