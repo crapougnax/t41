@@ -236,6 +236,15 @@ if (! window.t41.object) {
 	};
 	
 	
+	window.t41.object.remove = function() {
+		var src = t41.view.caller;
+		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
+		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
+
+		t41.view._alert = t41.view.alert.confirm("Veuillez confirmer la suppression",{confirm:t41.object.retDelete});
+	};
+	
+	
 	window.t41.object.retDelete = function(obj) {
 		if (obj && obj.status) {
 			switch (obj.status) {
