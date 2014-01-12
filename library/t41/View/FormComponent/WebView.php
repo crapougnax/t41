@@ -28,6 +28,10 @@ class WebView extends WebDefault {
         	
         	$field = $element;
         	
+        	if ($this->getParameter('hideempty') === true && ! $field->getValue()) {
+        		continue;
+        	}
+        	
         	/* hidden fields treatment */
         	if ($element->getConstraint(Element\AbstractElement::CONSTRAINT_HIDDEN) === true) {
         		continue;

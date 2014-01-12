@@ -37,6 +37,10 @@
 						<type>string</type>
 						<defaultvalue>t41 component</defaultvalue>
 					</parameter>
+					<parameter id="hideempty">
+						<type>boolean</type>
+						<defaultvalue>false</defaultvalue>
+					</parameter>
 				</parameters>
 			</decorator>
 			<decorator id="WebSearch" extends="t41\View\Decorator\AbstractWebDecorator">
