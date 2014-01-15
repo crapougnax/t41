@@ -261,7 +261,7 @@ HTML;
         }
         
         foreach ($this->_obj->getColumns() as $val) {
-        	$line .= '<th><strong>';
+        	$line .= sprintf('<th class="tb-%s"><strong>', $val->getId());
         	if ($this->getParameter('sortable') == false) {
         		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
         		continue;
@@ -348,7 +348,8 @@ HTML;
             		continue;
             	}
             	
-            	$attrib = ($property instanceof Property\CurrencyProperty) ? ' class="cellcurrency"' : null;
+            	$attrib = sprintf(' class="tb-%s', $column->getId());
+            	$attrib .= ($property instanceof Property\CurrencyProperty) ? ' cellcurrency"' : '"';
             	 
             	if ($column->getParameter('recursion')) {
             		$parts = $column->getParameter('recursion');
