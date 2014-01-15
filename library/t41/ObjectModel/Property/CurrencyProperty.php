@@ -35,10 +35,9 @@ class CurrencyProperty extends AbstractProperty {
 	
 	public function setValue($value)
 	{
-		if (! is_numeric($value) && ! is_float($value) && ! is_integer($value)) {
+		if (! empty($value) && ! is_numeric($value) && ! is_float($value) && ! is_integer($value)) {
 			throw new Exception(array("VALUE_NOT_INTEGER_OR_FLOAT", $value));
 		}
-		
 		parent::setValue((float) $value);
 	}
 	
