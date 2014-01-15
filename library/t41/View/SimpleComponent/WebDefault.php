@@ -50,6 +50,8 @@ class WebDefault extends AbstractWebDecorator {
 	
 	public function render()
 	{
+		View::addCoreLib(array('style.css'));
+		
 		return    $this->_headerRendering()
 				. $this->_contentRendering()
 				. $this->_footerRendering();
