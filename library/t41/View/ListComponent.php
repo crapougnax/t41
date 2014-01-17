@@ -125,7 +125,7 @@ class ListComponent extends ViewObject {
 
     			if ($column == ObjectUri::IDENTIFIER) {
     				$obj = new Element\IdentifierElement();
-    				$obj->setTitle(isset($alt[$column]) ? $alt[$column] : $property->getLabel());
+    				$obj->setTitle(isset($alt[$column]) ? $alt[$column] : 'ID');
     				$this->_columns[] = $obj;
     			}
     			
