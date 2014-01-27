@@ -64,6 +64,9 @@
 				<parameter id="redirect_nok" type="string">
 					<bogus/>
 				</parameter>
+				<parameter id="redirect_abort" type="string">
+					<bogus/>
+				</parameter>
 				<parameter id="redirect_on_condition" type="array"/>
 				<parameter id="pre" type="array">
 					<bogus/>
