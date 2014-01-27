@@ -67,6 +67,15 @@ window.t41.view.action.upload = function(element, uri) {
 		
 	}
 
+	/**
+	 * Reset current value
+	 */
+	this.reset = function(obj) {
+		this.field.find('.hiddenfilename').val(t41.core.none);
+		jQuery(obj).parent().remove();
+	};
+	
+	
 	// EVENT HANDLERS
 	this.onSubmit = function(id, fileName) {
 		this.setFilename();

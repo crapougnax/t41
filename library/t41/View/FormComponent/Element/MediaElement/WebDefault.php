@@ -49,15 +49,16 @@ class WebDefault extends AbstractWebDecorator {
 		}
 		$uri = $prefix . 'upload';
 		View::addCoreLib(array('core.js','locale.js','view.js','uploader.css','view:action:upload.js'));
-		View::addEvent(sprintf("new t41.view.action.upload(jQuery('#%s_ul'),'%s')", $name, $uri), 'js');
+		View::addEvent(sprintf("t41.view.register('%s_ul', new t41.view.action.upload(jQuery('#%s_ul'),'%s'))", $name, $name, $uri), 'js');
 		
 		$html = '';
 		// @todo code media deletion JS
 		if (($this->_obj->getValue()) != null) {
-			$html .= sprintf('<a href="%s" target="_blank">%s %s</a> | <a href="#" onclick="">%s</a>'
+			$html .= sprintf('<span><a href="%s" target="_blank">%s %s</a> | <a href="#" onclick="t41.view.get(\'%s_ul\').reset(this)">%s</a></span>'
 					, MediaElement::getDownloadUrl($this->_obj->getValue()->getUri())
 					, 'Télécharger'
 					, $this->_obj->getValue()->getLabel()
+					, $name
 					, 'Supprimer'
 			);
 		}
