@@ -126,17 +126,27 @@ class CollectionProperty extends AbstractProperty {
 			/* inject any other defined condition */
 			if ($this->getParameter('morekeyprop')) {
 				foreach ($this->getParameter('morekeyprop') as $value) {
-					if (strstr($value, ' ') !== false) {
+					if (strstr(trim($value), ' ') !== false) {
 						// if value contains spaces, it's a pattern
 						$parts = explode(' ', $value);
 						if (count($parts) == 3) {
-							
 							if ($parts[2] == 'novalue') $parts[2] = Condition::NO_VALUE;
+							if (substr($parts[2],0,1) == '%' && substr($parts[2], -1) == '%') {
+								$prop = substr($parts[2], 1, strlen($parts[2])-2);
+								if (($prop = $this->_parent->getProperty($prop)) !== false) {
+									$parts[2] = $prop->getValue();
+								}
+							}
 							if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
 							$this->_value->having($parts[0])->$parts[1]($parts[2]);
-						
 						} else {
 							if ($parts[1] == 'novalue') $parts[1] = Condition::NO_VALUE;
+							if (substr($parts[1],0,1) == '%' && substr($parts[1], -1) == '%') {
+								$prop = substr($parts[1], 1, strlen($parts[1])-2);
+								if (($prop = $this->_parent->getProperty($prop)) !== false) {
+									$parts[1] = $prop->getValue();
+								}
+							}
 							if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
 							$this->_value->having($parts[0])->equals($parts[1]);
 						}
@@ -145,7 +155,7 @@ class CollectionProperty extends AbstractProperty {
 						// default case, we expect the member to hold a property
 						// with the same name and value as the current object
 						if (($property = $this->_parent->getProperty($value)) === false) {
-							throw new Exception("keyprop doesn't match any property");
+							throw new Exception("keyprop value doesn't match any property");
 						}
 						$this->_value->having($value)->equals($property->getValue());
 					}
