@@ -43,13 +43,7 @@ class CsvAdapter extends AbstractAdapter {
 	
 	protected $_context = 'Csv';
 	
-	protected $_allowedComponents = array();
-	
-	protected $_componentDependancies = array();
-
 	protected $_allowedEvents = array();
-	
-	protected $_displayContexts = array();
 	
 	protected $_componentsBasePath;
 	
@@ -59,50 +53,8 @@ class CsvAdapter extends AbstractAdapter {
 		$params = array();
 		$params['title'] = new Parameter(Parameter::STRING);
 		$this->_setParameterObjects($params);
-		
 		parent::__construct($parameters);
 	}
-	
-	
-	/**
-	 * Ajoute un composant externe à la page sous réserve que le fichier de référence existe
-	 *
-	 * @param string $file
-	 * @param string $type
-	 * @return boolean
-	 */
-    public function componentAdd($file, $type, $lib = null, $priority = 0)
-    {
-
-    }
-    
-    
-    public function mediaAdd($file, $lib = null)
-    {
-    }
-    
-    
-	/**
-	 * Ajout d'un événement à la vue
-	 *
-	 * @param string $event
-	 * @param string $type
-	 * @param boolean $isFile
-	 * @return boolean
-	 */
-    public function eventAdd($event, $type, $isFile = false)
-    {
-    }
-
-    
-    public function eventAttach()
-    {
-    }
-
-
-    protected function _renderComponents($type, $params = null)
-    {
-    }
 
     
     public function display()
@@ -112,7 +64,6 @@ class CsvAdapter extends AbstractAdapter {
     	
         header("Content-type: text/x-csv");
         header("Content-Disposition: attachment; filename=\"$filename\"");
-    	
     	return $this->_render();
     }
 
@@ -123,9 +74,7 @@ class CsvAdapter extends AbstractAdapter {
     	$elems = View::getObjects(View::PH_DEFAULT);
     	
     	if (is_array($elems)) {
-    		
     		foreach ($elems as $elem) {
-    		
 				$object = $elem[0];
     			$params = $elem[1];
     			    					
@@ -145,7 +94,6 @@ class CsvAdapter extends AbstractAdapter {
     			}
     		}
     	}
-
     	return $content;
     }
 }
