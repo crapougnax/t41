@@ -259,6 +259,10 @@ class PdfDefault extends AbstractPdfDecorator {
             		$p .= "<td$attrib>" . $column->getDisplayValue($this->_do) . '</td>';
             	} else {
 	            	$property = $this->_do->getProperty($column->getParameter('property'));
+	            	if (! $property) {
+	            		$pdf->Multicell($this->_colsWidth[$key], $this->_cellHeight, '??', 1, $this->_colsAlignment[$key], 0, $nextPos);
+	            		continue;
+	            	}
     	        	$column->setValue($property->getValue());
             	            	 
             		if ($column->getParameter('recursion')) {

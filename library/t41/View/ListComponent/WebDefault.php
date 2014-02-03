@@ -338,6 +338,11 @@ HTML;
             		continue;
             	}
             	$property = $this->_do->getProperty($column->getParameter('property'));
+            	if (! $property) {
+            		$p .= '<td>??</td>';
+            		continue;
+            	}
+            	
             	$column->setValue($property->getValue());
             	
             	/* if a decorator has been declared for property/element, use it */
