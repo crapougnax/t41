@@ -272,6 +272,12 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	public function resetSortings($property)
+	{
+		$this->_sortings = array();
+	}
+	
+	
 	/**
 	 * Sets a new sorting rule which is added to the previous, if any 
 	 * @param array|t41\ObjectModel\Property\AbstractProperty $property
