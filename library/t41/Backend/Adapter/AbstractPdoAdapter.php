@@ -170,6 +170,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		$this->_setLastQuery('insert', $recordSet['data']);
 		
+		
 		try {
 			$this->_connect();
 			$this->_ressource->insert($table, $recordSet['data']);
@@ -200,18 +201,19 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			if (! $property instanceof Property\CollectionProperty) {
 				continue;
 			}
-			
 			$collection = $property->getValue();
 			/* @var $member t41\ObjectModel\BaseObject */
 			foreach ($collection->getMembers() as $member) {
 				// @todo check that keyprop is set before
-				if (($prop = $member->getProperty($property->getParameter('keyprop'))) !== false) {
-					$prop->setValue($uri);
-				} else {
-					throw new Exception(sprintf("member of '%s' class missing '%s' property"
-										, $collection->getClass(), $property->getParameter('keyprop')));
+				if ($property->getParameter('keyprop')) {
+					if (($prop = $member->getProperty($property->getParameter('keyprop'))) !== false) {
+						$prop->setValue($uri);
+					} else {
+						throw new Exception(sprintf("member of '%s' class missing '%s' property"
+											, $collection->getClass(), $property->getParameter('keyprop')));
+					}
+					$member->save();
 				}
-				$member->save();
 			}
 		}
 		
@@ -554,8 +556,10 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				// @todo improve this part 
 				if (ObjectModel::getObjectBackend($property->getParameter('instanceof'))->getAlias() != $this->_uri->getAlias()) {
 					$clauses = $condition->getClauses();
-					$clauses[0]['operator'] = Condition::OPERATOR_ENDSWITH | Condition::OPERATOR_EQUAL;
-					$condition->setClauses($clauses);
+					if ($clauses[0]['value'] != Condition::NO_VALUE) {
+						$clauses[0]['operator'] = Condition::OPERATOR_ENDSWITH | Condition::OPERATOR_EQUAL;
+						$condition->setClauses($clauses);
+					}
 					$field = $this->_mapper ? $this->_mapper->propertyToDatastoreName($this->_class, $property->getId()) : $property->getId();
 				} else {
 					// which table to join with ? (in case of condition is last element of a recursion)
