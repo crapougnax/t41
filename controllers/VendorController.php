@@ -29,7 +29,7 @@ class t41_VendorController extends t41_AssetsController {
 	
 	public function __call($methodName, $args)
 	{
-		$params = array_slice($this->_getAllParams(),3,1);
+		$params = array_slice($this->_getAllParams(),3);
 
 		$segments = array(
 				Core::$t41Path,
@@ -41,8 +41,15 @@ class t41_VendorController extends t41_AssetsController {
 		$filepath = implode(DIRECTORY_SEPARATOR, $segments) . DIRECTORY_SEPARATOR;
 		$filename = current($params);
 			
-				$filepath = implode(DIRECTORY_SEPARATOR, $segments) . DIRECTORY_SEPARATOR;
-			$filename = str_replace(':', '/', current($params));
+			$filepath = implode(DIRECTORY_SEPARATOR, $segments) . DIRECTORY_SEPARATOR;
+			
+			if (strpos('.', current($params)) !== false) {
+				$filename = str_replace(':', '/', current($params));
+			} else if (current($params) == 'images') {
+				// tmp fix to allow images call from css declaration
+				$filename = substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], 'images'));
+			}
+			
 			$extension = substr($filename, strrpos($filename,'.')+1);
 			
 			if (! array_key_exists($extension, $this->_mimetypes)) {
