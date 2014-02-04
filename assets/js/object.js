@@ -227,7 +227,10 @@ if (! window.t41.object) {
 	};
 	
 	
-	window.t41.object.delete = function() {
+	/**
+	 * @deprecated conflicts in IE 8/9
+	 */
+	window.t41.object._delete = function() {
 		var src = t41.view.caller;
 		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
 		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
@@ -238,7 +241,7 @@ if (! window.t41.object) {
 	
 	window.t41.object.remove = function() {
 		var src = t41.view.caller;
-		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
+		t41.view._data = {uuid:src.data('uuid'), member:src.data('member'), id:src.data('id')};
 		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
 
 		t41.view._alert = t41.view.alert.confirm("Veuillez confirmer la suppression",{confirm:t41.object.retDelete});
