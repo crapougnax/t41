@@ -53,7 +53,7 @@ class WebDefault extends AbstractWebDecorator {
 	
 	protected function _renderField($name, $value = null, $prefix = null, $boundaries = true)
 	{
-		$id = 't41_' . md5($name);
+		$id = 't41_' . $this->_obj->getId();
 		$dispField = 'disp_' . $id;
 		
 		$pickerArgs = array( 'dateFormat'	=> 'dd/mm/yy'
@@ -63,6 +63,7 @@ class WebDefault extends AbstractWebDecorator {
 							,'altField'		=> '#' . $id
 							,'altFormat'	=> 'yy-mm-dd'
 							,'monthNames'	=> array('Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre')
+							,'monthNamesShort'=> array('Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sept', 'Oct', 'Nov', 'Déc')
 							,'dayNames'		=> array('Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi')
 							,'dayNamesMin'	=> array('Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam')	
 						   );
@@ -91,7 +92,7 @@ class WebDefault extends AbstractWebDecorator {
 						
 		$dispValue = $value ? $this->_obj->formatValue($value, (bool) $this->getParameter(Property::CONSTRAINT_PROTECTED)) : null;
 		
-		$html .= sprintf('<input type="text" id="%s" value="%s" size="10" maxlength="10"/>'
+		$html .= sprintf('<input type="text" id="%s" value="%s" size="10" maxlength="10" readonly="readonly" style="color:grey;"/>'
 						, $dispField
 						, $dispValue
 						);
