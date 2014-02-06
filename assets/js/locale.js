@@ -99,6 +99,7 @@ if (! window.t41.locale) {
 		form:{
 			saveok:"Successfully saved",
 			fielderr:"Required value for",
+			emailerr:"is not a valid email address",
 			savenew:"Save & New"
 		}
 	};
@@ -142,6 +143,7 @@ if (! window.t41.locale) {
 		form:{
 			saveok:"Sauvegarde effectuée",
 			fielderr:"Valeur requise pour le champ",
+			emailerr:"n'est pas une adresse mél valide",
 			savenew:"Sauvez & Nouveau"
 		}
 	};

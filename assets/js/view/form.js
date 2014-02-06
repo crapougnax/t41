@@ -36,6 +36,8 @@ window.t41.view.form = function(id,obj,form) {
 	
 	this.labels = {submit:t41.lget('save'), cancel:t41.lget('cancel'), savenew:t41.lget('form:savenew')};
 	
+	this.patterns = {email:new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i)};
+	
 	/**
 	 * List of redirection URL
 	 */
@@ -164,6 +166,13 @@ window.t41.view.form = function(id,obj,form) {
 				continue;
 			}
 			
+			if (field.constraints.emailaddress) {
+			    if (this.patterns.email.test(value) == false) {
+					errors[errors.length] = {msg:'"' + value + '" ' + t41.lget('form:emailerr'),field:i};
+					continue;
+			    }
+			}
+			
 			// @todo replace currencyElement with constant
 			if (value && field.type == 'currencyElement') {
 				value = value.replace(',','.');
@@ -176,7 +185,6 @@ window.t41.view.form = function(id,obj,form) {
 		if (errors.length > 0) {
 			for (var i in errors) {
 				var _element = jQuery('#elem_' + errors[i].field);
-				console.log(_element);
 				var span = document.createElement('span');
 				span.setAttribute('class', 'error');
 				span.innerHTML = errors[i].msg;
