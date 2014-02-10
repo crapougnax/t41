@@ -263,6 +263,12 @@ if (! window.t41.view) {
 	 */
 	window.t41.view.link = function(value, obj) { 
 		if (value.substring(0,1) == '/' ||  value.substring(0,4) == 'http') {
+            if (obj) {
+                if (obj.hasClass('blank')) {
+                    window.open(value, '_blank');
+                    return;
+                }
+            }
 			document.location = value; 
 		} else {
 			if (obj) {
