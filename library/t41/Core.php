@@ -53,6 +53,9 @@ class Core {
 
 	
 	const ENV_STAGE	= 'stage';
+
+	
+	const ENV_FORM	= 'formation';
 	
 	
 	/**
