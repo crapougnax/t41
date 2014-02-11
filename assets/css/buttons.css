@@ -19,7 +19,7 @@
 
 /*.t41 a.element.button*/
 
-.t41 a.button, a.button.t41, a.button.element:hover{
+.t41 a.button, a.button.t41, a.button.element:hover, a.button.element:focus {
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
@@ -56,7 +56,7 @@
 }
 
 /*.t41 a.element.button:hover*/
-.t41 a.button:hover, a.button.t41:hover, a.button.element:hover{
+.t41 a.button:hover, a.button.t41:hover, a.button.element:hover, a.button.element:focus {
 	background: -moz-linear-gradient(
 		center top,
 		rgba(255, 255, 255, .6) 0%,

@@ -331,6 +331,13 @@ window.t41.view.form = function(id,obj,form) {
 	if (this.form.params && this.form.params.buttons != false) {
 		this.addButtons(jQuery(this.formId + ' .form_actions'));
 	}
+	
+	// add tabindex to each field and button
+	tb = 1000;
+	jQuery(this.formId + ' a>span,:input,select').each(function(i,o) { 
+		jQuery(o).attr('tabindex',tb);tb+=100;
+	});
+	
 };
 
 
