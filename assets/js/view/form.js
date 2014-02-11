@@ -62,6 +62,11 @@ window.t41.view.form = function(id,obj,form) {
 	};
 	
 	
+	this.toggleButtons = function() {
+		jQuery('#' + id + ' .form_actions').fadeToggle();
+	};
+	
+	
 	this.redirector = function(status) {
 		switch (status) {
 		
@@ -195,7 +200,7 @@ window.t41.view.form = function(id,obj,form) {
 		} else {
 			
 			// deactivate buttons
-			jQuery('#' + id + ' .form_actions').fadeOut();
+			this.toggleButtons();
 			
 			formdata['uuid'] = this.form.uuid;
 			formdata['objuuid'] = this.obj.uuid;
@@ -271,7 +276,7 @@ window.t41.view.form = function(id,obj,form) {
 				window.location.href = this.redirects.redirect_nok;
 			} else {
 				// reactivate buttons
-				jQuery('#' + this.id + '.form_actions').fadeIn();
+				this.toggleButtons();
 			}
 		}
 	};
