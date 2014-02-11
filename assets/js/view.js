@@ -44,8 +44,6 @@ if (! window.t41.view) {
 		var button = document.createElement('a');
 		button.setAttribute('title', label);
 		button.setAttribute('href', '');
-		//var ndate = new Date();
-		//button.setAttribute('tabindex', ndate.getMilliseconds());
 		if (options.id) button.setAttribute('id',options.id);
 		
 		if (! options.size) options.size = t41.view.size;
