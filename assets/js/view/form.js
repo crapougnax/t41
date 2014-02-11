@@ -333,9 +333,12 @@ window.t41.view.form = function(id,obj,form) {
 	}
 	
 	// add tabindex to each field and button
-	tb = 1000;
-	jQuery(this.formId + ' a>span,:input,select').each(function(i,o) { 
-		jQuery(o).attr('tabindex',tb);tb+=100;
+	tb = 100;
+	var selector = this.formId + ' :input,select,a';
+	// fix for Mozilla Bug #338035
+	if (jQuery.browser.mozilla == true) selector += '>span';
+	jQuery(selector).each(function(i,o) { 
+		jQuery(o).attr('tabindex',tb);tb+=10;
 	});
 	
 };
