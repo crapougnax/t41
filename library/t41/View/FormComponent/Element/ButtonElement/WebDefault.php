@@ -40,30 +40,24 @@ class WebDefault extends AbstractWebDecorator {
 	public function render()
 	{
 		// add CSS libraries
-		View::addCoreLib('sprites.css');
-		View::addCoreLib('buttons.css');
+		View::addCoreLib(array('sprites.css','buttons.css'));
 		
 		$extraHtml = array();
-		$class = array('element');
+		$class = explode(' ', $this->getParameter('css'));
 		if ($this->getParameter('nolabel') != true) $class[] = 'button';
 		if ($this->getParameter('size')) $class[] = $this->getParameter('size');
 		
 		/* bind optional action to button */
 		if ($this->_obj->getAction()) {
-		
 			$this->_bindAction($this->_obj->getAction());
-			
 		} else if ($this->_obj->getLink()) {
-			
 			$link = $this->_obj->getLink();
-
 			$uri = $this->_obj->getParameter('uri');
 			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') $link .= '/id/' . rawurlencode($uri->getIdentifier());
 			
 			$extraHtml[] = sprintf("onclick=\"t41.view.link('%s', jQuery('#%s'))\"", $link, $this->getId());
 			
 		} else {
-			
 			$data = $this->getParameter('data');
 			$adapter = ViewUri::getUriAdapter();
 			$args = array();
