@@ -8,7 +8,7 @@ if (! window.t41.core) {
 
 (function() {
 	
-	window.t41.core = {version:'0.1.0', backend:'/rest', transparent:false, enableGA:false, cookies:false, none:'_NONE_'};
+	window.t41.core = {version:'0.1.0', backend:'/rest', transparent:false, enableGA:false, cookies:false, none:'_NONE_', tabindex:100};
 	window.t41.core.status = {ok:'OK',nok:'NOK',err:'ERR',abort:'ABORT'};
 
 	/* t41 libraries declaration */
