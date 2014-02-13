@@ -44,11 +44,12 @@ class CurrencyProperty extends AbstractProperty {
 	
 	public function getDisplayValue()
 	{
-		return self::format($this->_value);
+		$precision = $this->getParameter('constraints.precision') != false ? $this->getParameter('constraints.precision') : 2;
+		return self::format($this->_value, $precision);
 	}
 	
 	
-	static public function format($value, $precision = 2)
+	static public function format($value, $precision = 4)
 	{
 		setlocale(LC_MONETARY, 'fr_FR.UTF-8');
 		$format = '%.' . $precision . 'n';
