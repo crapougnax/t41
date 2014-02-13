@@ -215,7 +215,11 @@ class WebDefault extends AbstractWebDecorator {
     {
     	$params = $button->getDecoratorParams();
     	$params['size'] = 'medium';
-    	$params['data'] = array('member' => $this->_key, 'uuid' => $this->_uuid);
+    	$params['data'] = array(
+    							'member' => $this->_key, 
+    							'uuid' => $this->_uuid ,
+    							'id' => $this->_do->getUri() ? $this->_do->getUri()->getIdentifier() : null
+    						   );
     	$deco = View\Decorator::factory($button, $params);
     	return $deco->render();
     }
@@ -293,9 +297,9 @@ HTML;
         }
 
         if (count($this->_obj->getEvents('row')) > 0) {
-        	$line .= '<th>&nbsp;</th>';
+        	$line .= '<th class="tb-actions">&nbsp;</th>';
         } else {
-        	$line .= '<th>&nbsp;</th>';
+        	$line .= '<th class="tb-actions">&nbsp;</th>';
         }
         
         return $line . "</tr>\n";
@@ -396,7 +400,7 @@ HTML;
             	$p .= "<td$attrib>" . $value . '</td>';
             }
 
-            $p .= '<td>';
+            $p .= '<td class="tb-actions">';
             foreach ($this->_obj->getEvents('row') as $button) {
             	$button->setParameter('uri', $this->_do->getUri());
                 $p .= $this->_renderButton($button);
