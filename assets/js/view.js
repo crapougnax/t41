@@ -43,7 +43,7 @@ if (! window.t41.view) {
 		// create <a> element
 		var button = document.createElement('a');
 		button.setAttribute('title', label);
-		button.setAttribute('href', '');
+		button.setAttribute('href', '#');
 		if (options.id) button.setAttribute('id',options.id);
 		
 		if (! options.size) options.size = t41.view.size;
@@ -439,7 +439,8 @@ if (! window.t41.view) {
 		
 		this.addContent = function(obj) {
 			if (this.domObject) {
-				jQuery(this.domObject).append(obj);
+				console.log(this.domObject);
+				jQuery(this.domObject).find('.content').append(obj);
 			} else {
 				this.content += obj;
 			}
