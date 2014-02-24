@@ -259,13 +259,13 @@ window.t41.view.form = function(id,obj,form) {
 							baseurl += jQuery('#' + this.redirects.redirect_ok[1][i]).val();
 						}
 					}
-					window.location.href = baseurl;
+					document.location.replace(baseurl);
 				} else {
 					if (this.redirects.redirect_ok == t41.core.none) {
 						jQuery('#' + id + ' .form_actions').fadeIn();
 						new t41.view.alert(t41.locale.get('form:saveok'), {timer:3});
 					} else {
-						window.location.href = this.redirects.redirect_ok;
+						document.location.replace(this.redirects.redirect_ok);
 					}
 				}
 			}
@@ -273,7 +273,7 @@ window.t41.view.form = function(id,obj,form) {
 			var params = this.redirects && this.redirects.redirect_nok ? {defer:true} : {timer:10};
 			new t41.view.alert("Erreur lors de la sauvegarde", params);
 			if (this.redirects && this.redirects.redirect_nok){
-				window.location.href = this.redirects.redirect_nok;
+				document.location.replace(this.redirects.redirect_nok);
 			} else {
 				// reactivate buttons
 				this.toggleButtons();
