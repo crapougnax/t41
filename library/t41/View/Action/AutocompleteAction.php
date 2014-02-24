@@ -64,6 +64,9 @@ class AutocompleteAction extends AbstractAction {
 	protected $_parsedDisplay;
 	
 	
+	protected $_parsedSearchDisplay;
+	
+	
 	public $queryfield = '_query';
 	
 	
@@ -130,7 +133,6 @@ class AutocompleteAction extends AbstractAction {
 		$data = array();
 		
 		$combo = $this->_obj->having(Condition::MODE_AND);
-		
 		foreach ($this->getParameter('searchprops') as $property) {
 			
 			switch ($this->getParameter('searchmode')) {
@@ -159,10 +161,10 @@ class AutocompleteAction extends AbstractAction {
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
 
 		$this->_obj->find(ObjectModel::MODEL);
-//		var_dump(\t41\Backend::getLastQuery()); die;
+		//$this->_obj->debug();
 		
 		if ($this->_obj->find(ObjectModel::MODEL) === false) {
-		//	return false;
+			return false;
 		}
 		
 		foreach ($this->_obj->getMembers() as $member) {
@@ -197,6 +199,7 @@ class AutocompleteAction extends AbstractAction {
 	
 		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());
 	}
+
 	
 	public function getDisplay()
 	{
@@ -212,8 +215,6 @@ class AutocompleteAction extends AbstractAction {
 		
 				$property = $do->getRecursiveProperty($propId);
 				if (! $property instanceof Property\AbstractProperty) {
-					//\Zend_Debug::dump($propId);
-					//\Zend_Debug::dump($property); die;
 					continue;
 				}
 		
@@ -229,10 +230,40 @@ class AutocompleteAction extends AbstractAction {
 	}
 	
 	
+	public function getSearchDisplay()
+	{
+		if (! $this->_parsedSearchDisplay) {
+	
+			// @todo get propertys from objects and collection properties
+			$this->_parsedSearchDisplay = array();
+				
+			/* @var $do t41\ObjectModel\DataObject */
+			$do = $this->_obj->getDataObject();
+				
+			foreach ($this->getParameter('sdisplay') as $propId) {
+	
+				$property = $do->getRecursiveProperty($propId);
+				if (! $property instanceof Property\AbstractProperty) {
+					continue;
+				}
+	
+				if (strstr($propId, '.')) {
+					$propId = '_' . $propId;
+				}
+	
+				$this->_parsedSearchDisplay[$propId] = $property->reduce();
+			}
+		}
+	
+		return $this->_parsedSearchDisplay;
+	}
+	
+	
 	public function reduce(array $params = array())
 	{
 		$array = parent::reduce($params);
 		$array['data']['display'] = $this->getDisplay();
+		$array['data']['sdisplay'] = $this->getSearchDisplay();
 		
 		return $array;
 	}

@@ -145,6 +145,10 @@ class DefaultAdapter extends AbstractAdapter {
 						$element->setParameter('search', $property->getParameter('search'));
 					}
 
+					if ($property->getParameter('sdisplay')) {
+						$element->setParameter('sdisplay', $property->getParameter('sdisplay'));
+					}
+					
 					$element->setCollection($collection);
 				}
 				break;

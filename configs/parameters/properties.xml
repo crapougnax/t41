@@ -45,6 +45,10 @@
 					<type>string</type>
 					<protected>false</protected>
 				</parameter>
+				<parameter id="sdisplay">
+					<type>string</type>
+					<protected>false</protected>
+				</parameter>
 				<parameter id="display">
 					<type>string</type>
 					<protected>false</protected>

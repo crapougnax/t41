@@ -143,6 +143,9 @@
 				<parameter id="search" type="string">
 					<bogus/>
 				</parameter>
+				<parameter id="sdisplay" type="string">
+					<bogus/>
+				</parameter>
 				<parameter id="display" type="string">
 					<bogus/>
 				</parameter>
@@ -211,6 +214,9 @@
 		<object id="t41\View\Action\AutocompleteAction" extends="t41\View\Action\AbstractAction">
 			<parameters>
 				<parameter id="search" type="array">
+				<bogus/>
+				</parameter>
+				<parameter id="sdisplay" type="array">
 				<bogus/>
 				</parameter>
 				<parameter id="display" type="array">

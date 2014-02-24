@@ -69,6 +69,7 @@ class WebAutocomplete extends AbstractWebDecorator {
 		$action->setParameter('searchprops', explode(',', $this->getParameter('searchprops') ? $this->getParameter('searchprops') : $objsearchprops));
 		$action->setParameter('searchmode', $this->getParameter('searchmode'));
 		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
+		$action->setParameter('sdisplay', explode(',', $this->_obj->getParameter('sdisplay') ? $this->_obj->getParameter('sdisplay') : $this->_obj->getParameter('display')));
 		$action->setParameter('event', 'keyup');
 		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
 		$action->setContextData('target', $this->_nametoDomId($name));

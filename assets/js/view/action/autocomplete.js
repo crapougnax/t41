@@ -24,6 +24,8 @@ if (! window.t41.view.action.autocomplete) {
 		 */
 		this.display = obj.data.display;
 		
+		this.sdisplay = obj.data.sdisplay;
+		
 		// real (hidden) field target
 		this.target = obj.data.target;
 
@@ -127,7 +129,6 @@ if (! window.t41.view.action.autocomplete) {
 			
 			if (size == 1 && this.options.defaultSelect == true) {
 				// display directly unique value returned by query
-				console.log('coucouc');
 				for (var id in this.currentSuggestions) {
 					this.defaultSelect(id);
 					return true;
@@ -222,7 +223,7 @@ if (! window.t41.view.action.autocomplete) {
 		this._displayAsTable = function() {
 			
 			this.table = new t41.view.table({
-				'display': this.display,
+				'display': this.sdisplay ? this.sdisplay : this.display,
 				'collection': this.currentSuggestions,
 				'id': this.props+'_table'
 			});
