@@ -75,7 +75,10 @@ if (! window.t41.object) {
 			for (var i in data) {
 			
 				//console.log(data[i]);
-				this.properties[i] = new t41.object.data.property(data[i].type, data[i].uuid ? data[i] : data[i].value);
+				this.properties[i] = new t41.object.data.property(data[i].type, 
+																  data[i].uuid ? data[i] : data[i].value,
+																  data[i].label
+																 );
 				
 				// register object display value
 				if (data[i].uuid && typeof data[i].value == 'string') this.properties[i].display = data[i].value;
@@ -103,8 +106,7 @@ if (! window.t41.object) {
 	/**
 	 * Property handler
 	 */
-	window.t41.object.data.property = function(type, val) {
-		
+	window.t41.object.data.property = function(type, val, label) {
 		
 		// store display value (for objects)
 		this.display;
@@ -159,6 +161,7 @@ if (! window.t41.object) {
 		
 		// constructor
 		this.type = type;
+		this.label = label;
 		this.set(val);
 	};
 	
@@ -231,6 +234,9 @@ if (! window.t41.object) {
 	 * @deprecated conflicts in IE 8/9
 	 */
 	window.t41.object._delete = function() {
+		
+		return t41.object.remove();
+		
 		var src = t41.view.caller;
 		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
 		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
@@ -244,7 +250,7 @@ if (! window.t41.object) {
 		t41.view._data = {uuid:src.data('uuid'), member:src.data('member'), id:src.data('id')};
 		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
 
-		t41.view._alert = t41.view.alert.confirm("Veuillez confirmer la suppression",{confirm:t41.object.retDelete});
+		t41.view._alert = t41.view.alert.confirm(t41.lget('confirm:remove'),{confirm:t41.object.retDelete});
 	};
 	
 	
@@ -258,7 +264,7 @@ if (! window.t41.object) {
 					break;
 				
 				default:
-					new t41.view.alert("Erreur à la suppression");
+					new t41.view.alert(t41.lget('err:remove'));
 					break;
 			}
 			return;

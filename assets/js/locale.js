@@ -74,7 +74,8 @@ if (! window.t41.locale) {
 		confirm:{
 			button:'Confirm',
 			title:'Confirmation Request',
-			message:"Please confirm the demanded action"
+			message:"Please confirm the demanded action",
+			remove:"Please confirm the removing of chosen element"
 		},
 		wd:{ // weekdays
 			sunday:'Sunday',
@@ -94,7 +95,8 @@ if (! window.t41.locale) {
 		},
 		err:{
 			lbl_srv:'Server Error',
-			bkd:'Server error, please refresh the page'
+			bkd:'Server error, please refresh the page',
+			remove:"An error occured while removing element"
 		},
 		form:{
 			saveok:"Successfully saved",
@@ -118,7 +120,8 @@ if (! window.t41.locale) {
 		confirm:{
 			button:'Confirmer',
 			title:'Demande de confirmation',
-			message:"Veuillez confirmer l'action demandée"
+			message:"Veuillez confirmer l'action demandée",
+			remove:"Veuillez confirmer la suppression de l'élément sélectionné"
 		},
 		wd:{
 			sunday:'Dimanche',
@@ -138,7 +141,8 @@ if (! window.t41.locale) {
 		},
 		err:{
 			lbl_srv:'Une erreur a été signalée par le serveur',
-			bkd:'Erreur serveur, veuillez rafraîchir la page'
+			bkd:'Erreur serveur, veuillez rafraîchir la page',
+			remove:"Erreur lors de la suppression"
 		},
 		form:{
 			saveok:"Sauvegarde effectuée",

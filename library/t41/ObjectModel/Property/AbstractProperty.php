@@ -345,6 +345,6 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	{
 		$class = get_class($this);
 		$type = str_replace('Property','', substr($class, strrpos($class, '\\')+1));
-		return array_merge(parent::reduce($params, $cache), array('value' => $this->getValue(), 'type' => $type));
+		return array_merge(parent::reduce($params, $cache), array('value' => $this->getValue(), 'type' => $type, 'label' => $this->getLabel()));
 	}
 }
