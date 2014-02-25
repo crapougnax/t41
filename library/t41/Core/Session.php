@@ -24,6 +24,7 @@ namespace t41\Core;
 
 use t41\Core;
 use t41\ObjectModel\BaseObject;
+use t41\Backend\Adapter\AbstractAdapter;
 
 /**
  * Simple session handler
@@ -55,7 +56,7 @@ class Session extends BaseObject {
 	}
 	
 	
-	public function save($backend = null)
+	public function save(AbstractAdapter $backend = null)
 	{
 		if (is_null($backend)) {
 			$this->setKey(Core::cacheSet($this, $this->getKey(), true, array('tags' => 'session')));
