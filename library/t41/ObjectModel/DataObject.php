@@ -528,7 +528,7 @@ class DataObject extends ObjectModelAbstract {
     				}
     				
     				if ($value && $value != Property::EMPTY_VALUE) {
-    					if (get_class($value) == $property->getParameter('instanceof')) {
+    					if (is_object($value) && get_class($value) == $property->getParameter('instanceof')) {
     						$property->setValue($value);
     					} else if (substr($value, 0, 4) == 'obj_') {
     						// get object from cache
