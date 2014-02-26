@@ -386,7 +386,7 @@ class WebAdapter extends AbstractAdapter {
     				break;
     				    				
     			case 'env':
-    				$content = Core::htmlEncode(View::getEnvData($tag[2]));
+    				$content = htmlspecialchars(View::getEnvData($tag[2]));
     				break;
     		}
     		
@@ -407,17 +407,12 @@ class WebAdapter extends AbstractAdapter {
     	    if (count($errors) > 0) {
         	
         		$str = "\n";
-        	
         		foreach ($errors as $errorCode => $errorbloc) {
-        		
         			$str .= $errorCode . "\n";
-        		
         			foreach ($errorbloc as $error) {
-        			
         				$str .= "\t" . $error[0] . "\n";
         			}
         		}
-        	
         		$template = str_replace('</body>', '</body><!--' . $str . ' -->' , $template);
         	}
         }
