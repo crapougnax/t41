@@ -46,4 +46,18 @@ class ArrayProperty extends AbstractProperty {
 		}
 		parent::setValue($value);
 	}
+	
+	
+	public function getValue($key = null)
+	{
+		if (is_null($key)) {
+			return parent::getValue();
+		} else {
+			if (isset($this->_value[$key])) {
+				return $this->_value[$key];
+			} else {
+				return false;
+			}
+		}
+	}
 }
