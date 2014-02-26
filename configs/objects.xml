@@ -4,7 +4,10 @@
 		<object id="t41\Core\BaseUser">
 			<properties>
 				<property id="label" type="string">
-					<label>Name</label>
+					<label>
+						<label lang="en">Name</label>
+						<label lang="fr">Nom</label>
+					</label>
 				</property>
 			</properties>
 		</object>
@@ -48,7 +51,7 @@
 					<display>label</display>
 					<instanceof>t41\Core\Acl\Role</instanceof>
 				</property>
-				<property id="data" type="array">
+				<property id="sessiondata" type="array">
 					<label>Data</label>
 				</property>
 			</properties>
