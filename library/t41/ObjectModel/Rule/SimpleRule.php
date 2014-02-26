@@ -43,43 +43,32 @@ class SimpleRule extends AbstractRule {
 	 *  @param t41\ObjectModel\Property\AbstractProperty $obj
 	 *  @return boolean
 	 */
-	public function execute(Property\AbstractProperty $property)
+	public function execute(Property\AbstractProperty $property = null)
 	{
 		$do = $this->_object->getDataObject();
 		
 		try {
-			
 			$source = $this->_source->getValue();
 			
 			/* get source value */
 			if (! $this->_source->isMethod()) {
-	
-
 				throw new Exception("Source must be a method or a function");
 			}
 
 			// recursion
 			if (strstr($source, '.') !== false) {
-
 				$parts = explode('.', $source);
 				foreach ($parts as $part) {
-						
 					$property = $do->getProperty($part);
-						
 					if ($property instanceof Property\AbstractProperty) {
-							
 						if ($property->getValue() instanceof ObjectModel\ObjectModelAbstract){
-								
 							$obj = $property->getValue();
 						}
-							
 					} else {
-								
 						$source = $part;
 					}
 				}
 			} else {
-					
 				$obj = $this->_object;
 			}
 
@@ -90,7 +79,6 @@ class SimpleRule extends AbstractRule {
 			 */
 				
 			if ($obj instanceof ObjectModel\Collection && $this->_object->getUri() == null) {
-					
 				return;
 			}
 				
@@ -100,10 +88,8 @@ class SimpleRule extends AbstractRule {
 			
 			/* @todo log exception */
 			$this->_object->setStatus('Exception executing rule: ' . $e->getMessage(), 0, array('rule' => __CLASS____));
-			
 			return false;
 		}
-		
 		return true;
 	}
 }

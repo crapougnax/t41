@@ -43,7 +43,7 @@ class CopyRule extends AbstractRule {
 	 *  @param t41\ObjectModel\Property\AbstractProperty $obj
 	 *  @return boolean
 	 */
-	public function execute(Property\AbstractProperty $property)
+	public function execute(Property\AbstractProperty $property = null)
 	{
 		$do = $this->_object->getDataObject();
 		

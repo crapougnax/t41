@@ -104,7 +104,7 @@ abstract class AbstractRule extends ObjectModel\ObjectModelAbstract implements R
 	}
 	
 	
-	public function execute(Property\AbstractProperty $property)
+	public function execute(Property\AbstractProperty $property = null)
 	{
 		return true;
 	}
