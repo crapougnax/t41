@@ -17,20 +17,20 @@ namespace t41\View\Adapter;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2014 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 865 $
  */
 
-use t41\View,
-	t41\Core;
+use t41\View;
+use t41\Core;
+use t41\Parameter;
 
 /**
  * Class providing the view engine with a Web context adapter.
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2014 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class WebAdapter extends AbstractAdapter {
@@ -55,7 +55,7 @@ class WebAdapter extends AbstractAdapter {
 	public function __construct(array $parameters = null)
 	{
 		$this->_setParameterObjects(array(
-			'js_documentready' => new \t41\Parameter(\t41\Parameter::BOOLEAN, true)
+			'js_documentready' => new Parameter(Parameter::BOOLEAN, true)
 		));
 		parent::__construct($parameters);
 	}
@@ -70,8 +70,10 @@ class WebAdapter extends AbstractAdapter {
 	 */
     public function componentAdd($file, $type, $lib = null, $priority = 0)
     {
-        if (!in_array($type, $this->_allowedComponents)) return false;
-
+        if (! in_array($type, $this->_allowedComponents)) {
+    		return false;
+    	}
+    	
         if (substr($file, 0, 4) != 'http' && substr($file, 0, 4) != '/t41') {
 	        if ($lib) {
 		        $filePath = '/lib/' . $lib . '/' . $type . '/' . $file . '.' . $type;
@@ -82,11 +84,23 @@ class WebAdapter extends AbstractAdapter {
         	$filePath = $file;
         }
         
-        // return true if component is already listed
-        if (in_array($filePath, $this->_component[$type])) return false;
+        // return false if component is already listed
+        if (in_array($filePath, $this->_component[$type])) {
+        	return false;
+        }
 
         if (substr($filePath, 0, 4) == 'http' || substr($filePath, 0, 4) == '/t41') {
-        
+        	if (($cacheassets = Core::getEnvData('cache_assets')) != false) {
+	        	if (strstr($filePath, '/t41/') !== false) {
+    	    		$filePath = $this->minify($filePath, $cacheassets);
+	        	}
+        	}
+        	
+        	// return false if component is already listed
+        	if (in_array($filePath, $this->_component[$type])) {
+        		return false;
+        	}
+        	
         	if ($priority == -1) {
         		array_unshift($this->_component[$type], $filePath);
         	} else {
@@ -94,22 +108,18 @@ class WebAdapter extends AbstractAdapter {
         	}
            
         } else if (file_exists(Core::$basePath . $this->_componentsBasePath . $filePath)) {
-
             if ($priority == -1) {
         		array_unshift($this->_component[$type], $filePath);
         	} else {
 	           $this->_component[$type][] = $filePath;
         	}
-        	
            if (isset($this->_componentDependancies[$type])) {
-           	
            		foreach ($this->_componentDependancies[$type] as $chainedType) {
            			$this->componentAdd($file, $chainedType, $lib, $priority);
            		}
            }
            return true;
         }
-
         return false;
     }
     
@@ -248,29 +258,22 @@ class WebAdapter extends AbstractAdapter {
     	if (! isset($this->_component[$type])) {
     		return '';
     	}
-    	
-    	$components = $this->_component[$type]; // t41_View::getRequiredLibs($type);
-    	
-/*    	if (! isset($this->_component[$type]) || count($this->_component[$type]) == 0) {
-    		return null; 
-    	}
-*/
+    	 
+    	$components = $this->_component[$type];
+
     	if (count($components) == 0) return null;
     	    	
     	if ($params) { // params come as a pseudo json string
-    		
     		$params = \Zend_Json::decode('{' . $params . '}');
-    		
     		$baseUrl = sprintf('http%s://%s', $_SERVER['SERVER_PORT'] == 443 ? 's' : null, $_SERVER['SERVER_NAME']);
     	}
     	
     	$html = '';
     	
     	foreach ($components as $component) {
-    		
     	    if (isset($params['fullUrl']) && $params['fullUrl'] == true && substr($component, 0, 4) != 'http') {
-    				$component = $baseUrl . $component;
-    			}
+    			$component = $baseUrl . $component;
+    		}
     	
     		switch ($type) {
     			
@@ -283,25 +286,69 @@ class WebAdapter extends AbstractAdapter {
     				break;
     		}
     	}
-    	
     	return $html;
     }
 
     
+    /**
+     * Minify and cache JS & CSS files
+     * @param string $file
+     * @param string configuration string fs path ; web path (ex: html/cache;cache)
+     * @return string web uri of cached file in case of success, $file in case of failure
+     */
+    public function minify($file, $confstr)
+    {
+    	$confstr = explode(';', $confstr);
+    	$cachedir = Core::$basePath . $confstr[0];
+    	if (substr($cachedir,-1) != DIRECTORY_SEPARATOR) $cachedir .= DIRECTORY_SEPARATOR;
+    	
+    	$ext = substr($file,strrpos($file,'.')+1);
+    	 
+    	if (strstr($file, '/core/')) {
+    		$filepath = Core::$basePath . 'vendor/quatrain' . str_replace(array(':','core/'), array('/',''), $file);
+    		$prefix = 'core';
+    	} else if (strstr($file, '/vendor/')) {
+    		$filepath = Core::$basePath . 'vendor/quatrain' . $file;
+    		$prefix = 'vendor';
+    	} else {
+    		$filepath = substr_replace($file, '/assets/' . $ext, strrpos($file, '/'), -strlen(substr($file,strrpos($file,'/'))));
+    		$filepath = Core::$basePath . str_replace('/t41/app', 'application/modules/', $file);
+    		$prefix = 'app';
+    	}
+    	
+    	clearstatcache(true,$filepath);
+    	if (file_exists($filepath)) {
+    		$md5 = filemtime($filepath); //md5_file($file);
+    		$basecached = substr($filepath, strrpos($filepath, '/')+1, strrpos($filepath,'.')-strlen($filepath));
+    		$cached = $prefix . '/' . $basecached . '-' . $md5 . '.' .$ext;
+    		if (! file_exists($basecached . $cached)) {
+    			// remove possible previous outdated file(s)
+    			foreach (glob($cachedir . $basecached . '-*.' . $ext) as $oldfile) {
+    				unlink($oldfile);
+    			}
+    			require_once 'vendor/tedivm/jshrink/src/JShrink/Minifier.php';
+    			$shrinked = $ext == 'css' || $prefix == 'vendor' ? file_get_contents($filepath) : \JShrink\Minifier::minify(file_get_contents($filepath), array('flaggedComments' => false));
+    			file_put_contents($cachedir . $cached, $shrinked);
+    		}
+    		$file = $confstr[1];
+    		if (substr($file, 0, 1) != DIRECTORY_SEPARATOR) $file = DIRECTORY_SEPARATOR . $file;
+    		if (substr($file,-1) != DIRECTORY_SEPARATOR) $file .= DIRECTORY_SEPARATOR;
+    		$file .= $cached;
+    	}
+    	
+    	return $file;
+    }
+    
+    
     public function display($content = null, $error = false)
     {    	
     	if ($this->_template) {
-
     		if (View::getTheme('web')) {
-    			
     			$this->componentAdd(View::getTheme('web'), 'css', 't41');
     		}
-    		
     	    if (View::getColor('web')) {
-    			
     			$this->componentAdd(View::getColor('web'), 'css', 't41');
     		}
-    		    		
     		return $this->_render();
     	}
     }
@@ -316,7 +363,7 @@ class WebAdapter extends AbstractAdapter {
     	
     	preg_match_all($tagPattern, $template, $tags, PREG_SET_ORDER);
     	
-    	// PHASE 1 : analyse et interpretation des tags generant du contenu
+    	// PHASE 1: analyse et parsing of content-generating tags
     	foreach ($tags as $tag) {
 
     		$content = false;
@@ -330,38 +377,23 @@ class WebAdapter extends AbstractAdapter {
     					$helper = new $class;
     					$content = $helper->render();
     				} catch (Exception $e) {
-    					
-    					if (Core::getEnvData('Env') == Core::ENV_DEV) {
+    					if (Core::$env == Core::ENV_DEV) {
     						$content = $e->getMessage();
     					}
     				}
     				break;
     				
     			case 'container':
-    				
     				$elems = View::getObjects($tag[2]);
-    				
     				if (is_array($elems)) {
-    					
     					foreach ($elems as $elem) {
-    						
     						$object = $elem[0];
     						$params = $elem[1];
-
     						if (! is_object($object)) continue;
     						
-    						// on cherche d'abord à récupérer le décorateur par la voie "moderne"
-    						if (method_exists($object, 'getDecorator')) {
-    							
-    							try {
-    								$decorator = View\Decorator::factory($object, $params);
-        							$content .= $decorator->render();
-    							} catch (Exception $e) {
-    								
-    								$content .= 'ERREUR : ' . $e->getMessage() . $e->getTraceAsString() . "<br/>";
-    							}
-    							
-    						}
+    						// look for a custom decorator
+    						$decorator = View\Decorator::factory($object, $params);
+        					$content .= $decorator->render();
     					}
     				}
     				break;
@@ -374,9 +406,8 @@ class WebAdapter extends AbstractAdapter {
 
     	preg_match_all($tagPattern, $template, $tags, PREG_SET_ORDER);
     	
-        // PHASE 2 : analyse et interprétation des tags générants des liens vers des fichiers (js, css) ou l'affichage de variables d'environnement
+        // PHASE 2: analyze & parsing of other tags (components linking & env variables)
     	foreach ($tags as $tag) {
-
     		$content = null;
     		
     		switch ($tag[1]) {
@@ -386,10 +417,9 @@ class WebAdapter extends AbstractAdapter {
     				break;
     				    				
     			case 'env':
-    				$content = htmlspecialchars(View::getEnvData($tag[2]));
+    				$content = View::getEnvData($tag[2]);
     				break;
     		}
-    		
        		$template = str_replace($tag[0], $content, $template);
     	}	
 
@@ -401,11 +431,8 @@ class WebAdapter extends AbstractAdapter {
         
         // PHASE 5: display logged errors in dev mode
         if (Core::$env == Core::ENV_DEV) {
-        	
 	        $errors = View::getErrors();
-        
     	    if (count($errors) > 0) {
-        	
         		$str = "\n";
         		foreach ($errors as $errorCode => $errorbloc) {
         			$str .= $errorCode . "\n";
@@ -416,7 +443,6 @@ class WebAdapter extends AbstractAdapter {
         		$template = str_replace('</body>', '</body><!--' . $str . ' -->' , $template);
         	}
         }
-        
         return $template;
     }
 }
