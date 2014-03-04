@@ -92,50 +92,11 @@ class CsvDefault extends AbstractCsvDecorator {
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
     	
-    	
     	// set data source for environment
     	$this->_env = $this->_uriAdapter->getEnv();
     	
-        	// set query parameters from context
-    	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
-
-    	    foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			
-    			$field = str_replace("-",".",$field);
-
-    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
-    				
-    				if ($property instanceof MetaProperty) {
-    					$this->_collection->having($property->getParameter('property'))->contains($value);
-    				} else if ($property instanceof ObjectProperty) {
-    					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->equals($value);
-    				} else if ($property instanceof AbstractProperty) {
-    					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->contains($value);
-    				}
-	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
-    			}
-    		}
-    	}
-    	
-    	// set query sorting from context
-        if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
-        	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			$this->_collection->setSorting(array($field, $value));
-    		}
-    	}
-
-    	// define offset parameter value from context
-    	if (isset($this->_env[$this->_offsetIdentifier])) {
-    		$this->_obj->setParameter('offset', (int) $this->_env[$this->_offsetIdentifier]);
-    		$this->_collection->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
-    	}
-    	
     	$this->_collection->setBoundaryBatch(1000);
-    	
-        $this->_obj->query();
+        $this->_obj->query($this->_uriAdapter);
 
         $row = '';
         $sep = str_replace('\\t', "\011", ",");

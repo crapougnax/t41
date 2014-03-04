@@ -23,7 +23,6 @@ namespace t41\View;
  */
 
 use t41\ObjectModel\ObjectUri;
-use t41\ObjectModel\Property\CurrencyProperty;
 use t41\View\ListComponent\Element\MetaElement;
 
 use t41\ObjectModel;
@@ -32,6 +31,9 @@ use t41\View\ListComponent\Element;
 use t41\View\FormComponent\Element\ButtonElement;
 use t41\Core\Registry;
 use t41\ObjectModel\Property\ArrayProperty;
+use t41\ObjectModel\Property\AbstractProperty;
+use t41\ObjectModel\Property\CurrencyProperty;
+
 
 /**
  * Class providing data list objects
@@ -193,8 +195,62 @@ class ListComponent extends ViewObject {
     }
     
     
-    public function query()
+    public function query(ViewUri $uriAdapter)
     {
+    	$offsetIdentifier	= $uriAdapter->getIdentifier('offset');
+    	$sortIdentifier		= $uriAdapter->getIdentifier('sort');
+    	$searchIdentifier	= $uriAdapter->getIdentifier('search');
+    	 
+    	// try and restore cached search terms for the current uri
+    	$uriAdapter->restoreSearchTerms();
+    	
+    	$env = $uriAdapter->getEnv();
+    	 
+    	// set query parameters from context
+    	if (isset($env[$searchIdentifier]) && is_array($env[$searchIdentifier])) {
+    		foreach ($env[$searchIdentifier] as $field => $value) {
+    			$field = str_replace("-",".",$field);
+    	
+    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
+    				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
+    				if ($property instanceof Property\MetaProperty) {
+    					$this->_collection->having($property->getParameter('property'))->contains($value);
+    				} else if ($property instanceof Property\ObjectProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->equals($value);
+    				} else if ($property instanceof Property\DateProperty) {
+    					if (is_array($value)) {
+    						if (isset($value['from']) && ! empty($value['from'])) {
+    							$this->_collection->having($field)->greaterOrEquals($value['from']);
+    						}
+    						if (isset($value['to']) && ! empty($value['to'])) {
+    							$this->_collection->having($field)->lowerOrEquals($value['to']);
+    						}
+    					} else {
+    						$this->_collection->having($field)->equals($value);
+    					}
+    				} else if ($property instanceof Property\AbstractProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->contains($value);
+    				}
+    				$uriAdapter->setArgument($searchIdentifier . '[' . $field . ']', $value);
+    			}
+    		}
+    	}
+    	 
+    	// set query sorting from context
+    	if (isset($env[$sortIdentifier]) && is_array($env[$sortIdentifier])) {
+    		foreach ($env[$sortIdentifier] as $field => $value) {
+    			$this->_collection->setSorting(array($field, $value));
+    		}
+    	}
+    	
+    	// define offset parameter value from context
+    	if (isset($env[$offsetIdentifier])) {
+    		$this->setParameter('offset', (int) $env[$offsetIdentifier]);
+    		$this->_collection->setBoundaryOffset($env[$offsetIdentifier]);
+    	}
+    	
     	if ($this->_collection->getParameter('populated') !== true) {
     		$this->_collection->find(ObjectModel::DATA);
     		$this->setParameter('max', $this->_collection->getMax());

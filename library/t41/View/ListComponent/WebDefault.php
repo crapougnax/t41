@@ -129,59 +129,10 @@ class WebDefault extends AbstractWebDecorator {
     	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
     	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
     	
-    	// try and restore cached search terms for the current uri
-    	$this->_uriAdapter->restoreSearchTerms();
-
     	$this->_env = $this->_uriAdapter->getEnv();
-    	
-    	// set query parameters from context
-    	if (isset($this->_env[$this->_searchIdentifier]) && is_array($this->_env[$this->_searchIdentifier])) {
-    		foreach ($this->_env[$this->_searchIdentifier] as $field => $value) {
-    			$field = str_replace("-",".",$field);
 
-    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
-    				$property = $this->_obj->getCollection()->getDataObject()->getRecursiveProperty($field);
-    				
-    				if ($property instanceof MetaProperty) {
-    					$this->_obj->getCollection()->having($property->getParameter('property'))->contains($value);
-    				} else if ($property instanceof ObjectProperty) {
-    					$this->_obj->getCollection()->resetConditions($field);
-    					$this->_obj->getCollection()->having($field)->equals($value);
-    				} else if ($property instanceof DateProperty) {
-    					if (is_array($value)) {
-    						if (isset($value['from']) && ! empty($value['from'])) {
-    							$this->_obj->getCollection()->having($field)->greaterOrEquals($value['from']);
-    						}
-    						if (isset($value['to']) && ! empty($value['to'])) {
-    							$this->_obj->getCollection()->having($field)->lowerOrEquals($value['to']);
-    						}
-    					} else {
-    						$this->_obj->getCollection()->having($field)->equals($value);
-    					}
-    				} else if ($property instanceof AbstractProperty) {
-    					$this->_obj->getCollection()->resetConditions($field);
-    					$this->_obj->getCollection()->having($field)->contains($value);
-    				}
-	    			$this->_uriAdapter->setArgument($this->_searchIdentifier . '[' . $field . ']', $value);
-    			}
-    		}
-    	}
-    	
-    	// set query sorting from context
-        if (isset($this->_env[$this->_sortIdentifier]) && is_array($this->_env[$this->_sortIdentifier])) {
-        	foreach ($this->_env[$this->_sortIdentifier] as $field => $value) {
-    			$this->_obj->getCollection()->setSorting(array($field, $value));
-    		}
-    	}
-
-    	// define offset parameter value from context
-    	if (isset($this->_env[$this->_offsetIdentifier])) {
-    		$this->_obj->setParameter('offset', (int) $this->_env[$this->_offsetIdentifier]);
-    		$this->_obj->getCollection()->setBoundaryOffset($this->_env[$this->_offsetIdentifier]);
-    	}
-    	
         if (! $this->_obj->getCollection() instanceof StatsCollection) {
-	    	$this->_obj->query();
+	    	$this->_obj->query($this->_uriAdapter);
         }
             
         $p = '';
