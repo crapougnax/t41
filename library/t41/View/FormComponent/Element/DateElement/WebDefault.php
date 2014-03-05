@@ -53,7 +53,7 @@ class WebDefault extends AbstractWebDecorator {
 	
 	protected function _renderField($name, $value = null, $prefix = null, $boundaries = true)
 	{
-		$id = 't41_' . $this->_obj->getId();
+		$id = str_replace(array('[',']'), array('_',''), $name);
 		$dispField = 'disp_' . $id;
 		
 		$pickerArgs = array( 'dateFormat'	=> 'dd/mm/yy'
