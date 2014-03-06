@@ -68,18 +68,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 		}
 		
 		foreach ($display as $element) {
-			if (strpos($element,'.') !== false) {
-				$parts = explode('.', $element);
-				$tmprop = $do->getProperty($parts[0]);
-				if ($tmprop instanceof ObjectProperty) {
-					$property = $tmprop->getInstanceOf()->getProperty($parts[1]);
-				} else {
-					$property = $tmprop;
-				}
-			} else {
-				$property = $do->getProperty($element);
-			}
-			
+			$property = $do->getRecursiveProperty($element);
 			if ($property instanceof AbstractProperty) {
 				/* convert property to form element */
 				$this->addElementFromProperty($property, $element, (count($this->_elements)+1) * 100);

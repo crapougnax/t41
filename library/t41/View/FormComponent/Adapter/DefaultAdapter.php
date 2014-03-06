@@ -51,7 +51,6 @@ class DefaultAdapter extends AbstractAdapter {
 										 , Property::CONSTRAINT_HASLETTERS
 										 , Property::CONSTRAINT_UPPERCASE
 										 , Property::CONSTRAINT_LOWERCASE
-										// , Property::CONSTRAINT_MULTIPLE
 										 , Property::CONSTRAINT_DATEMIN
 										 , Property::CONSTRAINT_DATEMAX
 										 , Property::CONSTRAINT_HOURMIN

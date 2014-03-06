@@ -55,21 +55,24 @@ class WebDefault extends AbstractWebDecorator {
 			}
 		}
 		
-		// set correct name for field name value depending on 'mode' parameter value
-		$name = $this->_obj->getId();
-		
-		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
-			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
-		}
 		
 		// display autocompleter field
-		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('selectmax') 
-		/*		&& $this->getParameter('mode') != View\FormComponent::SEARCH_MODE */) {
-
-			$deco = new WebAutocomplete($this->_obj, array($this->_params));
+		if ($this->_obj->getTotalValues() > $this->_obj->getParameter('selectmax')) {
+			$params = array();
+			foreach ($this->_params as $key => $param) {
+				$params[$key] = $param->getValue();
+			}
+			$deco = new WebAutocomplete($this->_obj, $params);
 			return $deco->render();
-			
 		} else {
+			
+			// set correct name for field name value depending on 'mode' parameter value
+			$name = $this->_obj->getId();
+			
+			if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
+				$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
+			}
+			
 			// display menu list
 			$zv = new \Zend_View();
 			$options = array(Property::EMPTY_VALUE => $this->getParameter('defaultlabel')) + (array) $this->_obj->getEnumValues();

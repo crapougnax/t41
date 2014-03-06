@@ -52,9 +52,8 @@ class WebAutocomplete extends AbstractWebDecorator {
 			}
 		}
 		
-		// set correct name for field name value depending on 'mode' parameter value
 		$name = $this->_obj->getId();
-		
+		// set correct name for field name value depending on 'mode' parameter value
 		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
 			$name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $name . ']';
 		}
