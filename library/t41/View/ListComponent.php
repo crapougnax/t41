@@ -211,7 +211,7 @@ class ListComponent extends ViewObject {
     		foreach ($env[$searchIdentifier] as $field => $value) {
     			$field = str_replace("-",".",$field);
     	
-    			if (! empty($value) && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
+    			if ($value != '' && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
     				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				if ($property instanceof Property\MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
@@ -229,6 +229,9 @@ class ListComponent extends ViewObject {
     					} else {
     						$this->_collection->having($field)->equals($value);
     					}
+    				} else if ($property instanceof Property\IntegerProperty) {
+    					$this->_collection->resetConditions($field);
+    					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof Property\AbstractProperty) {
     					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->contains($value);
@@ -252,6 +255,7 @@ class ListComponent extends ViewObject {
     	}
     	
     	if ($this->_collection->getParameter('populated') !== true) {
+    		//$this->_collection->debug(); die;
     		$this->_collection->find(ObjectModel::DATA);
     		$this->setParameter('max', $this->_collection->getMax());
     	}
