@@ -42,7 +42,7 @@ class ViewUri {
 	static protected $_uriAdapter;
 	
 	
-	public static function setUriAdapter($adapter = 'default', array $params = null)
+	public static function setUriAdapter($adapter = 'get', array $params = null)
 	{
 		if ($adapter instanceof AbstractAdapter) {
 			self::$_uriAdapter = $adapter;
