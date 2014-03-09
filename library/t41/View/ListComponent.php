@@ -23,16 +23,15 @@ namespace t41\View;
  */
 
 use t41\ObjectModel\ObjectUri;
-use t41\View\ListComponent\Element\MetaElement;
 
 use t41\ObjectModel;
 use t41\ObjectModel\Property;
 use t41\View\ListComponent\Element;
 use t41\View\FormComponent\Element\ButtonElement;
+use t41\View\ListComponent\Element\MetaElement;
 use t41\Core\Registry;
-use t41\ObjectModel\Property\ArrayProperty;
-use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\Property\CurrencyProperty;
+use t41\View\ViewUri\Adapter\AbstractAdapter;
 
 
 /**
@@ -195,7 +194,12 @@ class ListComponent extends ViewObject {
     }
     
     
-    public function query(ViewUri $uriAdapter)
+    /**
+     * Execute a query on the collection after injection of the optional parameters
+     * extracted from the View Uri adapter environment
+     * @param AbstractAdapter $uriAdapter
+     */
+    public function query(AbstractAdapter $uriAdapter)
     {
     	$offsetIdentifier	= $uriAdapter->getIdentifier('offset');
     	$sortIdentifier		= $uriAdapter->getIdentifier('sort');
@@ -211,7 +215,7 @@ class ListComponent extends ViewObject {
     		foreach ($env[$searchIdentifier] as $field => $value) {
     			$field = str_replace("-",".",$field);
     	
-    			if ($value != '' && $value != Property::EMPTY_VALUE) { // @todo also test array values for empty values
+    			if ($value != '' && $value != Property::EMPTY_VALUE) {
     				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				if ($property instanceof Property\MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
