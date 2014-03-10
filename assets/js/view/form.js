@@ -171,7 +171,7 @@ window.t41.view.form = function(id,obj,form) {
 				continue;
 			}
 			
-			if (field.constraints.emailaddress) {
+			if (field.constraints.emailaddress && value != '') {
 			    if (this.patterns.email.test(value) == false) {
 					errors[errors.length] = {msg:'"' + value + '" ' + t41.lget('form:emailerr'),field:i};
 					continue;
