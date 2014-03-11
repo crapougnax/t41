@@ -128,12 +128,11 @@ class CsvDefault extends AbstractCsvDecorator {
         
         		$fv = str_replace('\r\n', ', ', stripslashes($value));
         		$p .= "\"" . str_replace("\"","\\\"",$fv) . "\"";
-        		$column = null;
 	        }
         	$row .= $p . "\r\n";
         	
         	// preserve memory!
-        	$this->_do = null;
+        	$this->_do->reclaimMemory();
         }
         
         return $this->_drawHeaderRow() . $row;
