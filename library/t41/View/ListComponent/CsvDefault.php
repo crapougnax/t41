@@ -19,19 +19,16 @@ namespace t41\View\ListComponent;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 963 $
  */
 
 use t41\ObjectModel;
+use t41\ObjectModel\Property;
+use t41\ObjectModel\DataObject;
 use t41\ObjectModel\Property\AbstractProperty;
-use t41\View\Decorator\AbstractCsvDecorator;
 use t41\View\ViewUri;
 use t41\View\ListComponent\Element;
-use t41\ObjectModel\Property\MetaProperty;
-use t41\ObjectModel\Property;
-use t41\ObjectModel\Property\ObjectProperty;
-use t41\ObjectModel\DataObject;
-use t41\View\Decorator;
+use t41\View\Decorator\AbstractCsvDecorator;
+
 
 /**
  * List view object default Web Decorator
@@ -80,22 +77,13 @@ class CsvDefault extends AbstractCsvDecorator {
     public function render()
     {
     	$this->_collection = $this->_obj->getCollection();
-    	 
-    	// set relevant uri adapter and get some identifiers 
-    	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter) {
-    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
-    	} else {
-    		$this->_uriAdapter = ViewUri::getUriAdapter();
-    	}
-    	
-    	$this->_offsetIdentifier	= $this->_uriAdapter->getIdentifier('offset');
-    	$this->_sortIdentifier		= $this->_uriAdapter->getIdentifier('sort');
-    	$this->_searchIdentifier	= $this->_uriAdapter->getIdentifier('search');
-    	
-    	// set data source for environment
-    	$this->_env = $this->_uriAdapter->getEnv();
-    	
     	$this->_collection->setBoundaryBatch(1000);
+    	 
+        // set relevant uri adapter and get some identifiers
+    	/* @var $_uriAdapter t41\View\ViewUri\AbstractAdapter */
+    	if (! ($this->_uriAdapter = ViewUri::getUriAdapter()) instanceof ViewUri\Adapter\GetAdapter ) {
+    		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
+    	}
         $this->_obj->query($this->_uriAdapter);
 
         $row = '';
@@ -140,8 +128,12 @@ class CsvDefault extends AbstractCsvDecorator {
         
         		$fv = str_replace('\r\n', ', ', stripslashes($value));
         		$p .= "\"" . str_replace("\"","\\\"",$fv) . "\"";
+        		$column = null;
 	        }
         	$row .= $p . "\r\n";
+        	
+        	// preserve memory!
+        	$this->_do = null;
         }
         
         return $this->_drawHeaderRow() . $row;
@@ -160,9 +152,7 @@ class CsvDefault extends AbstractCsvDecorator {
         $add_character = str_replace('\\n', "\012", $add_character);
         $add_character = str_replace('\\t', "\011", $add_character);
         
-        /* @var $val t41_Form_Element_Abstract */
         foreach ($this->_obj->getColumns() as $colonne) {
-        
         	if ($row) {
         		$row .= $sep;
         	}
