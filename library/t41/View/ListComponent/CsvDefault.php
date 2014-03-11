@@ -77,7 +77,7 @@ class CsvDefault extends AbstractCsvDecorator {
     public function render()
     {
     	$this->_collection = $this->_obj->getCollection();
-    	$this->_collection->setBoundaryBatch(1000);
+    	$this->_collection->setBoundaryBatch(10000);
     	 
         // set relevant uri adapter and get some identifiers
     	/* @var $_uriAdapter t41\View\ViewUri\AbstractAdapter */
