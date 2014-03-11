@@ -676,7 +676,9 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$select->reset('group');
 			}
 		} else {
-			$select->limit($collection->getBoundaryBatch(), $collection->getBoundaryOffset());
+			$select->limit($collection->getBoundaryBatch() != -1 ? $collection->getBoundaryBatch() : null
+						 , $collection->getBoundaryOffset()
+						  );
 		}
 				
 			foreach ($collection->getSortings() as $sorting) {
