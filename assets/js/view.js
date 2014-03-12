@@ -482,4 +482,122 @@ if (! window.t41.view) {
 			domObject.dispatchEvent(event);
         }
     };
+    
+    
+    /**
+     * Enable or disable blocking of given dom element
+     * @param string el dom element or id (prefixed with a #) if empty effect is triggered on page body
+     * @param object o optional parameters object
+     */
+    window.t41.view.shade = function(el, o) {
+
+    	var el = el || 'body';
+    	
+    	// size and offset values
+    	var pos = {
+    		width: 0,
+    		height: 0,
+    		top: 0,
+    		left: 0
+    	};
+
+    	// default option values
+    	var defaults = {
+    		displayText: false,
+    		textValue: 'Veuillez patienter...',
+    		addClass: ''
+    	};
+
+    	// apply options
+    	var options = jQuery.extend({}, defaults, o);
+
+    	// get ID from target element, fail if it can't be found
+    	// @todo auto-generate an ID in case target element doesn't have one
+    	if (jQuery(el).length == 1) {
+    		var id = jQuery(el).attr('id') + '_shade';
+    	} else {
+    		return false;
+    	}
+
+    	// if a shade is already active on the element, remove it and exit
+    	if (jQuery('#'+id).length>0) {
+    		jQuery('#'+id).hide().remove();
+
+    		jQuery(el).find(':input').addBack().each(function() {
+    			if (jQuery(this).hasClass('wasdisabled')) {
+    				jQuery(this).removeClass('wasdisabled');
+    				jQuery(this).prop('disabled', true);
+    			} else {
+    				jQuery(this).prop('disabled', false);
+    			}
+    		});
+
+    		return true;
+    	}
+
+    	// if target element can be found in the DOM, read its position
+    	if (jQuery(el).length==1) {
+    		var t = jQuery(el).position();
+
+    		// basic offset and size
+    		pos.width = jQuery(el).width();
+    		pos.height = jQuery(el).height();
+    		pos.top = t.top;
+    		pos.left = t.left;
+
+    		// add padding and margin
+    		if (jQuery(el).css('padding-top')) 		pos.height += 	parseInt(jQuery(el).css('padding-top'));
+    		if (jQuery(el).css('padding-right')) 	pos.width += 	parseInt(jQuery(el).css('padding-right'));
+    		if (jQuery(el).css('padding-bottom')) 	pos.height += 	parseInt(jQuery(el).css('padding-bottom'));
+    		if (jQuery(el).css('padding-left')) 	pos.width += 	parseInt(jQuery(el).css('padding-left'));
+
+    		if (jQuery(el).css('margin-top')) 		pos.height += 	parseInt(jQuery(el).css('margin-top'));
+    		if (jQuery(el).css('margin-right')) 	pos.width += 	parseInt(jQuery(el).css('margin-right'));
+    		if (jQuery(el).css('margin-bottom')) 	pos.height += 	parseInt(jQuery(el).css('margin-bottom'));
+    		if (jQuery(el).css('margin-left')) 		pos.width += 	parseInt(jQuery(el).css('margin-left'));
+
+    		// if target element has a box-shadow
+    		// @todo what if box-shadow is defined with any other unit than px?
+    		if (jQuery(el).css('box-shadow')!='none') {
+    			var s = jQuery(el).css('box-shadow');
+    			s = s.substring(s.indexOf(')')+2, s.length).split(' ');//.map(parseInt);
+    			// 0 = top, 1 = right, 2 = bottom, 3 = left
+
+    			pos.width += parseInt(s[1]) + parseInt(s[3]); // +left & +right
+    			pos.height += parseInt(s[0]) + parseInt(s[2]); // +top & +bottom
+    			pos.top -= parseInt(s[0]); // -top
+    			pos.left -= parseInt(s[3]); // -left
+    		}
+
+    		// store input state before disabling them
+    		jQuery(el).find(':input').addBack().each(function() {
+    			if (jQuery(this).is(':disabled')) {
+    				jQuery(this).addClass('wasdisabled');
+    			} else {
+    				jQuery(this).prop('disabled', true);
+    			}
+    		});
+
+    	} else return false;
+
+
+    	// insert new shade element in the DOM
+    	jQuery('<div id="'+id+'" class="shade"><p></p></div>')
+    		.addClass(options.addClass)
+    		.appendTo(jQuery('body'));
+
+    	if (options.displayText) {
+    		jQuery('#'+id+' p').html(options.textValue).addClass('on');
+    	}
+
+    	// lift off
+    	jQuery('#'+id).css({
+    		top: pos.top,
+    		left: pos.left,
+    		width: pos.width,
+    		height: pos.height
+    	}).show();
+
+    	return true;
+    }
 }

@@ -659,3 +659,26 @@ h1,h2,h3,h4,h5 {
 }
 
 /* -- END DATE BUTTON -- */
+
+
+/* DOM ELEMENT SHADING */
+.shade {
+	position: absolute;
+	overflow: hidden;
+	background: rgba( 255, 255, 255, .7 ) 
+                url('http://i.stack.imgur.com/FhHRx.gif') 
+                50% 50% 
+                no-repeat;
+	z-index: 99;
+	display: none;
+}
+
+.shade p {
+	display: none;
+	text-align: center;
+	padding-top: 1%;
+}
+
+.shade p.on {
+	display: block;
+}
