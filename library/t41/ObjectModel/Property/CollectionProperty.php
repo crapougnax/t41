@@ -116,7 +116,7 @@ class CollectionProperty extends AbstractProperty {
 
 			/* set a new Collection based on instanceof parameter value */
 			$this->_value = new ObjectModel\Collection($this->getParameter('instanceof'));
-			$this->_value->setBoundaryBatch(10000);
+			$this->_value->setBoundaryBatch(-1);
 				
 			/* inject the condition that allows to find collection members */
 			if ($this->getParameter('keyprop')) {
@@ -165,7 +165,7 @@ class CollectionProperty extends AbstractProperty {
 			// set sorting
 			if ($this->getParameter('sorting')) {
 				foreach ($this->getParameter('sorting') as $key => $val) {
-					if ($this->getParent()->getRecursiveProperty($key) !== false) {
+					if ($this->_value->getDataObject()->getRecursiveProperty($key) !== false) {
 						$this->_value->setSorting(array($key, $val));
 					} else {
 						Core::log(sprintf("Can't sort %s property with unknown property %s", $this->_id, $key), \Zend_Log::WARN);
@@ -175,7 +175,9 @@ class CollectionProperty extends AbstractProperty {
 			
 			// query now only if object exists in backend
 			// populate only with ObjectUri instances for performance sake
-			if ($this->_parent->getUri()) $this->_value->find(ObjectModel::URI);
+			if ($this->_parent->getUri()) {
+				$this->_value->find(ObjectModel::URI);
+			}
 		}
 		return parent::getValue();
 	}
