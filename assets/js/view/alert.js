@@ -329,10 +329,10 @@ window.t41.view.alert.runDeferred = function() {
 };
 
 
-window.t41.view.alert.confirm = function(content,callbacks) {
+window.t41.view.alert.confirm = function(content,callbacks,title) {
 	var content = content || t41.locale.get('confirm:message');
 	return new t41.view.alert(content,{
-										title:t41.locale.get('confirm:title'), 
+										title:title || t41.locale.get('confirm:title'), 
 										buttons:{confirm:true, abort:true},
 										callbacks:callbacks
 		  							  }
