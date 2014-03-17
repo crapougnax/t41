@@ -24,6 +24,9 @@ namespace t41\View\Adapter;
 use t41\View;
 use t41\Core;
 use t41\Parameter;
+use t41\ObjectModel\BaseObject;
+use t41\ObjectModel\Property\AbstractProperty;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * Class providing the view engine with a Web context adapter.
@@ -358,6 +361,8 @@ class WebAdapter extends AbstractAdapter {
     {
     	$template = file_get_contents($this->_template);
     	$tagPattern = "/%([a-z0-9]+)\\:([a-z0-9.]*)\\{*([a-zA-Z0-9:,\\\"']*)\\}*%/";
+    	$tagPattern = "/%([a-z0-9]+)\\:([a-z0-9_.]*)\\{*([a-zA-Z0-9:_,\\\"']*)\\}*%/";
+    	 
     	
     	$tags = array();
     	
@@ -417,7 +422,46 @@ class WebAdapter extends AbstractAdapter {
     				break;
     				    				
     			case 'env':
+    			case 'var':
     				$content = View::getEnvData($tag[2]);
+    				break;
+    				
+    			case 'obj': // obj:
+    				$tmp = explode('.', $tag[2]);
+    				$obj = View::getEnvData($tmp[0]);
+    				if ($obj instanceof MediaObject && isset($tmp[1])) {
+    					// meta properties handling
+    					switch ($tmp[1]) {
+    				
+    						case '_base64':
+    							$content = sprintf('data:%s;base64,%s', $obj->getMime(), base64_encode($obj->loadBlob('media')));
+    							break;
+    									
+    						case '_icon':
+    							$content = 'file-' . $obj->getExtension();
+    							break;
+    									
+    						case '_size':
+    							$content = MediaElement::getDisplaySize($obj->getSize());
+    							break;
+    									
+    						case '_url':
+    							$content = MediaElement::getDownloadUrl($obj->getUri());
+    							break;
+    							
+    						default:
+    							break;
+    					}
+    				}
+    				
+    				if (! $content) {
+    					if ($obj instanceof BaseObject) {
+    						$content = isset($tmp[1]) && $tmp[1] == ObjectUri::IDENTIFIER ? $obj->getIdentifier() : $obj->getProperty($tmp[1]);
+    						$content = ($content instanceof AbstractProperty)  ? $content->getDisplayValue() : $content;
+    					} else {
+    						$content = Core::$env == Core::ENV_DEV ? sprintf("Can't substitute any value to '%s'", $tag[0]) : null;
+    					}
+    				}
     				break;
     		}
        		$template = str_replace($tag[0], $content, $template);
