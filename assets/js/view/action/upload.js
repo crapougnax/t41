@@ -60,12 +60,13 @@ window.t41.view.action.upload = function(element, uri) {
 	        },
 	        template: '<div class="qq-uploader">' +
 	            '<div class="qq-upload-drop-area"><span>{dragText}</span></div>' +
-	            '<div class="qq-upload-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">{uploadButtonText}</span></div>' +
+	           // '<div class="qq-upload-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">{uploadButtonText}</span></div>' +
+	            '<a class="t41 element button medium icon qq-upload-button"><span class="file"></span>{uploadButtonText}</a>' +
 	            '<ul class="qq-upload-list"></ul>' + '</div>'
 		});
 		
 		
-	}
+	};
 
 	/**
 	 * Reset current value
@@ -80,7 +81,7 @@ window.t41.view.action.upload = function(element, uri) {
 	this.onSubmit = function(id, fileName) {
 		this.setFilename();
 		this.setLastevent('start');
-	}
+	};
 	
 	this.onComplete = function(id, fileName, responseJSON) {
 		if (this.getLastevent()=='error' || this.getLastevent()=='cancel') {
@@ -90,37 +91,38 @@ window.t41.view.action.upload = function(element, uri) {
 			this.warning(false).check(true);
 		}
 		this.setLastevent('complete');
-	}
+	};
 	
 	this.onError = function(id, fileName, xhr) {
 		this.warning(true).check(false);
 		this.setFilename();
 		this.setLastevent('error');
-	}
+	};
 	
 	this.onProgress = function(id, fileName, loaded, total) {
 		this.setLastevent('progress');
-	}
+	};
 	
 	this.onCancel = function(id, fileName) {
 		this.warning(true).check(false);
 		this.setFilename();
 		this.setLastevent('cancel');
-	}
+	};
 	
 	this.setLastevent = function(str) {
 		this.lastevent = str;
 		//console.log(str);
-	}
+	};
 	
 	this.getLastevent = function() {
 		return this.lastevent;
-	}
+	};
 	
 	this.setFilename = function(str) {
 		var fileName = str || null;
 		this.field.find('.hiddenfilename').val('tmp:' + fileName);
-	}
+		t41.view.customEvent(this.field.find('.hiddenfilename').attr('id'),'change');
+	};
 	
 	/**
 	 * Checkbox state toggle
@@ -130,7 +132,7 @@ window.t41.view.action.upload = function(element, uri) {
 		var state = (bool==true)? true: false;
 		this.field.find('input[type=checkbox]').attr('checked', state);
 		return this;
-	}
+	};
 	
 	/**
 	 * Warning state toggle
@@ -143,7 +145,7 @@ window.t41.view.action.upload = function(element, uri) {
 			this.field.removeClass('warning', 500);
 		}
 		return this;
-	}
+	};
 
 	this.init();
 };
