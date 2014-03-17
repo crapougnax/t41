@@ -198,6 +198,17 @@ class View {
 	}
 	
 	
+	
+	static public function  addVendorLib($lib)
+	{
+		$file = '/t41/vendor/' . $lib;
+		$type = substr($lib, strrpos($lib,'.')+1);
+		if (self::_isInstanciated ()) {
+			return self::$_display->componentAdd ($file, $type);
+		}	
+	}
+	
+	
 	/**
 	 * Register a library from core
 	 * @param string|array $lib
@@ -481,10 +492,8 @@ class View {
 		}
 		
 		if (! isset(self::$_envData[$registre])) {
-			
 			self::$_envData[$registre] = array();
 		}
-		
 		self::$_envData[$registre][$cle] = $val;
 	}
 	
