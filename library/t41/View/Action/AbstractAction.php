@@ -54,6 +54,9 @@ abstract class AbstractAction extends ViewObject {
 	protected $_cachePrefix;
 	
 	
+	protected $_jspeer;
+	
+	
 	public $status;
 	
 	
@@ -92,6 +95,11 @@ abstract class AbstractAction extends ViewObject {
 	 */
 	public function execute($data)
 	{
+		$method = '_' . $data['action'];
+		if (method_exists($this, $method)) {
+			return $this->$method($data);
+		}
+		
 		return true;
 	}
 	
@@ -225,16 +233,31 @@ abstract class AbstractAction extends ViewObject {
 						'callbacks'	=> $this->_callbacks
 					  );
 		
+		if ($this->_obj) {
+			$array['obj'] = $this->_obj->reduce();
+		}
+		
 		// add or replace data with optional $params['data'] content 
 		if (isset($params['extra'])) {
-			
 			foreach ((array) $params['extra'] as $key => $val) {
-				
 				$array[$key] = $val;
 			}
 		}
-		
 		// return reduced action without parameters
 		return $array;
+	}
+	
+	
+	static public function initPeer(self $action, $key = null, array $params = array())
+	{
+		if (is_null($key)) {
+			$key = '_' . substr(md5(microtime()), rand(0,27), 5);
+		}
+		return sprintf("t41.view.register('%s', new %s(%s,%s))"
+						, $key
+						, $action->_jspeer
+						, \Zend_Json::encode($action->reduce())
+						, \Zend_Json::encode($params)
+					  );
 	}
 }
