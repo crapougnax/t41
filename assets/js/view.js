@@ -536,7 +536,7 @@ if (! window.t41.view) {
     	}
 
     	// if target element can be found in the DOM, read its position
-    	if (jQuery(el).length==1) {
+    	if (jQuery(el).length == 1) {
     		var t = jQuery(el).position();
 
     		// basic offset and size
@@ -595,9 +595,10 @@ if (! window.t41.view) {
     		top: pos.top,
     		left: pos.left,
     		width: pos.width,
-    		height: pos.height
+    		height: pos.height,
+    		'z-index':jQuery(el).css('z-index')+1
     	}).show();
 
     	return true;
-    }
+    };
 }

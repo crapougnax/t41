@@ -669,7 +669,7 @@ h1,h2,h3,h4,h5 {
                 url('http://i.stack.imgur.com/FhHRx.gif') 
                 50% 50% 
                 no-repeat;
-	z-index: 99;
+	z-index: 999;
 	display: none;
 }
 

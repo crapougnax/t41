@@ -246,7 +246,7 @@ window.t41.view.alert = function(str,o) {
 
 	/* Create buttons and bind event handlers */
 	this.addButtons = function() {
-		for (i in this.o.buttons) {
+		for (var i in this.o.buttons) {
 			if (this.o.buttons[i] == false) continue;
 			switch (i) {
 			
