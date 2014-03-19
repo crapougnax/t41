@@ -23,6 +23,7 @@ namespace t41\View\ViewUri\Adapter;
  */
 
 use t41\Core;
+use t41\Core\Layout;
 
 /**
  * Abstract adapter for URI manipulation.
@@ -94,7 +95,9 @@ abstract class AbstractAdapter {
 	
 	public function __construct($uriBase = null, array $params = null)
 	{
-		if (! $uriBase) $uriBase = @$_SERVER['REDIRECT_URL'];
+		if (! $uriBase) {
+			$uriBase = '/' . Layout::$module . '/' . Layout::$controller . '/' . Layout::$action; //@$_SERVER['REDIRECT_URL'];
+		}
 		
 		$this->setUriBase($uriBase);
 		if (is_array($params)) $this->_params = $params;
