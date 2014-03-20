@@ -468,7 +468,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_connect();
 		
 		/* @var $select \Zend_Db_Select */
-		$select = $this->_ressource->select();
+		$select = $this->_ressource->select()->distinct();
 		$select->from($table, $returnCount ? new \Zend_Db_Expr("COUNT(*) AS " . \t41\Backend::MAX_ROWS_IDENTIFIER) : $pkey);
 		
 		$this->_alreadyJoined = array();
