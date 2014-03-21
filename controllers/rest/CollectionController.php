@@ -197,7 +197,8 @@ class Rest_CollectionController extends Rest_DefaultController {
 		try {
 			/* @var $collection t41\ObjectModel\Collection */
 			$collection = $this->_obj->getCollection();
-			$member = $collection->getMember($this->_post['member'], ObjectModel::MODEL);
+			$collection->find();
+			$member = $collection->getMemberFromUri($this->_post['id']);
 			$collection->removeMember($member);
 			$res = $collection->save();
 			
