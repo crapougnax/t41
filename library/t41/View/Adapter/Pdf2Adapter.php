@@ -27,6 +27,7 @@ use Dispam\Exception;
 
 /**
  * Class providing the view engine with a Pdf context adapter.
+ * Required libraries are libXrender and libfontconfig (debian: apt-get install libxrender-dev libfontconfig)
  *
  * @category   t41
  * @package    t41_View
@@ -41,6 +42,15 @@ class Pdf2Adapter extends WebAdapter {
 	
 	public function __construct(array $parameters = array())
 	{
+		if (PHP_OS == 'Linux') {
+			if (exec('/sbin/ldconfig -p | grep libXrender | wc -l') == 0) {
+				throw new \t41\View\Exception("Missing required libXrender library. Please install it.");
+			}
+			if (exec('/sbin/ldconfig -p | grep libfontconfig | wc -l') == 0) {
+				throw new \t41\View\Exception("Missing required libfontconfig library. Please install it.");
+			}
+		}
+			
 		$this->_setParameterObjects(array(
 					'orientation' 	=> new Parameter(Parameter::STRING, PdfAdapter::ORIENTATION_PORTRAIT, false, array(PdfAdapter::ORIENTATION_PORTRAIT, PdfAdapter::ORIENTATION_LANDSCAPE)),
 					'copies'		=> new Parameter(Parameter::INTEGER, 1),
