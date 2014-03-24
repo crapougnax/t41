@@ -154,6 +154,14 @@ class GridElement extends AbstractElement {
     
     public function reduce(array $params = array())
     {
-    	return null;
+    	$type = get_class($this);
+    	$type = lcfirst(substr($type, strrpos($type,'\\')+1));
+    	$array = array(
+    					'type' => $type, 
+    					'label' => $this->_title, 
+    					'constraints' => $this->_is
+    				 );
+    	
+    	return $array;
     }
 }
