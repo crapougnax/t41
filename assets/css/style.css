@@ -429,7 +429,7 @@ table.t41.list td.cellcurrency {
 /* -- BEGIN FORM -- */
 .t41 form fieldset {
   padding: 4px;
-  margin: 6px 4px;
+  margin: 4px 4px;
   border: 1px dotted  #ccc;
 }
 
@@ -585,9 +585,9 @@ h1,h2,h3,h4,h5 {
   top: auto;
   left: auto;
   min-width: 200px;
-  max-width: 700px;
+  max-width: 800px;
   min-height: 100px;
-  max-height: 700px;
+  max-height: 800px;
   background-color: #ffffff;
   box-shadow: 1px 1px 10px #444;
 }
@@ -601,11 +601,11 @@ h1,h2,h3,h4,h5 {
 }
 
 .t41.component.alert .content {
-  padding: 12px 4px;
+  padding: 4px 4px;
 }
 
 .t41.component.alert .buttons {
-  padding: 8px 16px;
+  padding: 1px 16px;
 }
 
 .t41.component.alert .title .close {
