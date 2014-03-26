@@ -16,6 +16,9 @@
 		</object>
 		<object id="t41\View\ListComponent" extends="t41\View\ViewObjectModel">
 			<parameters>
+				<parameter id="uricache" type="boolean">
+					<defaultvalue>true</defaultvalue>
+				</parameter>
 				<parameter id="selectable" type="boolean">
 					<defaultvalue>false</defaultvalue>
 				</parameter>

@@ -19,7 +19,6 @@ namespace t41\View;
  * @package    t41_Form
  * @copyright  Copyright (c) 2006-2009 Quatrain Technologies SAS (http://technologies.quatrain.com)
  * @license    http://t41.quatrain.com/license/new-bsd     New BSD License
- * @version    $Revision: 879 $
  */
 
 use t41\ObjectModel\ObjectUri;
@@ -205,8 +204,10 @@ class ListComponent extends ViewObject {
     	$sortIdentifier		= $uriAdapter->getIdentifier('sort');
     	$searchIdentifier	= $uriAdapter->getIdentifier('search');
     	 
-    	// try and restore cached search terms for the current uri
-    	$uriAdapter->restoreSearchTerms();
+        // try and restore cached search terms for the current uri
+    	if ($this->getParameter('uricache') != false) {
+	    	$uriAdapter->restoreSearchTerms();
+    	}	
     	
     	$env = $uriAdapter->getEnv();
     	 
@@ -215,7 +216,7 @@ class ListComponent extends ViewObject {
     		foreach ($env[$searchIdentifier] as $field => $value) {
     			$field = str_replace("-",".",$field);
     	
-    			if ($value != '' && $value != Property::EMPTY_VALUE) {
+    			if (!is_null($value) && $value != '' && $value != Property::EMPTY_VALUE) {
     				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				if ($property instanceof Property\MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
