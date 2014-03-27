@@ -50,6 +50,8 @@ class CsvAdapter extends AbstractAdapter {
 	
 	public function __construct(array $parameters = null)
 	{
+		error_reporting(E_ALL);
+		
 		$params = array();
 		$params['title'] = new Parameter(Parameter::STRING);
 		$this->_setParameterObjects($params);
@@ -84,6 +86,7 @@ class CsvAdapter extends AbstractAdapter {
     			switch (get_class($object)) {
     				
     				case 't41\View\ListComponent':
+    				case 't41\View\TableComponent':
     					$object->setDecorator();
     					$decorator = Decorator::factory($object);
     					$content .= $decorator->render();
