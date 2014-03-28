@@ -277,7 +277,8 @@ class Core {
     			. $path . 'application/' . PATH_SEPARATOR
     			. $path . 'vendor/' . PATH_SEPARATOR
     			. $path . 'vendor/quatrain/t41/library' . PATH_SEPARATOR
-    			. $path . 'vendor/zend/zf1/library'
+    			. $path . 'vendor/zendframework/zendframework1/library' . PATH_SEPARATOR
+    			. $path . 'vendor/zend/zf1/library' // @legacy
     	);
     }
 
