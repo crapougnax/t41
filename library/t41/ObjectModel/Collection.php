@@ -68,6 +68,13 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
+	 * 
+	 * @var t41\ObjectModel\Property\AbstractProperty
+	 */
+	protected $_parent;
+	
+	
+	/**
 	 * Array of members awaiting saving or deletion
 	 * @var array
 	 */
@@ -90,7 +97,7 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Array of t41_Condition objects
+	 * Array of t41\Backend\Condition objects
 	 * 
 	 * @var array
 	 */
@@ -134,6 +141,28 @@ class Collection extends ObjectModelAbstract {
 		if (is_array($params)) {
 			$this->_setParameters($params);
 		}
+	}
+	
+	
+	/**
+	 * Defines collection parent if exists
+	 * @param AbstractProperty $prop
+	 * @return \t41\ObjectModel\Collection
+	 */
+	public function setParent(AbstractProperty $prop)
+	{
+		$this->_parent = $prop;
+		return $this;
+	}
+	
+	
+	/**
+	 * Return previously defined collection parent if exists
+	 * @return \t41\ObjectModel\Property\AbstractProperty
+	 */
+	public function getParent()
+	{
+		return $this->_parent;
 	}
 	
 	

@@ -204,8 +204,8 @@ class ListComponent extends ViewObject {
     	$sortIdentifier		= $uriAdapter->getIdentifier('sort');
     	$searchIdentifier	= $uriAdapter->getIdentifier('search');
     	 
-        // try and restore cached search terms for the current uri
-    	if ($this->getParameter('uricache') != false) {
+        // try and restore cached search terms for the current uri but protect collection spawned from properties
+    	if (! $this->_collection->getParent() && $this->getParameter('uricache') != false) {
 	    	$uriAdapter->restoreSearchTerms();
     	}	
     	

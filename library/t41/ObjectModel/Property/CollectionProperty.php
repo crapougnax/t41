@@ -117,6 +117,7 @@ class CollectionProperty extends AbstractProperty {
 			/* set a new Collection based on instanceof parameter value */
 			$this->_value = new ObjectModel\Collection($this->getParameter('instanceof'));
 			$this->_value->setBoundaryBatch(-1);
+			$this->_value->setParent($this->_parent);
 				
 			/* inject the condition that allows to find collection members */
 			if ($this->getParameter('keyprop')) {
