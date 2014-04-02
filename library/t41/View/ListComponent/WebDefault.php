@@ -162,14 +162,14 @@ class WebDefault extends AbstractWebDecorator {
      * @param ButtonElement $button
      * @return string
      */
-    protected function _renderButton(ButtonElement $button)
+    protected function _renderButton(ButtonElement $button, $alias)
     {
     	$params = $button->getDecoratorParams();
     	$params['size'] = 'medium';
     	$params['data'] = array(
     							'member' => $this->_key, 
     							'uuid' => $this->_uuid ,
-    							'id' => $this->_do->getUri() ? $this->_do->getUri()->getIdentifier() : null
+    							'alias' => $alias
     						   );
     	$deco = View\Decorator::factory($button, $params);
     	return $deco->render();
@@ -262,14 +262,16 @@ HTML;
         $i = 0;
         $p = '';
         
+        $aliases = $this->_obj->getAliases();
+        
         // print out rows
         foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $this->_key => $this->_do) {
         	$css = $i%2 == 0 ? 'odd' : 'even';
         	
         	// @todo handle objects coming from different backends
-			$p .= sprintf('<tr data-member="%s" data-id="%s" class="%s">'
+			$p .= sprintf('<tr data-member="%s" data-alias="%s" class="%s">'
 					, $this->_key
-					, $this->_do->getUri() ? $this->_do->getUri()->getIdentifier() : $this->_key
+					, $aliases[$this->_do->getUri()->getIdentifier()]
 					, $css
         		  );
         	$i++;
@@ -354,7 +356,7 @@ HTML;
             $p .= '<td class="tb-actions">';
             foreach ($this->_obj->getEvents('row') as $button) {
             	$button->setParameter('uri', $this->_do->getUri());
-                $p .= $this->_renderButton($button);
+                $p .= $this->_renderButton($button, $aliases[$this->_do->getUri()->getIdentifier()]);
             }
             $p .= '</td></tr>' . "\n";
         }

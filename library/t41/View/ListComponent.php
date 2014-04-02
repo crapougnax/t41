@@ -69,6 +69,9 @@ class ListComponent extends ViewObject {
 	protected $_groups = array();
 	
 	
+	protected $_aliases = array();
+	
+	
 	/**
 	 * Class constructor
 
@@ -268,6 +271,40 @@ class ListComponent extends ViewObject {
     
     
     /**
+     * Create and array of members identifiers & md5 hash in order to securely 
+     * manipulate members in view
+     */
+    public function bindAliases()
+    {
+    	$this->_aliases = array();
+    	foreach ($this->_collection->getMembers() as $member) {
+    		$this->_aliases[$member->getIdentifier()] = md5(microtime());
+    	}
+    	return $this->_aliases;
+    }
+    
+    
+    public function getAliases()
+    {
+    	if (count($this->_aliases) == 0) {
+    		$this->bindAliases();
+    	}
+    	return $this->_aliases;
+    }
+
+    /**
+     * Return the matching member identifier of the given md5 alias if exists
+     * false otherwise
+     * @param string $alias
+     * @return mixed
+     */
+    public function getIdentifierFromAlias($alias)
+    {
+    	return array_search($alias, $this->_aliases);
+    }
+    
+    
+    /**
      * 
      * @param string $type
      * @param Element\ButtonElement|string $button
@@ -309,6 +346,7 @@ class ListComponent extends ViewObject {
     
     public function reduce(array $params = array(), $cache = true)
     {
+    	$this->bindAliases();
     	$uuid = Registry::set($this, null, true);
     	return array_merge(parent::reduce($params), array('uuid' => $uuid, 'obj' => $this->_collection->reduce($params, $cache)));
     }

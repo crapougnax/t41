@@ -190,7 +190,7 @@ class Rest_CollectionController extends Rest_DefaultController {
 
 
 	/**
-	 * Delete a member
+	 * Delete a member from its alias key (md5 hash matching identifier in an array)
 	 */
 	public function deleteAction()
 	{
@@ -198,7 +198,14 @@ class Rest_CollectionController extends Rest_DefaultController {
 			/* @var $collection t41\ObjectModel\Collection */
 			$collection = $this->_obj->getCollection();
 			$collection->find();
-			$member = $collection->getMemberFromUri($this->_post['id']);
+			
+			if (! isset($this->_post['alias'])) {
+				$this->status = 'NOK';
+				return false;
+			}
+			
+			$identifier = $this->_obj->getIdentifierFromAlias($this->_post['alias']);
+			$member = $collection->getMemberFromUri($identifier);
 			$collection->removeMember($member);
 			$res = $collection->save();
 			
