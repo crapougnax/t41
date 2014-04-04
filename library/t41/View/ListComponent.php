@@ -266,7 +266,7 @@ class ListComponent extends ViewObject {
     		//$this->_collection->debug(); die;
     		$this->_collection->find(ObjectModel::DATA);
     		$this->setParameter('max', $this->_collection->getMax());
-    		$this->_obj->bindAliases();
+    		$this->bindAliases();
     	}
     }
     
