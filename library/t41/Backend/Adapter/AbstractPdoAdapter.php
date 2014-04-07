@@ -972,7 +972,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		} else {
 			$field = $property->getId();
 			if ($this->_mapper) {
-				$field = $this->_mapper->propertyToDatastoreName($property->getParameter('instanceof'), $field);
+				$field = $this->_mapper->propertyToDatastoreName($property->getParent()->getClass(), $field);
 			}
 		}
 		
