@@ -221,9 +221,8 @@ if (! window.t41.view.action.autocomplete) {
 
 		
 		this._displayAsTable = function() {
-			
 			this.table = new t41.view.table({
-				'display': this.sdisplay.length > 0 ? this.sdisplay : this.display,
+				'display': jQuery(this.sdisplay).length > 0 ? this.sdisplay : this.display,
 				'collection': this.currentSuggestions,
 				'id': this.props+'_table'
 			});
