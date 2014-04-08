@@ -271,7 +271,7 @@ HTML;
         	// @todo handle objects coming from different backends
 			$p .= sprintf('<tr data-member="%s" data-alias="%s" class="%s">'
 					, $this->_key
-					, $aliases[$this->_do->getUri()->getIdentifier()]
+					, $this->_do->getUri() ? $aliases[$this->_do->getUri()->getIdentifier()] : null
 					, $css
         		  );
         	$i++;
