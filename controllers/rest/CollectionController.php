@@ -197,7 +197,6 @@ class Rest_CollectionController extends Rest_DefaultController {
 		try {
 			/* @var $collection t41\ObjectModel\Collection */
 			$collection = $this->_obj->getCollection();
-			$collection->find();
 			
 			if (! isset($this->_post['alias'])) {
 				$this->status = 'NOK';

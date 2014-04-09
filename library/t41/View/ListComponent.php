@@ -347,7 +347,6 @@ class ListComponent extends ViewObject {
     
     public function reduce(array $params = array(), $cache = true)
     {
-    	$this->bindAliases();
     	$uuid = Registry::set($this, null, true);
     	return array_merge(parent::reduce($params), array('uuid' => $uuid, 'obj' => $this->_collection->reduce($params, $cache)));
     }

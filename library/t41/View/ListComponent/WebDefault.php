@@ -113,9 +113,6 @@ class WebDefault extends AbstractWebDecorator {
     		$this->setParameter('sortable', false);
     	}
     	
-    	$tmp = $this->_obj->reduce();
-    	$this->_uuid = $tmp['uuid'];
-    	
     	// set relevant uri adapter and get some identifiers
     	/* @var $_uriAdapter t41\View\ViewUri\AbstractAdapter */
     	if (! ViewUri::getUriAdapter() instanceof ViewUri\Adapter\GetAdapter ) {
@@ -134,7 +131,10 @@ class WebDefault extends AbstractWebDecorator {
         if (! $this->_obj->getCollection() instanceof StatsCollection) {
 	    	$this->_obj->query($this->_uriAdapter);
         }
-            
+
+        $tmp = $this->_obj->reduce();
+        $this->_uuid = $tmp['uuid'];
+        
         $p = '';
         
         $p = $this->_headerRendering();

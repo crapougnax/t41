@@ -136,7 +136,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 	
 	public function getIdentifier()
 	{
-		return $this->_dataObject->getUri() ? $this->_dataObject->getUri()->getIdentifier() : false;
+		return $this->_dataObject->getIdentifier();
 	}
 	
 	

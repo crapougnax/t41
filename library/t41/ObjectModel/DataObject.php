@@ -101,6 +101,16 @@ class DataObject extends ObjectModelAbstract {
 		$this->_key = substr(md5(time()), rand(0,27), 5);
 	}
 	
+
+	/**
+	 * Return the identifier or the identifier chain of the current data object
+	 * @return mixed
+	 */
+	public function getIdentifier()
+	{
+		return $this->getUri() ? $this->getUri()->getIdentifier() : false;
+	}
+	
 	
 	/**
 	 * Magic method to access a property value
