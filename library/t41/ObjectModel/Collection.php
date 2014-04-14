@@ -317,7 +317,7 @@ class Collection extends ObjectModelAbstract {
 	public function setSorting($property, $order = 'ASC', $modifier = null)
 	{
 		if (! $property instanceof Property\PropertyInterface) {
-			
+			$parent = substr($property[0], 0, strpos($property[0],'.'));
 			if (! is_array($property)) {
 				throw new Exception('First parameter must be either a t41\ObjectModel\Property\AbstractProperty-derived instance or an array');
 			}
@@ -335,7 +335,7 @@ class Collection extends ObjectModelAbstract {
 				throw new Exception("PARAM_DOESNT_MATCH_PROPERTY");
 			}
 		}
-		$this->_sortings[] = array($property, $order, $modifier);
+		$this->_sortings[] = array($property, $order, $modifier, isset($parent) ? $parent : null);
 		return $this;
 	}
 	
@@ -427,21 +427,21 @@ class Collection extends ObjectModelAbstract {
 		
 		if (is_null($backend)) $backend = $this->_latestBackend;
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
-		$res = Backend::find($this, $backend);
 		$this->_latestBackend = $backend;
-		$this->_max = null;
+		$this->_count($backend);
 		
-		if ($memberType) {
-			$this->setParameter('memberType', $prevMemberType);
-		}
-		
-		if ($res === false) {
+		if ($this->_max > 0) {
+			
+			if ($memberType) {
+				$this->setParameter('memberType', $prevMemberType);
+			}
+			Backend::find($this, $backend);
+			$this->_members = Backend::find($this, $backend);
+			$this->setParameter('populated', true);
+			return (integer) $this->_max;
+		} else {
 			return false;
 		}
-		
-		$this->_members = $res;
-		$this->setParameter('populated', true);
-		return (integer) $this->_max;
 	}
 	
 	

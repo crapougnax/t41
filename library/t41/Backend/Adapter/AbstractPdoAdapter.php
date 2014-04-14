@@ -30,6 +30,7 @@ use t41\ObjectModel;
 use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\DateProperty;
+use t41\ObjectModel\Property\ObjectProperty;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters
@@ -636,8 +637,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			
 			$statement = $this->_buildConditionStatement($field, $condition->getClauses(), $conditionArray[1]);
 
-//var_dump($statement); die;
-
 			switch ($conditionArray[1]) {
 				
 				case Condition::MODE_OR:
@@ -687,7 +686,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
 					continue;
 				} else if ($sorting[0] instanceof Property\CollectionProperty) {
-				
 					// handling of conditions based on collection limited to withMembers() and withoutMembers()
 					$leftkey = $sorting[0]->getParameter('keyprop');
 					$field = $property->getId();
@@ -702,6 +700,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					continue;
 				}
 		
+				// default sorting on a different table
 				$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
 				$stable = $this->_getTableFromClass($class);
 		
@@ -714,24 +713,20 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					
 				// add a left join if the sorting field belongs to a table not yet part of the query
 				if ($stable != $table) {
-					if ( ! array_key_exists($stable, $this->_alreadyJoined)) {
+					// get the property id from the class name
+					$tfield = isset($sorting[3]) ? $sorting[3] : $collection->getDataObject()->getObjectPropertyId($class);
 						
-						// get the property id from the class name
-						$tfield = $collection->getDataObject()->getObjectPropertyId($class);
+					$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
+					$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 						
-						$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
-						$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
-						
-						$uniqext = $stable . '__joined_for__' . $leftkey;
-						
+					$uniqext = $stable . '__joined_for__' . $leftkey;
+					if ( ! in_array($uniqext, $this->_alreadyJoined)) {
 						$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
 						$select->joinLeft("$stable AS $uniqext", $join, array());
-						
 						$this->_alreadyJoined[$stable] = $uniqext;
 					}
 					
-					$sortingExpr = $this->_alreadyJoined[$stable] . '.' . $sfield;
-				
+					$sortingExpr  = $this->_alreadyJoined[$stable] . '.' . $sfield;
 				} else {
 					$sortingExpr = $stable . '.' . $sfield;
 				}
@@ -739,14 +734,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
 				$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
-			//}
-		}
+			}
 		
-// 		if (isset($subSelect)) {
-//			echo $select; 
-// 			die;
-// 		}
-
 		$result = array();
 		$context = array('table' => $table);
 		
