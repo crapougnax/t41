@@ -155,15 +155,12 @@ class ObjectProperty extends AbstractProperty {
 	{
 		if (! $this->_value) {
 			return parent::reduce($params, $cache);
-			
 		} else {
-
 			// @todo improve performances !!
 			$uuid = Core\Registry::set($this->getValue(ObjectModel::DATA));
 			
 			if (isset($params['extprops']) && ($params['extprops'] === true || array_key_exists($this->_id, $params['extprops']))) {
-				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id]), $cache);
-				
+				$value = $this->getValue(ObjectModel::DATA)->reduce(array('props' => $params['extprops'][$this->_id], 'extprops' => $params['extprops']), $cache);
 			} else {
 				$value = $this->getDisplayValue();
 			}				
