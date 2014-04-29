@@ -46,6 +46,7 @@ class WebDefault extends AbstractWebDecorator {
 		$class = explode(' ', $this->getParameter('css'));
 		if ($this->getParameter('nolabel') != true) $class[] = 'button';
 		if ($this->getParameter('size')) $class[] = $this->getParameter('size');
+		if ($this->getParameter('color')) $class[] = $this->getParameter('color');
 		
 		/* bind optional action to button */
 		if ($this->_obj->getAction()) {

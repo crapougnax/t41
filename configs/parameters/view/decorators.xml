@@ -172,6 +172,9 @@
 						<type>string</type>
 						<defaultvalue>medium</defaultvalue>
 					</parameter>
+					<parameter id="color">
+						<type>string</type>
+					</parameter>
 					<parameter id="icon">
 						<type>string</type>
 					</parameter>
