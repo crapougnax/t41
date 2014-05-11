@@ -23,11 +23,12 @@ class t41_CronController extends Zend_Controller_Action {
 	protected $_modules = array();
 	
 	
-	public $cr = '<br/>';
+	public $cr = null;
 	
 
 	public function preDispatch()
 	{
+		$this->cr = Core::$mode == 'cli' ? "\n" : '<br/>';
 		// get active modules list
 		// detect existing CronController()
 		foreach (Module::getConfig() as $vendor => $modules) {
