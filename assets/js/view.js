@@ -14,6 +14,7 @@ if (! window.t41.view) {
 
 	window.t41.view.register = function(id, obj) {
 		t41.view.registry[id] = obj;
+		t41.view.get[id] = obj; // temp hack
 	};
 
 	
