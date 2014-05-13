@@ -799,7 +799,7 @@ class Collection extends ObjectModelAbstract {
 				
 					/* sum up the values of all members $prop property */
 					case ObjectModel::CALC_SUM:
-						foreach ($this->_members as $member) {
+						foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
 							$property = $member->getProperty($prop);
 							if (! $property instanceof Property\AbstractProperty) {
 								continue;
