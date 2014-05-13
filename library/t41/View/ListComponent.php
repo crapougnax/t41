@@ -268,12 +268,15 @@ class ListComponent extends ViewObject {
     		$this->_collection->setBoundaryOffset($env[$offsetIdentifier]);
     	}
     	
-    //	if ($this->_collection->getParameter('populated') !== true) {
+    	if ($this->_collection->getParameter('populated') !== true) {
     		//$this->_collection->debug(); die;
     		$this->_collection->find(ObjectModel::DATA);
-    		$this->setParameter('max', $this->_collection->getMax());
     		$this->bindAliases();
-    //	}
+    	}
+    	
+    	if (! $this->_collection->getMax()) {
+    		$this->setParameter('max', $this->_collection->getMax());
+    	}
     }
     
     
