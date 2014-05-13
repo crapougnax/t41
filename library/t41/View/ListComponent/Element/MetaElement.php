@@ -64,7 +64,6 @@ class MetaElement extends AbstractElement {
 	{
 		$value = $this->getValue($do);
 		
-		\Zend_Debug::dump($this->getParameter('type'));
 		switch ($this->getParameter('type')) {
 			
 			case 'currency':
