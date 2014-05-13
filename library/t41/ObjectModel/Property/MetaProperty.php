@@ -81,7 +81,7 @@ class MetaProperty extends AbstractProperty {
 		switch ($this->getParameter('type')) {
 			
 			case 'currency':
-				$value = CurrencyProperty::format($value);
+				$value = CurrencyProperty::format($value,2);
 				break;
 				
 			case 'date':

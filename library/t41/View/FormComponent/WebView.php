@@ -40,14 +40,13 @@ class WebView extends WebDefault {
         	$label = '&nbsp;';
 	        $label = $this->_escape($element->getTitle());
 
-    	    $line = sprintf('<div class="clear"></div><div class="label"><label for="%s" data-help="%s">%s</label></div>'
+    	    $p .= sprintf('<div class="clear"></div><div class="label"><label for="%s" data-help="%s">%s</label></div>'
     	    				, $field->getAltId()
     	    				, $field->getHelp()
             				, $label
             			 );
             			 
-            	
-            $p .= $line . '<div class="field">' . $field->formatValue($field->getValue()) . '</div>';
+            $p .= sprintf('<div class="field" id="elem_%s">%s</div>', $element->getId(), $field->formatValue($field->getValue()));
         }
 
         $p .= '</fieldset>';

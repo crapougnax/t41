@@ -33,6 +33,7 @@ use t41\Backend\Condition;
 use t41\ObjectModel\Property\ArrayProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\MediaProperty;
+use t41\ObjectModel\Property\CollectionProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -307,8 +308,10 @@ class DataObject extends ObjectModelAbstract {
     		// meta properties are ignored
     		if ($value instanceof MetaProperty) continue;
     		
-    		// should we consider only changed properties?
-    		if ($changed === true && $value->hasChanged() !== true) continue;
+    		// should we consider only changed properties (except for collection which status is ambiguous) ?
+    		if (! $value instanceof CollectionProperty && $changed === true && $value->hasChanged() !== true) {
+    			continue;
+    		}
     		
     		if ($display === true && ! $value instanceof Property\CurrencyProperty) {
     			// if $display is set to TRUE, store property's display value

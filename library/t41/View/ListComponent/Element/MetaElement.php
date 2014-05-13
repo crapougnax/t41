@@ -48,17 +48,13 @@ class MetaElement extends AbstractElement {
 		$property = $do->getProperty($this->getParameter('property'));
 			
 		if ($property instanceof CollectionProperty) {
-				
 			$subParts = explode('.', $this->getParameter('action'));
 			$collection = $property->getValue();
 			return $collection->{$subParts[0]}(isset($subParts[1]) ? $subParts[1] : null);
 			
 		} else if ($property instanceof AbstractProperty) {
-			
 			return $property->getValue();
-			
 		} else {
-			
 			return $this->_value; //parent::getValue();
 		}
 	}
@@ -68,10 +64,11 @@ class MetaElement extends AbstractElement {
 	{
 		$value = $this->getValue($do);
 		
+		\Zend_Debug::dump($this->getParameter('type'));
 		switch ($this->getParameter('type')) {
 			
 			case 'currency':
-				$value = CurrencyProperty::format($value);
+				$value = CurrencyProperty::format($value,2);
 				break;
 		}
 		

@@ -43,12 +43,12 @@ class WebDefault extends AbstractWebDecorator {
 		View::addCoreLib(array('view:table2.js','view:action:autocomplete.js'));
 		
 		$id = $this->_nametoDomId($this->_obj->getBoundObject()->getId());
-		$event = sprintf("t41.view.registry['%s'] = new t41.view.action.autocomplete(%s,'%s')"
+		$event = sprintf("t41.view.register('%s', new t41.view.action.autocomplete(%s,'%s'))"
 						, $id
 						, \Zend_Json::encode($this->_obj->reduce(array('params' => array(), 'collections' => 1)))
 						, $id
 						);
 		View::addEvent($event, 'js');
-		View::addEvent(sprintf("t41.view.registry['%s'].init()", $id), 'js');
+		View::addEvent(sprintf("t41.view.get('%s').init()", $id), 'js');
 	}
 }

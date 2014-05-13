@@ -47,6 +47,10 @@ class ListComponent extends ViewObject {
 	const METACOL = '*';
 	
 	
+	/**
+	 * Collection
+	 * @var t41\ObjectModel\Collection
+	 */
 	protected $_collection;
 	
 
@@ -252,7 +256,9 @@ class ListComponent extends ViewObject {
     	// set query sorting from context
     	if (isset($env[$sortIdentifier]) && is_array($env[$sortIdentifier])) {
     		foreach ($env[$sortIdentifier] as $field => $value) {
-    			$this->_collection->setSorting(array($field, $value));
+    			if (($property = $this->_collection->getDataObject()->getRecursiveProperty($field)) !== false) {
+    				$this->_collection->setSorting($property, $value);
+    			}
     		}
     	}
     	
