@@ -45,9 +45,6 @@ class AbstractCronController extends \Zend_Controller_Action {
 	{
 		if (Core::$mode != 'cli') {
 			echo "</pre></body></html>\n";
-		} else {
-			$this->_component->register();
-			echo View::display();
 		}
 	}
 
