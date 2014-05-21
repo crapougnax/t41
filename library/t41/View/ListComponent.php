@@ -274,7 +274,7 @@ class ListComponent extends ViewObject {
     		$this->bindAliases();
     	}
     	
-    	if (! $this->_collection->getMax()) {
+    	if ($this->getParameter('max') == 0) {
     		$this->setParameter('max', $this->_collection->getMax());
     	}
     }
