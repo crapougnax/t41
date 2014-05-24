@@ -161,14 +161,16 @@ class AutocompleteAction extends AbstractAction {
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
 
 		$this->_obj->find(ObjectModel::MODEL);
-		//$this->_obj->debug();
 		
 		if ($this->_obj->find(ObjectModel::MODEL) === false) {
 			return false;
 		}
 		
+		$params = $this->getParameter('member_reduce_params') ? $this->getParameter('member_reduce_params') : array();
+		$params['props'] = array_merge($this->getParameter('display'), $this->getParameter('sdisplay'));
+		
 		foreach ($this->_obj->getMembers() as $member) {
-			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
+			$data[$member->getUri()->getIdentifier()] = $member->reduce($params);
 		}
 
 		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());	
