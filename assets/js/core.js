@@ -127,7 +127,7 @@ if (! window.t41.core) {
 		
 		
 		// send ajax request to server
-		t41.core.ajax({url:url,
+		return t41.core.ajax({url:url,
 				 	 data:p.data,
 				 	 success:p.callback ? p.callback : arguments.callee.caller,
 				 	 error:t41.core.defaultCallback,
@@ -163,7 +163,7 @@ if (! window.t41.core) {
 	window.t41.core.ajax = function(value) {
 		try {
 			t41.core.ajaxSetup(value);
-			jQuery.ajax(value);
+			return jQuery.ajax(value);
 		} catch (e) {
 			new t41.view.alert(e.message, {level:'error'});
 		}
@@ -171,15 +171,11 @@ if (! window.t41.core) {
 
 	
 	window.t41.core.defaultCallback = function(data) {
-
 		switch (data.status) {
-		
 			case t41.core.status.ok:
 				if (data.context.redirect) {
-				//	console.log(data.context.redirect);
 					document.location = data.context.redirect;
 				} else {
-					
 					new t41.view.alert(data.context.message, {level:'info',timer:5});
 				}
 				break;
@@ -196,20 +192,16 @@ if (! window.t41.core) {
 	
 	
 	window.t41.core.parameter = function(type,val) {
-	
 		this.type = type;
 		this.val = val;
 	};
 	
 	
 	window.t41.core.setParameters = function(obj) {
-		
 		var params = {};
 		for (var i in obj) {
-			
 			params[i] = new t41.core.parameter(obj[i].type,obj[i].val);
 		}
-		
 		return params;
 	};
 	

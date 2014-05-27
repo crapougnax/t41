@@ -186,8 +186,7 @@ if (! window.t41.view.action.autocomplete) {
 
 		
 		this.getHelper = function(data) {
-
-			if (data.total == 0) {
+			if (data.total == 0 || ! data.total) {
 				var helpertext = t41.lget('ac:noresult');
 				var css = 'none';
 			} else if (data.total == 1) {
@@ -429,7 +428,12 @@ if (! window.t41.view.action.autocomplete) {
 		if (ac.callbacks.preQuery && typeof ac.callbacks.preQuery == 'function') {
 			config = ac.callbacks.preQuery.call(this,config);
 		}
-		t41.core.call(config);
+		
+		var xhrId = obj.currentTarget.id + '_xhr';
+		if (t41.view.get(xhrId)) {
+			t41.view.get(xhrId).abort();
+		}
+		t41.view.register(xhrId, t41.core.call(config));
 	};
 	
 	
@@ -443,11 +447,11 @@ if (! window.t41.view.action.autocomplete) {
 		switch (obj.status) {
 		
 			case t41.core.status.ok:
+			case t41.core.status.nok:
 				var ac = t41.view.registry[this.attr('id')];
 				
 				// ignore queries coming back home too late
 				if (ac.sequence > obj.data._sequence) {
-					//console.log('ignored server late response #' + obj.data._sequence + ' for query "' + obj.data._query + '".');
 					return false;
 				}
 				
