@@ -119,6 +119,9 @@ HTML;
             	$field->setValue($this->_env[$this->_searchIdentifier][$field->getId()]);
         	}
         	
+        	// Reset default value to empty
+        	$field->setDefaultValue('');
+        	
         	$data = isset($this->_env[$this->_searchIdentifier]) ? $this->_env[$this->_searchIdentifier] : null;
             $deco = Decorator::factory($field, array('mode' => FormComponent::SEARCH_MODE, 'data' => $data));
 
