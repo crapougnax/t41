@@ -127,7 +127,7 @@ class CsvDefault extends AbstractCsvDecorator {
             	}
         
         		$fv = str_replace('\r\n', ', ', stripslashes($value));
-        		$p .= "\"" . str_replace("\"","\\\"",$fv) . "\"";
+        		$p .= "\"" . str_replace('"','""',$fv) . "\"";
 	        }
         	$row .= $p . "\r\n";
         	
