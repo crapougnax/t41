@@ -19,7 +19,6 @@ namespace t41\View\ViewUri\Adapter;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
 
@@ -66,7 +65,6 @@ class GetAdapter extends AbstractAdapter {
 	public function __construct($uriBase = null, $params = null)
 	{
 		$this->setEnv($_GET);
-		
 		parent::__construct($uriBase, $params);
 	}
 }

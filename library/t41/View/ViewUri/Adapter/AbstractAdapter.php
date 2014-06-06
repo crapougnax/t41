@@ -19,7 +19,6 @@ namespace t41\View\ViewUri\Adapter;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
 use t41\Core;
@@ -83,6 +82,9 @@ abstract class AbstractAdapter {
 	protected $_env = array();
 	
 	
+	protected $_defaults = array();
+	
+	
 	protected $_params = array();
 	
 	/**
@@ -100,6 +102,10 @@ abstract class AbstractAdapter {
 		}
 		
 		$this->setUriBase($uriBase);
+		$this->_defaults = array($this->_identifiers['search'] => array(),
+								 $this->_identifiers['sort']   => array(),
+								 $this->_identifiers['offset'] => array()
+								);
 		if (is_array($params)) $this->_params = $params;
 	}
 	
@@ -107,6 +113,31 @@ abstract class AbstractAdapter {
 	public function setUriBase($uri)
 	{
 		$this->_uriBase = $uri;
+	}
+	
+	
+	
+	/**
+	 * Define a default value for given argument
+	 * @param string $key
+	 * @param string $val
+	 * @return \t41\View\ViewUri\Adapter\AbstractAdapter
+	 */
+	public function setArgumentDefault($key, $val, $set = 'search')
+	{
+		$this->_defaults[$this->_identifiers[$set]][$key] = $val;
+		return $this;
+	}
+	
+	
+	/**
+	 * Return given argument default value if exists, FALSE otherwise
+	 * @param string $key
+	 * @return mixed
+	 */
+	public function getArgumentDefault($key, $set = 'search')
+	{
+		return isset($this->_defaults[$set][$key]) ? $this->_defaults[$set][$key] : false;
 	}
 	
 	
@@ -128,14 +159,11 @@ abstract class AbstractAdapter {
 	public function setArgument($key, $value = null, $set = null)
 	{
 		if (! is_numeric($key)) {
-			
 			if ($set && !is_numeric($set)) {
-
 				if (! isset($this->_arguments[$set])) {
 					$this->_arguments[$set] = array();
 				}
 				$this->_arguments[$set][$key] = $value;
-				
 			} else {
 				$this->_arguments[$key] = $value;
 			}
@@ -284,13 +312,13 @@ abstract class AbstractAdapter {
 	
 	
 	/**
-	 * Return current $_env value
+	 * Return current $_env value merged with $_defaults value
 	 * 
 	 * @return array
 	 */
 	public function getEnv()
 	{
-		return $this->_env;
+		return array_merge($this->_defaults, $this->_env);
 	}
 	
 	

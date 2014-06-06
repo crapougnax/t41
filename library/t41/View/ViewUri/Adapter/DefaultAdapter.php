@@ -19,7 +19,6 @@ namespace t41\View\ViewUri\Adapter;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2009 Quatrain Technologies SAS (http://technologies.quatrain.com)
  * @license    http://t41.quatrain.com/license/new-bsd     New BSD License
- * @version    $Revision: 650 $
  */
 
 use t41\View\ViewUri\Adapter;
