@@ -279,6 +279,7 @@ class Collection extends ObjectModelAbstract {
 	
 	/**
 	 * Reset all conditions matching the given property id
+	 * Limitation: combos are ignored 
 	 * @param string $property
 	 * @return t41\ObjectModel\Collection current instance
 	 */
@@ -293,10 +294,12 @@ class Collection extends ObjectModelAbstract {
 		foreach ($this->_conditions as $key => $condition) {
 			if (! $condition[0] instanceof Combo && $condition[0]->getProperty()->getId() == $property) {
 				unset($this->_conditions[$key]);
-				$this->setParameter('populated', false);
-				$this->_members = null;
 			}
 		}
+		
+		$this->setParameter('populated', false);
+		$this->_members = null;
+		
 		return $this;
 	}
 	
