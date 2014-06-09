@@ -59,6 +59,10 @@ class ViewUri {
 	}
 	
 	
+	/**
+	 * Return the current view uri adapter
+	 * @return \t41\View\t41\View\ViewUri\AbstractAdapter
+	 */
 	public static function getUriAdapter()
 	{
 		if (self::$_uriAdapter instanceof AbstractAdapter) {
