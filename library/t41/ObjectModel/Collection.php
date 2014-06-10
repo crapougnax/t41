@@ -269,7 +269,7 @@ class Collection extends ObjectModelAbstract {
 	 * @param string $mode
 	 * @return \t41\Backend\Condition\Combo
 	 */
-	public function setConditionCombo($mode)
+	public function setConditionCombo($mode = null)
 	{
 		$combo = new Condition\Combo($this);
 		$this->_conditions[] = array($combo, $mode);
