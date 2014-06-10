@@ -54,10 +54,14 @@ class WebDefault extends AbstractWebDecorator {
 		} else if ($this->_obj->getLink()) {
 			$link = $this->_obj->getLink();
 			$uri = $this->_obj->getParameter('uri');
-			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') $link .= '/id/' . rawurlencode($uri->getIdentifier());
-			
-			$extraHtml[] = sprintf("onclick=\"t41.view.link('%s', jQuery('#%s'))\"", $link, $this->getId());
-			
+			if ($uri instanceof ObjectUri && substr($link,0,1) == '/') {
+				$link .= '/id/' . rawurlencode($uri->getIdentifier());
+			}
+			if (substr($link, 0, 4) == 't41.') {
+				$extraHtml[] = sprintf("onclick=\"%s\"", $link);
+			} else {
+				$extraHtml[] = sprintf("onclick=\"t41.view.link('%s', jQuery('#%s'))\"", $link, $this->getId());
+			}		
 		} else {
 			$data = $this->getParameter('data');
 			$adapter = ViewUri::getUriAdapter();
