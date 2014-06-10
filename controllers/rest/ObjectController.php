@@ -72,7 +72,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 								// action exists to update or remove member
 								if (isset($memberArray['action'])) {
 									// get target member
-									$object = $property->getValue()->getMember($memberKey);
+									$object = $property->getValue()->getMember($memberKey, ObjectModel::MODEL);
 										
 									switch ($memberArray['action']) {
 										
