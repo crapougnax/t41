@@ -140,7 +140,7 @@ window.t41.view.form = function(id,obj,form) {
 					
 				case 'enumElement':
 					var elem = jQuery('[name="' + i + '"]');
-					elements[i] = elem[0].type == 'select-one' ? jQuery('[name="' + i + '"]').val() : jQuery('[name="' + i + '"]:checked').val()
+					elements[i] = elem.length > 0 && elem[0].type == 'select-one' ? jQuery('[name="' + i + '"]').val() : jQuery('[name="' + i + '"]:checked').val();
 					// @todo find a better way to address radio sets with none checked
 					// undefined should only be found when element is missing because already defined & protected
 					if (elements[i] == undefined) elements[i] = "";
