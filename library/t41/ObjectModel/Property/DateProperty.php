@@ -82,15 +82,24 @@ class DateProperty extends AbstractProperty {
 	}
 	
 	
-	static public function format($str)
+	/**
+	 * Format a date or datetime string for display
+	 * @param string $str
+	 * @param boolean $time
+	 * @return string
+	 */
+	static public function format($str, $time = false)
 	{
 		$parts = explode(' ', $str);
+		if (count($parts) == 1) {
+			$parts = explode('T', $str);
+		}
 			
 		$date = explode('-', $parts[0]);
 		$date = array_reverse($date);
 		$date = implode('/', $date);
 		
-		if (isset($parts[1])) {
+		if ($time && isset($parts[1])) {
 			$hour = explode(':',$parts[1]);
 			$date .= sprintf(' %sh%s', $hour[0], $hour[1]);
 		}
