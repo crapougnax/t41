@@ -68,7 +68,11 @@ class t41_CronController extends Zend_Controller_Action {
 	{
 		foreach ($this->_modules as $key => $module) {
 			printf("Executing cron jobs in %s module: ", $key);
-			$this->_forward('daily','cron',$module['controller']['base']);
+			require_once Core::$basePath . '/application/modules/' . $key . '/controllers/CronController.php';
+			$controller = sprintf('%s_CronController', $module['controller']['base']);
+			$controller = new $controller;
+			$controller->dailyAction();
+//			$this->_forward('daily','cron',$module['controller']['base']);
 			print "OK";
 			print $this->cr;
 		}		
