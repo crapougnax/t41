@@ -323,7 +323,7 @@ class Parameter implements Core\ClientSideInterface {
 	
 	static public function getViewObjectParameters($objectClass)
 	{
-		if (! isset(self::$_config['view_objects'])) {
+		if (! isset(self::$_config['view'])) {
 			self::loadConfig('parameters/view/objects.xml');
 		}
 		$array = self::_compileFragments($objectClass, 'view');
