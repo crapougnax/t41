@@ -633,15 +633,12 @@ class Collection extends ObjectModelAbstract {
 				if ($member instanceof BaseObject) {
 					$member = $member->getDataObject();
 				} else {
-					$do = new DataObject($class);
-					$do->setUri($member);
-					Backend::read($do);
-					$member = $do;
+					$member = Core::_($member)->getDataObject();
 				}
 				break;
 				
 			case ObjectModel::MODEL:
-				$member = new $class($member);
+				$member =  Core::_($member); //new $class($member);
 				break;
 				
 			case ObjectModel::URI:
