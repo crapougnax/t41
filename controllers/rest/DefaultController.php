@@ -61,17 +61,14 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		$this->_uuid = $this->_getParam('uuid');
 	
 		if ($this->_uuid) {
-	
 			$this->_obj = Core\Registry::get($this->_uuid);
 			$this->_defineRedirect(array('ok','nok','err'));
 	
 			if ($this->_obj instanceof ObjectModel\ObjectUri) {
-	
 				$this->_obj = ObjectModel::factory($this->_obj);
 			}
 	
 			if (! $this->_obj) {
-	
 				$this->_context['message'] = "Unable to restore object";
 				$this->_status = 'ERR';
 				$this->postDispatch();
@@ -79,12 +76,9 @@ class Rest_DefaultController extends Zend_Controller_Action {
 
 			// @todo post actions coming from js, unsecure, we should keep a reference of the handling form object
 			if ($this->_getParam('post_ok')) {
-
 				$this->_actions['ok'] = $this->_getParam('post_ok');
 			}
-			
 		} else {
-	
 			$this->_context['message'] = 'Missing remote object id';
 			$this->_status = 'NOK';
 			$this->postDispatch();
@@ -95,13 +89,11 @@ class Rest_DefaultController extends Zend_Controller_Action {
 	public function postDispatch()
 	{
 		if ($this->_uuid && $this->_refreshCache === true) {
-
 			Registry::set($this->_obj, $this->_uuid, true);
 		}
 		
 		// reinject some data 
 		foreach ($this->_post as $key => $val) {
-
 			if (substr($key,0,1) == '_') {
 				$this->_data[$key] = $val;
 			}
@@ -112,11 +104,8 @@ class Rest_DefaultController extends Zend_Controller_Action {
 			
 			// declare object in tag parsing class to use it for tag substitution on redirect urls
 			if ($this->_obj instanceof ObjectModel\BaseObject || $this->_obj instanceof ObjectModel\DataObject) {
-					
 				Core\Tag\ObjectTag::$object = $this->_obj;
-				
 			} else if ($this->_obj instanceof Action\AbstractAction) {
-				
 				Core\Tag\ObjectTag::$object = $this->_obj->getObject();
 			}
 					
@@ -125,28 +114,28 @@ class Rest_DefaultController extends Zend_Controller_Action {
 			
 		if (isset($this->_post['_debug'])) $this->_context['debug'] = Backend::getLastQuery();
 		
-		exit($this->_setResponse($this->_status, $this->_data, $this->_context));
+		$this->_setResponse($this->_status, $this->_data, $this->_context);
 	}
 	
 	
 	protected function _setResponse($status = 'OK', $data, $context = null, $format = 'json')
 	{
 		$response = array('status' => $status, 'data' => $data, 'context' => $context);
-		
  		switch ($format) {
  			
  			case 'json':
  			default:
- 				header('Content-Type:application/json');
+ 				$this->getResponse()->setHeader('Content-type', 'application/json')->setBody(\Zend_Json::encode($response));
  				if (Core::getEnvData('cache_datasets') !== false) {
-	 				header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
- 					header_remove('Cache-Control');
- 					header_remove('Pragma');
+	 				$this->getResponse()->setHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
+ 					$this->getResponse()->clearHeader('Cache-Control');
+ 					$this->getResponse()->clearHeader('Pragma');
  				}
- 				return \Zend_Json::encode($response);
  				break;
  		}
-		
+ 		
+ 		$this->getResponse()->sendResponse();
+		exit();
 	}
 	
 	
@@ -159,15 +148,11 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		if (! is_array($val)) $val = (array) $val;
 		
 		foreach ($val as $key) {
-			
 			$var = 'redirect_' . $key;
 
 			if (isset($this->_post[$var])) {
-				
 				$this->_redirects[$key] = $this->_post[$var];
-				
 			} else if ($this->_obj instanceof Action\AbstractAction && $this->_obj->getParameter($var)) {
-				
 				$this->_redirects[$key] = $this->_obj->getParameter($var);
 			}
 		}
