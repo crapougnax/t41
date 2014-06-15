@@ -177,7 +177,6 @@ if (! window.t41.view.action.autocomplete) {
 			if (data.total > 0) {
 				this.table.render(jQuery('#' + this.props));
 				var callback = typeof this.callbacks.select == 'function' ? this.callbacks.select : eval(this.callbacks.select);
-				console.log(callback);
 				t41.view.bindLocal(jQuery('#' + this.props + '_table'), 'click', callback, this);
 			}
 
