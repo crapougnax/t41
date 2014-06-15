@@ -31,6 +31,7 @@ use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\IdentifierProperty;
 use t41\ObjectModel\Collection\StatsCollection;
 use t41\Backend\Condition\Combo;
+use t41\Core;
 
 /**
  * Class for a collection of Objects
