@@ -161,6 +161,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 	}
 	
 	
+	public function getTableFromClass($class)
+	{
+		return $this->_getTableFromClass($class);
+	}
+	
+	
 	protected function _getTableFromUri(ObjectModel\ObjectUri $uri)
 	{
 		if ($uri instanceof ObjectModel\ObjectUri && $uri->getUrl()) {

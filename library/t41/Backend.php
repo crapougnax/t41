@@ -383,6 +383,7 @@ class Backend {
 		if ($do->getUri()) {
 				
 			// populate data object in backend adapter and return status
+			Core::log(sprintf('[Backend] Loading %s object (%s)', $do->getClass(), $do->getUri()));
 			return $backend->read($do);
 			
 		} else {

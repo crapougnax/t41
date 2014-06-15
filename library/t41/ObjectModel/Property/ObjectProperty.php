@@ -19,7 +19,6 @@ namespace t41\ObjectModel\Property;
  * @package    t41_Property
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 865 $
  */
 
 use	t41\Core;
@@ -91,28 +90,22 @@ class ObjectProperty extends AbstractProperty {
 			
 			case ObjectModel::MODEL:
 				if ($this->_value instanceof ObjectModel\DataObject) {
-					
-					$this->_value = ObjectModel::factory($this->_value);
+					$this->_value = Core::_($this->_value->getUri());
 					return $this->_value;
-					
 				} else if ($this->_value instanceof ObjectUri) {
 					/* object uri */
-					$this->_value = ObjectModel::factory($this->_value);
+					$this->_value = Core::_($this->_value);
 				}
 				return $this->_value;
 				break;
 				
 			case ObjectModel::DATA:
 				if ($this->_value instanceof ObjectUri) {
-					
-					$this->_value = ObjectModel::factory($this->_value);
+					$this->_value = Core::_($this->_value);
 					return $this->_value->getDataObject();
-					
 				} else if ($this->_value instanceof DataObject) {
 					return $this->_value;
-					
 				} else {
-					
 					return $this->_value->getDataObject();
 				}
 				break;
@@ -120,15 +113,10 @@ class ObjectProperty extends AbstractProperty {
 			case ObjectModel::URI:
 			default:
 				if ($this->_value instanceof ObjectUri) {
-					
 					return $this->_value;
-					
 				} else if ($this->_value instanceof DataObject) {
-					
 					return $this->_value->getUri();
-					
 				} else {
-					
 					return $this->_value->getDataObject()->getUri();
 				}
 				break;

@@ -28,6 +28,7 @@ use t41\Core,
 	t41\Config;
 use t41\View\Decorator;
 use t41\Core\Session;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -989,6 +990,39 @@ class Core {
 			return self::$_env['controllers'][$type];
 		} else {
 			return false;
+		}
+	}
+	
+	
+	static public function _($uri, $class = null)
+	{
+		if (! $uri instanceof ObjectUri) {
+			if (is_null($class)) {
+				throw new Exception("Give ObjectUri() instance or specify object class as second argument");
+			}
+		} else {
+			$class = $uri->getClass();
+		}
+	
+		$def = ObjectModel::getObjectDna($class);
+		if ($def && isset($def['unchanging'])) {
+			// get cache version
+			if (! $uri instanceof ObjectUri) {
+				$uri = new ObjectUri($uri);
+				$uri->setClass($class);
+			}
+	
+			if (($obj = self::cacheGet($uri->getPermanentUUID())) !== false) {
+				self::log(sprintf('[Persistence] Loaded %s object (%s) from cache', $class, $uri));
+			} else {
+				$obj = new $class($uri);
+				self::cacheSet($obj, $uri->getPermanentUUID(), true, array('tags' => array('permanent')));
+				self::log(sprintf('[Persistence] Saved %s object (%s) in cache', $class, $uri));
+			}
+			return $obj;
+	
+		} else {
+			return new $class($uri);
 		}
 	}
 }

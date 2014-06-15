@@ -35,14 +35,10 @@ class Registry {
 		}
 		
 		if (is_null($id)) {
-			
 			if (($obj instanceof ObjectModel\BaseObject || $obj instanceof ObjectModel\DataObject) && $obj->getUri()) {
-				
 				$prefix = ($obj instanceof ObjectModel\BaseObject) ? 'obj_' : 'do_';
 				$id = $prefix . md5($obj->getUri()->asString());
-				
 			} else {
-
 				$id = UUID::v4();
 			}
 		}

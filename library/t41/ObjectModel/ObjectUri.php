@@ -24,6 +24,7 @@ namespace t41\ObjectModel;
 
 use t41\Backend,
 	t41\Core;
+use t41\ObjectModel;
 
 /**
  * Class providing exchange interface with data sources
@@ -162,6 +163,7 @@ class ObjectUri implements Core\ClientSideInterface {
 	public function setClass($class)
 	{
 		$this->_class = $class;
+		$this->_url = Backend::getInstance($this->_backendUri)->getTableFromClass($class) . '/' . $this->_identifier;
 		return $this;
 	}
 	
@@ -205,12 +207,15 @@ class ObjectUri implements Core\ClientSideInterface {
 	public function asString(BackendUri $backend = null)
 	{
 		if ($backend && $backend->getAlias() == $this->_backendUri->getAlias()) {
-				
 			return $this->_identifier;
-		
 		} else {
-		
 			return $this->__toString();
 		}
+	}
+	
+	
+	public function getPermanentUUID()
+	{
+		return 'perm_' . md5($this->__toString());
 	}
 }
