@@ -572,16 +572,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 
 					$uniqext = $jtable . '__joined_for__' . $leftkey;
-					if (in_array($uniqext, $this->_alreadyJoined)) {
-						continue;
+					if (! in_array($uniqext, $this->_alreadyJoined)) {
+						$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
+						$select->joinLeft($jtable . " AS $uniqext", $join, array());
+						$this->_alreadyJoined[$jtable] = $uniqext;
 					}
-					$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
-					$select->joinLeft($jtable . " AS $uniqext", $join, array());
-					$this->_alreadyJoined[$jtable] = $uniqext;
 					$jtable = $uniqext;
 				}
 			} else if ($property instanceof Property\CollectionProperty) {
-				
 				// handling of conditions based on collection limited to withMembers() and withoutMembers()
 				$leftkey = $property->getParameter('keyprop');
 				$field = $property->getId();
