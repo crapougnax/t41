@@ -325,9 +325,11 @@ class Condition {
 	 */
 	public function where($value, $operator, $mode = self::MODE_AND)
 	{
-		$value = trim($value);
-		if (strlen($value) == 0) {
-			throw new Exception("The value of the condition is empty");
+		if (is_string($value)) {
+			$value = trim($value);
+			if (strlen($value) == 0) {
+				throw new Exception("The value of the condition is empty");
+			}
 		}
 		// clause is added and counter is incremented
 		return $this->setValue($value)
