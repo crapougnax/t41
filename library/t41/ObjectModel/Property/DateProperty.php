@@ -76,9 +76,9 @@ class DateProperty extends AbstractProperty {
 	
 	
 	
-	public function getDisplayValue()
+	public function getDisplayValue($time = true)
 	{
-		return self::format($this->_value);
+		return self::format($this->_value, $time);
 	}
 	
 	
