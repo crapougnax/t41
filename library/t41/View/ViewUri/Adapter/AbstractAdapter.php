@@ -330,6 +330,9 @@ abstract class AbstractAdapter {
 	 */
 	public function setEnv(array $env)
 	{
+		foreach ($env as $key => $val) {
+			$env[$key] = array_map(function($v) { return is_string($v) ? trim($v) : $v; }, $val);
+		}
 		$this->_env = $env;
 		return $this;
 	}
