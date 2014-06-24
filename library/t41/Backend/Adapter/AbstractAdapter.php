@@ -27,6 +27,7 @@ use t41\ObjectModel\DataObject;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\AbstractProperty;
 use t41\ObjectModel\ObjectUri;
+use t41\Core;
 
 /**
  * Abstract class for Backend adapters
@@ -320,7 +321,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 		if ($collection->getParameter('memberType') != ObjectModel::URI) {
 			$do = clone $collection->getDataObject();
 		}
-
+		
 		foreach ($ids as $key => $id) {
 			$uri = clone $uriBase;
 			$uri->setUrl($uri->getUrl() . $id)->setIdentifier($id);
@@ -332,24 +333,17 @@ abstract class AbstractAdapter implements AdapterInterface {
             		break;
             		
             	case ObjectModel::MODEL:
-            		$obj = clone $do;
-            		$obj->setUri($uri);
-            		$this->read($obj);
-            		$obj = new $class($obj);
+            		$obj = Core::_($uri,$class);
             		break;
             		
             		
             	case ObjectModel::DATA:
             	default:
-            		$obj = clone $do;
-            		$obj->setUri($uri);
-            		$this->read($obj);
+            		$obj = Core::_($uri,$class)->getDataObject();
             		break;
             }
-            
             $array[$key] = $obj;
 		}
-		
 		return $array;
 	}
 	

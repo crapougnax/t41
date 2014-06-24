@@ -31,6 +31,7 @@ use t41\ObjectModel\ObjectUri;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\DateProperty;
 use t41\ObjectModel\Property\ObjectProperty;
+use t41\Core;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters

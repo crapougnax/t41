@@ -520,6 +520,7 @@ class Backend {
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 
+		Core::log(sprintf('[Backend] executing find() on %s collection', $co->getClass()));
 		return $backend->find($co, $returnCount);
 	}
 	
