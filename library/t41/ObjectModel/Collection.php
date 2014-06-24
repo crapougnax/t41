@@ -435,11 +435,9 @@ class Collection extends ObjectModelAbstract {
 		$this->_count($backend);
 		
 		if ($this->_max > 0) {
-			
 			if ($memberType) {
 				$this->setParameter('memberType', $prevMemberType);
 			}
-			Backend::find($this, $backend);
 			$this->_members = Backend::find($this, $backend);
 			$this->setParameter('populated', true);
 			return (integer) $this->_max;
