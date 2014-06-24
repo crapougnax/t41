@@ -82,8 +82,7 @@ class ListElement extends AbstractElement {
 	public function getTotalValues()
 	{
 		if (is_null($this->_totalValues)) {
-			$this->_collection->find();
-			$this->_totalValues = $this->_collection->getTotalMembers();
+			$this->_totalValues = $this->_collection->count();
 		}
 		return $this->_totalValues;
 	}
