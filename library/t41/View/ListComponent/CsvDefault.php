@@ -84,6 +84,7 @@ class CsvDefault extends AbstractCsvDecorator {
     	if (! ($this->_uriAdapter = ViewUri::getUriAdapter()) instanceof ViewUri\Adapter\GetAdapter ) {
     		$this->_uriAdapter = new ViewUri\Adapter\GetAdapter();
     	}
+    	$this->_uriAdapter->setEnvData($this->_uriAdapter->getIdentifier('offset'), 0);
         $this->_obj->query($this->_uriAdapter);
 
         $row = '';

@@ -19,7 +19,6 @@ namespace t41\View\ListComponent;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 963 $
  */
 
 use t41\ObjectModel;
@@ -108,6 +107,8 @@ class PdfDefault extends AbstractPdfDecorator {
     	 
     	// set data source for environment
     	$this->_env = $this->_uriAdapter->getEnv();
+    	
+    	$this->_uriAdapter->setEnvData($this->_uriAdapter->getIdentifier('offset'), 0);
     	
         $this->_obj->query($this->_uriAdapter);
 
