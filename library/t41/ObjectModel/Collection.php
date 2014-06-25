@@ -637,7 +637,7 @@ class Collection extends ObjectModelAbstract {
 				break;
 				
 			case ObjectModel::MODEL:
-				$member =  Core::_($member); //new $class($member);
+				$member =  Core::_($member instanceof DataObject ? $member->getUri() : $member); //new $class($member);
 				break;
 				
 			case ObjectModel::URI:

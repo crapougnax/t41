@@ -270,6 +270,7 @@ class DataObject extends ObjectModelAbstract {
     {
     	$property->setParent($this);
     	$this->_data[$property->getId()] = $property;
+    	$this->_dna['custom'] = true;
     	return $this;
     }
     

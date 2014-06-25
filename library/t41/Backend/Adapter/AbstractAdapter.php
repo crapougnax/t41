@@ -270,15 +270,10 @@ abstract class AbstractAdapter implements AdapterInterface {
 	protected function _matchOperator($operator)
 	{
 		if (! is_numeric($operator)) {
-			
 			$const = array_search($operator, $this->_operators);
-			
 			if ($const === false) {
-
-//				var_dump($operator); die;
 				throw new Backend\Exception(array("CONDITION_UNDECLARED_OPERATOR", $operator));
 			}
-			
 			return (array) $const;
 		}
 		
@@ -289,13 +284,10 @@ abstract class AbstractAdapter implements AdapterInterface {
 		$ops = array();
 		
 		foreach ($constants as $constant) {
-			
 			if (($constant & $operator) != 0) {
-				
 				$ops[] = $constant;
 			}
 		}
-
 		return $ops;
 	}
 	
@@ -318,13 +310,23 @@ abstract class AbstractAdapter implements AdapterInterface {
 		// populate array with relevant objects type
 		$array = array();
 		
-		if ($collection->getParameter('memberType') != ObjectModel::URI) {
+		/**
+		 * If data object has been modified (meta property added) we need to use it to populate objects
+		 */
+		if ($collection->getParameter('memberType') != ObjectModel::URI && $collection->getDataObject()->getDna('custom')) {
 			$do = clone $collection->getDataObject();
 		}
 		
 		foreach ($ids as $key => $id) {
 			$uri = clone $uriBase;
 			$uri->setUrl($uri->getUrl() . $id)->setIdentifier($id);
+			
+			if (isset($do)) {
+				$obj = clone $do;
+				$obj->setUri($uri);
+			} else {
+				unset($obj);
+			}
                 
             switch ($collection->getParameter('memberType')) {
             	
@@ -333,13 +335,22 @@ abstract class AbstractAdapter implements AdapterInterface {
             		break;
             		
             	case ObjectModel::MODEL:
-            		$obj = Core::_($uri,$class);
+            		if (isset($obj)) {
+            			Backend::read($obj);
+            		} else {
+	            		$obj = Core::_($uri,$class);
+            		}
             		break;
             		
             		
             	case ObjectModel::DATA:
             	default:
-            		$obj = Core::_($uri,$class)->getDataObject();
+                    if (isset($obj)) {
+            			Backend::read($obj);
+            		} else {
+	            		$obj = Core::_($uri,$class);
+            		}
+            		$obj = $obj->getDataObject();
             		break;
             }
             $array[$key] = $obj;
