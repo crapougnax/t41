@@ -343,6 +343,28 @@ abstract class AbstractAdapter {
 	
 	
 	/**
+	 * Set a custom value for a value of the $_env array
+	 * @param string $key
+	 * @param mixed $val
+	 * @return \t41\View\ViewUri\Adapter\AbstractAdapter
+	 */
+	public function setEnvData($key,$val)
+	{
+		$this->_env[$key] = $val;
+		return $this;
+	}
+	
+	
+	public function getEnvData($key, $store = null)
+	{
+		if (is_null($store)) {
+			$store = $this->getIdentifier('search');
+		}
+		return isset($this->_env[$store]) && isset($this->_env[$store][$key]) ? $this->_env[$store][$key] : false;
+	}
+	
+	
+	/**
 	 * Escape the value from a pair
 	 *
 	 * @param string $str
