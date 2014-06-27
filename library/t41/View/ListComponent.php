@@ -228,7 +228,6 @@ class ListComponent extends ViewObject {
     				if ($property instanceof Property\MetaProperty) {
     					$this->_collection->having($property->getParameter('property'))->contains($value);
     				} else if ($property instanceof Property\ObjectProperty) {
-    					$this->_collection->resetConditions($field);
     					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof Property\DateProperty) {
     					if (is_array($value)) {
@@ -269,7 +268,7 @@ class ListComponent extends ViewObject {
     	}
     	
     	if ($this->_collection->getParameter('populated') !== true) {
-    		//$this->_collection->debug(); die;
+//    		$this->_collection->debug(); die;
     		$this->_collection->find(ObjectModel::DATA);
     		$this->bindAliases();
     	}
