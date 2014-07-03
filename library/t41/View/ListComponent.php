@@ -226,7 +226,7 @@ class ListComponent extends ViewObject {
     			if (!is_null($value) && $value != '' && $value != Property::EMPTY_VALUE) {
     				$property = $this->_collection->getDataObject()->getRecursiveProperty($field);
     				if ($property instanceof Property\MetaProperty) {
-    					$this->_collection->having($property->getParameter('property'))->contains($value);
+    					$this->_collection->having($property->getParameter('property'))->{$property->getParameter('searchmode')}($value);
     				} else if ($property instanceof Property\ObjectProperty) {
     					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof Property\DateProperty) {
@@ -245,7 +245,7 @@ class ListComponent extends ViewObject {
     					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof Property\AbstractProperty) {
     					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->contains($value);
+    					$this->_collection->having($field)->{$property->getParameter('searchmode')}($value);
     				}
     				$uriAdapter->setArgument($searchIdentifier . '[' . $field . ']', $value);
     			}

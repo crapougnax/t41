@@ -18,6 +18,10 @@
 				<parameter id="help">
 					<type>string</type>
 				</parameter>
+				<parameter id="searchmode">
+					<type>string</type>
+					<defaultvalue>contains</defaultvalue>
+				</parameter>
 			</parameters>
 		</property>
 		<property id="t41\ObjectModel\Property\StringProperty"
