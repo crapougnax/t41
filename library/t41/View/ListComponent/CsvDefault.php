@@ -122,6 +122,8 @@ class CsvDefault extends AbstractCsvDecorator {
             	
             		if ($property instanceof Property\MediaProperty) {
             			$value = '';
+            		} else if ($property instanceof Property\CurrencyProperty) {
+            			$value = $property->getValue(); // value formatting must not be converted
             		} else {
 	  					$value = ($property instanceof Property\AbstractProperty) ? $property->getDisplayValue() : null;
             		}
