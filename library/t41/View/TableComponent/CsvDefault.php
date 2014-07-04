@@ -52,8 +52,7 @@ class CsvDefault extends AbstractDecorator {
     		    if ($row) $row .= $this->_sep;
     		    
     		    if (is_float($value + 0)) {
-    		    	
-    		    	$value = str_replace('.',',', $value);
+    		    //	$value = str_replace('.',',', $value);
     		    }
     		    
     		    $row .= '"' . str_replace(array('\r\n', '"'), array(', ', '""'), $value) . '"';
