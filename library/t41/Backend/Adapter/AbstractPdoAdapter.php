@@ -19,7 +19,6 @@ namespace t41\Backend\Adapter;
  * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 915 $
  */
 
 
@@ -674,60 +673,113 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$select->reset('group');
 			}
 		} else {
-			$select->limit($collection->getBoundaryBatch() != -1 ? $collection->getBoundaryBatch() : null
-						 , $collection->getBoundaryOffset()
-						  );
+			$select->limit($collection->getBoundaryBatch() != - 1 ? $collection->getBoundaryBatch() : null, $collection->getBoundaryOffset());
 		}
-				
-			foreach ($collection->getSortings() as $sorting) {
-				if ($sorting[0]->getId() == ObjectUri::IDENTIFIER) {
-					$id = Backend::DEFAULT_PKEY;
-					$select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
-					continue;
-				} else if ($sorting[0] instanceof Property\CollectionProperty) {
-					// handling of conditions based on collection limited to withMembers() and withoutMembers()
-					$leftkey = $sorting[0]->getParameter('keyprop');
-					$field = $property->getId();
-					$subSelect = $this->_ressource->select();
-					$subseltbl = $this->_mapper ? $this->_mapper->getDatastore($sorting[0]->getParameter('instanceof')) : $this->_getTableFromClass($sorting[0]->getParameter('instanceof'));
-					$subSelect->from($subseltbl, new \Zend_Db_Expr(sprintf("COUNT(%s)", $leftkey)));
-					$join = sprintf("%s.%s = %s", $subseltbl, $leftkey, $pkey);
-					$subSelect->where($join);
-				
-				//	$statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
-					$select->order('(' . $subSelect . ') ' . $sorting[1]);
-					continue;
-				}
 		
-				// default sorting on a different table
-				$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
-				$stable = $this->_getTableFromClass($class);
-		
-				if ($this->_mapper) {
-					$sfield = $this->_mapper->propertyToDatastoreName($class, $sorting[0]->getId());
-				} else {
-					$field = $sorting[0];
-					$sfield = $field->getId();
-				}
+		/**
+		 * Sorting part
+		 */
+		foreach ($collection->getSortings () as $sorting) {
+			
+			// Specific cases first
+			if ($sorting[0]->getId() == ObjectUri::IDENTIFIER) {
+				$id = Backend::DEFAULT_PKEY;
+				$select->order(new \Zend_Db_Expr ( $table . '.' . $id . ' ' . $sorting[1]));
+				continue;
+			} else if ($sorting[0] instanceof Property\CollectionProperty) {
+				// handling of conditions based on collection limited to withMembers() and withoutMembers()
+				$leftkey = $sorting[0]->getParameter('keyprop');
+				$field = $property->getId();
+				$subSelect = $this->_ressource->select();
+				$subseltbl = $this->_mapper ? $this->_mapper->getDatastore($sorting[0]->getParameter('instanceof')) : $this->_getTableFromClass($sorting[0]->getParameter('instanceof'));
+				$subSelect->from($subseltbl, new \Zend_Db_Expr(sprintf("COUNT(%s)", $leftkey)));
+				$join = sprintf("%s.%s = %s", $subseltbl, $leftkey, $pkey);
+				$subSelect->where($join);
+				
+				// $statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
+				$select->order('(' . $subSelect . ') ' . $sorting[1]);
+				continue;
+			} else if ($sorting[0] instanceof Property\ObjectProperty) {
+				// try to sort with properties used to display value
+				$sprops = explode(',', $sorting[0]->getParameter('display'));
+				if (count($sprops) > 0) {
 					
-				// add a left join if the sorting field belongs to a table not yet part of the query
-				if ($stable != $table) {
-					// get the property id from the class name
-					$tfield = isset($sorting[3]) ? $sorting[3] : $collection->getDataObject()->getObjectPropertyId($class);
+					$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($collection->getDataObject()->getClass(), $sorting[0]->getId()) : $sorting[0]->getId();
 						
-					$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
-					$rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
-						
+					$class = $sorting[0]->getParameter('instanceof');
+					$stable = $this->_getTableFromClass($class);
+					$sbackend = ObjectModel::getObjectBackend($class);
+					// Property to sort from is in a different backend from current one
+					if ($sbackend->getAlias() != $this->getAlias()) {
+						// We presume that the current backend is allowed to connect to the remote one
+						// Should we raise an exception instead ?
+						$stable = $sbackend->getUri()->getDatabase() . '.' . $stable;
+					}
+					$field = $sorting[0]->getId();
+
+					$rightkey = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
 					$uniqext = $stable . '__joined_for__' . $leftkey;
-					if ( ! in_array($uniqext, $this->_alreadyJoined)) {
-						$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+					if (! in_array($uniqext, $this->_alreadyJoined)) {
+						if (is_array($rightkey)) {
+							foreach ($rightkey as $rightkeyObj) {
+								$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkeyObj->getName());
+							}
+						} else {
+							$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+						}
 						$select->joinLeft("$stable AS $uniqext", $join, array());
 						$this->_alreadyJoined[$stable] = $uniqext;
 					}
 					
-					$sortingExpr  = $this->_alreadyJoined[$stable] . '.' . $sfield;
-				} else {
-					$sortingExpr = $stable . '.' . $sfield;
+					foreach ($sprops as $sprop) {
+						if ($this->_mapper) {
+							$sfield = $this->_mapper->propertyToDatastoreName($class, $sprop);
+						} else {
+							$field = $sprop;
+							$sfield = $field->getId();
+						}
+							
+						$sortingExpr = $this->_alreadyJoined[$stable] . '.' . $sfield;
+						
+						if (isset($sorting[2]) && !empty($sorting[2])) {
+							$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
+						}
+						$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
+					}
+				}
+				continue;
+			}
+
+			
+			// default sorting on a different table
+			$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
+			$stable = $this->_getTableFromClass($class);
+			
+			if ($this->_mapper) {
+				$sfield = $this->_mapper->propertyToDatastoreName($class, $sorting[0]->getId());
+			} else {
+				$field = $sorting[0];
+				$sfield = $field->getId();
+			}
+			
+			// add a left join if the sorting field belongs to a table not yet part of the query
+			if ($stable != $table) {
+				// get the property id from the class name
+				$tfield = isset($sorting[3]) ? $sorting[3] : $collection->getDataObject()->getObjectPropertyId($class);
+				
+				$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $tfield) : $tfield;
+				$rightkey = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
+				
+				$uniqext = $stable . '__joined_for__' . $leftkey;
+				if (! in_array($uniqext, $this->_alreadyJoined)) {
+					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+					$select->joinLeft("$stable AS $uniqext", $join, array());
+					$this->_alreadyJoined[$stable] = $uniqext;
+				}
+				
+				$sortingExpr = $this->_alreadyJoined[$stable] . '.' . $sfield;
+			} else {
+				$sortingExpr = $stable . '.' . $sfield;
 				}
 				if (isset($sorting[2]) && !empty($sorting[2])) {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
@@ -983,5 +1035,48 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$statement = $this->_buildConditionStatement($field, $condition->getClauses(), 'OR'); //$conditionArray[1]);
 		
 		return $statement;
+	}
+	
+	
+	/**
+	 * Perform the correct join from given object property and return the table alias
+	 * @todo test and implement in various places in find() method
+	 * @param Property\ObjectProperty $property
+	 * @param string $table
+	 * @return string
+	 */
+	protected function _join(Property\ObjectProperty $property, $table)
+	{
+		$join = array();
+		$class = $property->getParameter('instanceof');
+		$stable = $this->_getTableFromClass($class);
+		$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($property->getParent()->getDataObject()->getClass(), $property->getId()) : $property->getId();
+		
+		$uniqext = $stable . '__joined_for__' . $leftkey;
+		
+		if (! isset($this->_alreadyJoined[$stable])) {
+			$sbackend = ObjectModel::getObjectBackend($class);
+		
+			if ($sbackend->getAlias() != $this->getAlias()) {
+				// @todo raise and exception if backends are not of same type
+				// We presume that the current backend is allowed to connect to the remote one
+				// Should we raise an exception instead ?
+				$stable = $sbackend->getUri()->getDatabase() . '.' . $stable;
+			}
+			$field = $property->getId();
+		
+			$rightkey = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
+			if (is_array($rightkey)) {
+				foreach ($rightkey as $rightkeyObj) {
+					// @todo fix left key that should be provided by mapper 
+					$join[] = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkeyObj->getName());
+				}
+			} else {
+				$join[] = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+			}
+			$select->joinLeft("$stable AS $uniqext", implode(' AND ', $join), array());
+			$this->_alreadyJoined[$stable] = $uniqext;
+		}
+		return $uniqext;
 	}
 }
