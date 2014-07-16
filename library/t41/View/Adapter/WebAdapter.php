@@ -279,7 +279,7 @@ class WebAdapter extends AbstractAdapter {
     		}
     		
     		// use CDN url if provided
-    		if (false !== ($cdn = Core::getEnvData('cdn'))) {
+    		if (null !== ($cdn = Core::getEnvData('cdn'))) {
     			$component = '//' . $cdn . $component;
     		}
     	
