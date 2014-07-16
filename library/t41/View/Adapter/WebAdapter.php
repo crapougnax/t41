@@ -277,6 +277,11 @@ class WebAdapter extends AbstractAdapter {
     	    if (isset($params['fullUrl']) && $params['fullUrl'] == true && substr($component, 0, 4) != 'http') {
     			$component = $baseUrl . $component;
     		}
+    		
+    		// use CDN url if provided
+    		if (false !== ($cdn = Core::getEnvData('cdn'))) {
+    			$component = '//' . $cdn . $component;
+    		}
     	
     		switch ($type) {
     			
