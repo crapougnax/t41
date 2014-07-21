@@ -272,6 +272,7 @@ class WebAdapter extends AbstractAdapter {
     	}
     	
     	$html = '';
+    	$cdn = Core::getEnvData('cdn');
     	
     	foreach ($components as $component) {
     	    if (isset($params['fullUrl']) && $params['fullUrl'] == true && substr($component, 0, 4) != 'http') {
@@ -279,7 +280,7 @@ class WebAdapter extends AbstractAdapter {
     		}
     		
     		// use CDN url if provided
-    		if (null !== ($cdn = Core::getEnvData('cdn'))) {
+    		if (! is_null($cdn)) {
     			$component = '//' . $cdn . $component;
     		}
     	
