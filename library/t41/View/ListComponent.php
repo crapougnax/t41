@@ -111,7 +111,6 @@ class ListComponent extends ViewObject {
     		
     		$do = $this->_collection->getDataObject();
     		$columns = $this->getParameter('columns') ? $this->getParameter('columns') : array_keys($do->getProperties());
-    		
     		$this->_columns = array();
     		
     		foreach ($columns as $column) {
@@ -134,6 +133,7 @@ class ListComponent extends ViewObject {
     				$obj = new Element\IdentifierElement();
     				$obj->setTitle(isset($alt[$column]) ? $alt[$column] : 'ID');
     				$this->_columns[] = $obj;
+    				continue;
     			}
     			
     			// $column may contain recursive property reference

@@ -19,7 +19,6 @@ namespace t41\ObjectModel;
  * @package    t41_Data
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 876 $
  */
 
 use t41\Core;
@@ -34,6 +33,7 @@ use t41\ObjectModel\Property\ArrayProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\MediaProperty;
 use t41\ObjectModel\Property\CollectionProperty;
+use t41\ObjectModel\Property\IdentifierProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -415,6 +415,10 @@ class DataObject extends ObjectModelAbstract {
      */
     public function getRecursiveProperty($name)
     {
+    	if ($name == ObjectUri::IDENTIFIER) {
+    		return new IdentifierProperty('id');
+    	}
+    	
     	if (strpos($name, '.') === false) {
     		return $this->getProperty($name);
     	}
