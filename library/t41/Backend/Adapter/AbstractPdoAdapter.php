@@ -703,7 +703,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				continue;
 			} else if ($sorting[0] instanceof Property\ObjectProperty) {
 				// try to sort with properties used to display value
-				$sprops = explode(',', $sorting[0]->getParameter('display'));
+				if (substr($sorting[0]->getParameter('display'), 0, 1) == '[') {
+					// @todo extract elements of pattern to order from them ?
+					$sprops = array('id');
+				} else {
+					$sprops = explode(',', $sorting[0]->getParameter('display'));
+				}
 					
 				$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($collection->getDataObject()->getClass(), $sorting[0]->getId()) : $sorting[0]->getId();
 						
