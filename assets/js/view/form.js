@@ -199,6 +199,20 @@ window.t41.view.form = function(id,obj,form) {
 			return false;
 		} else {
 			
+			// Add custom fields if any (form fields prefixed with '__')
+			formdata['__'] = {};
+			jQuery(':input[name^="__"]').each(function(i,o) {
+				var name = o.name.substring(2);
+				if (name.substring(name.length-2) == '[]') {
+					name = name.substring(0, name.length-2);
+					console.log(name);
+					if (! formdata['__'][name]) formdata['__'][name] = [];
+					formdata['__'][name].push(o.value);
+				} else {
+					formdata['__'][name] = o.value;
+				}
+			});
+			
 			// deactivate buttons
 			this.toggleButtons();
 			
