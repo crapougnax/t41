@@ -180,7 +180,7 @@
 				<parameter id="action">
 					<type>string</type>
 				</parameter>
-				<parameter id="type">
+				<parameter id="format">
 					<type>string</type>
 				</parameter>
 			</parameters>
