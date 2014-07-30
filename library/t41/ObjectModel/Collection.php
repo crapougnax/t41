@@ -868,6 +868,20 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	public function toArray(array $properties = array())
+	{
+		$array = array();
+		foreach ($this->getMembers(ObjectModel::MODEL) as $member) {
+			$value = '';
+			foreach ($properties as $property) {
+				$value .= $member->getProperty($property) instanceof ObjectProperty ? $member->getProperty($property)->getDisplayValue() . ' ' : $member->$property . ' ';
+			}
+			$array[$member->getIdentifier()] = trim($value);
+		}
+		return $array;
+	}
+	
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
