@@ -27,6 +27,7 @@ use	t41\ObjectModel\Property;
 use	t41\View\FormComponent\Element;
 use	t41\View\Exception;
 use t41\ObjectModel\Property\AbstractProperty;
+use t41\ObjectModel\Property\MetaProperty;
 
 /**
  * t41 Data Object handling a set of properties tied to an object
@@ -173,11 +174,15 @@ class DefaultAdapter extends AbstractAdapter {
 		$element->setDefaultValue($property->getDefaultValue());
 		$element->setHelp($property->getParameter('help'));
 		
-		$value = $property->getValue();
-		if ($value instanceof ObjectModel\ObjectUri) {
-			$value = $value->__toString();
-		} else if ($value instanceof ObjectModel\BaseObject) {
-			$value = $value->getUri() ? $value->getUri()->__toString() : null;
+		if ($property instanceof MetaProperty) {
+			$value = $property->getDisplayValue();
+		} else {
+			$value = $property->getValue();
+			if ($value instanceof ObjectModel\ObjectUri) {
+				$value = $value->__toString();
+			} else if ($value instanceof ObjectModel\BaseObject) {
+				$value = $value->getUri() ? $value->getUri()->__toString() : null;
+			}
 		}
 		$element->setValue($value);
 		
