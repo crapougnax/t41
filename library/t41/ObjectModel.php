@@ -153,6 +153,16 @@ class ObjectModel {
 	}
 	
 
+	/**
+	 * Return the list of defined objects in config
+	 * @return array
+	 */
+	static public function getList()
+	{
+		return array_keys(self::$_config);
+	}
+	
+	
 	static public function getObjectExtends($key)
 	{
 		return isset(self::$_config[$key]['extends']) ? self::$_config[$key]['extends'] : false;
