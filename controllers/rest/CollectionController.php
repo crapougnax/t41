@@ -195,15 +195,19 @@ class Rest_CollectionController extends Rest_DefaultController {
 	public function deleteAction()
 	{
 		try {
-			/* @var $collection t41\ObjectModel\Collection */
-			$collection = $this->_obj->getCollection();
-			
 			if (! isset($this->_post['alias'])) {
 				$this->status = 'NOK';
 				return false;
 			}
 			
 			$identifier = $this->_obj->getIdentifierFromAlias($this->_post['alias']);
+			if ($identifier === false) {
+				$this->status = 'NOK';
+				return false;				
+			}
+			
+			/* @var $collection t41\ObjectModel\Collection */
+			$collection = $this->_obj->getCollection();
 			$member = $collection->getMemberFromUri($identifier);
 			$collection->removeMember($member);
 			$res = $collection->save();

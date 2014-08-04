@@ -270,9 +270,11 @@ class ListComponent extends ViewObject {
     	if ($this->_collection->getParameter('populated') !== true) {
 //    		$this->_collection->debug(); die;
     		$this->_collection->find(ObjectModel::DATA);
-    		$this->bindAliases();
     	}
     	
+    	// bind aliases there because collection coming from a property is already populated
+    	$this->bindAliases();
+    	 
     	if ($this->getParameter('max') == 0) {
     		$this->setParameter('max', $this->_collection->getMax());
     	}
@@ -334,6 +336,13 @@ class ListComponent extends ViewObject {
     	}
     	    	
     	return $this->_addEvent('row', $button);
+    }
+    
+    
+    
+    public function addRemoveAction(array $params = null)
+    {
+    	$this->addRowAction('t41.object.remove(this)', 'Supprimer', $params);
     }
     
     

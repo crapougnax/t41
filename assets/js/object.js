@@ -245,11 +245,13 @@ if (! window.t41.object) {
 	};
 	
 	
-	window.t41.object.remove = function() {
-		var src = t41.view.caller;
+	/**
+	 * Remove the collection's member matching the current alias in the collection registered with uuid
+	 */
+	window.t41.object.remove = function(obj) {
+		var src = jQuery(obj);
 		t41.view._data = {uuid:src.data('uuid'), alias:src.data('alias'), id:src.data('id')};
-		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
-
+		t41.view._currentDomElem = src.closest('tr');
 		t41.view._alert = t41.view.alert.confirm(t41.lget('confirm:remove'),{confirm:t41.object.retDelete});
 	};
 	
@@ -259,7 +261,6 @@ if (! window.t41.object) {
 			switch (obj.status) {
 			
 				case t41.core.status.ok:
-					//new t41.view.alert("Suppression effectuée");
 					jQuery(t41.view._currentDomElem).remove();
 					break;
 				
