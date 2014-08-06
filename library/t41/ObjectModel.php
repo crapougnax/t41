@@ -231,7 +231,14 @@ class ObjectModel {
 	}
 	
 	
-	static public function getRules($object)
+	/**
+	 * Return either rules configuration or rules objects for given class name
+	 * @param string $object
+	 * @param boolean $raw
+	 * @throws ObjectModel\Exception
+	 * @return NULL|array
+	 */
+	static public function getRules($object, $raw = false)
 	{
 		$class = get_class($object);
 		
@@ -242,6 +249,11 @@ class ObjectModel {
 		if (! isset(self::$_config[$class]['rules'])) {
 			return null;
 		}
+		
+		if ($raw !== false) {
+			return self::$_config[$class]['rules'];
+		}
+		
 		$rules = array();
 	
 		foreach (self::$_config[$class]['rules'] as $key => $val) {
