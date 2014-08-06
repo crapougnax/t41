@@ -94,6 +94,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	
 	
 	/**
+	 * Current or latest select query
+	 * @var \Zend_Db_Select
+	 */
+	protected $_select;
+	
+	
+	/**
 	 * Instanciate a PDO-based backend from a t41_Backend_Uri object 
 	 *
 	 * @param t41\Backend\BackendUri $uri
@@ -470,8 +477,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_connect();
 		
 		/* @var $select \Zend_Db_Select */
-		$select = $this->_ressource->select()->distinct();
-		$select->from($table, $returnCount ? new \Zend_Db_Expr("COUNT(*) AS " . \t41\Backend::MAX_ROWS_IDENTIFIER) : $pkey);
+		$this->_select = $this->_ressource->select()->distinct();
+		$this->_select->from($table, $returnCount ? new \Zend_Db_Expr("COUNT(*) AS " . \t41\Backend::MAX_ROWS_IDENTIFIER) : $pkey);
 		
 		$this->_alreadyJoined = array();
 
@@ -492,12 +499,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				switch ($conditionArray[1]) {
 				
 					case Condition::MODE_OR:
-						$select->orWhere($statement);
+						$this->_select->orWhere($statement);
 						break;
 							
 					case Condition::MODE_AND:
 					default:
-						$select->where($statement);
+						$this->_select->where($statement);
 						break;
 				}
 				
@@ -543,7 +550,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 					
 					$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $uniqext, $jpkey);
-					$select->joinLeft($jtable . " AS $uniqext", $join, array());
+					$this->_select->joinLeft($jtable . " AS $uniqext", $join, array());
 					$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 					$jtable = $uniqext;
 					$class = $property->getParameter('instanceof');
@@ -575,7 +582,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					$uniqext = $jtable . '__joined_for__' . $leftkey;
 					if (! in_array($uniqext, $this->_alreadyJoined)) {
 						$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, is_array($rightkey) ? $rightkey[0] : $rightkey);
-						$select->joinLeft($jtable . " AS $uniqext", $join, array());
+						$this->_select->joinLeft($jtable . " AS $uniqext", $join, array());
 						$this->_alreadyJoined[$jtable] = $uniqext;
 					}
 					$jtable = $uniqext;
@@ -591,7 +598,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$subSelect->where($join);
 				
 				$statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
-				$select->where($statement);
+				$this->_select->where($statement);
 				continue;
 			} else {
 				$field = $property->getId();
@@ -639,12 +646,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			switch ($conditionArray[1]) {
 				
 				case Condition::MODE_OR:
-					$select->orWhere($statement);
+					$this->_select->orWhere($statement);
 					break;
 					
 				case Condition::MODE_AND:
 				default:
-					$select->where($statement);
+					$this->_select->where($statement);
 					break;
 			}
 		}
@@ -653,7 +660,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		if ($returnCount) {
 			if (is_array($returnCount)) {
 				// return count on grouped columns
-				foreach ($returnCount as $property) {
+				foreach ($returnCount as $key => $property) {
 					$fieldmodifier = null;
 					if ($this->_mapper) {
 						$class = $property->getParent() ? $property->getParent()->getId() : $collection->getDataObject()->getClass();
@@ -662,31 +669,40 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 						$field = $property->getId();
 					}
 					
+					if ($property instanceof ObjectProperty) {
+						// join with $key if necessary
+						if (strstr($key, '.') !== false) {
+							$leftPart = substr($key, 0, strpos($key,'.'));
+							$intermediateProp = $collection->getDataObject()->getProperty($leftPart);
+							$fieldmodifier = $this->_join($intermediateProp, $table) . '.' . $field;
+						}
+					}
+					
 					// limit date grouping to date part, omitting possible hour part
 					if ($property instanceof DateProperty) {
 						$fieldmodifier = "DATE($field)";
 					}
 					
-					$select->group($fieldmodifier ? $fieldmodifier : $field);
-					$select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
+					$this->_select->group($fieldmodifier ? $fieldmodifier : $field);
+					$this->_select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
 				}
 			} else {
-				$select->reset('group');
+				$this->_select->reset('group');
 			}
 		} else {
-			$select->limit($collection->getBoundaryBatch() != - 1 ? $collection->getBoundaryBatch() : null, $collection->getBoundaryOffset());
+			$this->_select->limit($collection->getBoundaryBatch() != - 1 ? $collection->getBoundaryBatch() : null, $collection->getBoundaryOffset());
 		}
 		
 		/**
 		 * Sorting part
 		 */
-		foreach ($collection->getSortings () as $sorting) {
+		foreach ($collection->getSortings() as $sorting) {
 			
 			// Specific cases first
 			// @todo find a better way to sort on meta properties 
 			if ($sorting[0]->getId() == ObjectUri::IDENTIFIER || $sorting[0] instanceof MetaProperty) {
 				$id = Backend::DEFAULT_PKEY;
-				$select->order(new \Zend_Db_Expr ( $table . '.' . $id . ' ' . $sorting[1]));
+				$this->_select->order(new \Zend_Db_Expr ( $table . '.' . $id . ' ' . $sorting[1]));
 				continue;
 			} else if ($sorting[0] instanceof Property\CollectionProperty) {
 				// handling of conditions based on collection limited to withMembers() and withoutMembers()
@@ -699,7 +715,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$subSelect->where($join);
 				
 				// $statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
-				$select->order('(' . $subSelect . ') ' . $sorting[1]);
+				$this->_select->order('(' . $subSelect . ') ' . $sorting[1]);
 				continue;
 			} else if ($sorting[0] instanceof Property\ObjectProperty) {
 				// try to sort with properties used to display value
@@ -733,7 +749,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					} else {
 						$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
 					}
-					$select->joinLeft("$stable AS $uniqext", $join, array());
+					$this->_select->joinLeft("$stable AS $uniqext", $join, array());
 					$this->_alreadyJoined[$stable] = $uniqext;
 				}
 					
@@ -749,7 +765,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 					if (isset($sorting[2]) && !empty($sorting[2])) {
 						$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 					}
-					$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
+					$this->_select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
 				}
 				continue;
 			}
@@ -777,7 +793,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$uniqext = $stable . '__joined_for__' . $leftkey;
 				if (! in_array($uniqext, $this->_alreadyJoined)) {
 					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
-					$select->joinLeft("$stable AS $uniqext", $join, array());
+					$this->_select->joinLeft("$stable AS $uniqext", $join, array());
 					$this->_alreadyJoined[$stable] = $uniqext;
 				}
 				
@@ -788,21 +804,21 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (isset($sorting[2]) && !empty($sorting[2])) {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
-				$select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
+				$this->_select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
 			}
 		
 		$result = array();
 		$context = array('table' => $table);
 		
 		try {
-			$result = $this->_ressource->fetchAll($select);
+			$result = $this->_ressource->fetchAll($this->_select);
 		} catch (\Zend_Db_Exception $e) {
 			$context['error'] = $e->getMessage();
-			$this->_setLastQuery($select->__toString(), $select->getPart('where'), $context);
+			$this->_setLastQuery($this->_select->__toString(), $this->_select->getPart('where'), $context);
 			return false;
 		}
 		
-		$this->_setLastQuery($select->__toString(), $select->getPart('where'), $context);
+		$this->_setLastQuery($this->_select->__toString(), $this->_select->getPart('where'), $context);
 		
 		if ($returnCount !== false) {
 			return is_array($returnCount) ? $result : $result[0][Backend::MAX_ROWS_IDENTIFIER];
@@ -1052,6 +1068,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	protected function _join(Property\ObjectProperty $property, $table)
 	{
 		$join = array();
+		
 		$class = $property->getParameter('instanceof');
 		$stable = $this->_getTableFromClass($class);
 		$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($property->getParent()->getDataObject()->getClass(), $property->getId()) : $property->getId();
@@ -1078,7 +1095,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			} else {
 				$join[] = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
 			}
-			$select->joinLeft("$stable AS $uniqext", implode(' AND ', $join), array());
+			$this->_select->joinLeft("$stable AS $uniqext", implode(' AND ', $join), array());
 			$this->_alreadyJoined[$stable] = $uniqext;
 		}
 		return $uniqext;
