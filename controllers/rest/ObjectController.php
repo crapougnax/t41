@@ -158,6 +158,18 @@ class Rest_ObjectController extends Rest_DefaultController {
 	}
 	
 	
+	/**
+	 * Send an up-to-date version of the action-bound object
+	 */
+	public function refreshAction()
+	{
+		$collections = isset($this->_post['collections']) ? $this->_post['collections'] : 1;
+		$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true, 'collections' => $collections));
+		$this->_executeActions('ok');
+		$this->_refreshCache = true;		
+	}
+	
+	
 	public function createAction()
 	{
 		try {
