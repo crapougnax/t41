@@ -491,7 +491,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$statement = array();
 				
 				foreach ($conditionArray[0]->getConditions() as $condition) {
-					$statement[] = $this->_parseCondition($condition[0], $select, $table);
+					$statement[] = $this->_parseCondition($condition[0], $this->_select, $table);
 				}
 				
 				$statement = implode(' OR ', $statement);
@@ -971,7 +971,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$jtable = '';
 		/* does condition contain another condition object ? */
 		if ($condition->isRecursive()) {
-		
 			while ($condition->isRecursive()) {
 				$property = $condition->getProperty();
 				$parent	  = $property->getParent() ? $property->getParent()->getId() : $table;
@@ -1001,7 +1000,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$jpkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 					
 				$join = sprintf("%s.%s = %s.%s", $parentTable, $jlkey, $uniqext, $jpkey);
-				$select->joinLeft("$jtable AS $uniqext", $join, array());
+				$this->_select->joinLeft("$jtable AS $uniqext", $join, array());
 				$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
 				$class = $property->getParameter('instanceof');
 			}
