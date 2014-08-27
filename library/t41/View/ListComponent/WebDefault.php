@@ -371,24 +371,13 @@ HTML;
     	$batch  = $this->_obj->getParameter('batch');
     	$max    = $this->_obj->getParameter('max');
     	$sbatch = 20;
-
-        if ($max == 0) return '<div class="t41 paginator">Aucune fiche</div></div></div>';
     	
-        foreach ($this->_env as $key => $val) {
-        	
-            if (is_array($val)) {
-                foreach($val as $key2 => $val2) $this->baseUrl .= $key . '[' . $key2 . ']' . '=' . @rawurlencode($val2) . '&';
-            } else if ($key != $this->_offsetIdentifier) {
-            	$this->baseUrl .= $key . '=' . rawurlencode($val) . '&';
-            }
-        }
-
-
-	   $premier = floor($offset/($batch * $sbatch)) * $sbatch;
-
-	   $i = $j = 0;
-
-	   $p = sprintf('<div class="t41 paginator">Fiches %s &agrave; %s sur %s<br/>'
+    	if ($max == 0) return '<div class="t41 paginator">Aucune fiche</div></div></div>';
+    	
+    	$premier = floor($offset/($batch * $sbatch)) * $sbatch;
+    	$i = $j = 0;
+    	
+    	$p = sprintf('<div class="t41 paginator">Fiches %s &agrave; %s sur %s<br/>'
 	               , ($offset+1)
 	               , ($offset + $batch > $max)
 	                 ? $max : ($offset + $batch)
