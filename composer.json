@@ -1,0 +1,23 @@
+{
+  "name" : "t41",
+  "description" : "RAD Toolkit",
+  "version" : "1.0.0",
+  "require" : {
+    "message/wkhtmltopdf" : ">=1.0.0"
+  },
+  "authors" : [ {
+    "name" : "Olivier Lépine",
+    "email" : "olivier@lepine.fr",
+    "role" : "Developer"
+  } ],
+  "keywords" : [ "rad", "business", "application", "prototyping" ],
+  "minimum-stability" : "dev",
+  "autoload" : {
+    "psr-0" : {
+      "t41" : "library"
+    }
+  },
+  "type" : "library",
+  "license" : [ "BSD-3-Clause" ],
+  "homepage" : "https://github.com/crapougnax/t41"
+}
