@@ -340,9 +340,9 @@ class ListComponent extends ViewObject {
     
     
     
-    public function addRemoveAction(array $params = null)
+    public function addRemoveAction(array $params = null, $label = 'Supprimer')
     {
-    	$this->addRowAction('t41.object.remove(this)', 'Supprimer', $params);
+    	$this->addRowAction('t41.object.remove(this)', $label, $params);
     }
     
     
