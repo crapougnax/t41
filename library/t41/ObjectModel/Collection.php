@@ -505,19 +505,18 @@ class Collection extends ObjectModelAbstract {
 	{
 		if (! is_array($properties)) $properties = (array) $properties;
 		
-		foreach ($properties as $key => $prop) {
+		foreach ($properties as $key => $propkey) {
 			// retrieve actual properties from their id
-			if (($prop = $this->_do->getRecursiveProperty($prop)) !== false) {
-				$properties[$key] = $prop;
-			} else {
-				unset($properties[$key]);
+			if (($prop = $this->_do->getRecursiveProperty($propkey)) !== false) {
+				$properties[$propkey] = $prop;
 			}
+			unset($properties[$key]);
 		}
 		
 		if (is_null($backend)) $backend = $this->_latestBackend;
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
 		$res = Backend::find($this, $backend, $properties);
-		//\Zend_Debug::dump(Backend::getLastQuery());
+		//var_dump(Backend::getLastQuery());
 		$this->_latestBackend = $backend;
 		$this->_max = null;
 		
@@ -764,7 +763,6 @@ class Collection extends ObjectModelAbstract {
 	public function __call($m, $a)
 	{
 		if (substr($m, 0, 6) == 'having') {
-		
 			/* set a new condition with a call to having<<PropertyId>>() */
 			$prop = strtolower(substr($m, 6));
 		
@@ -792,7 +790,7 @@ class Collection extends ObjectModelAbstract {
 			$calc = 0;
 			
 			// populate or refresh collection, only if there is no member to save or delete
-			if (count($this->_members) == 0 || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
+			if ($this->getParameter('populated') !== true || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
 				$this->find();
 			}
 
@@ -822,7 +820,6 @@ class Collection extends ObjectModelAbstract {
 				throw new Exception("Missing mandatory argument for '$m' magic call");
 			}
 			return $calc;
-			
 		} else {
 			throw new Exception(array("OBJECT_UNKNOWN METHOD", $m));
 		}
