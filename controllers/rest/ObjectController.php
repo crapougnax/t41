@@ -143,13 +143,13 @@ class Rest_ObjectController extends Rest_DefaultController {
 				if ($result === false) {
 					$this->_context['message'] = Backend::getLastQuery();
 					$this->_status = 'NOK';
-	
 				} else {
-					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true, 'collections' => 1));
+					$collections = isset($this->_post['_collections']) ? $this->_post['_collections'] : 1;
+					$extprops = isset($this->_post['_extprops']) ? $this->_post['_extprops'] : true;
+					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => $extprops, 'collections' => $collections));
 					$this->_executeActions('ok');
 					$this->_refreshCache = true;
 				}
-	
 			} catch (\Exception $e) {
 				$this->_context['err'] = $e->getMessage();
 				if (Core::$env == Core::ENV_DEV) $this->_context['trace'] = $e->getTraceAsString();
@@ -163,8 +163,12 @@ class Rest_ObjectController extends Rest_DefaultController {
 	 */
 	public function refreshAction()
 	{
+		// @deprecated but kept for compatibility reason
 		$collections = isset($this->_post['collections']) ? $this->_post['collections'] : 1;
-		$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => true, 'collections' => $collections));
+		$collections = isset($this->_post['_collections']) ? $this->_post['_collections'] : $collections;
+		$extprops = isset($this->_post['_extprops']) ? $this->_post['_extprops'] : true;
+		
+		$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => $extprops, 'collections' => $collections));
 		$this->_executeActions('ok');
 		$this->_refreshCache = true;		
 	}
@@ -177,11 +181,9 @@ class Rest_ObjectController extends Rest_DefaultController {
 		
 			if ($result === false) {
 				$this->_status = 'NOK';
-						
 			} else {
 				$this->_data['object'] = $this->_obj->getObject()->reduce(array('params' => array()));
 			}
-		
 		} catch (\Exception $e) {
 			$this->_context['message'] = $e->getMessage();
 			$this->_status = 'ERR';
