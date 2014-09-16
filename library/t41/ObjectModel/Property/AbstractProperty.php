@@ -280,7 +280,7 @@ abstract class AbstractProperty extends ObjectModelAbstract implements PropertyI
 	{
 		$display = $this->getParameter('display');
 		if (! $display) {
-			$this->_displayValue = $this->getValue()->__toString();
+			$this->_displayValue = $this->getValue(ObjectModel::MODEL)->__toString();
 			return true;
 		}
 		
