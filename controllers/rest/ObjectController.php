@@ -145,7 +145,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 					$this->_status = 'NOK';
 				} else {
 					$collections = isset($this->_post['_collections']) ? $this->_post['_collections'] : 1;
-					$extprops = isset($this->_post['_extprops']) ? $this->_post['_extprops'] : true;
+					$extprops = isset($this->_post['_extprops']) ? $this->_post['_extprops'] : [];
 					$this->_data['object'] = $this->_obj->reduce(array('params' => array(), 'extprops' => $extprops, 'collections' => $collections));
 					$this->_executeActions('ok');
 					$this->_refreshCache = true;
