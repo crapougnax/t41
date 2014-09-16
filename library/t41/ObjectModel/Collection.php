@@ -493,6 +493,13 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Execute a calc on matching members properties using backend capabilities
+	 * @param array $properties
+	 * @param string $type
+	 * @param Adapter\AbstractAdapter $backend
+	 * @return number
+	 */
 	public function calc($properties, $type, Adapter\AbstractAdapter $backend = null)
 	{
 		if (! is_array($properties)) $properties = (array) $properties;
@@ -805,36 +812,36 @@ class Collection extends ObjectModelAbstract {
 			}
 			
 		} else if (substr($m, 0, 4) == 'calc') {
-			
 			$prop = strtolower(substr($m, 4));
 			$calc = 0;
 			
-			// populate or refresh collection, only if there is no member to save or delete
-//			if ($this->getParameter('populated') !== true || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
-//				$this->find();
-//			}
-
 			if (isset($a[0])) {
 				
-				// @todo count $a members
 				switch ($a[0]) {
 				
 					/* sum up the values of all members $prop property */
 					case ObjectModel::CALC_SUM:
-						$calc = $this->calc($prop, $a[0]);
-/* 						foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
-							$property = $member->getProperty($prop);
-							if (! $property instanceof Property\AbstractProperty) {
-								continue;
-							}
-							$calc += (float) $property->getValue();
-						} */
+						if ($this->getParent() && $this->getParent()->getUri() instanceof ObjectUri) {
+							$calc = $this->calc($prop, $a[0]);
+ 						} else { // parent has not yet been save or commited, calc on members
+ 							foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
+								$property = $member->getProperty($prop);
+								if (! $property instanceof Property\AbstractProperty) {
+									continue;
+								}
+								$calc += (float) $property->getValue();
+ 							}
+						}
 						break;
 					
 					/* sum up the values of all members $prop property and average the result */
 					case ObjectModel::CALC_AVG:
-						$calc = $this->__call($m, array(self::CALC_SUM));
-						$calc = ($calc / count($this->_members));
+						if ($this->getParent() && $this->getParent()->getUri() instanceof ObjectUri) {
+							$calc = $this->calc($prop, $a[0]);
+						} else {  // parent has not yet been save or commited, calc on members
+							$calc = $this->__call($m, array(self::CALC_SUM));
+							$calc = ($calc / count($this->_members));
+						}
 						break;
 				}
 			} else {
