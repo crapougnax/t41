@@ -256,6 +256,10 @@ class WebAdapter extends AbstractAdapter {
     }
     
     
+    /**
+     * (non-PHPdoc)
+     * @see \t41\View\Adapter\AbstractAdapter::_renderComponents()
+     */
     protected function _renderComponents($type, $params = null)
     {
     	if (! isset($this->_component[$type])) {
@@ -320,8 +324,9 @@ class WebAdapter extends AbstractAdapter {
     		$filepath = Core::$basePath . 'vendor/quatrain' . $file;
     		$prefix = 'vendor';
     	} else {
-    		$filepath = substr_replace($file, '/assets/' . $ext, strrpos($file, '/'), -strlen(substr($file,strrpos($file,'/'))));
-    		$filepath = Core::$basePath . str_replace('/t41/app', 'application/modules/', $file);
+    		$parts = explode('/', $file);
+    		$filefile = substr($file, strrpos($file,'/')+1);
+    		$filepath = sprintf('%sapplication/modules/%s/%s/assets/%s/%s', Core::$basePath, $parts[3], $parts[4], $ext, $parts[5]);
     		$prefix = 'app';
     	}
     	
