@@ -325,7 +325,6 @@ class WebAdapter extends AbstractAdapter {
     		$prefix = 'vendor';
     	} else {
     		$parts = explode('/', $file);
-    		$filefile = substr($file, strrpos($file,'/')+1);
     		$filepath = sprintf('%sapplication/modules/%s/%s/assets/%s/%s', Core::$basePath, $parts[3], $parts[4], $ext, $parts[5]);
     		$prefix = 'app';
     	}
@@ -335,9 +334,9 @@ class WebAdapter extends AbstractAdapter {
     		$md5 = filemtime($filepath); //md5_file($file);
     		$basecached = substr($filepath, strrpos($filepath, '/')+1, strrpos($filepath,'.')-strlen($filepath));
     		$cached = $prefix . '/' . $basecached . '-' . $md5 . '.' .$ext;
-    		if (! file_exists($basecached . $cached)) {
+    		if (! file_exists($cachedir . $cached)) {
     			// remove possible previous outdated file(s)
-    			foreach (glob($cachedir . $basecached . '-*.' . $ext) as $oldfile) {
+    			foreach (glob($cachedir . $prefix . '/' . $basecached . '-*.' . $ext) as $oldfile) {
     				unlink($oldfile);
     			}
     			require_once 'vendor/tedivm/jshrink/src/JShrink/Minifier.php';
