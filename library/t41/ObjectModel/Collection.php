@@ -493,6 +493,26 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	public function calc($properties, $type, Adapter\AbstractAdapter $backend = null)
+	{
+		if (! is_array($properties)) $properties = (array) $properties;
+		foreach ($properties as $key => $propkey) {
+			// retrieve actual properties from their id
+			if (($prop = $this->_do->getRecursiveProperty($propkey)) !== false) {
+				$properties[$propkey] = $prop;
+			}
+			unset($properties[$key]);
+		}
+
+		if (is_null($backend)) $backend = $this->_latestBackend;
+		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
+		$res = Backend::find($this, $backend, $properties, $type);
+		$this->_latestBackend = $backend;
+		//$this->_max = null;
+		return (float) $res[0][Backend::MAX_ROWS_IDENTIFIER];
+	}
+	
+	
 	/**
 	 * Return the total number of members grouped by the given property or properties
 	 * 
@@ -790,9 +810,9 @@ class Collection extends ObjectModelAbstract {
 			$calc = 0;
 			
 			// populate or refresh collection, only if there is no member to save or delete
-			if ($this->getParameter('populated') !== true || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
-				$this->find();
-			}
+//			if ($this->getParameter('populated') !== true || (count($this->_spool['save']) == 0 && count($this->_spool['delete']) == 0)) {
+//				$this->find();
+//			}
 
 			if (isset($a[0])) {
 				
@@ -801,13 +821,14 @@ class Collection extends ObjectModelAbstract {
 				
 					/* sum up the values of all members $prop property */
 					case ObjectModel::CALC_SUM:
-						foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
+						$calc = $this->calc($prop, $a[0]);
+/* 						foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
 							$property = $member->getProperty($prop);
 							if (! $property instanceof Property\AbstractProperty) {
 								continue;
 							}
 							$calc += (float) $property->getValue();
-						}
+						} */
 						break;
 					
 					/* sum up the values of all members $prop property and average the result */

@@ -32,6 +32,7 @@ use t41\ObjectModel\Property\DateProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\Core;
 use t41\ObjectModel\Property\MetaProperty;
+use t41\ObjectModel\Collection;
 
 /**
  * Abstract class providing all CRUD methods to use with PDO adapters
@@ -445,10 +446,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	 * the caller. For example, the t41_Object_Collection::find() method takes care of it.
 	 * 
 	 * @param t41\ObjectModel\Collection $collection
-	 * @param boolean|array $returnCount
+	 * @param boolean|array $returnCount true = counting, array = stats on listed properties
+	 * @param string $subOp complex operation like SUM or AVG
 	 * @return array
 	 */
-	public function find(ObjectModel\Collection $collection, $returnCount = false)
+	public function find(ObjectModel\Collection $collection, $returnCount = false, $subOp = null)
 	{
 		$this->_class = $class = $collection->getDataObject()->getClass();
 		$table = $this->_getTableFromClass($class);
@@ -461,7 +463,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : \t41\Backend::DEFAULT_PKEY;
 		
 		if (is_array($pkey)) {
-			
 			$composite = array();
 			
 			/* @var $obj t41_Backend_Key */
@@ -469,7 +470,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$composite[] = sprintf('TRIM(%s)', $table . '.' . $obj->getName());
 			}
 			$pkey = sprintf("%s", implode(',', $composite));
-			
 		} else {
 			$pkey = $table . '.' . $pkey;
 		}
@@ -477,8 +477,34 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_connect();
 		
 		/* @var $select \Zend_Db_Select */
-		$this->_select = $this->_ressource->select()->distinct();
-		$this->_select->from($table, $returnCount ? new \Zend_Db_Expr("COUNT(*) AS " . \t41\Backend::MAX_ROWS_IDENTIFIER) : $pkey);
+		$this->_select = $this->_ressource->select();
+		
+		// detect if query is of stat-kind
+		if ($returnCount) {
+			switch ($subOp) {
+				
+				case ObjectModel::CALC_SUM:
+					$expressions = [];
+					foreach ($returnCount as $propKey => $property) {
+						$prop = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $propKey) : $propKey;
+						$expressions[] = sprintf('SUM(%s.%s)', $table, $prop);
+					}
+					$subOpExpr = implode('+', $expressions);
+					break;
+					
+				case ObjectModel::CALC_AVG:
+					$subOpExpr = sprintf('AVG(%s)', $returnCount);
+					break;
+										
+				default:
+					$subOpExpr = 'COUNT(*)';
+					break;
+			}
+			$this->_select->from($table, new \Zend_Db_Expr($subOpExpr . " AS " . \t41\Backend::MAX_ROWS_IDENTIFIER));
+		} else {
+			$this->_select->distinct();
+			$this->_select->from($table, $pkey);
+		}
 		
 		$this->_alreadyJoined = array();
 
@@ -659,32 +685,37 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		// Adjust query based on returnCount
 		if ($returnCount) {
 			if (is_array($returnCount)) {
-				// return count on grouped columns
-				foreach ($returnCount as $key => $property) {
-					$fieldmodifier = null;
-					if ($this->_mapper) {
-						$class = $property->getParent() ? $property->getParent()->getId() : $collection->getDataObject()->getClass();
-						$field = $this->_mapper->propertyToDatastoreName($class, $property->getId());
-					} else {
-						$field = $property->getId();
-					}
+				
+				if ($subOp) {
 					
-					if ($property instanceof ObjectProperty) {
-						// join with $key if necessary
-						if (strstr($key, '.') !== false) {
-							$leftPart = substr($key, 0, strpos($key,'.'));
-							$intermediateProp = $collection->getDataObject()->getProperty($leftPart);
-							$fieldmodifier = $this->_join($intermediateProp, $table) . '.' . $field;
+				} else {
+					// return count on grouped columns
+					foreach ($returnCount as $key => $property) {
+						$fieldmodifier = null;
+						if ($this->_mapper) {
+							$class = $property->getParent() ? $property->getParent()->getId() : $collection->getDataObject()->getClass();
+							$field = $this->_mapper->propertyToDatastoreName($class, $property->getId());
+						} else {
+							$field = $property->getId();
 						}
-					}
 					
-					// limit date grouping to date part, omitting possible hour part
-					if ($property instanceof DateProperty) {
-						$fieldmodifier = "DATE($field)";
-					}
+						if ($property instanceof ObjectProperty) {
+							// join with $key if necessary
+							if (strstr($key, '.') !== false) {
+								$leftPart = substr($key, 0, strpos($key,'.'));
+								$intermediateProp = $collection->getDataObject()->getProperty($leftPart);
+								$fieldmodifier = $this->_join($intermediateProp, $table) . '.' . $field;
+							}
+						}
 					
-					$this->_select->group($fieldmodifier ? $fieldmodifier : $field);
-					$this->_select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
+						// limit date grouping to date part, omitting possible hour part
+						if ($property instanceof DateProperty) {
+							$fieldmodifier = "DATE($field)";
+						}
+					
+						$this->_select->group($fieldmodifier ? $fieldmodifier : $field);
+						$this->_select->columns(array($field => $fieldmodifier ? $fieldmodifier : $field));
+					}
 				}
 			} else {
 				$this->_select->reset('group');

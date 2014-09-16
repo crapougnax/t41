@@ -494,7 +494,7 @@ class Backend {
 	 * @throws t41\Backend\Exception
 	 * @return array
 	 */
-	static public function find(ObjectModel\Collection $co, Backend\Adapter\AbstractAdapter $backend = null, $returnCount = false)
+	static public function find(ObjectModel\Collection $co, Backend\Adapter\AbstractAdapter $backend = null, $returnCount = false, $subOp = null)
 	{
 		/*
 		 * Backend to use in order of preferences
@@ -509,19 +509,17 @@ class Backend {
 			$backend = ObjectModel::getObjectBackend($co->getDataObject()->getClass());
 			
 			if (is_null($backend)) {
-			
 				// get default backend
 				$backend = self::getDefaultBackend();
 			}
 		}
 			
 		if (! $backend) {
-
 			throw new Backend\Exception("NO_AVAILABLE_BACKEND");
 		}
 
 		Core::log(sprintf('[Backend] executing find() on %s collection', $co->getClass()));
-		return $backend->find($co, $returnCount);
+		return $backend->find($co, $returnCount, $subOp);
 	}
 	
 	
