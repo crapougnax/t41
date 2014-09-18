@@ -173,12 +173,7 @@ class CollectionProperty extends AbstractProperty {
 					}
 				}
 			}
-			
-			// query now only if object exists in backend
-			// populate only with ObjectUri instances for performance sake
-			if ($this->_parent->getUri()) {
-				$this->_value->find(ObjectModel::URI);
-			}
+			// DON'T POPULATE THERE, IT IS DONE IMPLICITELY IN Collection::getMembers()
 		}
 		return parent::getValue();
 	}
