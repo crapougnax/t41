@@ -577,13 +577,17 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
-	 * Return a member from is numeric key
+	 * Return a member from its numeric key
 	 * @param integer $pos
 	 * @param string $type
 	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
 	 */
 	public function getMember($pos = null, $type = null)
 	{
+		if ($this->getParameter('populated') == false) {
+			$this->find($type);
+		}
+		
 		if (! is_array($this->_members) || count($this->_members) == 0) {
 			return false;
 		}
