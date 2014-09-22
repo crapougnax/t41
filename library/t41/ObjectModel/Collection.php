@@ -614,6 +614,10 @@ class Collection extends ObjectModelAbstract {
 	
 	public function getMemberFromUri($uri)
 	{
+		if ($this->getParameter('populated') == false) {
+			$this->find();
+		}
+		
 		foreach ($this->_members as $member) {
 			if ($member->getIdentifier() && $member->getIdentifier() == $uri) {
 				return $this->_castMember($member, ObjectModel::MODEL);
