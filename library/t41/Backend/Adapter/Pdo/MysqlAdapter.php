@@ -19,7 +19,6 @@ namespace t41\Backend\Adapter\Pdo;
  * @package    t41_Backend
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 880 $
  */
 
 use t41\Backend\Adapter\AbstractPdoAdapter;
@@ -43,6 +42,7 @@ class MysqlAdapter extends AbstractPdoAdapter {
 		if (! $this->_ressource) {
 			parent::_connect();
 			$this->_ressource->query("SET NAMES 'utf8'");
+			$this->_ressource->query("SET CHARACTER SET 'utf8'");
 		}
 	}
 }
