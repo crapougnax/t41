@@ -697,8 +697,15 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * @deprecated use count() instead
+	 * @return Ambigous <NULL, number>
+	 */
 	public function getTotalMembers()
 	{
+		if ($this->getParameter('populated') == false) {
+			return $this->count();
+		}
 		return is_array($this->_members) ? count($this->_members) : null;
 	}
 	
@@ -721,6 +728,12 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Return the total number of members of the collection
+	 * @todo handle the case where collection is manually populated via addMember()
+	 * @param Backend\Adapter\AbstractAdapter $backend
+	 * @return Ambigous <NULL, number>
+	 */
 	public function count(Backend\Adapter\AbstractAdapter $backend = null)
 	{
 		$this->_count($backend);
