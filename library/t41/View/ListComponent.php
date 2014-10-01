@@ -245,7 +245,8 @@ class ListComponent extends ViewObject {
     					$this->_collection->having($field)->equals($value);
     				} else if ($property instanceof Property\AbstractProperty) {
     					$this->_collection->resetConditions($field);
-    					$this->_collection->having($field)->{$property->getParameter('searchmode')}($value);
+    					$searchmode = $property->getParameter('searchmode') ? $property->getParameter('searchmode') : 'equals';
+    					$this->_collection->having($field)->$searchmode($value);
     				}
     				$uriAdapter->setArgument($searchIdentifier . '[' . $field . ']', $value);
     			}

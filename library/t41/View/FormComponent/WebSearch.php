@@ -111,7 +111,7 @@ HTML;
         	$p .= sprintf('<span class="label"><label for="%s[%s]">%s</label></span>'
         					, $this->_searchIdentifier
         					, $field->getId()
-        					, $field->getTitle()
+        					, $field->getTitle() ? $field->getTitle() : 'ID'
         				 );
             
         	// get current field value from env
