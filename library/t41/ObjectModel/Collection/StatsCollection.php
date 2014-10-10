@@ -66,4 +66,15 @@ class StatsCollection extends Collection {
 		}
 		return $array;
 	}
+	
+	
+	/**
+	 * Return the members of the collection
+	 * @param string $type
+	 * @return array
+	 */
+	public function getMembers($type = null)
+	{
+		return $this->_members;
+	}
 }
