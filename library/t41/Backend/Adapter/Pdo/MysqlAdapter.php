@@ -41,8 +41,8 @@ class MysqlAdapter extends AbstractPdoAdapter {
 	{
 		if (! $this->_ressource) {
 			parent::_connect();
-			$this->_ressource->query("SET NAMES 'utf8'");
-			$this->_ressource->query("SET CHARACTER SET 'utf8'");
 		}
+		$this->_ressource->query("SET NAMES 'utf8'");
+		$this->_ressource->query("SET CHARACTER SET 'utf8'");
 	}
 }
