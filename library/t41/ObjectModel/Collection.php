@@ -432,18 +432,18 @@ class Collection extends ObjectModelAbstract {
 		if (is_null($backend)) $backend = $this->_latestBackend;
 		if (is_null($backend)) $backend = ObjectModel::getObjectBackend($this->_do->getClass());
 		$this->_latestBackend = $backend;
-		$this->_count($backend);
+		//$this->_count($backend);
 		
-		if ($this->_max > 0) {
+		//if ($this->_max > 0) {
 			if ($memberType) {
 				$this->setParameter('memberType', $prevMemberType);
 			}
 			$this->_members = Backend::find($this, $backend);
 			$this->setParameter('populated', true);
 			return (integer) $this->_max;
-		} else {
-			return false;
-		}
+//		} else {
+//			return false;
+//		}
 	}
 	
 	
@@ -635,9 +635,8 @@ class Collection extends ObjectModelAbstract {
 	public function getMembers($type = ObjectModel::MODEL)
 	{
 		// if collection has not been populated yet, do it now with $type as param
-		if (! $this->getParameter('populated')) {
+		if ($this->getParameter('populated') == false) {
 			$this->find($type);
-			return $this->_members;
 		}
 		return $this->_castMembers($this->_members, $type);
 	}
