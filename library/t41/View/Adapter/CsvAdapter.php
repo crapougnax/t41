@@ -19,11 +19,10 @@ namespace t41\View\Adapter;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
-use t41\View,
-	t41\View\Decorator;
+use t41\View;
+use t41\View\Decorator;
 use t41\Parameter;
 
 /**
@@ -54,6 +53,8 @@ class CsvAdapter extends AbstractAdapter {
 		
 		$params = array();
 		$params['title'] = new Parameter(Parameter::STRING);
+		$params['destination']	= new Parameter(Parameter::STRING, 'D'); // D = download
+		
 		$this->_setParameterObjects($params);
 		parent::__construct($parameters);
 	}
@@ -61,11 +62,13 @@ class CsvAdapter extends AbstractAdapter {
     
     public function display()
     {
-    	$filename = $this->getParameter('title') ? $this->getParameter('title') : 'Export';
-    	$filename .= '.csv';
+    	if ($this->getParameter('destination') == 'D') {
+	    	$filename = $this->getParameter('title') ? $this->getParameter('title') : 'Export';
+    		$filename .= '.csv';
     	
-        header("Content-type: text/x-csv");
-        header("Content-Disposition: attachment; filename=\"$filename\"");
+        	header("Content-type: text/x-csv");
+        	header("Content-Disposition: attachment; filename=\"$filename\"");
+    	}
     	return $this->_render();
     }
 
