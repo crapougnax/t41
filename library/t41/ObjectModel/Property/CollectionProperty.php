@@ -28,6 +28,7 @@ use t41\ObjectModel,
 	t41\ObjectModel\Collection,
 	t41\Backend\Condition;
 use t41\Core;
+use t41\ObjectModel\ObjectUri;
 
 /**
  * Property class to manipulate collections of objects
@@ -103,6 +104,11 @@ class CollectionProperty extends AbstractProperty {
 	}
 	
 	
+	public function getDisplayValue()
+	{
+	    return $this->_value->count();
+	}
+	
 	/**
 	 * Return current ObjecModel\Collection instance handled by current instance
 	 * instant instanciation is performed if $_value is null or $force is true
@@ -113,7 +119,6 @@ class CollectionProperty extends AbstractProperty {
 	public function getValue($force = false)
 	{
 		if (is_null($this->_value) || $force === true) {
-
 			/* set a new Collection based on instanceof parameter value */
 			$this->_value = new ObjectModel\Collection($this->getParameter('instanceof'));
 			$this->_value->setBoundaryBatch(-1);
@@ -132,6 +137,9 @@ class CollectionProperty extends AbstractProperty {
 						$parts = explode(' ', $value);
 						if (count($parts) == 3) {
 							if ($parts[2] == 'novalue') $parts[2] = Condition::NO_VALUE;
+							if ($parts[2] == ObjectUri::IDENTIFIER) {
+							    $parts[2] = $this->_parent->getUri();
+							}
 							if (substr($parts[2],0,1) == '%' && substr($parts[2], -1) == '%') {
 								$prop = substr($parts[2], 1, strlen($parts[2])-2);
 								if (($prop = $this->_parent->getProperty($prop)) !== false) {
@@ -156,7 +164,8 @@ class CollectionProperty extends AbstractProperty {
 						// default case, we expect the member to hold a property
 						// with the same name and value as the current object
 						if (($property = $this->_parent->getProperty($value)) === false) {
-							throw new Exception("keyprop value doesn't match any property");
+							throw new Exception(sprintf("keyprop value '%s' doesn't match any property of class '%s'"
+							    , $value, $this->_parent->getClass()));
 						}
 						$this->_value->having($value)->equals($property->getValue());
 					}
@@ -174,6 +183,7 @@ class CollectionProperty extends AbstractProperty {
 				}
 			}
 			// DON'T POPULATE THERE, IT IS DONE IMPLICITELY IN Collection::getMembers()
+			//$this->_value->debug();
 		}
 		return parent::getValue();
 	}
