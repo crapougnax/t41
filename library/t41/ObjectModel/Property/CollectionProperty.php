@@ -104,10 +104,15 @@ class CollectionProperty extends AbstractProperty {
 	}
 	
 	
+	/**
+	 * Returns the number of members in the collection
+	 * @see \t41\ObjectModel\Property\AbstractProperty::getDisplayValue()
+	 */
 	public function getDisplayValue()
 	{
-	    return $this->_value->count();
+	    return $this->getValue()->count();
 	}
+	
 	
 	/**
 	 * Return current ObjecModel\Collection instance handled by current instance
