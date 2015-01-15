@@ -237,10 +237,17 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	 * @param t41\ObjectModel\DataObject $do data object instance
 	 * @return boolean
 	 */
-	public function read(ObjectModel\DataObject $do) 
-	{	
+	public function read(ObjectModel\DataObject $do, $data = null) 
+	{
 		if (! $do->getUri() instanceof ObjectUri) {
 			throw new Exception('MISSING_URI_IN_DATAOBJECT');
+		}
+		
+		if (is_array($data) && count($data) > 0) {
+		    /* populate data object */
+		    $do->populate($data, $this->_mapper);
+		    $do->resetChangedState();
+		    return true;		    
 		}
 		
 		// get table to use
@@ -252,7 +259,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
-		// get properties name
+/* 		// get properties name
 		$columns = array();
 		foreach ($do->getProperties() as $property) {
 			if ($property instanceof Property\BlobProperty 
@@ -261,7 +268,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				continue;
 			}
 			$columns[] = $this->_mapper ? $this->_mapper->propertyToDatastoreName($do->getClass(), $property->getId()) : $property->getId();
-		}
+		} */
+		$columns = $this->_getColumns($do);
 		
 		// primary key is either part of the mapper configuration or 'id'
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
@@ -722,7 +730,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			}
 		} else {
 			$this->_select->limit($collection->getBoundaryBatch() != - 1 ? $collection->getBoundaryBatch() : null, $collection->getBoundaryOffset());
-		}
 		
 		/**
 		 * Sorting part
@@ -837,11 +844,15 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 				$this->_select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
 			}
+		}
 		
 		$result = array();
 		$context = array('table' => $table);
 		
 		try {
+		    if (true && $returnCount == false) {
+		        $this->_select->columns($this->_getColumns($collection->getDataObject()));
+		    }
 			$result = $this->_ressource->fetchAll($this->_select);
 		} catch (\Zend_Db_Exception $e) {
 			$context['error'] = $e->getMessage();
@@ -857,7 +868,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 		// convert array of primary keys to strings
 		foreach ($result as $key => $val) {
-			$result[$key] = implode(Backend\Mapper::VALUES_SEPARATOR, $val);
+		//	$result[$key] = implode(Backend\Mapper::VALUES_SEPARATOR, $val);
 		}
 		
 		/* prepare base of object uri */
@@ -875,6 +886,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$this->_connect();
 		if ($this->_ressource->beginTransaction()) {
 			$this->_transaction = $key ? $key : true;
+			$this->_setLastQuery('begin transaction');
 			return true;
 		} else {
 			return false;
@@ -888,9 +900,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			$this->_transaction = false;
 			try {
 				$this->_ressource->commit();
+				$this->_setLastQuery('commit transaction', 'OK');
 				return true;
 			} catch (\Exception $e) {
 				$this->_ressource->rollBack();
+				$this->_setLastQuery('commit transaction', $e->getMessage());
 				return false;
 			}
 		}

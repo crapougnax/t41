@@ -305,6 +305,10 @@ abstract class AbstractAdapter implements AdapterInterface {
 			return array();
 		}
 		
+		if (count($ids[0]) > 1) {
+		    $do = clone $collection->getDataObject();
+		}
+		
 		$class = $collection->getDataObject()->getClass();
 
 		// populate array with relevant objects type
@@ -319,8 +323,12 @@ abstract class AbstractAdapter implements AdapterInterface {
 		
 		foreach ($ids as $key => $id) {
 			$uri = clone $uriBase;
-			$uri->setUrl($uri->getUrl() . $id)->setIdentifier($id);
-			
+		    if (is_array($id)) {
+		        $uri->setUrl($uri->getUrl() . $id['id'])->setIdentifier($id['id']);
+		        unset($id['id']);
+		    } else {
+    			$uri->setUrl($uri->getUrl() . $id)->setIdentifier($id);
+		    }		
 			if (isset($do)) {
 				$obj = clone $do;
 				$obj->setUri($uri);
@@ -335,8 +343,8 @@ abstract class AbstractAdapter implements AdapterInterface {
             		break;
             		
             	case ObjectModel::MODEL:
-            		if (isset($obj)) {
-            			Backend::read($obj);
+            		if (isset($obj) || is_array($ids)) {
+            			Backend::read($obj, null, $id);
             		} else {
 	            		$obj = Core::_($uri,$class);
             		}
@@ -345,8 +353,8 @@ abstract class AbstractAdapter implements AdapterInterface {
             		
             	case ObjectModel::DATA:
             	default:
-                    if (isset($obj)) {
-            			Backend::read($obj);
+                    if (isset($obj) || is_array($ids)) {
+            			Backend::read($obj, null, $id);
             		} else {
 	            		$obj = Core::_($uri,$class);
             		}
@@ -440,5 +448,20 @@ abstract class AbstractAdapter implements AdapterInterface {
 			}
 		}
 		return $res;
+	}
+	
+	
+	protected function _getColumns(DataObject $do)
+	{
+	    $columns = array();
+	    foreach ($do->getProperties() as $property) {
+	        if ($property instanceof Property\BlobProperty
+	            || $property instanceof Property\CollectionProperty
+	            || $property instanceof Property\MetaProperty) {
+	                continue;
+	            }
+	            $columns[] = $this->_mapper ? $this->_mapper->propertyToDatastoreName($do->getClass(), $property->getId()) : $property->getId();
+	    }
+	    return $columns;
 	}
 }
