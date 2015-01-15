@@ -167,13 +167,18 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
+	/**
+	 * Return the unique cache prefix to use in order to cache the results sets
+	 * @return string
+	 */
 	public function getCachePrefix()
 	{
 		$str = '';
+		/* @var $condition t41\Backend\Condition */
 		foreach ($this->_conditions as $condition) {
-			$str .= '-' . print_r($condition, true);
+			$str .= '/' . $condition[0]->__toString();
 		}
-		return md5($this->_do->getClass() . $str);
+		return md5($str);
 	}
 	
 	
@@ -760,15 +765,6 @@ class Collection extends ObjectModelAbstract {
 		// condition on the identifier part of the uri
 		if ($propertyName == ObjectUri::IDENTIFIER) {
 			return $this->setCondition(new Property\IdentifierProperty(ObjectUri::IDENTIFIER, null, null, $mode));
-		} else if (strstr($propertyName, '.') !== false) {
-			// deal with recursive properties
-			$parts = explode('.', $propertyName);
-			$condition = $this->setCondition($this->_do->getProperty($parts[0]));
-				
-			foreach (array_slice($parts,1) as $property) {
-				$condition = $condition->having($property);
-			}
-			return $condition;
 		} else if (($property = $this->_do->getRecursiveProperty($propertyName)) !== false) {
 			return $this->setCondition($property, null, null, $mode);
 		}
