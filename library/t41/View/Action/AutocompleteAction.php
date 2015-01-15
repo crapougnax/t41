@@ -19,7 +19,6 @@ namespace t41\View\Action;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
 use t41\Core;
@@ -107,7 +106,7 @@ class AutocompleteAction extends AbstractAction {
 					$data = $this->_getFromIdentifier(trim($params[$this->queryidfield]));
 				}
 				$data['cache-key'] = $ckey;
-				Core::cacheSet($data,$ckey, true, array('tags' => array('view','ac')));
+				Core::cacheSet($data,$ckey, true, array('tags' => array('view','ac', str_replace('\\', '_', $this->_obj->getClass()))));
 			}
 			
 		} else {
@@ -160,9 +159,8 @@ class AutocompleteAction extends AbstractAction {
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
 
-		$this->_obj->find(ObjectModel::MODEL);
-		
-		if ($this->_obj->find(ObjectModel::MODEL) === false) {
+		//$this->_obj->debug(); die;
+		if ($this->_obj->count() == 0) {
 			return false;
 		}
 		
@@ -194,7 +192,6 @@ class AutocompleteAction extends AbstractAction {
 			return false;
 		}
 	
-		//\Zend_Debug::dump(\t41\Backend::getLastQuery()); die;
 		foreach ($this->_obj->getMembers() as $member) {
 			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
 		}
