@@ -353,41 +353,33 @@ class Backend {
 	 * @param t41_Backend_Adapter_Abstract $backend
 	 * @return boolean
 	 */
-	static public function read(ObjectModel\DataObject $do, Backend\Adapter\AbstractAdapter $backend = null)
+	static public function read(ObjectModel\DataObject $do, Backend\Adapter\AbstractAdapter $backend = null, $data = null)
 	{
 		if (is_null($backend)) {
-
 			if ($do->getUri()) {
-			
 				/* if uri is not empty, get backend information from it */
 				$backend = self::getInstance($do->getUri()->getBackendUri());
 
 			} else {
-				
 				/* get object definition default backend */
 				$backend = ObjectModel::getObjectBackend($do->getClass());
 			}
 				
 			if (is_null($backend)) {
-
 				/* get object default backend if exists */
 				$backend = self::getDefaultBackend();
 			}
 		}
 			
 		if (! $backend) {
-
 			throw new Exception("NO_AVAILABLE_BACKEND");
 		}
 			
 		if ($do->getUri()) {
-				
 			// populate data object in backend adapter and return status
 			Core::log(sprintf('[Backend] Loading %s object (%s)', $do->getClass(), $do->getUri()));
-			return $backend->read($do);
-			
+			return $backend->read($do, $data);
 		} else {
-
 			throw new Backend\Exception("NO_AVAILABLE_URI");
 		}
 	}
@@ -485,8 +477,8 @@ class Backend {
 	
 	
 	/**
-	 * Execute a search on given backend with given t41_Object_Collection parameters
-	 * and returns an array of results (either t41_Object_Uri, t41_Object_Data or t41_Object_Model instances)
+	 * Execute a search on given backend with given t41\ObjectModel\Collection parameters
+	 * and returns an array of results (either t41\ObjectModel\ObjectUri, t41\ObjectModel/DataObject or t41\ObjectModel\BaseObject instances)
 	 * 
 	 * @param t41\ObjectModel\Collection $co
 	 * @param t41\Backend\Adapter\AbstractAdapter $backend
@@ -503,11 +495,8 @@ class Backend {
 		 * 2. object default backend
 		 * 3. general default backend
 		 */
-		
 		if (is_null($backend)) {
-			
 			$backend = ObjectModel::getObjectBackend($co->getDataObject()->getClass());
-			
 			if (is_null($backend)) {
 				// get default backend
 				$backend = self::getDefaultBackend();
