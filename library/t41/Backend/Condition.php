@@ -514,4 +514,20 @@ class Condition {
 		$this->_clauses[$this->_current]['mode'] = $mode;
 		return $this;
 	}
+	
+	
+	/**
+	 * Returns a string representation of the condition
+	 * @return string
+	 */
+	public function __toString()
+	{
+	    $str = array($this->getProperty()->getId());
+	    foreach ($this->_clauses as $clause) {
+	        $str[] = $clause['operator'];
+	        $str[] = $clause['value'];
+	        $str[] = $clause['mode'];
+	    }
+	    return implode(',', $str);
+	}
 }
