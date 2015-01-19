@@ -49,11 +49,15 @@ if (! window.t41.view.action.autocomplete) {
 		
 		this.previous;
 		
+		this.observer;
+		
+		this.history = {};
+		
 		// callbacks
 		this.callbacks = obj.callbacks || {};
 		
-		if (! this.callbacks['display']) this.callbacks['display'] = 't41.view.action.autocomplete.display';
-		if (! this.callbacks['select'])  this.callbacks['select']  = 't41.view.action.autocomplete.select';
+		if (! this.callbacks['display']) this.callbacks['display'] = t41.view.action.autocomplete.display;
+		if (! this.callbacks['select'])  this.callbacks['select']  = t41.view.action.autocomplete.select;
 		if (! this.callbacks['extend'])  this.callbacks['extend']  = 't41.view.action.autocomplete.extendSuggestions';
 
 		
@@ -67,12 +71,10 @@ if (! window.t41.view.action.autocomplete) {
 		// Server Uri
 		this.action = obj.data.action || 'action/autocomplete';
 		
-		
 		this.currentSuggestions = {};
 		
 		
 		this.init = function() {
-			
 			// add accessories DOM elements
 			var span = document.createElement('SPAN');
 			span.setAttribute('id', this.target + '_display');
@@ -85,8 +87,8 @@ if (! window.t41.view.action.autocomplete) {
 				this.initSavedValue(val);
 			}
 			
-			// bind observer
-			t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
+			// start observer (@todo test with IE)
+			this.observer = window.setInterval(t41.view.action.autocomplete.observer, 500, this);
 			this.element.focus();
 		};
 		
@@ -157,17 +159,15 @@ if (! window.t41.view.action.autocomplete) {
 
 			jQuery('<h4>').appendTo(jQuery('#'+this.props)).html(helpertext).attr('id', id+'_helper').addClass(css);
 
-			if (css=='more') {
+			if (css == 'more') {
 				var button = new t41.view.button(t41.lget('ac:extend'), {icon:'more-blue',css:'ac_extend',id:id+'_extend'});
 				jQuery('#' + this.props).append(button);
 			}
 
 			jQuery(document).bind('click.propsgrid', function(e) {
-
-				if (e.target.id==id+'_extend' || jQuery(e.srcElement).parent().attr('id')==id+'_extend') {
+				if (e.target.id == id+'_extend' || jQuery(e.srcElement).parent().attr('id') == id+'_extend') {
 					t41.view.action.autocomplete.extender(t41.view.registry[element]);
-
-				} else if (e.target.id!=id) {
+				} else if (e.target.id != id) {
 					jQuery('#'+id).remove();
 					jQuery(document).unbind('click.propsgrid');
 					t41.view.registry[element].offset = 0;
@@ -176,10 +176,9 @@ if (! window.t41.view.action.autocomplete) {
 
 			if (data.total > 0) {
 				this.table.render(jQuery('#' + this.props));
-				var callback = typeof this.callbacks.select == 'function' ? this.callbacks.select : eval(this.callbacks.select);
+				var callback = typeof this.callbacks.select == 'function' ? this.callbacks.select.call(this) : eval(this.callbacks.select);
 				t41.view.bindLocal(jQuery('#' + this.props + '_table'), 'click', callback, this);
 			}
-
 			this.refreshSuggestionsPosition();
 		};
 
@@ -198,13 +197,11 @@ if (! window.t41.view.action.autocomplete) {
 				var helpertext = t41.lget('ac:manyresults', {vars:[data.total]});
 				var css = 'many';
 			}
-
 			return {txt:helpertext, css:css};
 		};
 
 		
 		this.refreshSuggestionsPosition = function() {
-		
 			var grid = jQuery('#' + this.props);
 			jQuery(document).unbind('resize.propsgrid');
 			var offset = this.element.offset();
@@ -226,7 +223,6 @@ if (! window.t41.view.action.autocomplete) {
 				'collection': this.currentSuggestions,
 				'id': this.props+'_table'
 			});
-			
 		};
 		
 		
@@ -391,12 +387,8 @@ if (! window.t41.view.action.autocomplete) {
 						action:ac.action,
 						callback:eval( ac.callbacks['extend'] ),//t41.view.registry[ jQuery(ac.element).attr('id') ].callbacks['extend'],
 					 	context:ac.element,
-					 	//method:'get',
 						data:{_query:search,uuid:ac.uuid,_sequence:++ac.sequence, _offset:offset}
 					 };
-		
-		//console.log(config);
-
 		t41.core.call(config);
 	};
 	
@@ -406,29 +398,30 @@ if (! window.t41.view.action.autocomplete) {
 	 * @param obj
 	 */
 	window.t41.view.action.autocomplete.observer = function(obj) {
-	
-		var search = (jQuery(obj.target).val());
-		var ac = obj.data.caller ? obj.data.caller : obj.data;
 
-		if (search.length < ac.options.minChars || (search == ac.previous)) {
+		var search = obj.element.val();
+		if (search.length < obj.minChars || (search == obj.previous)) {
 			return;
 		}
 		
-		ac.previous = search;
-		
-		var config = {
-						action:ac.action,
-						callback:eval(ac.callbacks.display),
-					 	context:ac.element,
-					 	//method:'get',
-						data:{_query:search,uuid:ac.uuid,_sequence:++ac.sequence}
-					 };
-		
-		if (ac.callbacks.preQuery && typeof ac.callbacks.preQuery == 'function') {
-			config = ac.callbacks.preQuery.call(this,config);
+		obj.previous = search;
+		if (obj.history[search]) {
+			obj.callbacks.display.call(obj,obj.history[search], 0);
+			return;
 		}
 		
-		var xhrId = obj.currentTarget.id + '_xhr';
+		var config = {
+						action:obj.action,
+						callback:function(res) { obj.callbacks.display.call(obj,res) },
+					 	context:obj.element,
+						data:{_query:search,uuid:obj.uuid,_sequence:++obj.sequence,_offset:0}
+					 };
+		
+		if (obj.callbacks.preQuery && typeof obj.callbacks.preQuery == 'function') {
+			config = obj.callbacks.preQuery.call(this,config);
+		}
+		
+		var xhrId = obj.uuid + '_xhr';
 		if (t41.view.get(xhrId)) {
 			t41.view.get(xhrId).abort();
 		}
@@ -440,22 +433,29 @@ if (! window.t41.view.action.autocomplete) {
 	 * Default autocompleter Ajax-success Handler
 	 * restore the autocomplete object and call the displaySuggestions() methods with the received collection
 	 * @param obj
+	 * @param offset
+	 * @param this Current autocomplete object
 	 */
-	window.t41.view.action.autocomplete.display = function(obj) {
+	window.t41.view.action.autocomplete.display = function(obj, offset) {
 
-		switch (obj.status) {
+		offset = isNaN(offset) ? false : offset;
+		if (offset !== false) {
+			obj = obj[offset];
+			console.log("from local cache");
+		} else {
+			if (! this.history[obj.data._query]) this.history[obj.data._query] = {};
+			this.history[obj.data._query][obj.data._offset] = obj;
+		}
 		
+		switch (obj.status) {
 			case t41.core.status.ok:
 			case t41.core.status.nok:
-				var ac = t41.view.registry[this.attr('id')];
-				
-				// ignore queries coming back home too late
-				if (ac.sequence > obj.data._sequence) {
+				// ignore server queries coming back too late
+				if (offset === false && this.sequence > obj.data._sequence) {
 					return false;
 				}
-				
-				ac.displaySuggestions(obj.data);
-				ac.offset = obj.data.total;
+				this.displaySuggestions(obj.data);
+				this.offset = obj.data.total;
 				break;
 
 			case t41.core.status.err:
@@ -469,13 +469,13 @@ if (! window.t41.view.action.autocomplete) {
 	};
 	
 	
+	/**
+	 * Triggered action when a value is clicked
+	 * Receives the current autocomplete object as context
+	 */
 	window.t41.view.action.autocomplete.select = function(obj) {
-
-		var ac = obj.data.caller;
 		var id = '';
-		
-		switch (ac.displayMode) {
-		
+		switch (this.displayMode) {
 			case 'table':
 				var id = jQuery(obj.target).parent('tr').data('id');
 				break;
@@ -486,7 +486,7 @@ if (! window.t41.view.action.autocomplete) {
 		}
 		
 		if (id) {
-			ac.defaultSelect(id);
+			this.defaultSelect(id);
 		} else {
 			console.log('selected row id is missing');
 		}
@@ -494,7 +494,6 @@ if (! window.t41.view.action.autocomplete) {
 	
 	
 	window.t41.view.action.autocomplete.reset = function(obj) {
-		
 		var ac = obj.data.caller;
 		ac.resetValue();
 	};
