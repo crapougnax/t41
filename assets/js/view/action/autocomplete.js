@@ -53,11 +53,15 @@ if (! window.t41.view.action.autocomplete) {
 		
 		this.history = {};
 		
+		this.stroke;
+		
+		this.toto;
+		
 		// callbacks
 		this.callbacks = obj.callbacks || {};
 		
 		if (! this.callbacks['display']) this.callbacks['display'] = t41.view.action.autocomplete.display;
-		if (! this.callbacks['select'])  this.callbacks['select']  = t41.view.action.autocomplete.select;
+		if (! this.callbacks['select'])  this.callbacks['select']  = ''; //'t41.view.action.autocomplete.select';
 		if (! this.callbacks['extend'])  this.callbacks['extend']  = 't41.view.action.autocomplete.extendSuggestions';
 
 		
@@ -88,7 +92,9 @@ if (! window.t41.view.action.autocomplete) {
 			}
 			
 			// start observer (@todo test with IE)
-			this.observer = window.setInterval(t41.view.action.autocomplete.observer, 500, this);
+			this.observer = window.setInterval(t41.view.action.autocomplete.observer, 100, this);
+			//this.observer = this.element.on('keypress', function() { t41.view.action.autocomplete.observer.call }, this);
+			//t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
 		};
 		
@@ -176,12 +182,41 @@ if (! window.t41.view.action.autocomplete) {
 
 			if (data.total > 0) {
 				this.table.render(jQuery('#' + this.props));
-				var callback = typeof this.callbacks.select == 'function' ? this.callbacks.select.call(this) : eval(this.callbacks.select);
+				if (this.callbacks.select == '') {
+					var callback = jQuery.proxy(this,'select');
+				} else if (typeof this.callbacks.select == 'function') {
+					var callback = this.callbacks.select;
+				} else {
+					var callback = eval(this.callbacks.select);
+				}
 				t41.view.bindLocal(jQuery('#' + this.props + '_table'), 'click', callback, this);
 			}
 			this.refreshSuggestionsPosition();
 		};
 
+		
+		/**
+		 * Triggered action when a value is clicked
+		 * Receives the current autocomplete object as context
+		 */
+		this.select = function(obj) {
+			var id = '';
+			switch (this.displayMode) {
+				case 'table':
+					var id = jQuery(obj.target).parent('tr').data('id');
+					break;
+					
+				case 'list':
+					var id = jQuery(obj.target).parent('tr').data('id');
+					break;
+			}
+			
+			if (id) {
+				this.defaultSelect(id);
+			} else {
+				console.log('selected row id is missing');
+			}
+		};
 		
 		this.getHelper = function(data) {
 			if (data.total == 0 || ! data.total) {
@@ -400,8 +435,19 @@ if (! window.t41.view.action.autocomplete) {
 	window.t41.view.action.autocomplete.observer = function(obj) {
 
 		var search = obj.element.val();
+		
+		if (search == "" && search != obj.previous) {
+			obj.resetValue();
+			return;
+		}
+		
 		if (search.length < obj.minChars || (search == obj.previous)) {
 			return;
+		}
+
+		if (obj.toto) { // cancel previous call
+			window.clearTimeout(obj.toto);
+			obj.toto = null;
 		}
 		
 		obj.previous = search;
@@ -413,19 +459,18 @@ if (! window.t41.view.action.autocomplete) {
 		var config = {
 						action:obj.action,
 						callback:function(res) { obj.callbacks.display.call(obj,res) },
-					 	context:obj.element,
+					 	context:this.element,
 						data:{_query:search,uuid:obj.uuid,_sequence:++obj.sequence,_offset:0}
 					 };
 		
 		if (obj.callbacks.preQuery && typeof obj.callbacks.preQuery == 'function') {
-			config = obj.callbacks.preQuery.call(this,config);
+			config = obj.callbacks.preQuery.call(obj,config);
 		}
 		
-		var xhrId = obj.uuid + '_xhr';
-		if (t41.view.get(xhrId)) {
-			t41.view.get(xhrId).abort();
-		}
-		t41.view.register(xhrId, t41.core.call(config));
+		obj.toto = window.setTimeout(function() {
+			t41.view.shade(obj.element);
+			t41.core.call(config);
+		}, obj.options.latency);
 	};
 	
 	
@@ -437,14 +482,14 @@ if (! window.t41.view.action.autocomplete) {
 	 * @param this Current autocomplete object
 	 */
 	window.t41.view.action.autocomplete.display = function(obj, offset) {
-
 		offset = isNaN(offset) ? false : offset;
 		if (offset !== false) {
 			obj = obj[offset];
-			console.log("from local cache");
+			console.log('"' + obj.data._query + '" query result from local cache');
 		} else {
 			if (! this.history[obj.data._query]) this.history[obj.data._query] = {};
 			this.history[obj.data._query][obj.data._offset] = obj;
+			t41.view.shade(this.element);
 		}
 		
 		switch (obj.status) {
@@ -467,31 +512,7 @@ if (! window.t41.view.action.autocomplete) {
 				break;
 		}
 	};
-	
-	
-	/**
-	 * Triggered action when a value is clicked
-	 * Receives the current autocomplete object as context
-	 */
-	window.t41.view.action.autocomplete.select = function(obj) {
-		var id = '';
-		switch (this.displayMode) {
-			case 'table':
-				var id = jQuery(obj.target).parent('tr').data('id');
-				break;
-				
-			case 'list':
-				var id = jQuery(obj.target).parent('tr').data('id');
-				break;
-		}
-		
-		if (id) {
-			this.defaultSelect(id);
-		} else {
-			console.log('selected row id is missing');
-		}
-	};
-	
+
 	
 	window.t41.view.action.autocomplete.reset = function(obj) {
 		var ac = obj.data.caller;

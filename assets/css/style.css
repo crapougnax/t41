@@ -234,7 +234,7 @@ textarea{
 /* -- BEGIN AUTOCOMPLETER -- */
 .t41.component.autocompletepropsgrid {
   box-shadow: 4px 4px 9px #737373;
-  max-width: 650px;
+  max-width: 800px;
   padding: 0;
   max-height: 380px;
 }

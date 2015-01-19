@@ -49,7 +49,7 @@ class AutocompleteAction extends AbstractAction {
 	protected $_callbacks = array();
 	
 	
-	protected $_context = array('minChars' => 1, 'displayMode' => 'list', 'defaultSelect' => true);
+	protected $_context = array('minChars' => 1, 'displayMode' => 'list', 'defaultSelect' => true, 'latency' => 500);
 	
 	
 	/**
