@@ -236,6 +236,10 @@
 						<type>string</type>
 						<defaultvalue>contains</defaultvalue>
 					</parameter>
+					<parameter id="retprops">
+						<!-- which properties to return (comma-separated list) -->
+						<type>string</type>
+					</parameter>
 				</parameters>
 			</decorator>
 		</object>

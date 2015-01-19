@@ -70,6 +70,11 @@ class WebAutocomplete extends AbstractWebDecorator {
 		$action->setParameter('display', explode(',', $this->_obj->getParameter('display')));
 		$action->setParameter('sdisplay', explode(',', $this->_obj->getParameter('sdisplay') ? $this->_obj->getParameter('sdisplay') : $this->_obj->getParameter('display')));
 		$action->setParameter('event', 'keyup');
+		
+		// if a list of properties to be returned exists, pass it to the action
+		if ($this->getParameter('retprops')) {
+		    $action->setParameter('member_reduce_params', array('props' => explode(',', $this->getParameter('retprops'))));
+		}
 		$action->setContextData('onclick', 't41.view.element.autocomplete.close');
 		$action->setContextData('target', $this->_nametoDomId($name));
 		$action->bind($acfield);

@@ -49,7 +49,7 @@ class AutocompleteAction extends AbstractAction {
 	protected $_callbacks = array();
 	
 	
-	protected $_context = array('minChars' => 3, 'displayMode' => 'list', 'defaultSelect' => true);
+	protected $_context = array('minChars' => 1, 'displayMode' => 'list', 'defaultSelect' => true);
 	
 	
 	/**
@@ -159,13 +159,14 @@ class AutocompleteAction extends AbstractAction {
 		$this->_obj->setBoundaryOffset($this->getParameter('offset'));
 		$this->_obj->setBoundaryBatch($this->getParameter('batch'));
 
-		//$this->_obj->debug(); die;
 		if ($this->_obj->count() == 0) {
 			return false;
 		}
 		
 		$params = $this->getParameter('member_reduce_params') ? $this->getParameter('member_reduce_params') : array();
-		$params['props'] = array_merge($this->getParameter('display'), $this->getParameter('sdisplay'));
+		if (! isset($params['props'])) {
+		    $params['props'] = array_merge($this->getParameter('display'), $this->getParameter('sdisplay'));
+		}
 		
 		foreach ($this->_obj->getMembers() as $member) {
 			$data[$member->getUri()->getIdentifier()] = $member->reduce($params);
@@ -183,19 +184,16 @@ class AutocompleteAction extends AbstractAction {
 	protected function _getFromIdentifier($id)
 	{
 		$data = array();
-	
 		$this->_obj->having(ObjectUri::IDENTIFIER)->equals($id);	
 		$this->_obj->setBoundaryOffset(0);
 		$this->_obj->setBoundaryBatch(1);
-			
-		if ($this->_obj->find(ObjectModel::MODEL) === false) {
+		if ($this->_obj->count() == 0) {
 			return false;
 		}
 	
 		foreach ($this->_obj->getMembers() as $member) {
 			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
 		}
-	
 		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());
 	}
 
