@@ -37,12 +37,12 @@ class ArrayProperty extends AbstractProperty {
 	public function setValue($value)
 	{
 		// try to detect serialized values
-		if (@unserialize($value) !== false) {
+		if (!is_array($value) && @unserialize($value) !== false) {
 			$value = unserialize($value);
 		}
 		
 		if (! is_array($value)) {
-			throw new Exception("This property accepts only arrays");
+			throw new Exception(sprintf("The '%s' property accepts only arrays", $this->_id));
 		}
 		parent::setValue($value);
 	}

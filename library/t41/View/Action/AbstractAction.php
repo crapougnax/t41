@@ -19,7 +19,6 @@ namespace t41\View\Action;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
 use t41\ObjectModel\ObjectModelAbstract,
@@ -75,13 +74,11 @@ abstract class AbstractAction extends ViewObject {
 		$this->_setParameterObjects();
 
 		if (! is_null($obj)) {
-			
 			$this->setObject($obj);
 			$this->_cachePrefix = method_exists($obj, 'getCachePrefix') ? $obj->getCachePrefix() : 'prefix';
 		}
 		
 		if (is_array($params)) {
-			
 			$this->_setParameters($params);
 		}
 	}
@@ -113,10 +110,8 @@ abstract class AbstractAction extends ViewObject {
 	public function setObject($obj)
 	{
 		if (! $obj instanceof $this->_objClass){
-
 			throw new \Exception("Object should be of type " . $this->_objClass);
 		}
-		
 		$this->_obj = $obj;
 		return $this;
 	}
@@ -164,7 +159,6 @@ abstract class AbstractAction extends ViewObject {
 	public function setContext(array $array)
 	{
 		foreach ($array as $key => $val) {
-			
 			$this->setContextData($key, $val);
 		}
 	}
@@ -186,10 +180,8 @@ abstract class AbstractAction extends ViewObject {
 	{
 		$res = parent::register($placeHolder, $params, $clone);
 		if ($res !== false) {
-			
 			$this->_context['rid'] = $res;
 		}
-		
 		return $res;
 	}
 	

@@ -259,25 +259,13 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			throw new Exception('MISSING_DBTABLE_PARAM');
 		}
 		
-/* 		// get properties name
-		$columns = array();
-		foreach ($do->getProperties() as $property) {
-			if ($property instanceof Property\BlobProperty 
-					|| $property instanceof Property\CollectionProperty
-						|| $property instanceof Property\MetaProperty) {
-				continue;
-			}
-			$columns[] = $this->_mapper ? $this->_mapper->propertyToDatastoreName($do->getClass(), $property->getId()) : $property->getId();
-		} */
-		$columns = $this->_getColumns($do);
-		
 		// primary key is either part of the mapper configuration or 'id'
 		$pkey = $this->_mapper ? $this->_mapper->getPrimaryKey($do->getUri()->getClass()) : Backend::DEFAULT_PKEY;
 		$this->_connect();
 		
 		// get data from backend
 		$select = $this->_ressource->select()
-								   ->from($table,$columns)
+								   ->from($table, $this->_getColumns($do))
 								   ->limit(1);
 		
 		/* add clause for primary key(s) */

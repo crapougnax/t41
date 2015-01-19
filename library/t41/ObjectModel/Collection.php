@@ -587,7 +587,7 @@ class Collection extends ObjectModelAbstract {
 	 * @param string $type
 	 * @return boolean|\t41\ObjectModel\DataObject|\t41\ObjectModel\ObjectUri>|\t41\ObjectModel\BaseObject
 	 */
-	public function getMember($pos = null, $type = null)
+	public function getMember($pos = null, $type = ObjectModel::MODEL)
 	{
 		if ($this->getParameter('populated') == false) {
 			$this->find($type);
