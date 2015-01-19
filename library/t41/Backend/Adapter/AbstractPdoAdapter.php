@@ -465,7 +465,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			foreach ($pkey as $obj) {
 				$composite[] = sprintf('TRIM(%s)', $table . '.' . $obj->getName());
 			}
-			$pkey = sprintf("%s", implode(',', $composite));
+			$pkey = sprintf("%s AS %s", implode(',', $composite), Backend::DEFAULT_PKEY);
 		} else {
 			$pkey = $table . '.' . $pkey;
 		}

@@ -166,6 +166,8 @@ class AutocompleteAction extends AbstractAction {
 		$params = $this->getParameter('member_reduce_params') ? $this->getParameter('member_reduce_params') : array();
 		if (! isset($params['props'])) {
 		    $params['props'] = array_merge($this->getParameter('display'), $this->getParameter('sdisplay'));
+		} else {
+		    $params['props'] = array_merge($params['props'],$this->getParameter('display'));
 		}
 		
 		foreach ($this->_obj->getMembers() as $member) {
