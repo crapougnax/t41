@@ -192,6 +192,7 @@ if (! window.t41.view.action.autocomplete) {
 				t41.view.bindLocal(jQuery('#' + this.props + '_table'), 'click', callback, this);
 			}
 			this.refreshSuggestionsPosition();
+			this.element.focus();
 		};
 
 		
