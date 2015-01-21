@@ -438,6 +438,7 @@ if (! window.t41.view.action.autocomplete) {
 		var search = obj.element.val();
 		
 		if (search == "" && search != obj.previous) {
+			obj.previous = search;
 			obj.resetValue();
 			return;
 		}
