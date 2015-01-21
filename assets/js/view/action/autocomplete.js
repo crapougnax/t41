@@ -47,15 +47,7 @@ if (! window.t41.view.action.autocomplete) {
 		 */
 		this.displayMode = obj.data.displayMode;
 		
-		this.previous;
-		
-		this.observer;
-		
-		this.history = {};
-		
-		this.stroke;
-		
-		this.toto;
+		this.previous, this.observer, this.history = {}, this.nextQuery;
 		
 		// callbacks
 		this.callbacks = obj.callbacks || {};
@@ -91,10 +83,8 @@ if (! window.t41.view.action.autocomplete) {
 				this.initSavedValue(val);
 			}
 			
-			// start observer (@todo test with IE)
+			// start observer (tested with IE 11)
 			this.observer = window.setInterval(t41.view.action.autocomplete.observer, 100, this);
-			//this.observer = this.element.on('keypress', function() { t41.view.action.autocomplete.observer.call }, this);
-			//t41.view.bindLocal(this.element, 'keyup change', t41.view.action.autocomplete.observer, this);
 			this.element.focus();
 		};
 		
@@ -435,24 +425,19 @@ if (! window.t41.view.action.autocomplete) {
 	 */
 	window.t41.view.action.autocomplete.observer = function(obj) {
 
-		var search = obj.element.val();
-		
-		if (search == "" && search != obj.previous) {
-			obj.previous = search;
-			obj.resetValue();
-			return;
-		}
-		
-		if (search.length < obj.minChars || (search == obj.previous)) {
+		var search = obj.element.val().trim();	
+		if (search.length < obj.minChars || search == obj.previous) {
 			return;
 		}
 
-		if (obj.toto) { // cancel previous call
-			window.clearTimeout(obj.toto);
-			obj.toto = null;
+		if (obj.nextQuery) { // cancel previous call
+			window.clearTimeout(obj.nextQuery);
+			obj.nextQuery = null;
 		}
 		
 		obj.previous = search;
+		obj.element.val(search);
+		
 		if (obj.history[search]) {
 			obj.callbacks.display.call(obj,obj.history[search], 0);
 			return;
@@ -469,7 +454,7 @@ if (! window.t41.view.action.autocomplete) {
 			config = obj.callbacks.preQuery.call(obj,config);
 		}
 		
-		obj.toto = window.setTimeout(function() {
+		obj.nextQuery = window.setTimeout(function() {
 			t41.view.shade(obj.element);
 			t41.core.call(config);
 		}, obj.options.latency);
