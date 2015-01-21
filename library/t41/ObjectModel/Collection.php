@@ -173,7 +173,7 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function getCachePrefix()
 	{
-		$str = '';
+		$str = $this->_do->getClass();
 		/* @var $condition t41\Backend\Condition */
 		foreach ($this->_conditions as $condition) {
 			$str .= '/' . $condition[0]->__toString();
@@ -914,6 +914,57 @@ class Collection extends ObjectModelAbstract {
 		$this->find();
 		$this->setParameter('populated', false);
 		\Zend_Debug::dump(Backend::getLastQuery());
+	}
+	
+	
+	public function populate(array $dataset, ObjectUri $uriBase)
+	{
+	    if (count($dataset) == 0) {
+	        return array();
+	    }
+	    
+	    $do = clone $this->getDataObject();
+	    $class = $do->getClass();
+	    
+	    // populate array with relevant objects type
+	    $array = array();
+	    
+	    foreach ($dataset as $key => $data) {
+	        $uri = clone $uriBase;
+	        $uri->setUrl($uri->getUrl() . $data[Backend::DEFAULT_PKEY])->setIdentifier($data[Backend::DEFAULT_PKEY]);
+	        unset($data[Backend::DEFAULT_PKEY]);
+
+	        if (isset($do)) {
+	            $obj = clone $do;
+	            $obj->setUri($uri);
+	        } else {
+	            unset($obj);
+	        }
+	    
+	        switch ($this->getParameter('memberType')) {
+	             
+	            case ObjectModel::URI:
+	                $obj = $uri;
+	                break;
+	    
+	            case ObjectModel::MODEL:
+	                $obj = clone $do;
+	                $obj->setUri($uri);
+	                Backend::read($obj, null, $data);
+                    $obj = new $class($obj);
+	                break;
+	    
+	    
+	            case ObjectModel::DATA:
+	            default:
+	                $obj = clone $do;
+	                $obj->setUri($uri);
+	                Backend::read($obj, null, $data);
+	                break;
+	        }
+	        $array[] = $obj;
+	    }
+	    return $array;
 	}
 	
 	
