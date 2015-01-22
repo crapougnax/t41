@@ -58,12 +58,6 @@ class AutocompleteAction extends AbstractAction {
 	protected $_callbacks = array();
 	
 	
-	/*
-	 * @deprectated these are now public config properties
-	 */
-	protected $_context = array('minChars' => 1, 'displayMode' => 'list', 'defaultSelect' => true, 'latency' => 500);
-	
-	
 	/**
 	 * Object class
 	 *
@@ -269,11 +263,13 @@ class AutocompleteAction extends AbstractAction {
 	
 	public function reduce(array $params = array())
 	{
-	    $this->_context = array(
+	    $this->_context = array_merge($this->_context, array(
 	                            'minChars'      => self::$minChars, 
 	                            'displayMode'   => self::$displayMode, 
 	                            'defaultSelect' => self::$defaultSelect, 
-	                            'latency'       => self::$latency);
+	                            'latency'       => self::$latency,
+	                            'cachePrefix'  => 'ac_' . $this->_obj->getCachePrefix()
+	    ));
 	    
 		$array = parent::reduce($params);
 		$array['data']['display'] = $this->getDisplay();

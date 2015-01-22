@@ -91,6 +91,7 @@ if (! window.t41.view.action.autocomplete) {
 		
 		/**
 		 * Detect & convert initial existing value
+		 * @todo implement sessionStorage caching
 		 */
 		this.initSavedValue = function(val) {
 			var config = {
@@ -208,6 +209,7 @@ if (! window.t41.view.action.autocomplete) {
 				console.log('selected row id is missing');
 			}
 		};
+		
 		
 		this.getHelper = function(data) {
 			if (data.total == 0 || ! data.total) {
@@ -438,9 +440,13 @@ if (! window.t41.view.action.autocomplete) {
 		obj.previous = search;
 		obj.element.val(search);
 		
-		if (obj.history[search]) {
-			obj.callbacks.display.call(obj,obj.history[search], 0);
-			return;
+		if (obj.options.cachePrefix) {
+			var cache = sessionStorage.getItem(obj.options.cachePrefix);
+			cache = cache ? JSON.parse(cache) : {};
+			if (cache[search]) {
+				obj.callbacks.display.call(obj,cache[search], 0);
+				return;
+			}
 		}
 		
 		var config = {
@@ -469,20 +475,27 @@ if (! window.t41.view.action.autocomplete) {
 	 * @param this Current autocomplete object
 	 */
 	window.t41.view.action.autocomplete.display = function(obj, offset) {
+
+		if (this.options.cachePrefix) {
+			var cache = sessionStorage.getItem(this.options.cachePrefix);
+			cache = (cache == null) ? {} : JSON.parse(cache);
+		}
+		
 		offset = isNaN(offset) ? false : offset;
 		if (offset !== false) {
 			obj = obj[offset];
-			console.log('"' + obj.data._query + '" query result from local cache');
-		} else {
-			if (! this.history[obj.data._query]) this.history[obj.data._query] = {};
-			this.history[obj.data._query][obj.data._offset] = obj;
+			console.log('"' + obj.data._query + '" query result from sessionStorage cache');
+		} else if (this.options.cachePrefix) {
+			if (! cache[obj.data._query]) cache[obj.data._query] = {};
+			cache[obj.data._query][obj.data._offset] = obj;
+			sessionStorage.setItem(this.options.cachePrefix, JSON.stringify(cache));
 			t41.view.shade(this.element);
 		}
 		
 		switch (obj.status) {
 			case t41.core.status.ok:
 			case t41.core.status.nok:
-				// ignore server queries coming back too late
+				// ignore server queries coming back too late (deprecated?)
 				if (offset === false && this.sequence > obj.data._sequence) {
 					return false;
 				}
