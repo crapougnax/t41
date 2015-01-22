@@ -17,7 +17,7 @@ namespace t41\View\Action;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 
@@ -32,7 +32,7 @@ use t41\ObjectModel;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class AutocompleteAction extends AbstractAction {
@@ -43,12 +43,24 @@ class AutocompleteAction extends AbstractAction {
 	const SEARCHMODE_BEGINS   = 'begins';
 	
 	
+	static public $minChars = 1;
+	
+	static public $latency = 500;
+	
+	static public $displayMode = 'list';
+	
+	static public $defaultSelect = true;
+	
+	
 	protected $_id = 'action/autocomplete';
 	
 	
 	protected $_callbacks = array();
 	
 	
+	/*
+	 * @deprectated these are now public config properties
+	 */
 	protected $_context = array('minChars' => 1, 'displayMode' => 'list', 'defaultSelect' => true, 'latency' => 500);
 	
 	
@@ -232,7 +244,6 @@ class AutocompleteAction extends AbstractAction {
 	public function getSearchDisplay()
 	{
 		if (! $this->_parsedSearchDisplay) {
-	
 			// @todo get propertys from objects and collection properties
 			$this->_parsedSearchDisplay = array();
 				
@@ -240,7 +251,6 @@ class AutocompleteAction extends AbstractAction {
 			$do = $this->_obj->getDataObject();
 				
 			foreach ($this->getParameter('sdisplay') as $propId) {
-	
 				$property = $do->getRecursiveProperty($propId);
 				if (! $property instanceof Property\AbstractProperty) {
 					continue;
@@ -249,7 +259,6 @@ class AutocompleteAction extends AbstractAction {
 				if (strstr($propId, '.')) {
 					$propId = '_' . $propId;
 				}
-	
 				$this->_parsedSearchDisplay[$propId] = $property->reduce();
 			}
 		}
@@ -260,6 +269,12 @@ class AutocompleteAction extends AbstractAction {
 	
 	public function reduce(array $params = array())
 	{
+	    $this->_context = array(
+	                            'minChars'      => self::$minChars, 
+	                            'displayMode'   => self::$displayMode, 
+	                            'defaultSelect' => self::$defaultSelect, 
+	                            'latency'       => self::$latency);
+	    
 		$array = parent::reduce($params);
 		$array['data']['display'] = $this->getDisplay();
 		$array['data']['sdisplay'] = $this->getSearchDisplay();
