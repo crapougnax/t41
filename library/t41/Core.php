@@ -1010,9 +1010,13 @@ class Core {
 			if (is_null($class)) {
 				throw new Exception("Give ObjectUri() instance or specify object class as second argument");
 			}
+			$uri = new ObjectUri($uri);
+			$uri->setClass($class);
 		} else {
 			$class = $uri->getClass();
 		}
+		
+		
 		
 		if (self::getEnvData('cache_objects') !== true) {
 		    $obj = DataObject::factory($class);
@@ -1024,10 +1028,6 @@ class Core {
 		$def = ObjectModel::getObjectDna($class);
 		if ($def && isset($def['unchanging'])) {
 			// get cache version
-			if (! $uri instanceof ObjectUri) {
-				$uri = new ObjectUri($uri);
-				$uri->setClass($class);
-			}
 	
 			if (($obj = self::cacheGet($uri->getPermanentUUID())) !== false) {
 				self::log(sprintf('[Persistence] Loaded %s object (%s) from cache', $class, $uri));
