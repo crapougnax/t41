@@ -29,6 +29,7 @@ use t41\Core,
 use t41\View\Decorator;
 use t41\Core\Session;
 use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\DataObject;
 
 /**
  * Class providing basic functions needed to handle environment building.
@@ -834,6 +835,7 @@ class Core {
     }
 
     
+    
     /**
      * REGISTRY GLOBAL ACCESS METHODS
      * 
@@ -994,7 +996,15 @@ class Core {
 	}
 	
 	
-	static public function _($uri, $class = null)
+	/**
+	 * Universal factory for DataObject() and BaseObject() instances with caching capabilities
+	 * @param ObjectUri $uri
+	 * @param string $class
+	 * @param string $type
+	 * @throws Exception
+	 * @return \t41\ObjectModel\DataObject|t41\ObjectModel\BaseObject
+	 */
+	static public function _($uri, $class = null, $type = ObjectModel::MODEL)
 	{
 		if (! $uri instanceof ObjectUri) {
 			if (is_null($class)) {
@@ -1002,6 +1012,13 @@ class Core {
 			}
 		} else {
 			$class = $uri->getClass();
+		}
+		
+		if (self::getEnvData('cache_objects') !== true) {
+		    $obj = DataObject::factory($class);
+		    $obj->setUri($uri);
+		    Backend::read($obj);
+		    return $type == ObjectModel::MODEL ? new $class($obj) : $obj;		    
 		}
 	
 		$def = ObjectModel::getObjectDna($class);
@@ -1015,14 +1032,27 @@ class Core {
 			if (($obj = self::cacheGet($uri->getPermanentUUID())) !== false) {
 				self::log(sprintf('[Persistence] Loaded %s object (%s) from cache', $class, $uri));
 			} else {
-				$obj = new $class($uri);
+			    // done this away to avoid infinite recursion in BaseObject::__construct()
+				$obj = DataObject::factory($class);
+				$obj->setUri($uri);
+				Backend::read($obj);
+				$obj = new $class($obj);
 				self::cacheSet($obj, $uri->getPermanentUUID(), true, array('tags' => array('permanent')));
 				self::log(sprintf('[Persistence] Saved %s object (%s) in cache', $class, $uri));
 			}
-			return $obj;
-	
+			return $type == ObjectModel::MODEL ? $obj : $obj->getDataObject();
 		} else {
-			return new $class($uri);
+		    $obj = DataObject::factory($class);
+		    $obj->setUri($uri);
+			Backend::read($obj);
+		    return $type == ObjectModel::MODEL ? new $class($obj) : $obj;
 		}
+	}
+	
+	
+	static public function _cached($uri)
+	{
+	    $cache = self::cacheGetAdapter();
+	    return $cache->test($uri->getPermanentUUID());
 	}
 }

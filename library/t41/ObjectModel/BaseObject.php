@@ -77,22 +77,11 @@ abstract class BaseObject extends ObjectModelAbstract {
 
 		/* build data object and populate it if possible */
 		if ($val instanceof DataObject) {
-
 			if ($val->getClass() != get_class($this)) {
 				throw new Exception("Provided Data Object is not build on class definition");
 			}
-			
 			$this->_dataObject = $val;
-			
-			/* get object rules from config */
-			$this->setRules();
-						
 		} else {
-			$this->_dataObject = DataObject::factory(get_class($this));
-			
-			/* get object rules from config */
-			$this->setRules();
-			
 			if (! is_null($val)) {
 				if (! $val instanceof ObjectUri) {
 					// provide backend if uri is partial
@@ -100,10 +89,14 @@ abstract class BaseObject extends ObjectModelAbstract {
 					$val = new ObjectUri($val, $backendUri);
 					$val->setClass(get_class($this));
 				}
-				$this->_dataObject->setUri($val);
-				$this->read();
+				$this->_dataObject = Core::_($val, get_class($this), ObjectModel::DATA);
+			} else {
+			    $this->_dataObject = DataObject::factory(get_class($this));
 			}
 		}
+		
+		/* get object rules from config */
+		$this->setRules();
 	}
 	
 	
