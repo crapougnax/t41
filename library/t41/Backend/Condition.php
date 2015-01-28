@@ -525,7 +525,7 @@ class Condition {
 	    $str = array($this->getProperty()->getId());
 	    foreach ($this->_clauses as $clause) {
 	        $str[] = $clause['operator'];
-	        $str[] = $clause['value'];
+	        $str[] = is_array($clause['value']) ? implode(',', $clause['value']) : $clause['value'];
 	        $str[] = $clause['mode'];
 	    }
 	    return implode(',', $str);
