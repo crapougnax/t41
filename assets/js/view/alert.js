@@ -46,6 +46,10 @@ window.t41.view.alert = function(str,o) {
 			close: function(o) { o.hide(); },
 			confirm: false,
 			abort:function(o) {o.hide(); }
+		},
+		labels: {
+			confirm: null,
+			abort: null			
 		}
 	};
 
@@ -61,7 +65,7 @@ window.t41.view.alert = function(str,o) {
 	this.applyOptions = function() {
 		// extend given options with default ones
 		this.o = jQuery.extend(true, this.defaults, this.o);
-		if (this.o.level == 'error') this.o.title = 'Erreur';
+		if (this.o.level == 'error' && ! this.o.title) this.o.title = 'Erreur';
 	};
 
 	this.run = function() {
@@ -102,7 +106,6 @@ window.t41.view.alert = function(str,o) {
 	
 	
 	this.setContent = function(str,level) {
-		
 		this.str = str;
 		if (this.visible == true) {
 			this.alert.find('.content').html(this.str);
@@ -111,7 +114,6 @@ window.t41.view.alert = function(str,o) {
 	
 	
 	this.addContent = function(str,params) {
-	
 		// remove waiting image
 		this.alert.find('.wait').remove();
 		
@@ -151,7 +153,6 @@ window.t41.view.alert = function(str,o) {
 
 	
 	this.show = function() {
-
 		var alert = this.alert;
 		var o = {
 					position: this.o.position,
@@ -177,7 +178,6 @@ window.t41.view.alert = function(str,o) {
 
 	
 	this.showOverlay = function() {
-
 		// building the overlay
 		this.overlay = new t41.view.overlay({loose:this.o.persistance});
 		this.overlay.show();
@@ -233,6 +233,8 @@ window.t41.view.alert = function(str,o) {
 	this.confirm = function () {
 		if (typeof this.o.callbacks.confirm == 'function') {
 			this.o.callbacks.confirm(this);
+		} else if (this.o.callbacks.confirm != 'undefined'){
+			eval(this.o.callbacks.confirm);
 		}
 	};
 
@@ -256,12 +258,11 @@ window.t41.view.alert = function(str,o) {
 					break;
 					
 				case 'confirm':
-					this.buttons.confirm = new t41.view.button(t41.lget('confirm:button'), {icon:'valid'});
+					var label = this.o.labels.confirm || t41.lget('confirm:button');
+					this.buttons.confirm = new t41.view.button(label, {icon:'valid'});
 					this.buttons.confirm.setAttribute('id', 'confirm');
 					t41.view.bindLocal(this.buttons.confirm, 'click', jQuery.proxy(this,'confirm'));	
-//					jQuery(this.buttons.confirm).bind('click', jQuery.proxy(this, 'confirm'));
 					jQuery('#' + this.o.id + ' .buttons').append(this.buttons.confirm);
-					//jQuery(button).bind('click', this.o.callbacks.confirm);
 					break;
 					
 				case 'abort':
@@ -273,14 +274,15 @@ window.t41.view.alert = function(str,o) {
 		}
 	};
 
+	
 	/**
 	 * Add the given t41.view.button object to the button div and bind given callback
 	 */
 	this.addButton = function(button, callback) {
-		
 		jQuery('#' + this.o.id + ' .buttons').append(button);
 		jQuery(button).bind('click', callback);
 	};
+
 	
 	this.addIcon = function() {
 		if (this.o.icon===false) {
