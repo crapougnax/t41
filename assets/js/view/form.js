@@ -213,6 +213,7 @@ window.t41.view.form = function(id,obj,form) {
 				}
 			});
 			
+			t41.view.shade();
 			// deactivate buttons
 			this.toggleButtons();
 			
@@ -290,6 +291,7 @@ window.t41.view.form = function(id,obj,form) {
 				document.location.replace(this.redirects.redirect_nok);
 			} else {
 				// reactivate buttons
+				t41.view.shade();
 				this.toggleButtons();
 			}
 		}
