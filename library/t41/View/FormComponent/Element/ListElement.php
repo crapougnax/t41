@@ -92,6 +92,7 @@ class ListElement extends AbstractElement {
 	{
 		if (is_array($str)) {
 	        $this->_enumValues = $str;
+	        $this->_totalValues = count($this->_enumValues);
 			return;
 		}
 
