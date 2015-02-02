@@ -59,6 +59,11 @@ class Core {
 	
 	const ENV_FORM	= 'formation';
 	
+
+	const ENV_SB0	= 'sandbox0';
+	const ENV_SB1	= 'sandbox1';
+	const ENV_SB2	= 'sandbox2';
+	
 	
 	/**
 	 * If set to TRUE, an autoloader has been activated
