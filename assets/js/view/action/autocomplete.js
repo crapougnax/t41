@@ -288,8 +288,7 @@ if (! window.t41.view.action.autocomplete) {
 			var display = jQuery('#' + this.target + '_display').css({
 				display: 'inline-block',
 				cursor: 'pointer',
-				'text-align':'left',
-				'margin-left':'5px'
+				'text-align':'left'
 			});
 			display.html(label);
 			jQuery('#' + this.target).val(key);

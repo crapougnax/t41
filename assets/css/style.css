@@ -449,6 +449,7 @@ table.t41.list td.cellcurrency {
   font-size: 16px;
   color: #444;
   vertical-align:middle;
+  margin: 5px 0 0;
 }
 
 .t41 form fieldset .error, .t41 form fieldset .error {
@@ -474,7 +475,9 @@ table.t41.list td.cellcurrency {
 .t41 form fieldset .label {
   width: 30%;
   text-align: right;
+  vertical-align: top;
   font-family: Abel, sans-serif;
+  margin: 5px 0 0;
 }
 
 .t41 form fieldset .label label {
@@ -501,9 +504,10 @@ table.t41.list td.cellcurrency {
 }
 
 .t41 form fieldset .field select {
+  max-width: 450px;
   height: 30px;
   font-size: 14px;
-  margin:5px;
+  /*margin:5px 0 0;*/
   padding:3px;
   font-family: Abel,​sans-serif;
 }
