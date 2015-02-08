@@ -255,6 +255,7 @@ class ListComponent extends ViewObject {
     	 
     	// set query sorting from context
     	if (isset($env[$sortIdentifier]) && is_array($env[$sortIdentifier])) {
+    	    $this->_collection->resetSortings(); // reset hard-coded sortings
     		foreach ($env[$sortIdentifier] as $field => $value) {
     			if (($property = $this->_collection->getDataObject()->getRecursiveProperty($field)) !== false) {
     				$this->_collection->setSorting($property, $value);

@@ -310,9 +310,14 @@ class Collection extends ObjectModelAbstract {
 	}
 	
 	
-	public function resetSortings($property)
+	/**
+	 * Reset all defined sortings
+	 * @return \t41\ObjectModel\Collection
+	 */
+	public function resetSortings()
 	{
 		$this->_sortings = array();
+		return $this;
 	}
 	
 	
