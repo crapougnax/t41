@@ -79,7 +79,7 @@ class ListComponent extends ViewObject {
 	/**
 	 * Class constructor
 
-	 * @param t41_Object_Collection $collection
+	 * @param t41\ObjectModel\Collection $collection
 	 * @param array $params
 	 */
     public function __construct(ObjectModel\Collection $collection, array $params = null)
@@ -254,7 +254,7 @@ class ListComponent extends ViewObject {
     	}
     	 
     	// set query sorting from context
-    	if (isset($env[$sortIdentifier]) && is_array($env[$sortIdentifier])) {
+    	if (isset($env[$sortIdentifier]) && is_array($env[$sortIdentifier]) && count($env[$sortIdentifier]) > 0) {
     	    $this->_collection->resetSortings(); // reset hard-coded sortings
     		foreach ($env[$sortIdentifier] as $field => $value) {
     			if (($property = $this->_collection->getDataObject()->getRecursiveProperty($field)) !== false) {
