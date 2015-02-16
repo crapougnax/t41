@@ -461,11 +461,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		if (is_array($pkey)) {
 			$composite = array();
 			
-			/* @var $obj t41_Backend_Key */
+			/* @var $obj t41\Backend\Key */
 			foreach ($pkey as $obj) {
 				$composite[] = sprintf('TRIM(%s)', $table . '.' . $obj->getName());
+				$composite[] = Backend\Mapper::VALUES_SEPARATOR;
 			}
-			$pkey = sprintf("%s AS %s", implode(',', $composite), Backend::DEFAULT_PKEY);
+			$pkey = sprintf("CONCAT(%s) AS %s", implode(',', $composite), Backend::DEFAULT_PKEY);
 		} else {
 			$pkey = $table . '.' . $pkey;
 		}
@@ -724,6 +725,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		 */
 		foreach ($collection->getSortings() as $sorting) {
 			
+		    $slUniqext = $slTable = null;
+		    
 			// Specific cases first
 			// @todo find a better way to sort on meta properties 
 			if ($sorting[0]->getId() == ObjectUri::IDENTIFIER || $sorting[0] instanceof MetaProperty) {
@@ -744,18 +747,56 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$this->_select->order('(' . $subSelect . ') ' . $sorting[1]);
 				continue;
 			} else if ($sorting[0] instanceof Property\ObjectProperty) {
-				// try to sort with properties used to display value
-				if (substr($sorting[0]->getParameter('display'), 0, 1) == '[') {
-					// @todo extract elements of pattern to order from them ?
-					$sprops = array('id');
-				} else {
-					$sprops = explode(',', $sorting[0]->getParameter('display'));
-				}
-					
-				$leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($collection->getDataObject()->getClass(), $sorting[0]->getId()) : $sorting[0]->getId();
-						
+			    
+			    // find which property to sort by
+			    if ($sorting[0]->getParameter('sorting')) {
+			        $sprops = array_keys($sorting[0]->getParameter('sorting'));
+			    } else {
+    				// try to sort with properties used to display value
+    	   			if (substr($sorting[0]->getParameter('display'), 0, 1) == '[') {
+    					// @todo extract elements of pattern to order from them ?
+    					$sprops = array('id');
+    				} else {
+    					$sprops = explode(',', $sorting[0]->getParameter('display'));
+    				}
+			    }
+
+			    
+			    // sorting property belongs to a second-level join
+			    if ($sorting[0]->getParent()->getClass() != $collection->getClass()) {
+			        $leftkey = 'commande'; //$this->_mapper ? $this->_mapper->propertyToDatastoreName($collection->getDataObject()->getClass(), $sorting[0]->getParent()getId()) : $sorting[0]->getId();
+			        $class = $sorting[0]->getParent()->getClass();
+			        $stable = $this->_getTableFromClass($class);
+			        $sbackend = ObjectModel::getObjectBackend($class);
+			        // Property to sort from is in a different backend from current one
+			        if ($sbackend->getAlias() != $this->getAlias()) {
+			            // We presume that the current backend is allowed to connect to the remote one
+			            // Should we raise an exception instead ?
+			            $stable = $sbackend->getUri()->getDatabase() . '.' . $stable;
+			        }
+			        $field = $sorting[0]->getId();
+			        
+			        $rightkey = $this->_mapper ? $this->_mapper->getPrimaryKey($class) : Backend::DEFAULT_PKEY;
+			        $uniqext = $stable . '__joined_for__' . $leftkey;
+			        if (! in_array($uniqext, $this->_alreadyJoined)) {
+			            if (is_array($rightkey)) {
+			                foreach ($rightkey as $rightkeyObj) {
+			                    $join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkeyObj->getName());
+			                }
+			            } else {
+			                $join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+			            }
+			            $this->_select->joinLeft("$stable AS $uniqext", $join, array());
+			            $this->_alreadyJoined[$stable] = $uniqext;
+			        }
+			        $slTable = $this->_getTableFromClass($sorting[0]->getParameter('instanceof'));
+			        $slUniqext = $uniqext;
+			    }
+
+			    
+			    $leftkey = $this->_mapper ? $this->_mapper->propertyToDatastoreName($collection->getDataObject()->getClass(), $sorting[0]->getId()) : $sorting[0]->getId();
 				$class = $sorting[0]->getParameter('instanceof');
-				$stable = $this->_getTableFromClass($class);
+				$stable = isset($slTable) ? $slTable : $this->_getTableFromClass($class);
 				$sbackend = ObjectModel::getObjectBackend($class);
 				// Property to sort from is in a different backend from current one
 				if ($sbackend->getAlias() != $this->getAlias()) {
@@ -773,7 +814,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 							$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkeyObj->getName());
 						}
 					} else {
-						$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+						$join = sprintf("%s.%s = %s.%s", isset($slUniqext) ? $slUniqext : $table, $leftkey, $uniqext, $rightkey);
 					}
 					$this->_select->joinLeft("$stable AS $uniqext", $join, array());
 					$this->_alreadyJoined[$stable] = $uniqext;
@@ -865,7 +906,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		$uri->setClass($collection->getDataObject()->getClass());
 		$uri->setUrl($this->_database . '/' . $table . '/');
 		
-		return $this->_populateCollection($result, $collection, $uri);
+		return $collection->populate($result, $uri);
+		//return $this->_populateCollection($result, $collection, $uri);
 	}
 	
 	
