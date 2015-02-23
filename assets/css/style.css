@@ -449,7 +449,13 @@ table.t41.list td.cellcurrency {
   font-size: 16px;
   color: #444;
   vertical-align:middle;
+<<<<<<< .mine
   margin: 5px 0 0;
+  min-width: 450px;
+  padding: 1px 8px;
+=======
+  margin: 5px 0 0;
+>>>>>>> .r715
 }
 
 .t41 form fieldset .error, .t41 form fieldset .error {
@@ -477,7 +483,13 @@ table.t41.list td.cellcurrency {
   text-align: right;
   vertical-align: top;
   font-family: Abel, sans-serif;
+<<<<<<< .mine
   margin: 5px 0 0;
+  min-width: 115px;
+  vertical-align: top;
+=======
+  margin: 5px 0 0;
+>>>>>>> .r715
 }
 
 .t41 form fieldset .label label {
