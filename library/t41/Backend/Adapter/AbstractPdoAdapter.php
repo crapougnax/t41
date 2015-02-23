@@ -736,7 +736,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			} else if ($sorting[0] instanceof Property\CollectionProperty) {
 				// handling of conditions based on collection limited to withMembers() and withoutMembers()
 				$leftkey = $sorting[0]->getParameter('keyprop');
-				$field = $property->getId();
+				//$field = $property->getId();
 				$subSelect = $this->_ressource->select();
 				$subseltbl = $this->_mapper ? $this->_mapper->getDatastore($sorting[0]->getParameter('instanceof')) : $this->_getTableFromClass($sorting[0]->getParameter('instanceof'));
 				$subSelect->from($subseltbl, new \Zend_Db_Expr(sprintf("COUNT(%s)", $leftkey)));
