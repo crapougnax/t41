@@ -124,6 +124,9 @@
 				<parameter id="align" type="string">
 					<bogus/>
 				</parameter>
+				<parameter id="sortable" type="boolean">
+					<defaultvalue>true</defaultvalue>
+				</parameter>
 			</parameters>
 		</object>
 		
@@ -137,6 +140,9 @@
 				</parameter>
 				<parameter id="type" type="string">
 					<bogus/>
+				</parameter>
+				<parameter id="sortable" type="boolean">
+					<defaultvalue>false</defaultvalue>
 				</parameter>
 			</parameters>
 		</object>

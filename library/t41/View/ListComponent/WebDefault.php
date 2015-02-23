@@ -217,7 +217,7 @@ HTML;
         
         foreach ($this->_obj->getColumns() as $val) {
         	$line .= sprintf('<th class="tb-%s"><strong>', $val->getId());
-        	if ($this->getParameter('sortable') == false) {
+        	if ($val->getParameter('sortable') == false) {
         		$line .= $this->_escape($val->getTitle()) . '</strong></th>';
         		continue;
         	}
@@ -267,6 +267,8 @@ HTML;
         // print out rows
         foreach ($this->_obj->getCollection()->getMembers(ObjectModel::DATA) as $this->_key => $this->_do) {
         	$css = $i%2 == 0 ? 'odd' : 'even';
+        	
+        //	\Zend_Debug::dump($this->_do->getProperty('marche')->getValue(ObjectModel::MODEL)); die;
         	
         	// @todo handle objects coming from different backends
 			$p .= sprintf('<tr data-member="%s" data-alias="%s" class="%s">'
@@ -338,8 +340,6 @@ HTML;
 							$property = ObjectModel::factory($property)->getProperty($recursion);
 						}
 					}
-					
-					//\Zend_Debug::dump($property->getDisplayValue());
             	}
             	
             	if ($property instanceof Property\MediaProperty) {
