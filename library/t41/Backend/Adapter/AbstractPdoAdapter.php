@@ -744,7 +744,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$subSelect->where($join);
 				
 				// $statement = $this->_buildConditionStatement(new \Zend_Db_Expr(sprintf("(%s)", $subSelect)), $condition->getClauses(), $conditionArray[1]);
-				$this->_select->order('(' . $subSelect . ') ' . $sorting[1]);
+				$this->_select->order(new \Zend_Db_Expr('(' . $subSelect->__toString() . ') ' . $sorting[1]));
 				continue;
 			} else if ($sorting[0] instanceof Property\ObjectProperty) {
 			    
