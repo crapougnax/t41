@@ -19,7 +19,6 @@ namespace t41\View\FormComponent\Element;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 876 $
  */
 
 use t41\ObjectModel;
@@ -52,7 +51,7 @@ class ListElement extends AbstractElement {
 	{
 		$this->_collection = $collection;
 		$this->_collection->setBoundaryBatch($this->getParameter('selectmax')+1);
-		if ($this->getParameter('sorting')) {
+		if ($this->getParameter('sorting')) {		    
 			if (! is_array($this->getParameter('sorting'))) {
 				$sortings = explode(',', $this->getParameter('sorting'));
 				$array = array();
@@ -60,9 +59,9 @@ class ListElement extends AbstractElement {
 					$array[] = explode(' ', $sorting);
 				}
 				$this->_collection->setSortings($array);
-				
 			} else {
-				$this->_collection->setSortings($this->getParameter('sorting'));
+			    foreach ($this->getParameter('sorting') as $key => $val)
+				$this->_collection->setSorting([$key,$val]);
 			}
 		}
 		return $this;
