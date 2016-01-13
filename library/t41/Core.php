@@ -19,7 +19,6 @@ namespace t41;
  * @package    t41_Core
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 914 $
  */
 
 use t41\View\SimpleComponent;
@@ -444,28 +443,28 @@ class Core {
     	gc_enable();
     	
     	// enable t41 error handler (notices are not catched until we get a proper logger)
-    	set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
+    	//set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
     	// define path but only if it's empty
     	if (! is_null($path) && empty(self::$basePath)) self::setPaths($path);
 
     	/* add application & t41 config files path (in first position if none was declared before) */
     	Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/configs/', Config::REALM_CONFIGS);
+    	Config::addPath(self::$basePath . 'vendor/crapougnax/t41/configs/', Config::REALM_CONFIGS);
     	 
     	/* add templates folder path (in first position if none was declared before) */
     	Config::addPath(self::$basePath . 'application/views/', Config::REALM_TEMPLATES);
 
     	/* add t41 & application controllers paths (in first position if none was declared before) */
     	Config::addPath(self::$basePath . 'application/controllers/', Config::REALM_CONTROLLERS, null, 'default');
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
+    	Config::addPath(self::$basePath . 'vendor/crapougnax/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
     	
     	/* register default REST controllers path */
     	/* @todo allow override in config file or even later */
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
+    	Config::addPath(self::$basePath . 'vendor/crapougnax/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
     	
     	/* register default path where to find view objects decorators */
-    	Decorator::addPath(self::$basePath . 'vendor/quatrain/t41/library/t41'); // without 'View'
+    	Decorator::addPath(self::$basePath . 'vendor/crapougnax/t41/library/t41'); // without 'View'
     	
     	// never cached, shall it be ?
     	$config = Config\Loader::loadConfig('application.xml');
@@ -586,8 +585,10 @@ class Core {
 		/* define lang - can be overwritten anywhere */
 		self::$lang = self::$_config['versions']['default'];
 		
+		
 		// load modules
 		Core\Module::init($mpath ? $mpath : self::$basePath);
+		
 		
 		// load ACL
 		Core\Acl::init($mpath ? $mpath : self::$basePath);
