@@ -1,3 +1,5 @@
 .settings/*
 .svn
-
+.buildpath
+.project
+vendor/
