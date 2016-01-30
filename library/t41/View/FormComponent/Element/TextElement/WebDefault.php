@@ -18,6 +18,10 @@ class WebDefault extends AbstractWebDecorator {
 	{
 		$name =  $this->_obj->getAltId();
 		
+		if ($this->getParameter('mode') == View\FormComponent::SEARCH_MODE) {
+		    $name = ViewUri::getUriAdapter()->getIdentifier('search') . '[' . $this->_nametoDomId($name) . ']';
+		}
+		
 		$extraArgs = '';
 		if ($this->getParameter('args')) {
 

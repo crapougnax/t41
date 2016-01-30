@@ -203,6 +203,16 @@
 		</decorator>
 		</object>
 
+		<object id="t41\View\FormComponent\Element\TextElement">
+			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
+				<parameters>
+					<parameter id="mode">
+						<type>string</type>
+					</parameter>
+				</parameters>
+		</decorator>
+		</object>
+		
 		<object id="t41\View\FormComponent\Element\ListElement">
 			<decorator id="WebDefault" extends="t41\View\Decorator\AbstractWebDecorator">
 				<parameters>
