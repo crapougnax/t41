@@ -78,7 +78,7 @@ class ObjectUri implements Core\ClientSideInterface {
 	 * @param string $str
 	 * @param t41\Backend\BackendUri $backendUri
 	 */
-	public function __construct($str = null, Backend\BackendUri $backendUri = null)
+	public function __construct($str = null, $backendUri = null)
 	{
 		if (! is_null($str)) {
 			$this->setUrl($str);
