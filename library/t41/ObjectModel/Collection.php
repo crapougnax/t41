@@ -152,7 +152,7 @@ class Collection extends ObjectModelAbstract {
 	 */
 	public function setParent(AbstractProperty $prop)
 	{
-		$this->_parent = $prop;
+		$this->_parent = $prop->getParent();
 		return $this;
 	}
 	
