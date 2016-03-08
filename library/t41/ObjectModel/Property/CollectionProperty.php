@@ -2,8 +2,6 @@
 
 namespace t41\ObjectModel\Property;
 
-use t41\Backend;
-
 /**
  * t41 Toolkit
  *
@@ -21,12 +19,11 @@ use t41\Backend;
  * @package    t41_Property
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
-use t41\ObjectModel,
-	t41\ObjectModel\Collection,
-	t41\Backend\Condition;
+use t41\ObjectModel;
+use t41\ObjectModel\Collection;
+use t41\Backend\Condition;
 use t41\Core;
 use t41\ObjectModel\ObjectUri;
 
@@ -127,7 +124,7 @@ class CollectionProperty extends AbstractProperty {
 			/* set a new Collection based on instanceof parameter value */
 			$this->_value = new ObjectModel\Collection($this->getParameter('instanceof'));
 			$this->_value->setBoundaryBatch(-1);
-			$this->_value->setParent($this->_parent);
+			$this->_value->setParent($this);
 				
 			/* inject the condition that allows to find collection members */
 			if ($this->getParameter('keyprop')) {
