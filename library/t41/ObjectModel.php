@@ -256,22 +256,24 @@ class ObjectModel {
 		
 		$rules = array();
 	
-		foreach (self::$_config[$class]['rules'] as $key => $val) {
-			$rule = ObjectModel\Rule::factory($val['type']);
-			$rule->setId($key);
-			$rule->setObject($object);
-	
-			if (isset($val['source'])) 			$rule->setSource($val['source']);
-			if (isset($val['destination']))		$rule->setDestination($val['destination']);
-				
-			$trigger = $val['trigger'];
-			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
-			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
-	
-			$rules[$ruleKey][$key] = $rule;
+		if (is_array(self::$_config[$class]['rules'])) {
+    		foreach (self::$_config[$class]['rules'] as $key => $val) {
+    			$rule = ObjectModel\Rule::factory($val['type']);
+    			$rule->setId($key);
+    			$rule->setObject($object);
+    	
+    			if (isset($val['source'])) 			$rule->setSource($val['source']);
+    			if (isset($val['destination']))		$rule->setDestination($val['destination']);
+    				
+    			$trigger = $val['trigger'];
+    			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
+    			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
+    	
+    			$rules[$ruleKey][$key] = $rule;
+    		}
+		  ksort($rules);
 		}
-	
-		ksort($rules);
+		
 		return $rules;
 	}
 	

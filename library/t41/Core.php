@@ -245,7 +245,11 @@ class Core {
     public static function setPaths($path)
     {
     	if (file_exists($path)) {
+    	    if (substr($path,-1) != DIRECTORY_SEPARATOR) {
+    	        $path .= DIRECTORY_SEPARATOR;
+    	    }
 	    	self::$basePath = $path;
+	    	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
     		$dirs = explode(DIRECTORY_SEPARATOR, __DIR__);
     		$dirs = array_slice($dirs, 0, count($dirs)-2);
     		self::$t41Path = implode(DIRECTORY_SEPARATOR, $dirs);
@@ -260,6 +264,7 @@ class Core {
      * Sets the necessary paths and optionaly remove an already existing Zend Framework path
      * @param string $path
      * @param boolean $removeZfPath
+     * @deprecated
      */
     public static function setIncludePaths($path, $removeZfPath = false)
     {
@@ -268,24 +273,6 @@ class Core {
 		self::setPaths($path);
 
 		$dpaths = explode(PATH_SEPARATOR, get_include_path());
-		
-		if ($removeZfPath === true) {
-			foreach ($dpaths as $key => $dpath) {
-				if (strpos($dpath, "/ZendFramework/") !== false) {
-					unset($paths[$key]);
-				}
-			}
-		}
-		
-    	set_include_path(
-    			implode(PATH_SEPARATOR, $dpaths) . PATH_SEPARATOR
-    			. $path . PATH_SEPARATOR
-    			. $path . 'application/' . PATH_SEPARATOR
-    			. $path . 'vendor/' . PATH_SEPARATOR
-    			. $path . 'vendor/quatrain/t41/library' . PATH_SEPARATOR
-    			. $path . 'vendor/zendframework/zendframework1/library' . PATH_SEPARATOR
-    			. $path . 'vendor/zend/zf1/library' // @legacy
-    	);
     }
 
     
@@ -341,7 +328,7 @@ class Core {
 		require_once 'Zend/Loader/Autoloader.php';
 		self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
 		
-		self::$autoloaderPrefixes['t41'] = self::$basePath . 'vendor/quatrain/t41/library/t41';
+		self::$autoloaderPrefixes['t41'] = self::$basePath . 'vendor/crapougnax/t41/library/t41';
 		foreach (self::$autoloaderPrefixes as $prefix => $path) {
 			self::$_autoloaderInstance->registerNamespace($prefix, $path);
 		}
@@ -608,7 +595,8 @@ class Core {
 		
         // configure error reporting according to env
         if (in_array(self::$env, array(self::ENV_STAGE, self::ENV_PROD))) {
-        	error_reporting(E_ERROR); //(E_ALL | E_STRICT) ^ E_NOTICE);
+            error_reporting(E_ALL & ~E_STRICT);
+            //error_reporting(E_ERROR); //(E_ALL | E_STRICT) ^ E_NOTICE);
         	ini_set('display_errors', 1);
         	
         } else {

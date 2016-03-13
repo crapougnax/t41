@@ -244,7 +244,7 @@ class AutocompleteAction extends AbstractAction {
 			/* @var $do t41\ObjectModel\DataObject */
 			$do = $this->_obj->getDataObject();
 				
-			foreach ($this->getParameter('sdisplay') as $propId) {
+			foreach ((array) $this->getParameter('sdisplay') as $propId) {
 				$property = $do->getRecursiveProperty($propId);
 				if (! $property instanceof Property\AbstractProperty) {
 					continue;
