@@ -19,13 +19,10 @@ namespace t41\View\Action\AutocompleteAction;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 876 $
  */
 
-use t41\View\Decorator\AbstractWebDecorator,
-	t41\Parameter,
-	t41\View,
-	t41\Core;
+use t41\View\Decorator\AbstractWebDecorator;
+use t41\View;
 
 /**
  * Web decorator for the FieldElement class

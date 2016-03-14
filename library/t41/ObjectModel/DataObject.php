@@ -28,7 +28,6 @@ use t41\ObjectModel;
 use t41\ObjectModel\Property;
 use t41\ObjectModel\Property\MetaProperty;
 use t41\ObjectModel\Property\AbstractProperty;
-use t41\Backend\Condition;
 use t41\ObjectModel\Property\ArrayProperty;
 use t41\ObjectModel\Property\ObjectProperty;
 use t41\ObjectModel\Property\MediaProperty;
@@ -712,18 +711,16 @@ class DataObject extends ObjectModelAbstract {
      */
     public function reduce(array $params = array(), $cache = true)
     {
-    	//$uuid = ($this->_uri instanceof ObjectUri) ? $this->_uri->reduce($params) : null;
     	$uuid = $cache ? Registry::set($this) : null;
     	
     	$props = array();
     	foreach ($this->_data as $key => $property) {
     		if (isset($params['props']) && ! in_array($key, $params['props'])) {
-    			continue;
+    		//	continue;
     		}
     		
-    		$constraints = $property->getParameter('constraints');
-    		
     		// ignore stricly server-side properties
+    		$constraints = $property->getParameter('constraints');
     		if (isset($constraints['serverside'])) continue;
     		
     		$props[$key] = $property->reduce($params, $cache);

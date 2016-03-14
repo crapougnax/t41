@@ -8,13 +8,10 @@
  */
 
 use t41\Core\Registry;
-
-use t41\Core,
-	t41\ObjectModel,
-	t41\ObjectModel\Collection,
-	t41\Backend,
-	t41\View,
-	t41\View\Action;
+use t41\Core;
+use t41\ObjectModel;
+use t41\Backend;
+use t41\View\Action;
 
 require_once 'Zend/Controller/Action.php';
 

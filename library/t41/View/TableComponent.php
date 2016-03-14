@@ -173,8 +173,8 @@ class TableComponent extends ViewObject {
 		}
 		
 		$data = $do->toArray(null, false, true);
-	//	\Zend_Debug::dump($data); die;
 		$this->addDataRow($data['data']);
+		
 		return $this;
 	}
 	

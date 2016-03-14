@@ -22,7 +22,6 @@ namespace t41\View\Action;
  */
 
 use t41\ObjectModel\ObjectModelAbstract,
-	t41\Parameter,
 	t41\Core,
 	t41\View,
 	t41\View\ViewObject;
@@ -214,6 +213,9 @@ abstract class AbstractAction extends ViewObject {
 	{
 		/* keep object in registry */
 		$this->setContextData('uuid', Core\Registry::set($this));
+		
+		//var_dump(Core::cacheGet($this->getContextData('uuid')));
+		//die;
 
 		$fullAction = $this->_id;
 		if ($this->_action) $fullAction .= '/' . $this->_action;

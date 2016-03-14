@@ -450,15 +450,6 @@ abstract class BaseObject extends ObjectModelAbstract {
 	{
 		/* keep object in registry (force refresh) */
 		$uuid = $cache ? Core\Registry::set($this, null, true) : null;
-		
-		// build an array with remotely callable methods
-		$methods = array();
-//		foreach (get_class_methods($this) as $method) {
-			
-//			if (substr($method,0,1) == '_') continue;
-			//$methods[] = $method;
-//		}
-		
 		$array = $uuid ? array('uuid' => $uuid) : array();
 		$array['value'] = $this->__toString();
 

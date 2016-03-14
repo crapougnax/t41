@@ -799,7 +799,9 @@ class Core {
         	$options['tags'] = $metadatas['tags'];
         }
         
-    	return $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : array()) ? $key : false;
+    	$res = $cache->save($val, $key, isset($options['tags']) ? (array) $options['tags'] : array()) ? $key : false;
+        
+        return $res;
     }
     
     
@@ -811,18 +813,7 @@ class Core {
     	Core::log(sprintf('[Cache] Retrieved %s as %s', $key, gettype($cached)));
     	 
         if (is_array($cached)) {
-        	if (isset($cached['_class'])) {
-        		try {
-                       \Zend_Loader::loadClass($cached['_class']);
-                    } catch (Exception $e) {
-                        return null;
-                    }
-                    
-                return unserialize($cached['content']);
-                
-            } else {
-                return $cached;
-            }
+            return isset($cached['content']) ? unserialize($cached['content']) : $cached;
         } else {
             return $cached;
         }
