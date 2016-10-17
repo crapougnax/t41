@@ -893,7 +893,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (isset($sorting[2]) && !empty($sorting[2])) {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
-				$this->_select->order(new \Zend_Db_Expr($sortingExpr . ' ' . $sorting[1]));
+				$this->_select->order(new \Zend_Db_Expr('TRIM(' . $sortingExpr . ') ' . $sorting[1]));
 			}
 		}
 		
