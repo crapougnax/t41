@@ -19,7 +19,6 @@ namespace t41\ObjectModel;
  * @package    t41_Core
  * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 876 $
  */
 
 use t41\Backend,

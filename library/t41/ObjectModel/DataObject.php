@@ -393,6 +393,7 @@ class DataObject extends ObjectModelAbstract {
     			$result['data'][$key] = $value;
     		}
     	}
+    	
     	return $result;
     }
     

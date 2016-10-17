@@ -109,34 +109,25 @@ class Backend {
 	{
 		// load config file (file extension defines which adapter will be used)
 		$config = Config\Loader::loadConfig($file);
-
 		if ($config === false) {
-			
 			return false;
 		}
 
 		if (! isset($config['backends'])) {
-			
-		//	\Zend_Debug::dump($config);
 			throw new Config\Exception("NO_CONFIG_IN_GIVEN_SOURCE");
 		}
 		
 		// if the key 'default' exists, it defines the default backend key value
 		if (isset($config['backends']['default'])) {
-			
 			self::setDefault($config['backends']['default']);
 			unset($config['backends']['default']);
 		}
 		
 		if ($add === false) {
-        
 			self::$_config = $config['backends'];
-		
 		} else {
-			
 	        self::$_config = array_merge((array) self::$_config, $config['backends']);
 		}
-		
 		return true;
 	}
 	
@@ -199,90 +190,66 @@ class Backend {
 	static public function getInstance($id)
 	{
 		if (! is_array(self::$_config)) {
-
 			self::loadConfig();
 		}
 		
 		if ($id instanceof Backend\BackendUri) {
-			
 			if ($id->getAlias()) {
-
 				return self::getInstance($id->getAlias());					
-			
 			} else if ($id->getHost() && $id->getType()) {
-
 				// si uri n'est pas un alias mais contient au moins host + type
 				return self::factory($id);
 			}
-			
 		} else {
-			
 			if (substr($id, 0, 1) == self::PREFIX) {
-				
 				$id = substr($id, 1);
 			}
 
 			/* return already instanciated backend */
 			if (isset(self::$_backendsObj[$id])) {
-					
 				return self::$_backendsObj[$id];
 			}
 			
 			if (isset(self::$_config[$id])) {
-
 				$config = self::$_config[$id];
 				$uri = array();
 				
 				/* temp fix - some backends require adapters (PDO), most don't */
 				if (! isset($config['uri']['adapter'])) {
-					
 					$uri['adapter'] = $config['type'];
 				}
 				
 				/* reduce possible arrays into proper env-based value */
 				/* @todo use parent value if backend extends some other backend */ 
 				foreach ($config['uri'] as $key => $val) {
-
 					if (is_array($val)) {
-						
 						$uri[$key] = isset($val[Core::$env]) ? $val[Core::$env] : null;
-						
 					} else {
-						
 						$uri[$key] = $val;
 					}
 				}
 				
 				$uri = new Backend\BackendUri($uri);
-				
 				$backend = self::factory($uri, $id);
 				
 				/* @todo refactor this */
 				if (isset($config['mapper'])) {
-						
 					if (is_array($config['mapper'])) {
-
 						if (isset($config['mapper'][Core::getEnvData('webEnv')])) {
-								
 							$mapper = $config['mapper'][Core::getEnvData('webEnv')];
-								 
 						} else {
-								
 							throw new Backend\Exception("NO_MAPPER_VALUE");
 						}
 					} else {
-						
 						$mapper = $config['mapper'];
 					}
 						
 					$mapper = Mapper::getInstance($mapper);
 					$backend->setMapper($mapper);
 				}
-				
 				return $backend;
 			}
 		}
-		
 		throw new Backend\Exception('Unknown backend alias: ' . $id . '.');
 	}
 	

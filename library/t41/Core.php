@@ -17,9 +17,8 @@ namespace t41;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 914 $
  */
 
 use t41\View\SimpleComponent;
@@ -36,7 +35,7 @@ use t41\ObjectModel\DataObject;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class Core {
@@ -75,7 +74,7 @@ class Core {
 	
 	/**
 	 * Array of prefixes for the autoloader
-	 * Redefine in your child class or use t41_Core::addAutoloaderPrefix() 
+	 * Redefine in your child class or use t41\Core::addAutoloaderPrefix() 
 	 * to add other prefixes BEFORE calling init()
 	 * 
 	 * @var array
@@ -91,7 +90,7 @@ class Core {
 	 * 
 	 * @var string
 	 */
-	static public $lang = 'en';
+	static public $lang = 'fr';
 	
 	
 	/**
@@ -285,7 +284,6 @@ class Core {
     			. $path . 'vendor/' . PATH_SEPARATOR
     			. $path . 'vendor/quatrain/t41/library' . PATH_SEPARATOR
     			. $path . 'vendor/zendframework/zendframework1/library' . PATH_SEPARATOR
-    			. $path . 'vendor/zend/zf1/library' // @legacy
     	);
     }
 
@@ -301,9 +299,7 @@ class Core {
 		}
 			
 		if (is_array($prefix)) {
-
 			foreach ($prefix as $key => $val) {
-				
 				/**
 				 * @since ZF 1.12 registerNamespace() doesn't support second argument (path) any more
 				 * @todo switch to another Autoloader
@@ -312,22 +308,21 @@ class Core {
 			
 				self::$autoloaderPrefixes[$key] = $val;	
 				if (is_object(self::$_autoloaderInstance)) {
-					if (substr($key, -1) == '_') {
-						self::$_autoloaderInstance->registerPrefix($key, $val);
-					} else {
+					//if (substr($key, -1) == '_') {
+					//	self::$_autoloaderInstance->registerPrefix($key, $val);
+					//} else {
 						self::$_autoloaderInstance->registerNamespace($key, $val);
-					}
+					//}
 				}
 			}
-			
 		} else {
 			self::$autoloaderPrefixes[$prefix] = $path;	
 			if (is_object(self::$_autoloaderInstance)) {
-				if (substr($prefix, -1) == '_') {
-					self::$_autoloaderInstance->registerPrefix($prefix, $path);
-				} else {
+			//	if (substr($prefix, -1) == '_') {
+			//		self::$_autoloaderInstance->registerPrefix($prefix, $path);
+			//	} else {
 					self::$_autoloaderInstance->registerNamespace($prefix, $path);
-				}
+			//	}
 			}
 		}
 	}
@@ -341,12 +336,10 @@ class Core {
 		
 		require_once 'Zend/Loader/Autoloader.php';
 		self::$_autoloaderInstance = \Zend_Loader_Autoloader::getInstance();
-		
 		self::$autoloaderPrefixes['t41'] = self::$basePath . 'vendor/quatrain/t41/library/t41';
 		foreach (self::$autoloaderPrefixes as $prefix => $path) {
 			self::$_autoloaderInstance->registerNamespace($prefix, $path);
 		}
-		
     	self::$autoloaded = true;
 	}
 	
@@ -361,12 +354,9 @@ class Core {
     	self::$_fancyExceptions = $bool;
     	if ($bool === true) {
     		set_exception_handler(array('\t41\Core', 'exceptionHandler'));
-    		
     	} else {
-    		
     		restore_exception_handler();
     	}
-    	
     	// le traitement n'est actuellement fait que pendant l'init
     }
     
@@ -390,7 +380,6 @@ class Core {
 				$error = new SimpleComponent();
 				$error->setTitle('ERREUR FATALE : ' . html_entity_decode($e->getMessage()));
                 if (self::$env == self::ENV_DEV) {
-                	
                 	// in dev mode, also print out execution trace
                     $error->setContent('<br/><pre>' . $e->getTraceAsString() . '</pre>');
                 }
@@ -416,142 +405,141 @@ class Core {
         $headers = headers_list(); //  getallheaders();
         
         if (isset($headers['X-Requested-With']) && $headers['X-Requested-With'] == 'XMLHttpRequest') {
-        	
         	//header($_SERVER['SERVER_PROTOCOL'] . ' ' . $errStr, true, 500);
 			exit(sprintf('{status:"ERR", message:"%s", context:{line:%d,file:%s}', $errStr, $errLine, $errFile));
-
         } else {
-        	
         	View::addError($errStr, $errFile, $errNo);
         }
-        
         if ($fatale == true) {
-        	
         	exit($errStr);
         }
     }
     
     
     /**
+     * Add all mandatory paths to configuration
+     */
+    public static function preInit()
+    {
+        /* add application & t41 config files path (in first position if none was declared before) */
+        Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
+        Config::addPath(self::$basePath . 'vendor/quatrain/t41/configs/', Config::REALM_CONFIGS);
+        
+        /* add templates folder path (in first position if none was declared before) */
+        Config::addPath(self::$basePath . 'application/views/', Config::REALM_TEMPLATES);
+        
+        /* add t41 & application controllers paths (in first position if none was declared before) */
+        Config::addPath(self::$basePath . 'application/controllers/', Config::REALM_CONTROLLERS, null, 'default');
+        Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
+         
+        /* register default REST controllers path */
+        /* @todo allow override in config file or even later */
+        Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
+         
+        /* register default path where to find view objects decorators */
+        Decorator::addPath(self::$basePath . 'vendor/quatrain/t41/library/t41'); // without 'View'
+    }
+    
+    
+    /**
      * environment builder
      *
-     * @var string $path base path
-     * @var string $mpath modules path
+     * @var string $env forced env value
      */
-    public static function init($path = null, $mpath = null)
+    public static function init($envKey = null)
     {
+        if (! is_null($envKey) && ! in_array($envKey, array(self::ENV_DEV,self::ENV_STAGE,self::ENV_PROD))) {
+            throw new \Exception(sprintf("'%s' is not a recognized environment", $envKey));
+        }
+        
     	// enable garbage collection
     	gc_enable();
     	
     	// enable t41 error handler (notices are not catched until we get a proper logger)
     	set_error_handler(array('t41\Core', 'userErrorHandler'), (E_ALL | E_STRICT) ^ E_NOTICE);
     	
-    	// define path but only if it's empty
-    	if (! is_null($path) && empty(self::$basePath)) self::setPaths($path);
-
-    	/* add application & t41 config files path (in first position if none was declared before) */
-    	Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/configs/', Config::REALM_CONFIGS);
-    	 
-    	/* add templates folder path (in first position if none was declared before) */
-    	Config::addPath(self::$basePath . 'application/views/', Config::REALM_TEMPLATES);
-
-    	/* add t41 & application controllers paths (in first position if none was declared before) */
-    	Config::addPath(self::$basePath . 'application/controllers/', Config::REALM_CONTROLLERS, null, 'default');
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
-    	
-    	/* register default REST controllers path */
-    	/* @todo allow override in config file or even later */
-    	Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
-    	
-    	/* register default path where to find view objects decorators */
-    	Decorator::addPath(self::$basePath . 'vendor/quatrain/t41/library/t41'); // without 'View'
+        self::preInit();
     	
     	// never cached, shall it be ?
     	$config = Config\Loader::loadConfig('application.xml');
     	self::$_config = $config['application'];
-    	
-    	/* CLI Mode */
-    	if (php_sapi_name() == 'cli') {
-    		
-    		self::$mode = self::$_config['environments']['mode'] = 'cli';
-			
-			$opts = new \Zend_Console_Getopt(array('env=s'			=> 'Environment value'
-												, 'controller=s'	=> "Controller"
-												, 'module=s'		=> "Module"
-												, 'action=s'		=> "Action"
-												, 'params=s'		=> "Action parameters"
-												, 'simulate'		=> "Simulate execution"
-									)
-							   );
 
-			try {
-				$opts->parse();
-				
-				//var_dump($opts->params); die;
-				
-			} catch (\Zend_Console_GetOpt_Exception $e) {
-				die($e->getUsageMessage());
-			}
-			
-			$match = trim($opts->env);
-			
-			/* temporary */
-			define('CLI_CONTROLLER', trim($opts->controller));
-			define('CLI_MODULE', trim($opts->module));
-			define('CLI_ACTION', trim($opts->action));
-			define('CLI_PARAMS', $opts->params);
-			define('CLI_SIMULATE', (bool) $opts->simulate);
-			
-		} else {
-    	
-			View::setDisplay(View\Adapter\WebAdapter::ID);
-			
-	    	/* array of mode / $_SERVER data key value */
-    		$envMapper = array('hostname' => 'SERVER_NAME');
-    	
-    		$match = isset($_SERVER[ $envMapper[self::$_config['environments']['mode']] ]) ?  $_SERVER[ $envMapper[self::$_config['environments']['mode']] ] : null;
-		}
-		
-    	/* define which environment matches current mode value */
-    	if (is_null($match)) {
-    		throw new Config\Exception("environment value not detected");
-    	}
-
-    	self::$appId = str_replace(array('.','-'), '_', $match);
-    	
-    	$envKey = null;
-    	
-    	switch (self::$_config['environments']['mode']) {
+    	if (! is_null($envKey)) {
+    	    self::$env = $envKey;
+    	    self::$appId = $envKey;
+    	} else {
+        	/* CLI Mode */
+        	if (php_sapi_name() == 'cli') {
+        		
+        		self::$mode = self::$_config['environments']['mode'] = 'cli';
+    			
+    			$opts = new \Zend_Console_Getopt(array('env=s'			=> 'Environment value'
+    												, 'controller=s'	=> "Controller"
+    												, 'module=s'		=> "Module"
+    												, 'action=s'		=> "Action"
+    												, 'params=s'		=> "Action parameters"
+    												, 'simulate'		=> "Simulate execution"
+    									)
+    							   );
+    
+    			try {
+    				$opts->parse();
+    			} catch (\Zend_Console_GetOpt_Exception $e) {
+    				exit($e->getUsageMessage());
+    			}
+    			
+    			$match = trim($opts->env);
+    			
+    			/* temporary */
+    			define('CLI_CONTROLLER', trim($opts->controller));
+    			define('CLI_MODULE', trim($opts->module));
+    			define('CLI_ACTION', trim($opts->action));
+    			define('CLI_PARAMS', $opts->params);
+    			define('CLI_SIMULATE', (bool) $opts->simulate);
+    		} else {
+    			View::setDisplay(View\Adapter\WebAdapter::ID);
+    			
+    	    	/* array of mode / $_SERVER data key value */
+        		$envMapper = array('hostname' => 'SERVER_NAME');
+        		$match = isset($_SERVER[ $envMapper[self::$_config['environments']['mode']] ]) ?  $_SERVER[ $envMapper[self::$_config['environments']['mode']] ] : null;
+    		}
     		
-    		case 'cli':
-    	    	foreach (self::$_config['environments'] as $key => $value) {
-    				
-    				if (! is_array($value)) continue;
-    				
-    				if ($key == $match) {
-    					$envKey = self::$env = $key;
-    					break;
-    				}
-    			}
-    			break;
-    			    		
-    		case 'hostname':
-    		default:	
-    			foreach (self::$_config['environments'] as $key => $value) {
-    				
-    				if (! is_array($value)) continue;
-    				
-    				if (isset($value['hostname']) && in_array($match, (array) $value['hostname'])) {
-    					$envKey = self::$env = $key;
-    					break;
-    				}
-    			}
-    			break;
-    	}
-    	
-    	if (is_null($envKey)) {
-    		throw new Config\Exception("No matching environment found");
+        	/* define which environment matches current mode value */
+        	if (is_null($match)) {
+        		throw new Config\Exception("environment value not detected");
+        	}
+    
+        	self::$appId = str_replace(array('.','-'), '_', $match);
+        	
+        	$envKey = null;
+        	
+        	switch (self::$_config['environments']['mode']) {
+        		
+        		case 'cli':
+        	    	foreach (self::$_config['environments'] as $key => $value) {
+        				if (! is_array($value)) continue;
+        				if ($key == $match) {
+        					$envKey = self::$env = $key;
+        					break;
+        				}
+        			}
+        			break;
+        			    		
+        		case 'hostname':
+        		default:	
+        			foreach (self::$_config['environments'] as $key => $value) {
+        				if (! is_array($value)) continue;
+        				if (isset($value['hostname']) && in_array($match, (array) $value['hostname'])) {
+        					$envKey = self::$env = $key;
+        					break;
+        				}
+        			}
+        			break;
+        	}
+        	
+        	if (is_null($envKey)) {
+        		throw new Config\Exception("No matching environment found");
+        	}
     	}
     	
     	self::$_env += self::$_config['environments'][$envKey];
@@ -560,7 +548,6 @@ class Core {
     		self::$cache = self::getEnvData('cache_backend');
     	}
     	 
-    	
     	self::$_env['version'] = self::$_config['versions'][self::$_config['versions']['default']];
     	
     	/* define app name */
@@ -582,25 +569,21 @@ class Core {
 			self::enableLogger(self::$_env['log']);
 		}
 
-		
 		/* define lang - can be overwritten anywhere */
 		self::$lang = self::$_config['versions']['default'];
 		
 		// load modules
-		Core\Module::init($mpath ? $mpath : self::$basePath);
+		Core\Module::init(self::$basePath);
 		
 		// load ACL
-		Core\Acl::init($mpath ? $mpath : self::$basePath);
+		Core\Acl::init(self::$basePath);
 		
 		/* load configuration files if lazy mode is off */
 		if (self::$lazy !== true) {
-
 			// get backends configuration
     		Backend::loadConfig();
-
     		// get mappers configuration
     		Mapper::loadConfig();
-    	
     		// get object model configuration
     		ObjectModel::loadConfig();
 		}
@@ -609,9 +592,8 @@ class Core {
         if (in_array(self::$env, array(self::ENV_STAGE, self::ENV_PROD))) {
         	error_reporting(E_ERROR); //(E_ALL | E_STRICT) ^ E_NOTICE);
         	ini_set('display_errors', 1);
-        	
         } else {
-            error_reporting(E_ALL & ~E_STRICT);
+            error_reporting(E_ERROR); // E_ALL & ~E_STRICT);
             ini_set('display_errors', 1);
         }
 
@@ -698,11 +680,9 @@ class Core {
     {
     	trigger_error("htmlEncode() is marked as deprecated and will be removed soon");
     	if (mb_detect_encoding($str) == 'ISO-8859-1') {
-    		
     		$str2 = htmlentities($str);
     		if (empty($str2)) $str2 = $str; // ugly temp fix when value is not returned at all
     	}
-    	
         return nl2br(isset($str2) ? $str2 : $str);
     }
 

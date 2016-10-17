@@ -102,7 +102,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	
 	
 	/**
-	 * Instanciate a PDO-based backend from a t41_Backend_Uri object 
+	 * Instanciate a PDO-based backend from a t41\Backend\BackendUri object 
 	 *
 	 * @param t41\Backend\BackendUri $uri
 	 * @param string $alias
@@ -143,6 +143,29 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				throw new Exception($e->getMessage());
 			}		
 		}
+	}
+	
+	
+	/**
+	 * execute a query on the adapter ressource
+	 * @param string $query
+	 * @return array
+	 */
+	public function query($query)
+	{
+	    $this->_connect();
+    	$array = array();
+	    try {
+    	    $res = $this->_ressource->query($query);
+	        if (preg_match('/^SELECT/i', trim($query))) {
+	            foreach ($res as $row) {
+    	            $array[] = $row;
+	            }
+	       }
+	    } catch (\Exception $e) {
+	        throw new Exception("Query failed: " . $e->getMessage() . $e->getTraceAsString());   
+	    }
+	    return $array;
 	}
 	
 	
@@ -481,7 +504,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			switch ($subOp) {
 				
 				case ObjectModel::CALC_SUM:
-					$expressions = [];
+					$expressions = array();
 					foreach ($returnCount as $propKey => $property) {
 						$prop = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $propKey) : $propKey;
 						$expressions[] = sprintf('SUM(%s.%s)', $table, $prop);
@@ -836,7 +859,6 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 				continue;
 			}
-
 			
 			// default sorting on a different table
 			$class = $sorting[0]->getParent() ? $sorting[0]->getParent()->getClass() : $collection->getDataObject()->getClass();
@@ -1090,19 +1112,16 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		
 			$jtable = $this->_mapper ? $this->_mapper->getDatastore($property->getParameter('instanceof')) : $this->_getTableFromClass($property->getParameter('instanceof'));
 		
-			if (array_key_exists($jtable, $this->_alreadyJoined)) {
-				continue;
-			}
-				
-			$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
-			$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
-			$uniqext = $jtable . '__joined_for__' . $leftkey;
-				
-			$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
-			$select->joinLeft("$jtable AS $uniqext", $join, array());
-		
-			$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
-		
+    	    if (! array_key_exists($jtable, $this->_alreadyJoined)) {
+    			$leftkey  = $this->_mapper ? $this->_mapper->propertyToDatastoreName($class, $property->getId()) : $property->getId();
+    			$field = $rightkey  = $this->_mapper ? $this->_mapper->getPrimaryKey($property->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
+    			$uniqext = $jtable . '__joined_for__' . $leftkey;
+    				
+    			$join = sprintf("%s.%s = %s.%s", $jtable2, $leftkey, $uniqext, $rightkey);
+    			$select->joinLeft("$jtable AS $uniqext", $join, array());
+    		
+    			$this->_alreadyJoined[$jtable] = $uniqext; //$jtable;
+    		}
 		} else {
 			$field = $property->getId();
 			if ($this->_mapper) {

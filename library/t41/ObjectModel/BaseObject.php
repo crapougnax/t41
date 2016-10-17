@@ -85,7 +85,7 @@ abstract class BaseObject extends ObjectModelAbstract {
 			if (! is_null($val)) {
 				if (! $val instanceof ObjectUri) {
 					// provide backend if uri is partial
-					$backendUri = substr($val,0,1) != Backend::PREFIX ? ObjectModel::getObjectBackend(get_class($this)) : null;
+					$backendUri = null; //substr($val,0,1) != Backend::PREFIX ? ObjectModel::getObjectBackend(get_class($this)) : null;
 					$val = new ObjectUri($val, $backendUri);
 					$val->setClass(get_class($this));
 				}

@@ -66,7 +66,7 @@ class BlobProperty extends AbstractProperty {
 	public function setValueFromFile($file)
 	{
 		if (is_readable($file)) {
-			$this->_value = file_get_contents($file);
+			$this->_value = (@file_get_contents($file));
 			$this->_filename = $file;
 		}
 		return $this;
