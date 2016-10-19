@@ -19,7 +19,6 @@ namespace t41\View\TemplateComponent;
  * @package    t41_View
  * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 832 $
  */
 
 use t41\Core,
@@ -52,7 +51,7 @@ class PdfDefault extends AbstractPdfDecorator {
 	 * @param TCPDF $pdf
 	 * @param integer $width
 	 */
-    public function render(TCPDF $pdf, $width = null)
+    public function render(\TCPDF $pdf, $width = null)
 	{
 		$deco = new WebDefault($this->_obj);
 		$pdf->writeHTMLCell(null, null, $this->_obj->getParameter('pos_x'), $this->_obj->getParameter('pos_y'), $deco->render());

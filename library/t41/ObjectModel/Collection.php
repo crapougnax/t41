@@ -150,7 +150,7 @@ class Collection extends ObjectModelAbstract {
 	 * @param AbstractProperty $prop
 	 * @return \t41\ObjectModel\Collection
 	 */
-	public function setParent(AbstractProperty $prop)
+	public function setParent(DataObject $prop)
 	{
 		$this->_parent = $prop;
 		return $this;
@@ -648,7 +648,8 @@ class Collection extends ObjectModelAbstract {
 		if ($this->getParameter('populated') == false) {
 			$this->find($type);
 		}
-		return $this->_castMembers($this->_members, $type);
+		
+		return is_array($this->_members) ? $this->_castMembers($this->_members, $type) : false;
 	}
 	
 
