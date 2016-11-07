@@ -61,7 +61,7 @@ class PdfDefault extends AbstractPdfDecorator {
 	 * @param TCPDF $pdf
 	 * @param integer $width
 	 */
-    public function render(TCPDF $pdf, $width = null)
+    public function render(\TCPDF $pdf, $width = null)
 	{
 		// Define border value from parameter
 		if ($this->getParameter('borders')) {
@@ -72,7 +72,6 @@ class PdfDefault extends AbstractPdfDecorator {
 			$borders = explode(' ', $this->getParameter('borders'));
 			
 			foreach ($borders as $key => $border) {
-				
 				$this->_borderType .= ($border != 0) ? $bordersVal[$key] : null;
 			}
 		}
