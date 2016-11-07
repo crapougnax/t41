@@ -149,7 +149,7 @@ class CollectionProperty extends AbstractProperty {
 								}
 							}
 							if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
-							$this->_value->having($parts[0])->$parts[1]($parts[2]);
+							$this->_value->having($parts[0])->{$parts[1]}($parts[2]);
 						} else {
 							if ($parts[1] == 'novalue') $parts[1] = Condition::NO_VALUE;
 							if (substr($parts[1],0,1) == '%' && substr($parts[1], -1) == '%') {
