@@ -166,6 +166,9 @@ class FormComponent extends View\ViewObject {
     
     public function save(array $data = null)
     {
+        // Add 'before saving' data
+        $data['_before'] = $this->getSource()->getDataObject()->toArray();
+        
     	if ($this->_executePreActions($data)) {
     		$this->getSource()->populate($data);
     		$res = $this->getSource()->save();
