@@ -163,10 +163,15 @@ class FormComponent extends View\ViewObject {
     }
     
     
-    
+    /**
+     * Execute form saving triggering optional pre and post actions
+     * @param array $data
+     * @return boolean
+     */
     public function save(array $data = null)
     {
         // Add 'before saving' data
+        // @todo data should be at the same level as 'user' block
         $data['_before'] = $this->getSource()->getDataObject()->toArray();
         
     	if ($this->_executePreActions($data)) {
