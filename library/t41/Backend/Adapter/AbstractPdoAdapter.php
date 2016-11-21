@@ -932,6 +932,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 		//return $this->_populateCollection($result, $collection, $uri);
 	}
 	
+	/**
+	 * Return the latest SQL Select
+	 * @return string
+	 */
+	public function getSql()
+	{
+	    return $this->_select ? $this->_select->__toString() : false;
+	}
 	
 	public function transactionStart($key = null)
 	{
