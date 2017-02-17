@@ -754,7 +754,8 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 			// @todo find a better way to sort on meta properties 
 			if ($sorting[0]->getId() == ObjectUri::IDENTIFIER || $sorting[0] instanceof MetaProperty) {
 				$id = Backend::DEFAULT_PKEY;
-				$this->_select->order(new \Zend_Db_Expr ( $table . '.' . $id . ' ' . $sorting[1]));
+				if ($sorting[1] != 'ASC' && $sorting[1] != 'DESC') continue;
+				$this->_select->order(new \Zend_Db_Expr($table . '.' . $id . ' ' . $sorting[1]));
 				continue;
 			} else if ($sorting[0] instanceof Property\CollectionProperty) {
 				// handling of conditions based on collection limited to withMembers() and withoutMembers()
@@ -893,7 +894,11 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				if (isset($sorting[2]) && !empty($sorting[2])) {
 					$sortingExpr = sprintf('%s(%s)', $sorting[2], $sortingExpr);
 				}
-				$this->_select->order(new \Zend_Db_Expr('TRIM(' . $sortingExpr . ') ' . $sorting[1]));
+				
+				if (! $sorting[0] instanceof DateProperty) {
+				    $sortingExpr = new \Zend_Db_Expr("TRIM('$sortingExpr')");
+				}
+				$this->_select->order($sortingExpr . ' ' . $sorting[1]);
 			}
 		}
 		
