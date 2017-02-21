@@ -989,6 +989,29 @@ class Collection extends ObjectModelAbstract {
 	
 	
 	/**
+	 * Update collection members with given args
+	 * @todo do this in one pass
+	 * @param array $args
+	 * @return bool
+	 */
+	public function update(array $args)
+	{
+	    foreach ($this->getMembers(ObjectModel::MODEL) as $member) {
+	        foreach ($args as $key => $val) {
+	            if (is_null($val)) {
+	                $method = 'del' . $key;
+	                $member->$method();
+	            } else {
+	               $member->$key = $val;
+	            }
+	        }
+	        $member->save();
+	    }
+	    
+	    return true;
+	}
+	
+	/**
 	 * (non-PHPdoc)
 	 * @see t41\ObjectModel.ObjectModelAbstract::reduce()
 	 */
