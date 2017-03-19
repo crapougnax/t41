@@ -467,6 +467,11 @@ class Collection extends ObjectModelAbstract {
 	{
 		$this->_lastSubFind = null;
 		
+		// if collection has not been populated yet, do it now with $type as param
+		if ($this->getParameter('populated') == false) {
+		    $this->find( ObjectModel::MODEL);
+		}
+		
 		if (! is_array($this->_members)) {
 			return $returnCount ? 0 : array();
 		}
