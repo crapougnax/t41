@@ -252,6 +252,9 @@ class DataObject extends ObjectModelAbstract {
     	if ($properties !== false) {
     		foreach ($properties as $propertyId => $propertyParams) {
     			$type = isset($propertyParams['type']) ? $propertyParams['type'] : null;
+    			if (is_string($propertyParams)) {
+    			    continue; // zero-property objects like HybridObject() can cause error
+    			}
     			$this->_data[$propertyId] = Property::factory($propertyId, $type, $propertyParams);
     			$this->_data[$propertyId]->setParent($this);
     		}
