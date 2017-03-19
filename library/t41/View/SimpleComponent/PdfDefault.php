@@ -47,7 +47,7 @@ class PdfDefault extends AbstractPdfDecorator {
 	 * @param TCPDF $pdf
 	 * @param integer $width
 	 */
-    public function render(TCPDF $pdf, $width = null)
+    public function render(\TCPDF $pdf, $width = null)
 	{
 		$pdf->writeHTML($this->_contentRendering()); // writeHTMLCell(null, null, $this->_obj->getParameter('pos_x'), $this->_obj->getParameter('pos_y'),);
 	}

@@ -98,7 +98,6 @@ class ListElement extends AbstractElement {
 		$this->_enumValues = array();
 
         $this->_collection->find();
-        
         foreach ($this->_collection->getMembers() as $member) {
         	// define value key (property val if altkey parameter is setted or uri's identifier by default
         	$key = $this->getParameter('altkey') ? $member->getProperty($this->getParameter('altkey'))->getValue() : $member->getIdentifier();
