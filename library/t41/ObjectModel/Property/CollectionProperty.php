@@ -29,6 +29,7 @@ use t41\ObjectModel,
 	t41\Backend\Condition;
 use t41\Core;
 use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\Exception;
 
 /**
  * Property class to manipulate collections of objects
@@ -138,6 +139,7 @@ class CollectionProperty extends AbstractProperty {
 			if ($this->getParameter('morekeyprop')) {
 				foreach ($this->getParameter('morekeyprop') as $value) {
 					if (strstr(trim($value), ' ') !== false) {
+					    	
 						// if value contains spaces, it's a pattern
 						$parts = explode(' ', $value);
 						if (count($parts) == 3) {
@@ -152,7 +154,11 @@ class CollectionProperty extends AbstractProperty {
 								}
 							}
 							if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
-							$this->_value->having($parts[0])->$parts[1]($parts[2]);
+							try {
+							    $this->_value->having($parts[0])->{$parts[1]}($parts[2]);
+							} catch (\Exception $e) {
+							    throw new Exception("Unable to apply condition: " . $e->getMessage());
+							}
 						} else {
 							if ($parts[1] == 'novalue') $parts[1] = Condition::NO_VALUE;
 							if (substr($parts[1],0,1) == '%' && substr($parts[1], -1) == '%') {
