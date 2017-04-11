@@ -23,8 +23,8 @@ namespace t41;
 
 use t41\View\SimpleComponent;
 
-use t41\Core,
-	t41\Config;
+use t41\Core;
+use t41\Config;
 use t41\View\Decorator;
 use t41\Core\Session;
 use t41\ObjectModel\ObjectUri;
@@ -421,23 +421,26 @@ class Core {
      */
     public static function preInit()
     {
+        // @todo change to "calculated" value
+        $path = 'vendor/crapougnax/t41';
+        
         /* add application & t41 config files path (in first position if none was declared before) */
         Config::addPath(self::$basePath . 'application/configs/', Config::REALM_CONFIGS);
-        Config::addPath(self::$basePath . 'vendor/quatrain/t41/configs/', Config::REALM_CONFIGS);
+        Config::addPath(self::$basePath . $path . '/configs/', Config::REALM_CONFIGS);
         
         /* add templates folder path (in first position if none was declared before) */
         Config::addPath(self::$basePath . 'application/views/', Config::REALM_TEMPLATES);
         
         /* add t41 & application controllers paths (in first position if none was declared before) */
         Config::addPath(self::$basePath . 'application/controllers/', Config::REALM_CONTROLLERS, null, 'default');
-        Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/', Config::REALM_CONTROLLERS, null, 't41');
+        Config::addPath(self::$basePath . $path . '/controllers/', Config::REALM_CONTROLLERS, null, 't41');
          
         /* register default REST controllers path */
         /* @todo allow override in config file or even later */
-        Config::addPath(self::$basePath . 'vendor/quatrain/t41/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
+        Config::addPath(self::$basePath . $path . '/controllers/rest/', Config::REALM_CONTROLLERS, null, 'rest');
          
         /* register default path where to find view objects decorators */
-        Decorator::addPath(self::$basePath . 'vendor/quatrain/t41/library/t41'); // without 'View'
+        Decorator::addPath(self::$basePath . $path . '/library/t41'); // without 'View'
     }
     
     
@@ -448,9 +451,9 @@ class Core {
      */
     public static function init($envKey = null)
     {
-/*         if (! is_null($envKey) && ! in_array($envKey, array(self::ENV_DEV,self::ENV_STAGE,self::ENV_PROD))) {
+        if (! is_null($envKey) && ! in_array($envKey, array(self::ENV_DEV,self::ENV_STAGE,self::ENV_PROD))) {
             throw new \Exception(sprintf("'%s' is not a recognized environment", $envKey));
-        } */
+        }
         
     	// enable garbage collection
     	gc_enable();
