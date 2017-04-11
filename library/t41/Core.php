@@ -448,9 +448,9 @@ class Core {
      */
     public static function init($envKey = null)
     {
-        if (! is_null($envKey) && ! in_array($envKey, array(self::ENV_DEV,self::ENV_STAGE,self::ENV_PROD))) {
+/*         if (! is_null($envKey) && ! in_array($envKey, array(self::ENV_DEV,self::ENV_STAGE,self::ENV_PROD))) {
             throw new \Exception(sprintf("'%s' is not a recognized environment", $envKey));
-        }
+        } */
         
     	// enable garbage collection
     	gc_enable();
