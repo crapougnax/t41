@@ -124,9 +124,11 @@ class DefaultAdapter extends AbstractAdapter {
 								$parts = explode(' ', $value);
 								if (count($parts) == 3) {
 									if (strstr($parts[2],',') !== false) $parts[2] = explode(',', $parts[2]);
-									$collection->having($parts[0])->$parts[1]($parts[2]);
+									$collection->having($parts[0])->{$parts[1]}($parts[2]);
 								} else {
-									if (strstr($parts[1],',') !== false) $parts[1] = explode(',', $parts[1]);
+									if (strstr($parts[1],',') !== false) {
+									    $parts[1] = explode(',', $parts[1]);
+									}
 									$collection->having($parts[0])->equals($parts[1]);
 								}
 							} else {
