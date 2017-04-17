@@ -107,7 +107,7 @@ if (! window.t41.view.action.autocomplete) {
 		
 		
 		this.displaySavedValue = function(obj) {
-			if (obj.data && obj.data._id) {
+			if (obj && obj.data && obj.data._id) {
 				var val = obj.data.collection[obj.data._id];
 				this.setValue(obj.data._id, this.prepareDisplay(val));
 			}
@@ -475,6 +475,7 @@ if (! window.t41.view.action.autocomplete) {
 	 */
 	window.t41.view.action.autocomplete.display = function(obj, offset) {
 
+		console.log(obj);
 		if (this.options.cachePrefix) {
 			var cache = sessionStorage.getItem(this.options.cachePrefix);
 			cache = (cache == null) ? {} : JSON.parse(cache);

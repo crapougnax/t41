@@ -8,51 +8,37 @@
  */
 
 use t41\Core\Registry;
-
-use t41\Core,
-	t41\ObjectModel,
-	t41\ObjectModel\Collection,
-	t41\Backend,
-	t41\View,
-	t41\View\Action;
+use t41\Core;
+use t41\ObjectModel;
+use t41\Backend;
+use t41\View\Action;
 
 require_once 'Zend/Controller/Action.php';
 
 class Rest_DefaultController extends Zend_Controller_Action {
 
-	
 	protected $_uuid;
-	
 	
 	protected $_obj = null;
 	
-	
 	protected $_status = 'OK';
-	
 	
 	protected $_refreshCache = false;
 	
+	protected $_data = [];
 	
-	protected $_data = array();
-	
-	
-	protected $_context = array();
+	protected $_context = [];
 
+	protected $_actions = ['pre' => [], 'ok' => [], 'nok' => []];
 	
-	protected $_actions = array('pre' => array(), 'ok' => array(), 'nok' => array());
-	
-	
-	protected $_redirects = array();
-	
+	protected $_redirects = [];
 	
 	protected $_post;
-	
 	
 	public function init()
 	{
 		/* redeclare with your ACL in your own controller */
 	}
-	
 	
 	public function preDispatch()
 	{
@@ -61,8 +47,8 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		$this->_uuid = $this->_getParam('uuid');
 	
 		if ($this->_uuid) {
-			$this->_obj = Core\Registry::get($this->_uuid);
-			$this->_defineRedirect(array('ok','nok','err'));
+		    $this->_obj = Core\Registry::get($this->_uuid);
+			$this->_defineRedirect(['ok','nok','err']);
 	
 			if ($this->_obj instanceof ObjectModel\ObjectUri) {
 				$this->_obj = ObjectModel::factory($this->_obj);
@@ -85,7 +71,6 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		}
 	}
 	
-	
 	public function postDispatch()
 	{
 		if ($this->_uuid && $this->_refreshCache === true) {
@@ -101,7 +86,6 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		
 		// if a redirect is available for the status, add it to the data
 		if (isset($this->_redirects[strtolower($this->_status)])) {
-			
 			// declare object in tag parsing class to use it for tag substitution on redirect urls
 			if ($this->_obj instanceof ObjectModel\BaseObject || $this->_obj instanceof ObjectModel\DataObject) {
 				Core\Tag\ObjectTag::$object = $this->_obj;
@@ -116,7 +100,6 @@ class Rest_DefaultController extends Zend_Controller_Action {
 		
 		$this->_setResponse($this->_status, $this->_data, $this->_context);
 	}
-	
 	
 	protected function _setResponse($status = 'OK', $data, $context = null, $format = 'json')
 	{
@@ -137,7 +120,6 @@ class Rest_DefaultController extends Zend_Controller_Action {
  		$this->getResponse()->sendResponse();
 		exit();
 	}
-	
 	
 	/**
 	 * Define the various redirects base on POST data or object parameters

@@ -17,7 +17,7 @@ namespace t41\View\Action;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 
@@ -32,7 +32,7 @@ use t41\ObjectModel;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2015 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class AutocompleteAction extends AbstractAction {
@@ -116,7 +116,6 @@ class AutocompleteAction extends AbstractAction {
 			}
 			
 		} else {
-			
 			if (isset($params[$this->queryfield])) {
 				$data = $this->_getSuggestions(trim($params[$this->queryfield]), $extra);
 			} else {
@@ -135,7 +134,7 @@ class AutocompleteAction extends AbstractAction {
 	 */
 	protected function _getSuggestions($query, array $extras = array())
 	{
-		$data = array();
+		$data = [];
 		
 		$combo = $this->_obj->having(Condition::MODE_AND);
 		foreach ($this->getParameter('searchprops') as $property) {
@@ -180,7 +179,11 @@ class AutocompleteAction extends AbstractAction {
 			$data[$member->getUri()->getIdentifier()] = $member->reduce($params);
 		}
 
-		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());	
+		return [
+		    'collection' => $data, 
+		    'max' => $this->_obj->getMax(), 
+		    'total' => $this->_obj->getTotalMembers()
+		];	
 	}
 	
 	
@@ -202,7 +205,12 @@ class AutocompleteAction extends AbstractAction {
 		foreach ($this->_obj->getMembers() as $member) {
 			$data[$member->getUri()->getIdentifier()] = $member->reduce((array) $this->getParameter('member_reduce_params'));
 		}
-		return array('collection' => $data, 'max' => $this->_obj->getMax(), 'total' => $this->_obj->getTotalMembers());
+		
+		return [
+		    'collection' => $data, 
+		    'max' => $this->_obj->getMax(), 
+		    'total' => $this->_obj->getTotalMembers()
+		];
 	}
 
 	
@@ -263,13 +271,14 @@ class AutocompleteAction extends AbstractAction {
 	
 	public function reduce(array $params = array())
 	{
-	    $this->_context = array_merge($this->_context, array(
+	    $this->_context = array_merge($this->_context, [
 	                            'minChars'      => self::$minChars, 
 	                            'displayMode'   => self::$displayMode, 
 	                            'defaultSelect' => self::$defaultSelect, 
 	                            'latency'       => self::$latency,
 	                            'cachePrefix'  => 'ac_' . $this->_obj->getCachePrefix()
-	    ));
+	                       ]
+	                   );
 	    
 		$array = parent::reduce($params);
 		$array['data']['display'] = $this->getDisplay();

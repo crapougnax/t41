@@ -11,13 +11,10 @@ use t41\Core;
 use t41\Backend;
 use t41\View\Action;
 
-
 require_once 'DefaultController.php';
-
 
 class Rest_ActionController extends Rest_DefaultController {
 
-	
 	/**
 	 * Map any given action string to the execute() method of the action's object
 	 */

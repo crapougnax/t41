@@ -3,11 +3,10 @@
 namespace t41\Core;
 
 use t41\View\ViewObject;
-
-use t41\ObjectModel,
-	t41\Core\UUID,
-	t41\Core,
-	t41\Exception;
+use t41\ObjectModel;
+use t41\Core\UUID;
+use t41\Core;
+use t41\Exception;
 
 
 class Registry {
@@ -18,13 +17,11 @@ class Registry {
 	 */
 	static protected $_store = null;
 	
-	
 	/**
 	 * Datastore identifier
 	 * @var string
 	 */
 	static public $storeId = 'registry_store';
-	
 	
 	static public function set($obj, $id = null, $force = false)
 	{
@@ -62,7 +59,6 @@ class Registry {
 		return Core::cacheGet($uuid);
 		
 		if (isset(self::$_store[$uuid])) {
-			
 			return self::unserialize(self::$_store[$uuid]);
 		}
 	}

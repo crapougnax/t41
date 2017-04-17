@@ -799,18 +799,16 @@ class Core {
     
     public static function cacheGet($key)
     {
-    	$cache = self::cacheGetAdapter();
-    	
-    	$cached = $cache->load($key);
+    	$cached = self::cacheGetAdapter()->load($key);
     	Core::log(sprintf('[Cache] Retrieved %s as %s', $key, gettype($cached)));
     	 
         if (is_array($cached)) {
         	if (isset($cached['_class'])) {
-        		try {
-                       \Zend_Loader::loadClass($cached['_class']);
+/*         		try {
+                      \Zend_Loader::loadClass($cached['_class']);
                     } catch (Exception $e) {
-                        return null;
-                    }
+                        return $e->getMessage();
+                    } */
                     
                 return unserialize($cached['content']);
                 
