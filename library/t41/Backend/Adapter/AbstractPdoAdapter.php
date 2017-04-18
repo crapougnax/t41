@@ -896,7 +896,7 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				}
 				
 				if (! $sorting[0] instanceof DateProperty) {
-				    $sortingExpr = new \Zend_Db_Expr("TRIM('$sortingExpr')");
+				    $sortingExpr = new \Zend_Db_Expr("TRIM($sortingExpr)");
 				}
 				$this->_select->order($sortingExpr . ' ' . $sorting[1]);
 			}
