@@ -859,13 +859,15 @@ class Collection extends ObjectModelAbstract {
 						if ($this->getParent() && $this->getParent()->getUri() instanceof ObjectUri) {
 							$calc = $this->calc($prop, $a[0]);
  						} else { // parent has not yet been save or commited, calc on members
- 							foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
-								$property = $member->getProperty($prop);
-								if (! $property instanceof Property\AbstractProperty) {
-									continue;
-								}
-								$calc += (float) $property->getValue();
- 							}
+ 						    if (is_array($this->_members)) {
+     							foreach ($this->_castMembers($this->_members, ObjectModel::DATA) as $member) {
+    								$property = $member->getProperty($prop);
+    								if (! $property instanceof Property\AbstractProperty) {
+    									continue;
+    								}
+    								$calc += (float) $property->getValue();
+     							}
+ 						    }
 						}
 						break;
 					
