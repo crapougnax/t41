@@ -192,7 +192,7 @@ class PdfAdapter extends AbstractAdapter {
         $this->_document->SetFontSize($this->getParameter('fontSize'));
         
         //initialize document
-        $this->_document->AliasNbPages();
+        $this->_document->getAliasNbPages();
         $this->_document->AddPage();    
         
         if ($this->_template) {
