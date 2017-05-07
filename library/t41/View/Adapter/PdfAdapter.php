@@ -17,9 +17,8 @@ namespace t41\View\Adapter;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 835 $
  */
 
 use t41\View;
@@ -30,7 +29,7 @@ use t41\View;
  *
  * @category   t41
  * @package    t41_View
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class PdfAdapter extends AbstractAdapter {
@@ -63,11 +62,11 @@ class PdfAdapter extends AbstractAdapter {
 	
 	public function __construct(array $parameters = null)
 	{
-		if (!defined('K_PATH_IMAGES')) {
-			define ('K_PATH_IMAGES','');
+		if (! defined('K_PATH_IMAGES')) {
+			define ('K_PATH_IMAGES', '');
 		}
 		
-		$params = array();
+		$params = [];
 		
 		$params['format']	 	= new \t41\Parameter(\t41\Parameter::STRING, self::FORMAT_A4, false, array(self::FORMAT_A3, self::FORMAT_A4));
 		$params['orientation'] 	= new \t41\Parameter(\t41\Parameter::STRING, self::ORIENTATION_PORTRAIT, false, array(self::ORIENTATION_PORTRAIT, self::ORIENTATION_LANDSCAPE));
@@ -113,9 +112,13 @@ class PdfAdapter extends AbstractAdapter {
 	
     public function display()
     {
-    	require_once 'vendor/tcpdf/tcpdf/tcpdf.php';
-        $this->_document = new \TCPDF($this->getParameter('orientation'), 'mm', $this->getParameter('format'), true); 
-     //   $this->_document->setImageScale(1/28);
+        $this->_document = new \TCPDF(
+            $this->getParameter('orientation'), 
+            'mm', 
+            $this->getParameter('format'), 
+            true
+        );
+        
         $this->_document->setPrintHeader($this->getParameter('addHeader'));
         $this->_document->setPrintFooter($this->getParameter('addFooter'));
         
@@ -135,7 +138,6 @@ class PdfAdapter extends AbstractAdapter {
         	
         	if ($this->getParameter('logo')) {
         		$imgformat = getimagesize($this->getParameter('logo'));
-        		//\Zend_Debug::dump($imgformat);
         		$this->setParameter('marginTop', 50);// (int) round($this->getParameter('marginTop') + $imgformat[1]/7));
 	       		$this->setParameter('headerMargin', 50); //(int) ($this->getParameter('marginTop') + ($imgformat[1]/7)));
         		$this->_document->setHeaderData($this->getParameter('logo'), $imgformat[0]/4);
@@ -158,22 +160,28 @@ class PdfAdapter extends AbstractAdapter {
         // font definition
         if ($this->getParameter('fontName')) {
         	
-	        $this->_document->setHeaderFont(array($this->getParameter('fontName'), ''
-	        									, $this->getParameter('headerFontSize') ? $this->getParameter('headerFontSize') : $this->getParameter('fontSize')-2));
-    	    $this->_document->setFooterFont(array($this->getParameter('fontName'), ''
-    	    									, $this->getParameter('footerFontSize') ? $this->getParameter('footerFontSize') : $this->getParameter('fontSize')-2));
+	        $this->_document->setHeaderFont([
+	            $this->getParameter('fontName'), 
+	            '',
+	            $this->getParameter('headerFontSize') ?? $this->getParameter('fontSize') - 2
+	        ]);
+    	    $this->_document->setFooterFont([
+    	        $this->getParameter('fontName'), 
+    	        '',
+    	        $this->getParameter('footerFontSize') ?? $this->getParameter('fontSize') - 2
+    	    ]);
         	$this->_document->SetFont($this->getParameter('fontName'));
         }
         
         // colors definition
         $this->_document->SetFillColor($this->getParameter('fillColor'));
         $this->_document->SetDrawColor($this->getParameter('drawColor'));
-        
-        $this->_document->setLanguageArray(array(	'a_meta_charset'  => 'UTF-8',
-                                            		'a_meta_dir'      => 'ltr',
-                                            		'a_meta_language' => 'fr',
-                                            		'w_page'          => 'page')
-                                     );
+        $this->_document->setLanguageArray([
+            'a_meta_charset'  => 'UTF-8',
+            'a_meta_dir'      => 'ltr',
+            'a_meta_language' => 'fr',
+            'w_page'          => 'page'
+        ]);
                                      
         // default display size is 100%                             
         $this->_document->SetDisplayMode(100);
@@ -188,12 +196,9 @@ class PdfAdapter extends AbstractAdapter {
         $this->_document->AddPage();    
         
         if ($this->_template) {
-
         	// document mode
         	$this->_();
-        	
         } else {
-        	
         	// registered objects rendering mode
         	$this->_render();
         }
@@ -212,11 +217,9 @@ class PdfAdapter extends AbstractAdapter {
         $doc = $this->getParameter('title') ? str_replace('/', '-', $this->getParameter('title')) . '.pdf' : 'Export.pdf';
         return $this->_document->Output($doc, $this->getParameter('destination'));
     }
-
     
     protected function _render()
     {
-		$content = null;
 		$newpage = false;
     	$elems = View::getObjects(View::PH_DEFAULT);
     	
@@ -305,17 +308,14 @@ class PdfAdapter extends AbstractAdapter {
     		switch ($tag[1]) {
     			
     			case 'container':
-    				
     				$elems = \t41\View::getObjects($tag[2]);
-    				
     				if (is_array($elems)) {
-    					
     					foreach ($elems as $elem) {
-    						
     						$object = $elem[0];
     						$params = $elem[1];
-    						
-    						if (! is_object($object)) continue;
+    						if (! is_object($object)) {
+    						    continue;
+    						}
     						
     					    /* @var $object t41_Form_Abstract */ 
     						switch (get_class($object)) {
