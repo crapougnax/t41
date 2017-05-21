@@ -125,7 +125,7 @@ class View {
 	 * @param array $parameters
 	 * @throws t41\View\Exception
 	 */
-	static public function setDisplay($adapter, array $parameters = null)
+	static public function setDisplay($adapter, array $parameters = [])
 	{
 		$adapter = ucfirst(strtolower($adapter));
 		$adapterClass = sprintf('t41\View\Adapter\%sAdapter', $adapter);
