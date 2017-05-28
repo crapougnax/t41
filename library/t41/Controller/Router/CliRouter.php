@@ -17,9 +17,8 @@ namespace t41\Controller\Router;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 890 $
  */
 
 /**
@@ -27,16 +26,16 @@ namespace t41\Controller\Router;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2011 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class CliRouter extends \Zend_Controller_Router_Abstract implements \Zend_Controller_Router_Interface {
 	
 
-	public function route(Zend_Controller_Request_Abstract $dispatcher){}
+	public function route(\Zend_Controller_Request_Abstract $dispatcher){}
     public function assemble($userParams, $name = null, $reset = false, $encode = true){}
     public function getFrontController(){}
-    public function setFrontController(Zend_Controller_Front $controller){}
+    public function setFrontController(\Zend_Controller_Front $controller){}
     public function setParam($name, $value){}
     public function setParams(array $params){}
     public function getParam($name){}

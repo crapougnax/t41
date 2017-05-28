@@ -626,8 +626,14 @@ class Core {
     static public function enableLogger()
     {
     	self::$_adapters['logger'] = new \Zend_Log();
-    	$writer = new \Zend_Log_Writer_Firebug();
+    	
+    	$writer = new \Zend_Log_Writer_Syslog(['application' => 't41']);
     	self::$_adapters['logger']->addWriter($writer);
+    	
+    	if (self::$env != self::ENV_PROD) {
+        	$writer = new \Zend_Log_Writer_Firebug();
+        	self::$_adapters['logger']->addWriter($writer);
+    	}
     }
     
     

@@ -17,9 +17,8 @@ namespace t41;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 886 $
  */
 
 /**
@@ -27,7 +26,7 @@ namespace t41;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 use t41\ObjectModel\ObjectUri,
