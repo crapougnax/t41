@@ -881,10 +881,14 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 				$rightkey = $this->_mapper ? $this->_mapper->getPrimaryKey($field->getParameter('instanceof')) : Backend::DEFAULT_PKEY;
 				
 				$uniqext = $stable . '__joined_for__' . $leftkey;
-				if (! in_array($uniqext, $this->_alreadyJoined)) {
-					$join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
-					$this->_select->joinLeft("$stable AS $uniqext", $join, array());
-					$this->_alreadyJoined[$stable] = $uniqext;
+				if (! array_key_exists($stable, $this->_alreadyJoined)) {
+				    $join = sprintf("%s.%s = %s.%s", $table, $leftkey, $uniqext, $rightkey);
+				    try {
+				        $this->_select->joinLeft("$stable AS $uniqext", $join, array());
+				    } catch (\Exception $e) {
+				        // silence exception
+				    }
+				    $this->_alreadyJoined[$stable] = $uniqext;
 				}
 				
 				$sortingExpr = $this->_alreadyJoined[$stable] . '.' . $sfield;
