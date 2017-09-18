@@ -516,7 +516,7 @@ table.t41.list td.cellcurrency {
 }
 
 .t41 form fieldset .field select {
-  max-width: 450px;
+  max-width: 295px;
   height: 30px;
   font-size: 14px;
   /*margin:5px 0 0;*/
