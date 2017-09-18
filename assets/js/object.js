@@ -229,21 +229,12 @@ if (! window.t41.object) {
 		}
 	};
 	
-	
 	/**
-	 * @deprecated conflicts in IE 8/9
+	 * conflicts in IE 8/9
 	 */
-	window.t41.object._delete = function() {
-		
+	window.t41.object._delete = function() {		
 		return t41.object.remove();
-		
-		var src = t41.view.caller;
-		t41.view._data = {uuid:src.data('uuid'), member:src.data('member')};
-		t41.view._currentDomElem = jQuery(t41.view.caller).closest('tr');
-
-		t41.view._alert = t41.view.alert.confirm("Veuillez confirmer la suppression",{confirm:t41.object.retDelete});
 	};
-	
 	
 	/**
 	 * Remove the collection's member matching the current alias in the collection registered with uuid
@@ -254,7 +245,6 @@ if (! window.t41.object) {
 		t41.view._currentDomElem = src.closest('tr');
 		t41.view._alert = t41.view.alert.confirm(t41.lget('confirm:remove'),{confirm:t41.object.retDelete});
 	};
-	
 	
 	window.t41.object.retDelete = function(obj) {
 		if (obj && obj.status) {
@@ -278,5 +268,4 @@ if (! window.t41.object) {
 						data:t41.view._data
 					 });
 	};
-
 }

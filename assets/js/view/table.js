@@ -268,7 +268,7 @@ if (! window['t41']['view']['table']) {
 			if (typeof data == 'undefined') { console.log('empty data'); return; }
 			var cell = document.createElement('td');
 			
-			cell.setAttribute('data-id', this.k);
+			if (this.k) cell.setAttribute('data-id', this.k);
         
 			if (event) {
         	

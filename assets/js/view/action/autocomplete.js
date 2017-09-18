@@ -475,7 +475,6 @@ if (! window.t41.view.action.autocomplete) {
 	 */
 	window.t41.view.action.autocomplete.display = function(obj, offset) {
 
-		console.log(obj);
 		if (this.options.cachePrefix) {
 			var cache = sessionStorage.getItem(this.options.cachePrefix);
 			cache = (cache == null) ? {} : JSON.parse(cache);
