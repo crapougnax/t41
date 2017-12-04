@@ -105,11 +105,15 @@ if (! window.t41.view.action.autocomplete) {
 			t41.core.call(config);
 		};
 		
-		
+		/**
+		 * Display persisted value - if exists
+		 */
 		this.displaySavedValue = function(obj) {
 			if (obj && obj.data && obj.data._id) {
-				var val = obj.data.collection[obj.data._id];
-				this.setValue(obj.data._id, this.prepareDisplay(val));
+				var val = obj.data.collection ? obj.data.collection[obj.data._id] : null;
+				if (val) {
+					this.setValue(obj.data._id, this.prepareDisplay(val));
+				}
 			}
 		};
 		
