@@ -1,7 +1,6 @@
 {
 	"name" : "crapougnax/t41",
 	"description" : "RAD Toolkit",
-	"version" : "1.0.0",
 	"require" : {
 		"message/wkhtmltopdf" : ">=1.0.0",
 		"tecnickcom/tcpdf" : "6.2.12",
@@ -35,4 +34,4 @@
 		"source" : "https://github.com/crapougnax/t41",
 		"wiki" : "https://github.com/crapougnax/t41/wiki"
 	}
-} 
+}
