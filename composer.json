@@ -20,7 +20,7 @@
 			"t41" : "library"
 		},
 		"psr-4" : {
-			"t41" : "library/t41"
+			"t41\\" : "library/t41"
 		}
 	},
 	"type" : "library",
@@ -35,4 +35,4 @@
 		"source" : "https://github.com/crapougnax/t41",
 		"wiki" : "https://github.com/crapougnax/t41/wiki"
 	}
-}
+} 
