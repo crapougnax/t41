@@ -93,6 +93,8 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	protected $_transaction = false;
 	
+	protected $_last;
+	
 	
 	/**
 	 * Class constructor
@@ -250,7 +252,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 	
 	public function transactionExists()
 	{
-		return $this->_transaction;
+		return (bool) $this->_transaction;
 	}
 	
 	

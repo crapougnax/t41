@@ -1,25 +1,13 @@
 <?php
 
-use t41\ObjectModel\ObjectUri;
-
-use t41\ObjectModel\Property\IdentifierProperty;
-
+use t41\Core;
 use t41\Core\Registry;
-
-/**
- * DefaultController
- * 
- * @author
- * @version 
- */
-
-use t41\Core,
-	t41\ObjectModel,
-	t41\ObjectModel\Property,
-	t41\ObjectModel\Collection,
-	t41\Backend,
-	t41\View,
-	t41\View\Action;
+use t41\ObjectModel;
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\Property;
+use t41\ObjectModel\Collection;
+use t41\Backend;
+use t41\View\Action;
 use t41\Core\Status;
 
 
@@ -239,9 +227,7 @@ class Rest_ObjectController extends Rest_DefaultController {
 	 */
 	public function dependAction()
 	{
-		if (($property = $this->_obj->getProperty($this->_post['destProperty']['id'])) !== false) {
-			
-			// @todo implement cache mechanism for the following collection
+		if (($property = $this->_obj->getProperty($this->_post['destProperty']['id'])) !== false) {			
 			$collection = new Collection($property->getParameter('instanceof'));
 			foreach ($this->_post['srcProperty'] as $key => $val) {
 				$collection->having($key)->equals($val);

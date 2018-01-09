@@ -17,17 +17,15 @@ namespace t41\Backend\Condition;
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
- * @version    $Revision: 839 $
  */
 
-use t41\ObjectModel,
-	t41\ObjectModel\Property,
-	t41\ObjectModel\ObjectUri,
-	t41\ObjectModel\Collection,
-	t41\Backend\Condition,
-	t41\DataObject;
+use t41\ObjectModel\Property;
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\Collection;
+use t41\Backend\Condition;
+use t41\Backend\Exception;
 
 /**
  * Simple class to handle query conditions on objects collections
@@ -40,17 +38,14 @@ use t41\ObjectModel,
  *
  * @category   t41
  * @package    t41_Core
- * @copyright  Copyright (c) 2006-2012 Quatrain Technologies SARL
+ * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SARL
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
 class Combo {
 	
-
 	protected $_collection;
 	
-	
 	protected $do;
-	
 	
 	/**
 	 * Conditions array
@@ -58,7 +53,6 @@ class Combo {
 	 * @var array
 	 */
 	protected $_conditions;
-	
 	
 	/**
 	 * Class constructor
@@ -112,28 +106,22 @@ class Combo {
 	 */
 	public function having($propertyName, $mode = Condition::MODE_AND)
 	{
-		if ($propertyName == ObjectUri::IDENTIFIER) {
-				
-			return $this->setCondition(new Property\IdentifierProperty(ObjectUri::IDENTIFIER, null, null, $mode));
-				
-		} else if (($property = $this->_do->getProperty($propertyName)) !== false) {
-	
+		if ($propertyName == ObjectUri::IDENTIFIER) {	
+			return $this->setCondition(new Property\IdentifierProperty(ObjectUri::IDENTIFIER, null, null, $mode));	
+		} elseif (($property = $this->_do->getProperty($propertyName)) !== false) {
 			return $this->setCondition($property, null, null, $mode);
-	
-		} else if (strstr($propertyName, '.') !== false) {
-				
+		} elseif (strstr($propertyName, '.') !== false) {		
 			// deal with recursive properties
 			$parts = explode('.', $propertyName);
 			$condition = $this->setCondition($this->_do->getProperty($parts[0]));
 	
 			foreach (array_slice($parts,1) as $property) {
-	
 				$condition = $condition->having($property);
 			}
 				
 			return $condition;
 		}
 	
-		throw new Backend\Exception(array("CONDITION_UNKNOWN_PROPERTY", $propertyName));
+		throw new Exception(["CONDITION_UNKNOWN_PROPERTY", $propertyName]);
 	}
 }

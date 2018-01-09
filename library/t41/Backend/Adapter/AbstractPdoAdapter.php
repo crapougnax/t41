@@ -954,11 +954,12 @@ abstract class AbstractPdoAdapter extends AbstractAdapter {
 	{
 		$this->_connect();
 		if ($this->_ressource->beginTransaction()) {
-			$this->_transaction = $key ? $key : true;
-			$this->_setLastQuery('begin transaction');
+			$this->_transaction = $key ?? true;
+			$this->_setLastQuery('starting transaction');
 			return true;
 		} else {
-			return false;
+		    $this->_setLastQuery('failed starting transaction');
+		    return false;
 		}
 	}
 	
