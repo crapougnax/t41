@@ -9,9 +9,6 @@
 				<parameter id="batch" typre="integer">
 					<defaultvalue>10</defaultvalue>
 				</parameter>
-				<parameter id="batch" type="integer">
-					<defaultvalue>0</defaultvalue>
-				</parameter>"
 				<parameter id="memberType" type="string">
 				<defaultvalue>model</defaultvalue>
 				<values>

@@ -2,6 +2,9 @@
 
 namespace t41;
 
+use t41\ObjectModel\ObjectUri;
+use t41\ObjectModel\DataObject;
+
 /**
  * t41 Toolkit
  *
@@ -29,42 +32,31 @@ namespace t41;
  * @copyright  Copyright (c) 2006-2017 Quatrain Technologies SAS
  * @license    http://www.t41.org/license/new-bsd     New BSD License
  */
-use t41\ObjectModel\ObjectUri,
-	t41\ObjectModel\DataObject;
-
-
 class ObjectModel {
-	
-	
+
 	const ID	= 'id';
-	
+
 	const URI	= 'uri';
-	
 	const MODEL = 'model';
-	
 	const DATA	= 'data';
-	
-	
+
 	/**
 	 * calculation flags
 	 * @var integer
 	 */
 	const CALC_SUM	= 'sum';
-	
+
 	const CALC_AVG	= 'avg';
-	
-	
+
 	/**
 	 * Array of objects definitions
-	 * 
 	 * @var array
 	 */
 	static protected $_config = array();
-	
 
 	/**
 	 * Load a configuration file (default value is objects.xml) and add or replace content
-	 * 
+	 *
 	 * @param string $file name of file to parse, file should be in application/configs folder
 	 * @param boolean $add wether to add to (true) or replace (false) existing configuration data
 	 * @return boolean true in case of success, false otherwise
@@ -72,23 +64,22 @@ class ObjectModel {
 	static public function loadConfig($file = 'objects.xml', $add = true)
 	{
 		$config = Config\Loader::loadConfig($file);
-		
+
 		if ($config === false) {
 			return false;
 		}
-		
+
 		if ($add === false) {
 			self::$_config = $config['objects'];
 		} else {
-	        self::$_config = array_merge(self::$_config, $config['objects']);
+	    self::$_config = array_merge(self::$_config, $config['objects']);
 		}
 		return true;
 	}
-	
-	
+
 	/**
 	 * Add or replace an object definition in the configuration
-	 * 
+	 *
 	 * @param $id id of object definition
 	 * @param $array	array of formatted data defining properties and parameters
 	 * @param $force	if set to true and a definition already exists for the given id, the new definition silently replaces the previous one 
@@ -100,17 +91,16 @@ class ObjectModel {
 		if (self::definitionExists($id) === true && $force !== true) {
 			return false;
 		}
-		
+
 		// @todo check array validity
 		self::$_config[$id] = $array;
-		
+
 		return true;
 	}
-	
-	
+
 	/**
 	 * Returns true if an object definition for the given id exists
-	 * 
+	 *
 	 * @param $id
 	 * @return boolean
 	 */
@@ -118,11 +108,10 @@ class ObjectModel {
 	{
 		return isset(self::$_config[$id]);
 	}
-	
-	
+
 	/**
 	 * Returns an instance of an object based on definition matching the given id
-	 * 
+	 *
 	 * @param string|ObjectModel\ObjectUri $param class id or object uri
 	 * @throws ObjectModel\Exception
 	 * @return ObjectModel\BaseObject
@@ -133,13 +122,12 @@ class ObjectModel {
 			$class = $param->getClass();
 			return new $class($param);
 		}
-		
+
 		$class = ($param instanceof ObjectModel\ObjectUri) ? $param->getClass() : $param;
-		
 		if (! array_key_exists($class, self::$_config)) {
-			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
+			throw new ObjectModel\Exception(['NO_CLASS_DECLARATION', $class]);
 		}
-		
+
 		try {
 			$obj = new $class($param instanceof ObjectModel\ObjectUri ? $param : null);
 		} catch (ObjectModel\Exception $e) {
@@ -147,10 +135,9 @@ class ObjectModel {
 		} catch (ObjectModel\DataObject\Exception $e) {
 			die($e->getMessage());
 		}
-		
+
 		return $obj;
 	}
-	
 
 	/**
 	 * Return the list of defined objects in config
@@ -158,31 +145,27 @@ class ObjectModel {
 	 */
 	static public function getList()
 	{
-		return array_keys(self::$_config);
+		return self::$_config;
 	}
-	
-	
+
 	static public function getObjectExtends($key)
 	{
 		return isset(self::$_config[$key]['extends']) ? self::$_config[$key]['extends'] : false;
 	}
-	
-	
+
 	static public function getObjectProperties($key)
 	{
 		return isset(self::$_config[$key]) ? self::$_config[$key]['properties'] : array();
 	}
-	
 
 	static public function getObjectDna($key)
 	{
 		return isset(self::$_config[$key]) && isset(self::$_config[$key]['dna']) ? self::$_config[$key]['dna'] : false;
 	}
-	
-	
+
 	/**
-	 * Returns the matching t41_Property_* object instance
-	 * 
+	 * Returns the matching t41\ObjectModel\Property\* object instance
+	 *
 	 * @param string $str value must be of form <class_id>.<property_id>
 	 * @return t41_Property_Abstract
 	 * @throws ObjectModel\Exception
@@ -190,28 +173,27 @@ class ObjectModel {
 	static public function getObjectProperty($str)
 	{
 		list($class, $property) = explode('.', $str);
-		
+
 		if (! $class || ! $property) {
 			throw new ObjectModel\Exception(array("INCORRECT_PROPERTY_DESCRIPTOR", $str));
 		}
-		
+
 		$props = self::getObjectProperties($class);
-		
+
 		if (isset($props[$property])) {
 			require_once 't41/Property.php';
 			return ObjectModel\Property::factory($property, $props[$property]['type'], $props[$property]);
-			
+
 		} else {
 			require_once 't41/Object/Exception.php';
 			throw new ObjectModel\Exception("NO_SUCH_PROPERTY");
 		}
 	}
-	
-	
+
 	/**
 	 * Tests if a definition exists for given $id
 	 * Returns a t41\Backend\Adapter\AbstractAdapter instance if object definition includes a default backend value
-	 * 
+	 *
 	 * @param string $id
 	 * @return t41\Backend\Adapter\AbstractAdapter
 	 * @throws ObjectModel\Exception
@@ -221,15 +203,14 @@ class ObjectModel {
 		if (! self::definitionExists($id)) {
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $id));
 		}
-		
+
 		if (isset(self::$_config[$id]['backend'])) {
 			return Backend::getInstance(Backend::PREFIX . self::$_config[$id]['backend']);
 		} else {
 			return Backend::getDefaultBackend();
 		}
 	}
-	
-	
+
 	/**
 	 * Return either rules configuration or rules objects for given class name
 	 * @param string $object
@@ -240,41 +221,39 @@ class ObjectModel {
 	static public function getRules($object, $raw = false)
 	{
 		$class = get_class($object);
-		
 		if (! self::definitionExists($class)) {
 			throw new ObjectModel\Exception(array('NO_CLASS_DECLARATION', $class));
 		}
-	
+
 		if (! isset(self::$_config[$class]['rules'])) {
 			return null;
 		}
-		
+
 		if ($raw !== false) {
 			return self::$_config[$class]['rules'];
 		}
-		
+
 		$rules = array();
-	
+
 		foreach (self::$_config[$class]['rules'] as $key => $val) {
 			$rule = ObjectModel\Rule::factory($val['type']);
 			$rule->setId($key);
 			$rule->setObject($object);
-	
-			if (isset($val['source'])) 			$rule->setSource($val['source']);
-			if (isset($val['destination']))		$rule->setDestination($val['destination']);
-				
+
+			if (isset($val['source'])) $rule->setSource($val['source']);
+			if (isset($val['destination'])) $rule->setDestination($val['destination']);
+
 			$trigger = $val['trigger'];
 			$ruleKey = $trigger['when'] . '/' . $trigger['event'];
 			if (isset($trigger['property']) && !empty($trigger['property'])) $ruleKey .= '/' . $trigger['property'];
-	
+
 			$rules[$ruleKey][$key] = $rule;
 		}
-	
+
 		ksort($rules);
 		return $rules;
 	}
-	
-	
+
 	/**
 	 * Objects collection factory
 	 * @param string $class
@@ -288,13 +267,10 @@ class ObjectModel {
 			$collection = new ObjectModel\Collection($do);
 			return $collection;
 		} catch (\Exception $e) {
-			
 			throw new Exception($e->getMessage());
 		}
 	}
-	
 
-	
 	/**
 	 * Compare two instances and returns true if they represent the same object
 	 * @param t41\ObjectModel\ObjectModelAbstract $obj1
@@ -305,20 +281,18 @@ class ObjectModel {
 	{
 		return (self::getObjectIdentifier($obj1) == self::getObjectIdentifier($obj2));
 	}
-	
-	
+
 	/**
 	 * Returns the object identifier
 	 * @param object $obj
 	 * @return string
 	 */
 	static public function getObjectIdentifier($obj)
-	{ 
+	{
 		if ($obj instanceof ObjectModel\BaseObject || $obj instanceof ObjectModel\DataObject) {
-
 			$obj = $obj->getUri();
 		}
-		
+
 		return ($obj instanceof ObjectUri) ? $obj->__toString() : microtime();
 	}
 }
